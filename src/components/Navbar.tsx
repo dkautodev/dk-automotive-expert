@@ -9,8 +9,9 @@ const Navbar = () => {
     <div className="w-full">
       <div className="bg-dk-navy text-white py-2 px-4">
         <div className="container mx-auto flex justify-between items-center">
-          <p className="text-sm">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
-          <div className="flex gap-4">
+          <div className="flex-1"></div>
+          <p className="text-sm text-center flex-1">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
+          <div className="flex gap-4 flex-1 justify-end">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-dk-blue transition-colors">
               <Facebook size={20} />
             </a>
