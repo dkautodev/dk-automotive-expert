@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,23 +14,18 @@ import { fr } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useQuoteManagement } from "@/hooks/useQuoteManagement";
+import { useQuery } from "@tanstack/react-query";
 
 const PendingQuotes = () => {
-  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const { fetchQuotes } = useQuoteManagement();
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Récupérer les devis depuis le localStorage
-    const savedQuotes = localStorage.getItem('pendingQuotes');
-    if (savedQuotes) {
-      const parsedQuotes = JSON.parse(savedQuotes).map((quote: Quote) => ({
-        ...quote,
-        dateCreated: new Date(quote.dateCreated)
-      }));
-      setQuotes(parsedQuotes);
-    }
-  }, []);
+  const { data: quotes = [], isLoading, error } = useQuery({
+    queryKey: ['pendingQuotes'],
+    queryFn: fetchQuotes
+  });
 
   const handleViewQuoteDetails = (quote: Quote) => {
     navigate("/dashboard/client/quote-total", { 
@@ -43,6 +37,14 @@ const PendingQuotes = () => {
       }
     });
   };
+
+  if (isLoading) {
+    return <div className="p-6 text-center">Chargement des devis...</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Une erreur est survenue lors du chargement des devis.</div>;
+  }
 
   if (quotes.length === 0) {
     return (

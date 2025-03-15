@@ -12,6 +12,7 @@ import { DatesTimesSection } from "@/components/quote/DatesTimesSection";
 import { useFileManagement } from "@/hooks/useFileManagement";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { useVehicleManagement } from "@/hooks/useVehicleManagement";
+import { useQuoteManagement } from "@/hooks/useQuoteManagement";
 
 const QuoteTotal = () => {
   const location = useLocation();
@@ -27,6 +28,7 @@ const QuoteTotal = () => {
     setOrderDetails,
     setShowAddVehicleDialog
   );
+  const { saveQuote } = useQuoteManagement();
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -86,7 +88,7 @@ const QuoteTotal = () => {
     }
   };
 
-  const handleSubmitQuote = () => {
+  const handleSubmitQuote = async () => {
     if (!orderDetails) return;
 
     const newQuote: Quote = {
@@ -99,16 +101,22 @@ const QuoteTotal = () => {
       status: 'pending'
     };
 
-    const existingQuotes = JSON.parse(localStorage.getItem('pendingQuotes') || '[]');
-    
-    localStorage.setItem('pendingQuotes', JSON.stringify([...existingQuotes, newQuote]));
-
-    toast({
-      title: "Devis envoyé",
-      description: "Votre devis a été envoyé avec succès et est en attente de validation.",
-    });
-    
-    navigate("/dashboard/client/pending-quotes");
+    try {
+      await saveQuote(newQuote);
+      
+      toast({
+        title: "Devis envoyé",
+        description: "Votre devis a été envoyé avec succès et est en attente de validation.",
+      });
+      
+      navigate("/dashboard/client/pending-quotes");
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi du devis.",
+        variant: "destructive"
+      });
+    }
   };
 
   const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
