@@ -124,7 +124,7 @@ const Index = () => {
                 </ul>
               </div>
               <div className="order-1 md:order-2">
-                <img src="/lovable-uploads/ba332028-1fb2-4ad1-a825-6305a46a5096.png" alt="Voiture dans un garage" className="rounded-lg w-full" />
+                <img alt="Voiture dans un garage" className="rounded-lg w-full" src="/lovable-uploads/38340b13-78ba-4ae6-ba15-9851924dcf27.jpg" />
               </div>
             </div>
           </div>
