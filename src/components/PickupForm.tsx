@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -55,6 +55,29 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
     resolver: zodResolver(pickupFormSchema),
   });
 
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: ['places'] as any,
+  });
+
+  const addressInputRef = useRef<HTMLInputElement | null>(null);
+
+  const initAutocomplete = (input: HTMLInputElement) => {
+    if (!isLoaded || !input) return;
+
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: 'fr' },
+      fields: ['address_components', 'geometry', 'formatted_address'],
+    });
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place.formatted_address) {
+        form.setValue('address', place.formatted_address);
+      }
+    });
+  };
+
   const onSubmit = async (data: PickupFormValues) => {
     console.log('Pickup details:', data);
     try {
@@ -71,10 +94,6 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
       });
     }
   };
-
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-  });
 
   if (isSubmitted) {
     return (
@@ -161,7 +180,15 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
                   ADRESSE <span className="text-blue-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Adresse complète" {...field} className="bg-[#EEF1FF]" />
+                  <Input
+                    placeholder="Commencez à taper une adresse..."
+                    {...field}
+                    className="bg-[#EEF1FF]"
+                    ref={(e) => {
+                      addressInputRef.current = e;
+                      if (e) initAutocomplete(e);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
