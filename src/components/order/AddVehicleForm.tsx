@@ -37,6 +37,21 @@ export const AddVehicleForm = ({ onSubmit, onCancel }: AddVehicleFormProps) => {
     onSubmit(vehicle);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const validFiles = Array.from(e.target.files).filter(file => 
+        file.type === 'application/pdf' || file.type.startsWith('image/')
+      );
+      
+      if (validFiles.length !== e.target.files.length) {
+        alert("Seuls les fichiers PDF et images sont acceptés.");
+        return;
+      }
+      
+      setVehicle({ ...vehicle, files: validFiles });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -77,6 +92,49 @@ export const AddVehicleForm = ({ onSubmit, onCancel }: AddVehicleFormProps) => {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="fuel">Carburant *</Label>
+        <Select
+          value={vehicle.fuel}
+          onValueChange={(value) => setVehicle({ ...vehicle, fuel: value })}
+          required
+        >
+          <SelectTrigger id="fuel">
+            <SelectValue placeholder="Sélectionnez le carburant" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="essence">Essence</SelectItem>
+            <SelectItem value="diesel">Diesel</SelectItem>
+            <SelectItem value="hybride">Hybride</SelectItem>
+            <SelectItem value="electrique">Électrique</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="licensePlate">Immatriculation *</Label>
+        <Input
+          id="licensePlate"
+          value={vehicle.licensePlate}
+          onChange={(e) => setVehicle({ ...vehicle, licensePlate: e.target.value })}
+          placeholder="AA-123-BB"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="files">Documents (facultatif)</Label>
+        <Input
+          id="files"
+          type="file"
+          onChange={handleFileChange}
+          accept=".pdf,image/*"
+          multiple
+          className="cursor-pointer"
+        />
+        <p className="text-sm text-gray-500">Formats acceptés : PDF, images</p>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
