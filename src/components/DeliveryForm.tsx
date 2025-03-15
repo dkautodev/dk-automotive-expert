@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,6 +22,7 @@ interface DeliveryFormProps {
     deliveryAddress: string;
     vehicles: any[];
     priceHT: number;
+    distance?: string | number;
   };
 }
 
@@ -48,7 +48,7 @@ const DeliveryForm = ({ onPrevious, vehicleData }: DeliveryFormProps) => {
         vehicles: vehicleData.vehicles,
         totalPriceHT: vehicleData.priceHT,
         totalPriceTTC: vehicleData.priceHT * 1.2,
-        distance: typeof vehicleData.distance === 'string' ? parseFloat(vehicleData.distance) : 0,
+        distance: vehicleData.distance ? (typeof vehicleData.distance === 'string' ? parseFloat(vehicleData.distance) : vehicleData.distance) : 0,
         status: 'pending',
         dateCreated: new Date()
       };
