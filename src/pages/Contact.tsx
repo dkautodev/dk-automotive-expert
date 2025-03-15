@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -5,11 +6,49 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { toast } from "sonner";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  fullName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  companyName: z.string().min(2, "Le nom de la société doit contenir au moins 2 caractères"),
+  email: z.string().email("Adresse email invalide"),
+  phone: z.string().regex(/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/, "Numéro de téléphone invalide"),
+  subject: z.string().min(3, "Le sujet doit contenir au moins 3 caractères"),
+  message: z.string().min(10, "Le message doit contenir au moins 10 caractères"),
+});
 
 const Contact = () => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Form submission logic will be implemented later
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      fullName: "",
+      companyName: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Créer le lien mailto avec tous les champs
+    const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=${encodeURIComponent(values.subject)}&body=${encodeURIComponent(
+      `Nom: ${values.fullName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nMessage:\n${values.message}`
+    )}`;
+    
+    window.location.href = mailtoLink;
+    toast.success("Formulaire validé avec succès!");
   };
 
   return (
@@ -43,7 +82,7 @@ const Contact = () => {
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
                 <Mail className="w-8 h-8 mx-auto mb-4 text-dk-navy" />
                 <h3 className="text-xl font-semibold mb-2">Email</h3>
-                <p className="text-gray-600">contact@dk-automotive.fr</p>
+                <p className="text-gray-600">dkautomotive70@gmail.com</p>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
@@ -59,44 +98,117 @@ const Contact = () => {
                 Envoyez-nous un message
               </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Nom complet
-                    </label>
-                    <Input id="name" placeholder="Votre nom" className="w-full" />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
-                    </label>
-                    <Input id="email" type="email" placeholder="votre@email.com" className="w-full" />
-                  </div>
-                </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Nom complet <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Votre nom" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Sujet
-                  </label>
-                  <Input id="subject" placeholder="Sujet de votre message" className="w-full" />
-                </div>
+                    <FormField
+                      control={form.control}
+                      name="companyName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Nom de la société <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nom de votre société" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Message
-                  </label>
-                  <Textarea 
-                    id="message" 
-                    placeholder="Votre message..." 
-                    className="w-full min-h-[150px]"
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Email <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="votre@email.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Téléphone <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="06 12 34 56 78" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Sujet <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Sujet de votre message" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors">
-                  Envoyer le message
-                </Button>
-              </form>
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Message <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Votre message..." 
+                            className="min-h-[150px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors">
+                    Envoyer le message
+                  </Button>
+                </form>
+              </Form>
             </div>
           </div>
         </section>
