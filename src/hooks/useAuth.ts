@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
@@ -68,37 +69,42 @@ export const useAuth = () => {
     company?: string;
     role: UserRole;
   }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          phone: userData.phone,
-          company: userData.company
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            phone: userData.phone,
+            company: userData.company
+          }
         }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Attendre que le trigger handle_new_user s'exécute
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Insérer le rôle utilisateur
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: data.user.id,
+            role: userData.role
+          });
+
+        if (roleError) throw roleError;
       }
-    });
 
-    if (error) throw error;
-
-    if (data.user) {
-      // Attendre que le trigger handle_new_user s'exécute
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Insérer le rôle utilisateur
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: data.user.id,
-          role: userData.role
-        });
-
-      if (roleError) throw roleError;
+      return { data, error: null };
+    } catch (error) {
+      console.error("Error in signUp:", error);
+      return { data: null, error };
     }
-
-    return { data, error: null };
   };
 
   const signIn = async (email: string, password: string) => {
