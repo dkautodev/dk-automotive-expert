@@ -17,8 +17,13 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          logo_url: string | null
           phone: string | null
+          siret: string | null
+          siret_locked: boolean | null
           updated_at: string
+          vat_number: string | null
+          vat_number_locked: boolean | null
         }
         Insert: {
           company?: string | null
@@ -27,8 +32,13 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          logo_url?: string | null
           phone?: string | null
+          siret?: string | null
+          siret_locked?: boolean | null
           updated_at?: string
+          vat_number?: string | null
+          vat_number_locked?: boolean | null
         }
         Update: {
           company?: string | null
@@ -37,8 +47,13 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          logo_url?: string | null
           phone?: string | null
+          siret?: string | null
+          siret_locked?: boolean | null
           updated_at?: string
+          vat_number?: string | null
+          vat_number_locked?: boolean | null
         }
         Relationships: []
       }
