@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -42,7 +41,7 @@ const About = () => {
                   POURQUOI CHOISIR DK AUTOMOTIVE POUR VOS BESOINS EN CONVOYAGE AUTOMOBILE ?
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  En faisant appel à DK AUTOMOTIVE, vous bénéficiez également de la conformité de toutes les régulations européennes en matière de convoyage automobile, garantissant un transport sécurisé de votre véhicule. Pour en savoir plus sur les régulations et les bonnes pratiques en matière de transport de véhicules en Europe, consultez l'article publié par la Commission européenne <a href="#" className="text-[#18257D] underline">lien</a>.
+                  En faisant appel à DK AUTOMOTIVE, vous bénéficiez également de la conformité de toutes les régulations européennes en matière de convoyage automobile, garantissant un transport sécurisé de votre véhicule. Pour en savoir plus sur les régulations et les bonnes pratiques en matière de transport de véhicules en Europe, consultez l'article publié par la Commission européenne <a href="https://transport.ec.europa.eu/index_en" target="_blank" rel="noopener noreferrer" className="text-[#18257D] underline">lien</a>.
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
