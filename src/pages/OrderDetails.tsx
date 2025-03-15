@@ -87,6 +87,7 @@ const OrderDetails = () => {
   const deleteVehicle = (indexToDelete: number) => {
     setVehicleCount(prev => prev - 1);
     setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
+    setVehicles(prev => prev.filter((_, i) => i !== indexToDelete));
   };
 
   const handleContactsUpdate = (pickup: ContactInfo, delivery: ContactInfo) => {
