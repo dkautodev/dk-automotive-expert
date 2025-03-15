@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { OrderState } from "@/types/order";
+import { OrderState, Quote } from "@/types/order";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { DatesTimesSection } from "./DatesTimesSection";
@@ -71,7 +70,7 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
     if (!orderDetails) return;
 
     const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
-    const quoteData = {
+    const quoteData: Quote = {
       id: crypto.randomUUID(),
       quote_number: '',
       pickupAddress: orderDetails.pickupAddress,
@@ -80,10 +79,12 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
       totalPriceHT: Number(totalPriceHT.toFixed(2)),
       totalPriceTTC: Number((totalPriceHT * 1.2).toFixed(2)),
       distance: typeof orderDetails.distance === 'string' ? parseFloat(orderDetails.distance) : orderDetails.distance,
-      status: 'pending',
+      status: 'pending' as const,
       dateCreated: new Date(),
       pickupDate: orderDetails.pickupDate,
-      deliveryDate: orderDetails.deliveryDate
+      deliveryDate: orderDetails.deliveryDate,
+      pickupTime: undefined,
+      deliveryTime: undefined
     };
 
     try {
