@@ -76,7 +76,7 @@ export const useAuth = () => {
           first_name: userData.first_name,
           last_name: userData.last_name,
           phone: userData.phone,
-          company: userData.company,
+          company: userData.company
         }
       }
     });
@@ -92,7 +92,7 @@ export const useAuth = () => {
         .from('user_roles')
         .insert({
           user_id: data.user.id,
-          role: userData.role,
+          role: userData.role
         });
 
       if (roleError) throw roleError;
