@@ -1,4 +1,3 @@
-
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
@@ -15,9 +14,8 @@ export const useQuoteManagement = () => {
       files: [] // Files are handled separately
     }));
 
-    // Convert Date to ISO string for Supabase
+    // Ensure we have a proper UUID format
     const quoteData = {
-      id: quote.id,
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
       vehicles: vehiclesJson,
