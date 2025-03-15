@@ -1,17 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Plus, Car, Settings } from 'lucide-react';
-
 const ClientSidebar = () => {
-  return (
-    <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0">
+  return <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0">
       <div className="p-4">
-        <img 
-          src="/dk-automotive-logo.png" 
-          alt="DK Automotive" 
-          className="w-full h-auto mb-2"
-        />
-        <p className="text-center text-sm text-gray-600">Convoyage | Livraisons | Restitutions</p>
+        <img alt="DK Automotive" className="w-full h-auto mb-2" src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" />
+        
       </div>
       
       <nav className="mt-6">
@@ -42,8 +36,6 @@ const ClientSidebar = () => {
           </li>
         </ul>
       </nav>
-    </div>
-  );
+    </div>;
 };
-
 export default ClientSidebar;
