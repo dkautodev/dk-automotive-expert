@@ -12,7 +12,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-1 text-center md:text-left">
-            <h2 className="text-2xl font-bold mb-4">DK AUTOMOTIVE</h2>
+            <img 
+              src="/lovable-uploads/0569d88f-5ec1-4822-8cae-a5f0ba017d54.png" 
+              alt="DK AUTOMOTIVE"
+              className="h-20 mb-4 mx-auto md:mx-0"
+            />
             <p className="text-sm text-white/80 leading-relaxed">
               Notre entreprise spécialisée dans le convoyage de véhicules propose un service sur mesure, écologique et économique pour les particuliers et les professionnels.
             </p>
