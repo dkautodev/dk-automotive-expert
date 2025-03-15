@@ -62,9 +62,20 @@ const SignUpForm = () => {
       
       navigate('/dashboard/client');
     } catch (error: any) {
+      let errorMessage = "Une erreur est survenue lors de l'inscription.";
+      
+      // Handle specific error cases
+      if (error.message.includes("over_email_send_rate_limit")) {
+        errorMessage = "Veuillez attendre quelques secondes avant de réessayer.";
+      } else if (error.message.includes("User already registered")) {
+        errorMessage = "Cette adresse email est déjà utilisée.";
+      } else if (error.message.includes("Email address is invalid")) {
+        errorMessage = "L'adresse email n'est pas valide.";
+      }
+
       toast({
         title: "Erreur",
-        description: error.message || "Une erreur est survenue lors de l'inscription.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
