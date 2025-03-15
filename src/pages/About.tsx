@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
+
 const About = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -167,6 +168,9 @@ const About = () => {
             <h2 className="text-4xl font-bold mb-4">FAITES LE CHOIX DE L'EXPERTISE</h2>
             <h3 className="text-4xl font-bold text-[#18257D] mb-4">DK AUTOMOTIVE</h3>
             <p className="text-lg text-gray-700 mb-8">UN PARTENAIRE FIABLE POUR VOS BESOINS EN CONVOYAGE</p>
+            <p className="text-lg text-gray-700 mb-8">
+              Rejoignez dès aujourd'hui notre réseau de clients satisfaits et découvrez la différence que DK AUTOMOTIVE peut apporter à votre expérience de convoyage de véhicules. En tant que professionnels de l'automobile, nous sommes impatients de travailler avec vous et de vous fournir les solutions de convoyage les plus adaptées à vos besoins.
+            </p>
             <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 text-lg font-semibold hover:bg-[#18257D]/90 transition-colors">
               DEMANDEZ VOTRE DEVIS
             </Link>
@@ -176,4 +180,5 @@ const About = () => {
       <Footer />
     </div>;
 };
+
 export default About;
