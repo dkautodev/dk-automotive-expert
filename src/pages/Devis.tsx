@@ -3,10 +3,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
 const Devis = () => {
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       <Navbar />
       <main className="animate-fadeIn">
         <div className="container mx-auto px-4 py-16">
@@ -19,12 +17,7 @@ const Devis = () => {
             </div>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Formulaire de demande de devis</CardTitle>
-                <CardDescription>
-                  Nous vous répondrons dans les plus brefs délais
-                </CardDescription>
-              </CardHeader>
+              
               <CardContent>
                 <div className="space-y-4">
                   {/* Le formulaire sera implémenté dans la prochaine étape */}
@@ -43,8 +36,6 @@ const Devis = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Devis;
