@@ -5,17 +5,15 @@ import { QuoteRow } from "@/types/database";
 
 export const useQuoteManagement = () => {
   const saveQuote = async (quote: Quote) => {
-    // Convert vehicles to a JSON-compatible format
     const vehiclesJson = quote.vehicles.map(vehicle => ({
       brand: vehicle.brand,
       model: vehicle.model,
       year: vehicle.year,
       fuel: vehicle.fuel,
       licensePlate: vehicle.licensePlate,
-      files: [] // Files are handled separately
+      files: []
     }));
 
-    // Format dates as ISO strings for Supabase
     const quoteData = {
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
@@ -23,7 +21,9 @@ export const useQuoteManagement = () => {
       total_price_ht: quote.totalPriceHT,
       status: quote.status,
       date_created: quote.dateCreated.toISOString(),
-      delivery_date: quote.deliveryDate?.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      pickup_date: quote.pickupDate?.toISOString().split('T')[0],
+      pickup_time: quote.pickupTime,
+      delivery_date: quote.deliveryDate?.toISOString().split('T')[0],
       delivery_time: quote.deliveryTime
     };
 
@@ -56,6 +56,8 @@ export const useQuoteManagement = () => {
       totalPriceHT: quote.total_price_ht,
       status: quote.status,
       dateCreated: new Date(quote.date_created),
+      pickupDate: quote.pickup_date ? new Date(quote.pickup_date) : undefined,
+      pickupTime: quote.pickup_time,
       deliveryDate: quote.delivery_date ? new Date(quote.delivery_date) : undefined,
       deliveryTime: quote.delivery_time
     }));
@@ -82,6 +84,8 @@ export const useQuoteManagement = () => {
       totalPriceHT: data.total_price_ht,
       status: data.status,
       dateCreated: new Date(data.date_created),
+      pickupDate: data.pickup_date ? new Date(data.pickup_date) : undefined,
+      pickupTime: data.pickup_time,
       deliveryDate: data.delivery_date ? new Date(data.delivery_date) : undefined,
       deliveryTime: data.delivery_time
     };
