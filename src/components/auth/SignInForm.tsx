@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +21,7 @@ type FormData = z.infer<typeof formSchema>;
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, role } = useAuthContext();
+  const { signIn } = useAuthContext();
   const navigate = useNavigate();
 
   const form = useForm<FormData>({
@@ -38,21 +37,11 @@ const SignInForm = () => {
       setIsLoading(true);
       await signIn(data.email, data.password);
       
-      // Redirect based on user role
-      switch (role) {
-        case 'client':
-          navigate('/dashboard/client');
-          break;
-        case 'driver':
-          navigate('/dashboard/driver');
-          break;
-        case 'admin':
-          navigate('/dashboard/admin');
-          break;
-        default:
-          // If no role is set yet, we'll show an error
-          toast.error("Erreur d'authentification: Rôle non défini");
-      }
+      // After successful login, redirect to client dashboard by default
+      // The role-based redirect will happen in the layout component
+      navigate('/dashboard/client');
+      toast.success("Connexion réussie");
+      
     } catch (error: any) {
       toast.error(error.message || "Une erreur est survenue lors de la connexion");
     } finally {
