@@ -22,7 +22,7 @@ const FAQ = () => {
                 <br />
                 <span className="text-[#1a237e]">DK AUTOMOTIVE</span>
               </h1>
-              <p className="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto">
+              <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto whitespace-nowrap">
                 Trouvez toutes les réponses à vos interrogations sur notre service de convoyage de véhicules
               </p>
             </div>
