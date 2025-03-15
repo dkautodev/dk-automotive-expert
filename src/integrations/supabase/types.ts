@@ -54,6 +54,7 @@ export type Database = {
           status: string
           total_price_ht: number
           total_price_ttc: number | null
+          user_id: string | null
           vehicles: Json
         }
         Insert: {
@@ -70,6 +71,7 @@ export type Database = {
           status?: string
           total_price_ht: number
           total_price_ttc?: number | null
+          user_id?: string | null
           vehicles: Json
         }
         Update: {
@@ -86,6 +88,7 @@ export type Database = {
           status?: string
           total_price_ht?: number
           total_price_ttc?: number | null
+          user_id?: string | null
           vehicles?: Json
         }
         Relationships: []
