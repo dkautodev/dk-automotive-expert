@@ -1,4 +1,6 @@
 
+import { Database } from "@/integrations/supabase/types";
+
 export type QuoteRow = {
   id: string;
   pickup_address: string;
