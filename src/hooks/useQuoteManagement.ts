@@ -1,3 +1,4 @@
+
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
@@ -14,7 +15,7 @@ export const useQuoteManagement = () => {
       files: [] // Files are handled separately
     }));
 
-    // Ensure we have a proper UUID format
+    // Format dates as ISO strings for Supabase
     const quoteData = {
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
@@ -22,7 +23,7 @@ export const useQuoteManagement = () => {
       total_price_ht: quote.totalPriceHT,
       status: quote.status,
       date_created: quote.dateCreated.toISOString(),
-      delivery_date: quote.deliveryDate,
+      delivery_date: quote.deliveryDate?.toISOString().split('T')[0], // Format as YYYY-MM-DD
       delivery_time: quote.deliveryTime
     };
 
