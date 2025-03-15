@@ -157,7 +157,7 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
             control={form.control}
             name="pickupDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem>
                 <FormLabel className="text-dk-navy font-semibold">
                   DATE D'ENLÈVEMENT <span className="text-blue-500">*</span>
                 </FormLabel>
