@@ -34,9 +34,9 @@ const FAQ = () => {
                   <AccordionItem 
                     key={`item-${index + 1}`} 
                     value={`item-${index + 1}`} 
-                    className={`${index === 1 ? 'bg-[#64B5F6]' : 'bg-[#1a237e]'} rounded-none shadow-sm`}
+                    className={`${index === 1 ? 'bg-[#1a237e]' : 'bg-[#1a237e]'} rounded-none shadow-sm`}
                   >
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline text-xl font-medium text-white">
+                    <AccordionTrigger className="px-6 py-4 hover:no-underline text-base font-medium text-white">
                       {item.question}
                     </AccordionTrigger>
                     <AccordionContent className="px-6 pb-6 text-white text-lg">
@@ -58,47 +58,47 @@ const FAQ = () => {
 const faqItems = [
   {
     question: "QU'EST-CE QUE LE CONVOYAGE DE VÉHICULES ?",
-    answer: "Le convoyage de véhicules est un service professionnel qui consiste à transporter un véhicule d'un point A à un point B avec un chauffeur qualifié qui conduit directement votre véhicule jusqu'à sa destination."
+    answer: "Le convoyage de véhicules consiste à déplacer un véhicule d'un point A à un point B, que ce soit pour de longues ou courtes distances. Cela peut inclure la livraison de véhicules neufs, le rapatriement de voitures d'occasion, ou le transfert de véhicules entre différentes agences ou sites."
   },
   {
     question: "COMMENT ÇA MARCHE ?",
-    answer: "Après avoir effectué votre demande, nous organisons la prise en charge de votre véhicule. Un chauffeur professionnel vient récupérer votre véhicule à l'adresse indiquée, effectue un état des lieux détaillé, puis conduit votre véhicule jusqu'à sa destination finale."
+    answer: "Vous pouvez faire une demande de prise en charge notre formulaire en ligne dans la rubrique « Obtenir mon devis », ou en nous envoyant un email avec les détails de votre demande. Nous vous fournirons un devis et organiserons le transport selon vos besoins."
   },
   {
     question: "LE CONVOYAGE EST-IL SÉCURISÉ POUR MON VÉHICULE ?",
-    answer: "Oui, votre véhicule est totalement assuré pendant le transport. Nous effectuons un état des lieux complet avant et après le convoyage, et nos chauffeurs sont des professionnels expérimentés et assurés."
+    answer: "Oui, nous prenons toutes les mesures nécessaires pour assurer la sécurité de votre véhicule pendant le transport. Nos convoyeurs professionnels veillent à ce que votre voiture arrive en bon état. En outre, nous offrons des options d'assurance pour plus de tranquillité d'esprit."
   },
   {
     question: "QUELS DOCUMENTS SONT NÉCESSAIRES POUR LE CONVOYAGE ?",
-    answer: "Les documents requis sont : la carte grise du véhicule, l'attestation d'assurance en cours de validité, et une autorisation de prise en charge que nous vous fournissons. Une pièce d'identité du propriétaire peut également être demandée."
+    answer: "Vous aurez besoin de fournir des documents tels que la carte grise du véhicule, l'assurance, et éventuellement procès verbaux de livraison et/restitution. Nous vous indiquerons les documents exacts nécessaires lors de la réservation."
   },
   {
     question: "QUE CONTIENT LE PRIX DE LA PRESTATION ?",
-    answer: "Le prix comprend la prise en charge du véhicule, le convoyage par un chauffeur professionnel, les frais de route (carburant, péages), l'assurance durant le transport, et la livraison à l'adresse indiquée."
+    answer: "Le coût du convoyage dépend de plusieurs facteurs, tels que la distance, le type de véhicule, et le niveau de service choisi. Nous vous fournirons un devis détaillé avant le début du service."
   },
   {
     question: "QUE FAIRE SI MON VÉHICULE ARRIVE ENDOMMAGÉ ?",
-    answer: "En cas de dommage constaté à l'arrivée, il sera noté sur l'état des lieux final. Notre assurance professionnelle prendra en charge les réparations nécessaires selon les conditions définies dans notre contrat."
+    answer: "Nous prenons des mesures pour éviter tout dommage. Si vous constatez des anomalies à la livraison de votre véhicule, veuillez nous en informer immédiatement. Nous avons une procédure en place pour traiter les réclamations et nous nous engageons à résoudre tout problème rapidement."
   },
   {
-    question: "POURQUOI CHOISIR UN CONVOYAGE DE VÉHICULE PAR ROUTE AVEC UN CHAUFFEUR PROFESSIONNEL ET QUELS SONT LES DÉLAIS DE LIVRAISON ?",
-    answer: "Le convoyage par route avec un chauffeur professionnel offre flexibilité, sécurité et rapidité. Les délais de livraison varient selon la distance mais sont généralement de 24 à 72 heures pour la France métropolitaine."
+    question: "POURQUOI CHOISIR UN CONVOYAGE DE VÉHICULE PAR LA ROUTE AVEC UN CHAUFFEUR PROFESSIONNEL ?",
+    answer: "Le convoyage auto est une solution avantageuse qui permet de disposer de votre véhicule lors de votre arrivée. Vous n'êtes pas obligé de vous préoccuper du voyage de votre véhicule entre le lieu de départ et la destination finale. De plus, cette solution de transport permet de réduire considérablement les délais de livraison. Dès lors que votre prise en charge confirmée par nos services, DK AUTOMOTIVE s'engage à livrer votre véhicule dans un délai de 24 à 48 heures maximum, quel que soit le lieu d'enlèvement et de livraison."
   },
   {
     question: "QUELS SONT LES TYPES DE VÉHICULES QUE VOUS POUVEZ TRANSPORTER ?",
-    answer: "Nous transportons tous types de véhicules : voitures particulières, utilitaires, camping-cars, motos, véhicules de collection, et véhicules professionnels."
+    answer: "Il vous suffit de nous indiquer les adresses d'enlèvement et de livraison, la date souhaitée pour le transport et le type de véhicule à convoyer. Nous vous soumettons ensuite un devis personnalisé comprenant le transfert du véhicule entre les deux adresses, ainsi que les frais de route (péages, carburant, etc.) et les éventuels frais annexes (mise en main du véhicule, nettoyage intérieur, etc.). Le devis est gratuit et sans engagement."
   },
   {
     question: "LE VÉHICULE DOIT-IL ÊTRE EN PARFAIT ÉTAT DE FONCTIONNEMENT POUR LE CONVOYAGE ?",
-    answer: "Le véhicule doit être en état de rouler de manière sécurisée. Un minimum de carburant est nécessaire, et les documents du véhicule doivent être à jour."
+    answer: "Bien que nous puissions transporter des véhicules en bon état de marche, nous recommandons que le véhicule soit en état de fonctionnement pour éviter tout problème pendant le transport. Si des réparations sont nécessaires avant le convoyage, veuillez nous en informer."
   },
   {
     question: "COMMENT SONT FORMÉS VOS CHAUFFEURS ?",
-    answer: "Nos chauffeurs sont des professionnels expérimentés, formés spécifiquement au convoyage de véhicules. Ils possèdent tous les permis nécessaires et suivent des formations régulières."
+    answer: "Tous nos chauffeurs sont formés aux différentes procédures indispensables pour assurer un convoyage sûr et respectueux de l'environnement. Ils suivent une formation rigoureuse à l'éco-conduite, à la connaissance technique des différents véhicules et à la réalisation de mises en main de véhicules. Nous accordons une importance primordiale à la formation continue de nos chauffeurs pour garantir un service de qualité à nos clients."
   },
   {
-    question: "QUE SE PASSE-T-IL SI JE DOIS ANNULER OU MODIFIER MA RÉSERVATION ?",
-    answer: "En cas d'annulation ou de modification, contactez-nous au plus tôt. Les conditions peuvent varier selon le délai de préavis. Notre équipe fera son possible pour s'adapter à vos besoins."
+    question: "QUE SE PASSE-T-IL SI JE DOIS MODIFIER OU ANNULER MA COMMANDE ?",
+    answer: "Vous pouvez modifier votre réservation en nous contactant directement. Vous pouvez annuler votre commande sans pénalités financières si l'annulation intervient jusqu'à 48h avant la date de début de disponibilité du véhicule. Si vous annulez une commande moins de 48h avant la prise en charge du véhicule, nous facturerons 50% du montant de la commande."
   }
 ];
 
