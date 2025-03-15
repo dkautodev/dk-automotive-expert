@@ -62,9 +62,10 @@ const Contact = () => {
                 <br />
                 <span className="text-dk-navy">VOS DEMANDES</span>
               </h1>
-              <p className="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto">
+              <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto whitespace-nowrap">
                 Besoin d'un devis personnalisé ? Des questions sur nos prestations de convoyage de véhicules ?
-                <br />
+              </p>
+              <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto whitespace-nowrap mt-2">
                 Contactez-nous dès maintenant pour obtenir toutes les informations dont vous avez besoin.
               </p>
             </div>
@@ -196,4 +197,3 @@ const Contact = () => {
 };
 
 export default Contact;
-
