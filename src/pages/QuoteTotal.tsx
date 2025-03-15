@@ -94,13 +94,12 @@ const QuoteTotal = () => {
     if (!orderDetails) return;
 
     const newQuote: Quote = {
-      id: Math.random().toString(36).substring(7),
-      dateCreated: new Date(),
       pickupAddress: orderDetails.pickupAddress,
       deliveryAddress: orderDetails.deliveryAddress,
       vehicles: orderDetails.vehicles,
       totalPriceHT: totalPriceHT,
-      status: 'pending'
+      status: 'pending' as const,
+      dateCreated: new Date()
     };
 
     try {
