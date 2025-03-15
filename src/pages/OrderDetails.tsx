@@ -84,8 +84,8 @@ const OrderDetails = () => {
 
   const canRequestQuote = vehicleCount > 0 && 
     vehicleFormsValidity.some(validity => validity) && 
-    pickupDate && 
-    deliveryDate;
+    pickupDate instanceof Date && 
+    deliveryDate instanceof Date;
 
   return <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
