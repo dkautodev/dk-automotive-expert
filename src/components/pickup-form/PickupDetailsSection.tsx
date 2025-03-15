@@ -43,7 +43,9 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
                 {...field}
                 className="bg-[#EEF1FF]"
                 ref={(e) => {
-                  addressInputRef.current = e;
+                  if (e) {
+                    addressInputRef.current = e;
+                  }
                 }}
               />
             </FormControl>
@@ -145,4 +147,3 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
 };
 
 export default PickupDetailsSection;
-
