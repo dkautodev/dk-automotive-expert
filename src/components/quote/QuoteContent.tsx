@@ -83,8 +83,8 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
       dateCreated: new Date(),
       pickupDate: orderDetails.pickupDate,
       deliveryDate: orderDetails.deliveryDate,
-      pickupTime: undefined,
-      deliveryTime: undefined
+      pickupTime: pickupTime,
+      deliveryTime: deliveryTime
     };
 
     try {
