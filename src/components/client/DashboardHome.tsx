@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
 import {
@@ -7,6 +6,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
+import OrderForm from "./OrderForm";
 
 const DashboardHome = () => {
   const handleLogout = () => {
@@ -64,6 +64,8 @@ const DashboardHome = () => {
           </CardContent>
         </Card>
       </div>
+
+      <OrderForm />
     </div>
   );
 };
