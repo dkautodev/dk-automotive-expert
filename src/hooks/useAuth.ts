@@ -84,7 +84,10 @@ export const useAuth = () => {
     if (error) throw error;
 
     if (data.user) {
-      // Insert user role
+      // Attendre que le trigger handle_new_user s'exécute
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Insérer le rôle utilisateur
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
@@ -93,17 +96,6 @@ export const useAuth = () => {
         });
 
       if (roleError) throw roleError;
-
-      // Update profile with company and phone
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          company: userData.company,
-          phone: userData.phone,
-        })
-        .eq('id', data.user.id);
-
-      if (profileError) throw profileError;
     }
 
     return { data, error: null };
