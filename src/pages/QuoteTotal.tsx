@@ -13,6 +13,7 @@ import { useFileManagement } from "@/hooks/useFileManagement";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { useVehicleManagement } from "@/hooks/useVehicleManagement";
 import { useQuoteManagement } from "@/hooks/useQuoteManagement";
+import { useQueryClient } from "@tanstack/react-query";
 
 const QuoteTotal = () => {
   const location = useLocation();
@@ -29,6 +30,7 @@ const QuoteTotal = () => {
     setShowAddVehicleDialog
   );
   const { saveQuote } = useQuoteManagement();
+  const queryClient = useQueryClient();
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -103,6 +105,8 @@ const QuoteTotal = () => {
 
     try {
       await saveQuote(newQuote);
+      
+      await queryClient.invalidateQueries({ queryKey: ['pendingQuotes'] });
       
       toast({
         title: "Devis envoyé",
