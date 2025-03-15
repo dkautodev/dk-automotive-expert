@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -20,10 +19,19 @@ const Contact = () => {
       <main className="animate-fadeIn">
         <section className="py-16 px-4">
           <div className="container mx-auto">
-            <h1 className="text-4xl font-bold text-center text-dk-navy mb-8">
-              Contactez-nous
-            </h1>
-            
+            <div className="max-w-4xl mx-auto text-center mb-16">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                <span className="text-black">CONTACTEZ-NOUS POUR TOUTES</span>
+                <br />
+                <span className="text-dk-navy">VOS DEMANDES</span>
+              </h1>
+              <p className="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto">
+                Besoin d'un devis personnalisé ? Des questions sur nos prestations de convoyage de véhicules ?
+                <br />
+                Contactez-nous dès maintenant pour obtenir toutes les informations dont vous avez besoin.
+              </p>
+            </div>
+
             {/* Contact Info Cards */}
             <div className="grid md:grid-cols-3 gap-8 mb-16">
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
