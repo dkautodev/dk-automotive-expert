@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
+
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -130,6 +131,39 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Tarification Section */}
+        <section className="relative py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <img alt="Remise de clés" className="rounded-lg w-full" src="/lovable-uploads/fb3723ff-6e2e-4b51-a701-fc9801684ff4.png" />
+              </div>
+              <div className="space-y-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-[#18257D]">
+                  TARIFICATION TRANSPARENTE ET PERSONNALISÉE
+                </h2>
+                <p className="text-gray-600">
+                  Nous offrons des tarifs transparents et adaptés, incluant tous les frais, pour répondre aux besoins uniques de chaque client, avec un engagement pour un service éco-responsable.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <span className="w-2 h-2 rounded-full bg-[#18257D]"></span>
+                    Tarifs transparents et adaptés
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <span className="w-2 h-2 rounded-full bg-[#18257D]"></span>
+                    Service inclusif sans frais cachés
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <span className="w-2 h-2 rounded-full bg-[#18257D]"></span>
+                    Engagement éco-responsable
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="bg-gray-100 py-20">
           <div className="container mx-auto px-4 text-center">
@@ -144,4 +178,5 @@ const Index = () => {
       </main>
     </div>;
 };
+
 export default Index;
