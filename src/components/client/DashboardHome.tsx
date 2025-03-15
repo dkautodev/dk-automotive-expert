@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Card,
@@ -12,8 +11,12 @@ import {
 import OrderForm from "./OrderForm";
 import { useQuoteManagement } from "@/hooks/useQuoteManagement";
 import { useDashboardCounts } from "@/hooks/useDashboardCounts";
+import { useAuthContext } from "@/context/AuthContext";
+import { toast } from "@/components/ui/use-toast";
 
 const DashboardHome = () => {
+  const { signOut } = useAuthContext();
+  const navigate = useNavigate();
   const { fetchQuotes } = useQuoteManagement();
   const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0 } } = useDashboardCounts();
   
@@ -22,8 +25,21 @@ const DashboardHome = () => {
     queryFn: fetchQuotes
   });
 
-  const handleLogout = () => {
-    console.log("Logout clicked");
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès."
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la déconnexion.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
