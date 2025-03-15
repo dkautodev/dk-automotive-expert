@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
-
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -136,7 +135,7 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <img alt="Remise de clés" className="rounded-lg w-full" src="/lovable-uploads/fb3723ff-6e2e-4b51-a701-fc9801684ff4.png" />
+                <img alt="Remise de clés" className="rounded-lg w-full" src="/lovable-uploads/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.jpg" />
               </div>
               <div className="space-y-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-[#18257D]">
@@ -178,5 +177,4 @@ const Index = () => {
       </main>
     </div>;
 };
-
 export default Index;
