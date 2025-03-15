@@ -1,5 +1,4 @@
-
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,8 +12,12 @@ interface OrderState {
 
 const OrderDetails = () => {
   const location = useLocation();
-  const orderDetails = location.state as OrderState;
+  const orderDetails = location.state as OrderState | null;
   const [distance, setDistance] = useState<string>("");
+
+  if (!orderDetails) {
+    return <Navigate to="/dashboard/client" replace />;
+  }
 
   useEffect(() => {
     const calculateDistance = async () => {
