@@ -1,113 +1,51 @@
-import { useLocation, Navigate, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
+
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { OrderSummary } from "@/components/order/OrderSummary";
 import { ContactsForm } from "@/components/order/ContactsForm";
 import { VehiclesSection } from "@/components/order/VehiclesSection";
 import { vehicleTypes } from "@/lib/vehicleTypes";
-import { Button } from "@/components/ui/button";
-import { Calculator } from "lucide-react";
-import { Plus } from "lucide-react";
 import { useScrollToElement } from "@/hooks/useScrollToElement";
-
-interface OrderState {
-  pickupAddress: string;
-  deliveryAddress: string;
-  selectedVehicle: string;
-  pickupDate: Date | undefined;
-  deliveryDate: Date | undefined;
-}
-
-interface ContactInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-}
-
-interface VehicleInfo {
-  brand: string;
-  model: string;
-  year: string;
-  fuel: string;
-  licensePlate: string;
-  files: File[];
-}
+import { useOrderDetails } from "@/hooks/useOrderDetails";
+import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 
 const OrderDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const orderDetails = location.state as OrderState | null;
-  const [distance, setDistance] = useState<string>("");
-  const [priceHT] = useState("150");
-  const [showContacts, setShowContacts] = useState(false);
-  const [showVehicle, setShowVehicle] = useState(false);
-  const [areContactFieldsValid, setAreContactFieldsValid] = useState(false);
-  const [vehicleCount, setVehicleCount] = useState(0);
-  const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
-  const [pickupContact, setPickupContact] = useState<ContactInfo | null>(null);
-  const [deliveryContact, setDeliveryContact] = useState<ContactInfo | null>(null);
-  const [vehicles, setVehicles] = useState<VehicleInfo[]>([]);
-  const [pickupDate, setPickupDate] = useState<Date | undefined>(orderDetails?.pickupDate);
-  const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(orderDetails?.deliveryDate);
   const scrollToElement = useScrollToElement();
+  const orderDetails = location.state as OrderState | null;
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
   }
 
-  useEffect(() => {
-    const calculateDistance = async () => {
-      const service = new google.maps.DistanceMatrixService();
-      try {
-        const response = await service.getDistanceMatrix({
-          origins: [orderDetails.pickupAddress],
-          destinations: [orderDetails.deliveryAddress],
-          travelMode: google.maps.TravelMode.DRIVING,
-          unitSystem: google.maps.UnitSystem.METRIC
-        });
-        if (response.rows[0].elements[0].status === "OK") {
-          setDistance(response.rows[0].elements[0].distance.text);
-        }
-      } catch (error) {
-        console.error("Error calculating distance:", error);
-      }
-    };
-    if (orderDetails.pickupAddress && orderDetails.deliveryAddress) {
-      calculateDistance();
-    }
-  }, [orderDetails.pickupAddress, orderDetails.deliveryAddress]);
+  const {
+    distance,
+    setDistance,
+    priceHT,
+    showContacts,
+    setShowContacts,
+    showVehicle,
+    setShowVehicle,
+    vehicleCount,
+    setVehicleCount,
+    vehicleFormsValidity,
+    pickupContact,
+    deliveryContact,
+    vehicles,
+    pickupDate,
+    deliveryDate,
+    handleVehicleValidityChange,
+    deleteVehicle,
+    handleContactsUpdate,
+    handleVehicleUpdate,
+    handleDateUpdate,
+  } = useOrderDetails(orderDetails);
+
+  useDistanceCalculation(orderDetails.pickupAddress, orderDetails.deliveryAddress, setDistance);
 
   const getVehicleName = (id: string) => {
     const vehicle = vehicleTypes.find(v => v.id === id);
     return vehicle ? vehicle.name : id;
-  };
-
-  const handleVehicleValidityChange = (index: number, isValid: boolean) => {
-    setVehicleFormsValidity(prev => {
-      const newValidity = [...prev];
-      newValidity[index] = isValid;
-      return newValidity;
-    });
-  };
-
-  const deleteVehicle = (indexToDelete: number) => {
-    setVehicleCount(prev => prev - 1);
-    setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
-    setVehicles(prev => prev.filter((_, i) => i !== indexToDelete));
-  };
-
-  const handleContactsUpdate = (pickup: ContactInfo, delivery: ContactInfo) => {
-    setPickupContact(pickup);
-    setDeliveryContact(delivery);
-  };
-
-  const handleVehicleUpdate = (index: number, vehicle: VehicleInfo) => {
-    setVehicles(prev => {
-      const newVehicles = [...prev];
-      newVehicles[index] = vehicle;
-      return newVehicles;
-    });
   };
 
   const navigateToQuoteTotal = () => {
@@ -141,11 +79,6 @@ const OrderDetails = () => {
   const handleAddVehicle = () => {
     setVehicleCount(prev => prev + 1);
     setTimeout(() => scrollToElement('vehicles-section'), 100);
-  };
-
-  const handleDateUpdate = (pickup: Date | undefined, delivery: Date | undefined) => {
-    setPickupDate(pickup);
-    setDeliveryDate(delivery);
   };
 
   return (
