@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, EuroIcon, CalendarIcon, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { fr } from 'date-fns/locale';
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface OrderSummaryProps {
   pickupAddress: string;
@@ -34,15 +34,26 @@ export const OrderSummary = ({
   pickupDate,
   deliveryDate
 }: OrderSummaryProps) => {
+  const [pickupTime, setPickupTime] = useState<string>("");
+  const [deliveryTime, setDeliveryTime] = useState<string>("");
+
   const handlePickupDateSelect = (date: Date | undefined) => {
-    onDateUpdate(date, deliveryDate);
+    onDateUpdate(date, date);
   };
 
   const handleDeliveryDateSelect = (date: Date | undefined) => {
     onDateUpdate(pickupDate, date);
   };
 
-  const isNextButtonEnabled = pickupDate && deliveryDate;
+  const handlePickupTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPickupTime(e.target.value);
+  };
+
+  const handleDeliveryTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliveryTime(e.target.value);
+  };
+
+  const isNextButtonEnabled = pickupDate && deliveryDate && pickupTime && deliveryTime;
 
   return (
     <Card>
@@ -98,6 +109,8 @@ export const OrderSummary = ({
                 type="time"
                 placeholder="Heure" 
                 className="pl-10 w-[150px]"
+                value={pickupTime}
+                onChange={handlePickupTimeChange}
               />
               <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
             </div>
@@ -143,6 +156,8 @@ export const OrderSummary = ({
                 type="time"
                 placeholder="Heure" 
                 className="pl-10 w-[150px]"
+                value={deliveryTime}
+                onChange={handleDeliveryTimeChange}
               />
               <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
             </div>
