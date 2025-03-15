@@ -1,3 +1,4 @@
+
 import { createContext, useContext, ReactNode } from "react";
 import { useAuth, UserRole } from "@/hooks/useAuth";
 
@@ -20,6 +21,7 @@ interface AuthContextType {
     first_name: string;
     last_name: string;
     phone?: string;
+    company?: string;
     role: UserRole;
   }) => Promise<any>;
   signOut: () => Promise<void>;
