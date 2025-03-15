@@ -1,26 +1,16 @@
+
 import { useLocation, Navigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, EuroIcon, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { VehicleForm } from "@/components/VehicleForm";
-import { Car } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { OrderSummary } from "@/components/order/OrderSummary";
+import { ContactsForm } from "@/components/order/ContactsForm";
+import { VehiclesSection } from "@/components/order/VehiclesSection";
+import { vehicleTypes } from "@/lib/vehicleTypes";
 
 interface OrderState {
   pickupAddress: string;
   deliveryAddress: string;
   selectedVehicle: string;
-}
-
-interface ContactInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
 }
 
 const OrderDetails = () => {
@@ -30,21 +20,9 @@ const OrderDetails = () => {
   const [priceHT] = useState("150");
   const [showContacts, setShowContacts] = useState(false);
   const [showVehicle, setShowVehicle] = useState(false);
-  const [pickupContact, setPickupContact] = useState<ContactInfo>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: ""
-  });
-  const [deliveryContact, setDeliveryContact] = useState<ContactInfo>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: ""
-  });
+  const [areContactFieldsValid, setAreContactFieldsValid] = useState(false);
   const [vehicleCount, setVehicleCount] = useState(0);
   const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
-  const [areContactFieldsValid, setAreContactFieldsValid] = useState(false);
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -72,37 +50,6 @@ const OrderDetails = () => {
     }
   }, [orderDetails.pickupAddress, orderDetails.deliveryAddress]);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-    return phoneRegex.test(phone);
-  };
-
-  useEffect(() => {
-    const isPickupEmailValid = validateEmail(pickupContact.email);
-    const isPickupPhoneValid = validatePhone(pickupContact.phone);
-    const isDeliveryEmailValid = validateEmail(deliveryContact.email);
-    const isDeliveryPhoneValid = validatePhone(deliveryContact.phone);
-    
-    const isPickupValid = 
-      pickupContact.firstName && 
-      pickupContact.lastName && 
-      isPickupEmailValid && 
-      isPickupPhoneValid;
-      
-    const isDeliveryValid = 
-      deliveryContact.firstName && 
-      deliveryContact.lastName && 
-      isDeliveryEmailValid && 
-      isDeliveryPhoneValid;
-    
-    setAreContactFieldsValid(isPickupValid && isDeliveryValid);
-  }, [pickupContact, deliveryContact]);
-
   const getVehicleName = (id: string) => {
     const vehicle = vehicleTypes.find(v => v.id === id);
     return vehicle ? vehicle.name : id;
@@ -116,8 +63,6 @@ const OrderDetails = () => {
     });
   };
 
-  const canAddNewVehicle = vehicleCount === 0 || vehicleFormsValidity[vehicleCount - 1] === true;
-
   const deleteVehicle = (indexToDelete: number) => {
     setVehicleCount(prev => prev - 1);
     setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
@@ -127,203 +72,34 @@ const OrderDetails = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-6 w-6" />
-              Informations du trajet
-            </CardTitle>
-            <div className="flex items-center gap-2 text-xl">
-              <EuroIcon className="h-5 w-5" />
-              <span>Prix HT: {priceHT}€</span>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <h3 className="font-semibold mb-1">Adresse de départ</h3>
-            <p className="text-gray-600">{orderDetails.pickupAddress}</p>
-          </div>
-          
-          <div>
-            <h3 className="font-semibold mb-1">Adresse de livraison</h3>
-            <p className="text-gray-600">{orderDetails.deliveryAddress}</p>
-          </div>
-
-          {distance && <div>
-              <h3 className="font-semibold mb-1">Distance</h3>
-              <p className="text-gray-600">{distance}</p>
-            </div>}
-          
-          <div>
-            <h3 className="font-semibold mb-1">Type de véhicule</h3>
-            <p className="text-gray-600">{getVehicleName(orderDetails.selectedVehicle)}</p>
-          </div>
-
-          <div className="flex justify-end">
-            <Button onClick={() => setShowContacts(true)}>Suivant</Button>
-          </div>
-        </CardContent>
-      </Card>
+      <OrderSummary
+        pickupAddress={orderDetails.pickupAddress}
+        deliveryAddress={orderDetails.deliveryAddress}
+        selectedVehicle={orderDetails.selectedVehicle}
+        distance={distance}
+        priceHT={priceHT}
+        onShowContacts={() => setShowContacts(true)}
+        getVehicleName={getVehicleName}
+      />
 
       {showContacts && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Coordonnées de livraison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Contact départ</h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="pickup-lastName">Nom *</Label>
-                    <Input id="pickup-lastName" value={pickupContact.lastName} onChange={e => setPickupContact({...pickupContact, lastName: e.target.value})} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="pickup-firstName">Prénom *</Label>
-                    <Input id="pickup-firstName" value={pickupContact.firstName} onChange={e => setPickupContact({...pickupContact, firstName: e.target.value})} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="pickup-email">Adresse mail *</Label>
-                    <Input 
-                      id="pickup-email" 
-                      type="email" 
-                      value={pickupContact.email} 
-                      onChange={e => setPickupContact({...pickupContact, email: e.target.value})}
-                      className={!validateEmail(pickupContact.email) && pickupContact.email ? "border-red-500" : ""}
-                      required 
-                    />
-                    {!validateEmail(pickupContact.email) && pickupContact.email && (
-                      <p className="text-red-500 text-sm mt-1">Format d'email invalide</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="pickup-phone">Téléphone *</Label>
-                    <Input 
-                      id="pickup-phone" 
-                      value={pickupContact.phone} 
-                      onChange={e => setPickupContact({...pickupContact, phone: e.target.value})}
-                      className={!validatePhone(pickupContact.phone) && pickupContact.phone ? "border-red-500" : ""}
-                      required 
-                    />
-                    {!validatePhone(pickupContact.phone) && pickupContact.phone && (
-                      <p className="text-red-500 text-sm mt-1">Format de téléphone invalide (ex: 0612345678 ou +33612345678)</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Contact livraison</h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="delivery-lastName">Nom *</Label>
-                    <Input id="delivery-lastName" value={deliveryContact.lastName} onChange={e => setDeliveryContact({...deliveryContact, lastName: e.target.value})} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="delivery-firstName">Prénom *</Label>
-                    <Input id="delivery-firstName" value={deliveryContact.firstName} onChange={e => setDeliveryContact({...deliveryContact, firstName: e.target.value})} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="delivery-email">Adresse mail *</Label>
-                    <Input 
-                      id="delivery-email" 
-                      type="email" 
-                      value={deliveryContact.email} 
-                      onChange={e => setDeliveryContact({...deliveryContact, email: e.target.value})}
-                      className={!validateEmail(deliveryContact.email) && deliveryContact.email ? "border-red-500" : ""}
-                      required 
-                    />
-                    {!validateEmail(deliveryContact.email) && deliveryContact.email && (
-                      <p className="text-red-500 text-sm mt-1">Format d'email invalide</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="delivery-phone">Téléphone *</Label>
-                    <Input 
-                      id="delivery-phone" 
-                      value={deliveryContact.phone} 
-                      onChange={e => setDeliveryContact({...deliveryContact, phone: e.target.value})}
-                      className={!validatePhone(deliveryContact.phone) && deliveryContact.phone ? "border-red-500" : ""}
-                      required 
-                    />
-                    {!validatePhone(deliveryContact.phone) && deliveryContact.phone && (
-                      <p className="text-red-500 text-sm mt-1">Format de téléphone invalide (ex: 0612345678 ou +33612345678)</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end mt-6">
-              <Button 
-                onClick={() => setShowVehicle(true)} 
-                disabled={!areContactFieldsValid}
-              >
-                Ajouter le.s véhicule.s
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ContactsForm
+          onContactsValid={setAreContactFieldsValid}
+          onShowVehicle={() => setShowVehicle(true)}
+        />
       )}
 
       {showVehicle && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Véhicule.s</CardTitle>
-              <Badge variant="secondary" className="flex items-center gap-2">
-                <Car className="h-4 w-4" />
-                {vehicleCount}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {Array.from({
-              length: vehicleCount
-            }).map((_, index) => (
-              <VehicleForm key={index} index={index} onDelete={() => deleteVehicle(index)} onChange={isValid => handleVehicleValidityChange(index, isValid)} />
-            ))}
-            
-            <div className="flex justify-end">
-              <Button onClick={() => setVehicleCount(prev => prev + 1)} variant="outline" className="gap-2" disabled={!canAddNewVehicle}>
-                <Plus className="h-4 w-4" />
-                Ajouter un véhicule
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <VehiclesSection
+          vehicleCount={vehicleCount}
+          vehicleFormsValidity={vehicleFormsValidity}
+          onVehicleValidityChange={handleVehicleValidityChange}
+          onDeleteVehicle={deleteVehicle}
+          onAddVehicle={() => setVehicleCount(prev => prev + 1)}
+        />
       )}
     </div>
   );
 };
-
-const vehicleTypes = [{
-  id: "citadine",
-  name: "Citadine"
-}, {
-  id: "berline",
-  name: "Berline"
-}, {
-  id: "suv",
-  name: "4x4 (ou SUV)"
-}, {
-  id: "utilitaire-3-5",
-  name: "Utilitaire 3-5m3"
-}, {
-  id: "utilitaire-6-12",
-  name: "Utilitaire 6-12m3"
-}, {
-  id: "utilitaire-12-15",
-  name: "Utilitaire 12-15m3"
-}, {
-  id: "utilitaire-15-20",
-  name: "Utilitaire 15-20m3"
-}, {
-  id: "utilitaire-20-plus",
-  name: "Utilitaire + de 20m3"
-}];
 
 export default OrderDetails;
