@@ -1,7 +1,10 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
+import { Check } from 'lucide-react';
+
 const About = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -36,11 +39,29 @@ const About = () => {
               </div>
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
-                  NOTRE EXPERTISE
+                  POURQUOI CHOISIR DK AUTOMOTIVE POUR VOS BESOINS EN CONVOYAGE AUTOMOBILE ?
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Notre engagement envers l'excellence et notre compréhension approfondie du secteur du transport nous permettent de fournir des solutions sur mesure pour chaque client. Notre équipe expérimentée assure un service professionnel et fiable, adapté à vos besoins spécifiques.
+                  En faisant appel à DK AUTOMOTIVE, vous bénéficiez également de la conformité de toutes les régulations européennes en matière de convoyage automobile, garantissant un transport sécurisé de votre véhicule. Pour en savoir plus sur les régulations et les bonnes pratiques en matière de transport de véhicules en Europe, consultez l'article publié par la Commission européenne <a href="#" className="text-[#18257D] underline">lien</a>.
                 </p>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
+                    <p className="text-gray-600">Une équipe de professionnels expérimentés pour garantir la sécurité de votre véhicule.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
+                    <p className="text-gray-600">Une couverture géographique étendue pour répondre à vos besoins de transport en France et pays limitrophes.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
+                    <p className="text-gray-600">Des services sur mesure, adaptés à vos exigences et contraintes.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
+                    <p className="text-gray-600">Des tarifs compétitifs et transparents pour un rapport qualité-prix optimal en matière de tarif convoyage voiture.</p>
+                  </div>
+                </div>
                 <div className="pt-4">
                   <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
                     Demander un devis
@@ -67,4 +88,5 @@ const About = () => {
       <Footer />
     </div>;
 };
+
 export default About;
