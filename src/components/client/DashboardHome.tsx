@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -8,12 +9,12 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import OrderForm from "./OrderForm";
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useQuoteManagement } from "@/hooks/useQuoteManagement";
+import { useDashboardCounts } from "@/hooks/useDashboardCounts";
 
 const DashboardHome = () => {
   const { fetchQuotes } = useQuoteManagement();
+  const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0 } } = useDashboardCounts();
   
   const { data: quotes = [] } = useQuery({
     queryKey: ['pendingQuotes'],
