@@ -15,21 +15,33 @@ interface ContactsFormProps {
   onContactsValid: (isValid: boolean) => void;
   onShowVehicle: () => void;
   onContactsUpdate: (pickup: ContactInfo, delivery: ContactInfo) => void;
+  initialPickupContact?: ContactInfo;
+  initialDeliveryContact?: ContactInfo;
 }
 
-export const ContactsForm = ({ onContactsValid, onShowVehicle, onContactsUpdate }: ContactsFormProps) => {
-  const [pickupContact, setPickupContact] = useState<ContactInfo>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: ""
-  });
-  const [deliveryContact, setDeliveryContact] = useState<ContactInfo>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: ""
-  });
+export const ContactsForm = ({ 
+  onContactsValid, 
+  onShowVehicle, 
+  onContactsUpdate,
+  initialPickupContact,
+  initialDeliveryContact 
+}: ContactsFormProps) => {
+  const [pickupContact, setPickupContact] = useState<ContactInfo>(
+    initialPickupContact || {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: ""
+    }
+  );
+  const [deliveryContact, setDeliveryContact] = useState<ContactInfo>(
+    initialDeliveryContact || {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: ""
+    }
+  );
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
