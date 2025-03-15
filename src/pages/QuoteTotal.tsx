@@ -125,6 +125,8 @@ const QuoteTotal = () => {
       title: "Devis envoyé",
       description: "Votre devis a été envoyé avec succès et est en attente de validation.",
     });
+    
+    navigate("/dashboard/client");
   };
 
   const handleAddVehicleSubmit = (newVehicle: Vehicle) => {
