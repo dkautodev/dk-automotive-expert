@@ -11,11 +11,12 @@ const Index = () => {
       
       <main className="animate-fadeIn">
         {/* Hero Section */}
-        <section className="relative h-[600px] bg-gradient-to-r from-dk-navy to-dk-blue text-white">
-          <div className="container mx-auto px-4 h-full flex items-center">
+        <section className="relative h-[600px] bg-cover bg-center" style={{ backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")' }}>
+          <div className="absolute inset-0 bg-black/40" /> {/* Overlay sombre pour la lisibilité */}
+          <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
-              <h1 className="text-5xl font-bold mb-6">Leader du convoyage automobile professionnel</h1>
-              <p className="text-xl mb-8">Votre partenaire de confiance pour le transport de véhicules depuis 2018</p>
+              <h1 className="text-5xl font-bold mb-6 text-white">Leader du convoyage automobile professionnel</h1>
+              <p className="text-xl mb-8 text-white">Votre partenaire de confiance pour le transport de véhicules depuis 2018</p>
               <Link to="/devis">
                 <Button className="bg-white text-dk-navy hover:bg-gray-100 transition-colors text-lg px-8 py-6">
                   Demander mon devis sur mesure
