@@ -29,6 +29,7 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
           <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+          <Route path="/cookies" element={<Cookies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
