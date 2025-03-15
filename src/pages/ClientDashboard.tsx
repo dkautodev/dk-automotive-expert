@@ -1,7 +1,7 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ClientSidebar } from "@/components/client/ClientSidebar";
+import ClientSidebar from "@/components/client/ClientSidebar";
 import DashboardHome from "@/components/client/DashboardHome";
 import Profile from "@/components/client/Profile";
 import OrderHistory from "@/components/client/OrderHistory";
