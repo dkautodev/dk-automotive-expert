@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import PickupForm from './PickupForm';
+import DeliveryForm from './DeliveryForm';
 import {
   Select,
   SelectContent,
@@ -64,8 +64,12 @@ const QuoteForm = () => {
     });
   };
 
+  if (step === 3) {
+    return <DeliveryForm onPrevious={() => setStep(2)} onNext={() => setStep(4)} />;
+  }
+
   if (step === 2) {
-    return <PickupForm onPrevious={() => setStep(1)} />;
+    return <PickupForm onPrevious={() => setStep(1)} onNext={() => setStep(3)} />;
   }
 
   return (
