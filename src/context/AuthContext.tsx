@@ -9,6 +9,11 @@ interface Profile {
   email: string;
   phone: string | null;
   company?: string | null;
+  logo_url?: string | null;
+  siret?: string | null;
+  vat_number?: string | null;
+  siret_locked?: boolean | null;
+  vat_number_locked?: boolean | null;
 }
 
 interface AuthContextType {
