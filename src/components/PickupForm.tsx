@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from "date-fns";
-import { CalendarIcon, Clock } from "lucide-react";
+import { CalendarIcon, Clock, Mail } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -33,6 +36,7 @@ const pickupFormSchema = z.object({
     required_error: "La date d'enlèvement est requise",
   }),
   pickupTime: z.string().min(1, "L'heure d'enlèvement est requise"),
+  additionalMessage: z.string().optional(),
 });
 
 type PickupFormValues = z.infer<typeof pickupFormSchema>;
@@ -43,14 +47,50 @@ interface PickupFormProps {
 }
 
 const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const form = useForm<PickupFormValues>({
     resolver: zodResolver(pickupFormSchema),
   });
 
-  const onSubmit = (data: PickupFormValues) => {
+  const onSubmit = async (data: PickupFormValues) => {
     console.log('Pickup details:', data);
-    onNext();
+    try {
+      setIsSubmitted(true);
+      toast({
+        title: "Demande envoyée",
+        description: "Votre demande de devis a été envoyée avec succès",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi du formulaire",
+      });
+    }
   };
+
+  if (isSubmitted) {
+    return (
+      <div className="space-y-6">
+        <Alert className="bg-[#F2FCE2] border-green-200">
+          <AlertTitle className="text-2xl font-bold text-[#40B058] mb-4">
+            NOUS AVONS BIEN REÇU VOTRE DEMANDE DE DEVIS.
+          </AlertTitle>
+          <AlertDescription className="space-y-4">
+            <p className="text-blue-700">
+              Pour toute question, n'hésitez pas à nous contacter à l'adresse suivante : {" "}
+              <a href="mailto:contact@dkautomotive.fr" className="underline">
+                contact@dkautomotive.fr
+              </a>
+            </p>
+            <p className="text-gray-700 text-center mt-4">
+              En vous remerciant de votre confiance.
+            </p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -221,6 +261,26 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="additionalMessage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  MESSAGE COMPLÉMENTAIRE
+                </FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Ajoutez des informations complémentaires à votre demande..."
+                    className="bg-[#EEF1FF] min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="flex justify-between mt-6">
@@ -233,7 +293,8 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
             RETOUR
           </Button>
           <Button type="submit" className="bg-[#1a237e] hover:bg-[#3f51b5]">
-            SUIVANT
+            ENVOYER
+            <Mail className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </form>
