@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
+
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -50,8 +51,8 @@ const Index = () => {
         </section>
 
         {/* Trust Section */}
-        <section className="relative bg-white py-[10px]">
-          <div className="container mx-auto px-[15px] py-[16px]">
+        <section className="relative py-16 bg-white">
+          <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-dk-blue mb-3 tracking-wide">
                 VOTRE CONFIANCE, NOTRE ENGAGEMENT
@@ -65,7 +66,7 @@ const Index = () => {
         </section>
 
         {/* Services Section */}
-        <section className="py-[8px] my-0">
+        <section className="py-20">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center text-dk-navy mb-16">Nos services de convoyage</h2>
             <div className="grid md:grid-cols-3 gap-12">
@@ -99,4 +100,5 @@ const Index = () => {
       </main>
     </div>;
 };
+
 export default Index;
