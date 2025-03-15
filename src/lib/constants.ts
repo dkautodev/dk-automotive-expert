@@ -1,3 +1,3 @@
 
-export const GOOGLE_MAPS_API_KEY = 'votre_clé_api';
+export const GOOGLE_MAPS_API_KEY = 'AIzaSyAq7jjZ09lIT6OqVe4BwNtX4QPwr3xSKPU';
 
