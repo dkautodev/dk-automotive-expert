@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -42,7 +41,6 @@ const Contact = () => {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Créer le lien mailto avec tous les champs
     const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=${encodeURIComponent(values.subject)}&body=${encodeURIComponent(
       `Nom: ${values.fullName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nMessage:\n${values.message}`
     )}`;
@@ -69,27 +67,6 @@ const Contact = () => {
                 <br />
                 Contactez-nous dès maintenant pour obtenir toutes les informations dont vous avez besoin.
               </p>
-            </div>
-
-            {/* Contact Info Cards */}
-            <div className="grid md:grid-cols-3 gap-8 mb-16">
-              <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                <Phone className="w-8 h-8 mx-auto mb-4 text-dk-navy" />
-                <h3 className="text-xl font-semibold mb-2">Téléphone</h3>
-                <p className="text-gray-600">+33 1 23 45 67 89</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                <Mail className="w-8 h-8 mx-auto mb-4 text-dk-navy" />
-                <h3 className="text-xl font-semibold mb-2">Email</h3>
-                <p className="text-gray-600">dkautomotive70@gmail.com</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                <MapPin className="w-8 h-8 mx-auto mb-4 text-dk-navy" />
-                <h3 className="text-xl font-semibold mb-2">Adresse</h3>
-                <p className="text-gray-600">123 Rue de Paris, 75001 Paris</p>
-              </div>
             </div>
 
             {/* Contact Form */}
