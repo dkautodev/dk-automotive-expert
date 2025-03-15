@@ -56,6 +56,8 @@ export interface Quote {
   deliveryAddress: string;
   vehicles: Vehicle[];
   totalPriceHT: number;
+  totalPriceTTC: number;
+  distance: string;
   status: 'pending' | 'accepted' | 'rejected';
   dateCreated: Date;
   pickupDate?: Date;

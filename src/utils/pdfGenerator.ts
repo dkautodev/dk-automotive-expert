@@ -6,6 +6,8 @@ import { OrderState } from '@/types/order';
 
 export const generateQuotePDF = (orderDetails: OrderState, totalPriceHT: number) => {
   const quoteNumber = 'DEV-00000100';
+  const totalPriceTTC = totalPriceHT * 1.2;
+  
   const content = document.createElement('div');
   content.innerHTML = `
     <div style="padding: 40px; font-family: Arial, sans-serif; max-width: 210mm;">
@@ -78,6 +80,7 @@ export const generateQuotePDF = (orderDetails: OrderState, totalPriceHT: number)
       <div style="margin-top: 40px; border-top: 2px solid #1a365d; padding-top: 20px;">
         <div style="text-align: right;">
           <h2 style="color: #2c5282; font-size: 20px; margin: 0;">Prix Total HT: ${totalPriceHT}€</h2>
+          <h2 style="color: #2c5282; font-size: 20px; margin: 5px 0;">Prix Total TTC: ${totalPriceTTC.toFixed(2)}€</h2>
           <p style="color: #64748b; margin: 5px 0; font-size: 12px;">Ce devis est valable 30 jours à compter de sa date d'émission.</p>
         </div>
       </div>
