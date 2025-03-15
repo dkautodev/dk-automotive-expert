@@ -59,6 +59,28 @@ const Footer = () => {
             </form>
           </div>
         </div>
+
+        {/* Legal Links and Copyright */}
+        <div className="mt-16 pt-8 border-t border-white/10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
+              <Link to="/mentions-legales" className="text-white/60 hover:text-white transition-colors">
+                Mentions légales
+              </Link>
+              <span className="text-white/60">•</span>
+              <Link to="/politique-confidentialite" className="text-white/60 hover:text-white transition-colors">
+                Politique de confidentialité
+              </Link>
+              <span className="text-white/60">•</span>
+              <Link to="/cookies" className="text-white/60 hover:text-white transition-colors">
+                Cookies
+              </Link>
+            </div>
+            <div className="text-sm text-white/60">
+              © {new Date().getFullYear()} DK Automotive. Tous droits réservés.
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
   );
