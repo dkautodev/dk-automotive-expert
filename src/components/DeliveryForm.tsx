@@ -73,7 +73,7 @@ const DeliveryForm = ({ onPrevious, vehicleData }: DeliveryFormProps) => {
         deliveryAddress: data.address,
         vehicles: vehicleData.vehicles,
         totalPriceHT: vehicleData.priceHT,
-        status: 'pending',
+        status: 'pending' as const,
         dateCreated: new Date()
       };
 
