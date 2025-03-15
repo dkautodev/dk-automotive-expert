@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { Link } from 'react-router-dom';
 import {
   Accordion,
   AccordionContent,
@@ -45,6 +46,23 @@ const FAQ = () => {
                 ))}
               </Accordion>
             </div>
+          </div>
+        </section>
+
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-4">FAITES LE CHOIX DE L'EXPERTISE</h2>
+            <h3 className="text-4xl font-bold text-[#1a237e] mb-4">DK AUTOMOTIVE</h3>
+            <p className="text-lg text-gray-700 mb-4">UN PARTENAIRE FIABLE POUR VOS BESOINS EN CONVOYAGE</p>
+            <p className="text-base text-gray-600 max-w-4xl mx-auto mb-8">
+              Rejoignez dès aujourd'hui notre réseau de clients satisfaits et découvrez la différence que DK AUTOMOTIVE peut apporter à votre expérience de transport de véhicules. En tant que professionnels de l'automobile, nous sommes impatients de travailler avec vous et de vous fournir les solutions de convoyage les plus adaptées à vos besoins.
+            </p>
+            <Link 
+              to="/devis" 
+              className="inline-block bg-[#1a237e] text-white px-8 py-4 text-lg font-semibold hover:bg-[#1a237e]/90 transition-colors"
+            >
+              DEMANDEZ VOTRE DEVIS
+            </Link>
           </div>
         </section>
       </main>
