@@ -173,15 +173,41 @@ const Index = () => {
         </section>
 
         {/* Trust Engagement Section */}
-        <section className="relative py-16 bg-white">
+        <section className="relative py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto">
               <h2 className="text-2xl md:text-4xl font-bold text-[#18257D] mb-6">
                 VOTRE CONFIANCE, NOTRE ENGAGEMENT
               </h2>
-              <p className="text-gray-600 text-lg md:text-xl">
+              <p className="text-gray-600 text-lg md:text-xl mb-8">
                 Chez DK Automotive, chaque parcours est une promesse de qualité et de fiabilité.
               </p>
+              
+              <div className="grid md:grid-cols-3 gap-8 mt-12">
+                <div className="p-6 bg-white rounded-lg shadow-lg">
+                  <div className="w-16 h-16 bg-[#18257D] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#18257D] mb-3">Fiabilité</h3>
+                  <p className="text-gray-600">Des services de convoyage sur lesquels vous pouvez compter à chaque instant.</p>
+                </div>
+
+                <div className="p-6 bg-white rounded-lg shadow-lg">
+                  <div className="w-16 h-16 bg-[#18257D] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#18257D] mb-3">Expertise</h3>
+                  <p className="text-gray-600">Une équipe de professionnels expérimentés à votre service.</p>
+                </div>
+
+                <div className="p-6 bg-white rounded-lg shadow-lg">
+                  <div className="w-16 h-16 bg-[#18257D] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#18257D] mb-3">Satisfaction</h3>
+                  <p className="text-gray-600">Votre satisfaction est notre priorité absolue.</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
