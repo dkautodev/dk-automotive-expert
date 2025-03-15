@@ -11,6 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import type { UserRole } from "@/hooks/useAuth";
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis"),
@@ -51,7 +52,8 @@ const SignUpForm = () => {
       const { data: authData, error: signUpError } = await signUp(data.email, data.password, {
         first_name: data.firstName,
         last_name: data.lastName,
-        phone: data.phone
+        phone: data.phone,
+        role: 'client' as UserRole
       });
 
       if (signUpError) throw signUpError;
