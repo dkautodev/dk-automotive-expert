@@ -4,7 +4,8 @@ import { Facebook, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
-  return <div className="w-full">
+  return (
+    <div className="w-full sticky top-0 z-50">
       <div className="bg-dk-navy text-white py-2 px-4">
         <div className="container flex justify-between items-center mx-auto">
           <div className="flex gap-4">
@@ -22,7 +23,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white/95 backdrop-blur-sm shadow-md">
         <div className="container mx-auto py-4 px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex-shrink-0">
@@ -40,7 +41,8 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-    </div>;
+    </div>
+  );
 };
 
 export default Navbar;
