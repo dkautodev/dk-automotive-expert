@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
@@ -39,6 +38,27 @@ const DriverSignUpForm = () => {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="isCompany"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Société</FormLabel>
+                    <FormDescription>
+                      Cochez si vous êtes une société (sinon autoentrepreneur)
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="lastName"
@@ -107,27 +127,6 @@ const DriverSignUpForm = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="isCompany"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Société</FormLabel>
-                    <FormDescription>
-                      Cochez si vous êtes une société (sinon autoentrepreneur)
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-            
             <FormField
               control={form.control}
               name="password"
