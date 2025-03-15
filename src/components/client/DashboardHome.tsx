@@ -1,5 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -25,23 +27,27 @@ const DashboardHome = () => {
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Devis en attente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-          </CardContent>
-        </Card>
+        <Link to="pending-quotes">
+          <Card className="hover:bg-accent transition-colors">
+            <CardHeader>
+              <CardTitle>Devis en attente</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">0</p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Convoyages en cours</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-          </CardContent>
-        </Card>
+        <Link to="ongoing-shipments">
+          <Card className="hover:bg-accent transition-colors">
+            <CardHeader>
+              <CardTitle>Convoyages en cours</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">0</p>
+            </CardContent>
+          </Card>
+        </Link>
 
         <Card>
           <CardHeader>
@@ -52,17 +58,19 @@ const DashboardHome = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Receipt className="h-6 w-6" />
-              Factures en attente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-          </CardContent>
-        </Card>
+        <Link to="pending-invoices">
+          <Card className="hover:bg-accent transition-colors">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Receipt className="h-6 w-6" />
+                Factures en attente
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">0</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <OrderForm />
