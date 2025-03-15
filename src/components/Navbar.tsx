@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram } from 'lucide-react';
+import { Facebook, Instagram, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
@@ -34,8 +34,9 @@ const Navbar = () => {
               <Link to="/about" className="text-dk-navy hover:text-dk-blue transition-colors">QUI SOMMES-NOUS</Link>
               <Link to="/contact" className="text-dk-navy hover:text-dk-blue transition-colors">CONTACTEZ-NOUS</Link>
               <Link to="/faq" className="text-dk-navy hover:text-dk-blue transition-colors">FAQ</Link>
-              <Button className="bg-dk-blue hover:bg-dk-navy text-white transition-colors">
-                Accès à mon espace
+              <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors">
+                <UserRound className="mr-2" />
+                Espace professionnel
               </Button>
             </div>
           </div>
