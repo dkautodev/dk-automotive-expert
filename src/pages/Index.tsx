@@ -11,18 +11,17 @@ const Index = () => {
       <Navbar />
       
       <main className="animate-fadeIn">
-        {/* Hero Section */}
-        <section className="relative h-[600px] bg-cover bg-center" style={{
-        backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
-      }}>
+        <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
+          backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
+        }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
-              <h1 className="text-5xl font-bold mb-8 text-white leading-tight tracking-tight uppercase">
+              <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-white leading-tight tracking-tight uppercase">
                 Convoyage de véhicules<br />par route en France
               </h1>
               
-              <div className="space-y-3 mb-8">
+              <div className="space-y-3 mb-6 md:mb-8">
                 <div className="flex items-center gap-2 text-white">
                   <Check className="w-5 h-5" />
                   <span className="text-lg font-light">Convoyage sur mesure et économique</span>
@@ -37,8 +36,8 @@ const Index = () => {
                 </div>
               </div>
 
-              <p className="text-xl text-white/90 mb-8 font-light leading-relaxed">
-                Confiez-nous le convoyage de vos véhicules, pour un service sur mesure,<br />
+              <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 font-light leading-relaxed">
+                Confiez-nous le convoyage de vos véhicules, pour un service sur mesure,<br className="hidden md:block" />
                 écologique et économique.
               </p>
               
