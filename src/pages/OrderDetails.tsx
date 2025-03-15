@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { VehicleForm } from "@/components/VehicleForm";
+import { Car } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface OrderState {
   pickupAddress: string;
@@ -270,7 +272,13 @@ const OrderDetails = () => {
       {showVehicle && (
         <Card>
           <CardHeader>
-            <CardTitle>Véhicule.s</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Véhicule.s</CardTitle>
+              <Badge variant="secondary" className="flex items-center gap-2">
+                <Car className="h-4 w-4" />
+                {vehicleCount}
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             {Array.from({
