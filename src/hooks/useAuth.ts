@@ -66,6 +66,7 @@ export const useAuth = () => {
     first_name: string;
     last_name: string;
     phone?: string;
+    company?: string;
     role: UserRole;
   }) => {
     const { data, error } = await supabase.auth.signUp({
@@ -76,6 +77,7 @@ export const useAuth = () => {
           first_name: userData.first_name,
           last_name: userData.last_name,
           phone: userData.phone,
+          company: userData.company,
         }
       }
     });
@@ -84,6 +86,17 @@ export const useAuth = () => {
 
     // Insert role after successful signup
     if (data.user) {
+      // Update the profiles table directly to ensure company and phone are saved
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          company: userData.company,
+          phone: userData.phone
+        })
+        .eq('id', data.user.id);
+
+      if (profileError) throw profileError;
+
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
