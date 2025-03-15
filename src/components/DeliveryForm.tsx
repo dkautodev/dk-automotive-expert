@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,40 +23,40 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-const pickupFormSchema = z.object({
+const deliveryFormSchema = z.object({
   companyName: z.string().min(1, "Le nom de la société est requis"),
   lastName: z.string().min(1, "Le nom est requis"),
   firstName: z.string().min(1, "Le prénom est requis"),
   address: z.string().min(1, "L'adresse est requise"),
   email: z.string().email("Email invalide"),
   phone: z.string().min(10, "Le numéro de téléphone est requis"),
-  pickupDate: z.date({
-    required_error: "La date d'enlèvement est requise",
+  deliveryDate: z.date({
+    required_error: "La date de livraison est requise",
   }),
-  pickupTime: z.string().min(1, "L'heure d'enlèvement est requise"),
+  deliveryTime: z.string().min(1, "L'heure de livraison est requise"),
 });
 
-type PickupFormValues = z.infer<typeof pickupFormSchema>;
+type DeliveryFormValues = z.infer<typeof deliveryFormSchema>;
 
-interface PickupFormProps {
+interface DeliveryFormProps {
   onPrevious: () => void;
   onNext: () => void;
 }
 
-const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
-  const form = useForm<PickupFormValues>({
-    resolver: zodResolver(pickupFormSchema),
+const DeliveryForm = ({ onPrevious, onNext }: DeliveryFormProps) => {
+  const form = useForm<DeliveryFormValues>({
+    resolver: zodResolver(deliveryFormSchema),
   });
 
-  const onSubmit = (data: PickupFormValues) => {
-    console.log('Pickup details:', data);
+  const onSubmit = (data: DeliveryFormValues) => {
+    console.log('Delivery details:', data);
     onNext();
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <h2 className="text-2xl font-bold text-dk-navy mb-6">Coordonnées d'enlèvement</h2>
+        <h2 className="text-2xl font-bold text-dk-navy mb-6">Coordonnées de livraison</h2>
         <div className="grid gap-6 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -155,11 +156,11 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
 
           <FormField
             control={form.control}
-            name="pickupDate"
+            name="deliveryDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="text-dk-navy font-semibold">
-                  DATE D'ENLÈVEMENT <span className="text-blue-500">*</span>
+                  DATE DE LIVRAISON <span className="text-blue-500">*</span>
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -200,11 +201,11 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
 
           <FormField
             control={form.control}
-            name="pickupTime"
+            name="deliveryTime"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-dk-navy font-semibold">
-                  HEURE D'ENLÈVEMENT <span className="text-blue-500">*</span>
+                  HEURE DE LIVRAISON <span className="text-blue-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
@@ -241,4 +242,4 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
   );
 };
 
-export default PickupForm;
+export default DeliveryForm;
