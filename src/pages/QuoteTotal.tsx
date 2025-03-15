@@ -1,8 +1,6 @@
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { useState } from "react";
 import { OrderState } from "@/types/order";
 import { QuoteActions } from "@/components/quote/QuoteActions";
@@ -13,6 +11,7 @@ import { QuoteFooter } from "@/components/quote/QuoteFooter";
 import { DatesTimesSection } from "@/components/quote/DatesTimesSection";
 import { useFileManagement } from "@/hooks/useFileManagement";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
+import { useVehicleManagement } from "@/hooks/useVehicleManagement";
 
 const QuoteTotal = () => {
   const location = useLocation();
@@ -22,7 +21,12 @@ const QuoteTotal = () => {
   const [showAddVehicleDialog, setShowAddVehicleDialog] = useState(false);
   const [pickupTime, setPickupTime] = useState<string>("");
   const [deliveryTime, setDeliveryTime] = useState<string>("");
-  const { newFiles, handleFileChange, handleRemoveFile, clearVehicleFiles } = useFileManagement();
+  const { newFiles, handleFileChange, handleRemoveFile } = useFileManagement();
+  const { handleDeleteVehicle, handleAddVehicle } = useVehicleManagement(
+    orderDetails!,
+    setOrderDetails,
+    setShowAddVehicleDialog
+  );
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -79,27 +83,6 @@ const QuoteTotal = () => {
         pickupContact: pickup,
         deliveryContact: delivery
       });
-    }
-  };
-
-  const handleDeleteVehicle = (index: number) => {
-    if (orderDetails) {
-      const updatedVehicles = orderDetails.vehicles.filter((_, i) => i !== index);
-      setOrderDetails({
-        ...orderDetails,
-        vehicles: updatedVehicles
-      });
-      clearVehicleFiles(index);
-    }
-  };
-
-  const handleAddVehicle = (newVehicle: any) => {
-    if (orderDetails) {
-      setOrderDetails({
-        ...orderDetails,
-        vehicles: [...orderDetails.vehicles, newVehicle]
-      });
-      setShowAddVehicleDialog(false);
     }
   };
 
