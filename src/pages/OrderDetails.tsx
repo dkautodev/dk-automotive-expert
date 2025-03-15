@@ -1,11 +1,12 @@
 import { useLocation, Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, EuroIcon } from "lucide-react";
+import { MapPin, EuroIcon, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { VehicleForm } from "@/components/VehicleForm";
 
 interface OrderState {
   pickupAddress: string;
@@ -39,6 +40,7 @@ const OrderDetails = () => {
     email: "",
     phone: "",
   });
+  const [vehicleCount, setVehicleCount] = useState(0);
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -218,8 +220,21 @@ const OrderDetails = () => {
           <CardHeader>
             <CardTitle>Véhicule.s</CardTitle>
           </CardHeader>
-          <CardContent>
-            {/* Vehicle selection content will go here */}
+          <CardContent className="space-y-6">
+            {Array.from({ length: vehicleCount }).map((_, index) => (
+              <VehicleForm key={index} index={index} />
+            ))}
+            
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setVehicleCount((prev) => prev + 1)}
+                variant="outline"
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Ajouter un véhicule
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
