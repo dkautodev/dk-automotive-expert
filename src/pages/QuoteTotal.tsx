@@ -168,8 +168,11 @@ const QuoteTotal = () => {
       <QuoteActions />
       
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Récapitulatif de votre devis</CardTitle>
+          <div className="text-sm text-muted-foreground">
+            DEV-00000100
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <AddressesSection orderDetails={orderDetails} />
