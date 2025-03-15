@@ -24,6 +24,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
+import { useMemo } from 'react';
+import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
 
 const pickupFormSchema = z.object({
   companyName: z.string().min(1, "Le nom de la société est requis"),
@@ -68,6 +71,10 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
       });
     }
   };
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+  });
 
   if (isSubmitted) {
     return (
@@ -281,6 +288,20 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
               </FormItem>
             )}
           />
+
+          <div className="col-span-2 h-[300px] rounded-lg overflow-hidden">
+            {!isLoaded ? (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                Chargement de la carte...
+              </div>
+            ) : (
+              <GoogleMap
+                zoom={5}
+                center={{ lat: 46.603354, lng: 1.888334 }}
+                mapContainerClassName="w-full h-full"
+              />
+            )}
+          </div>
         </div>
 
         <div className="flex justify-between mt-6">
