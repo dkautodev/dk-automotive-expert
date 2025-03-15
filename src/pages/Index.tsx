@@ -50,15 +50,18 @@ const Index = () => {
         </section>
 
         {/* Trust Section */}
-        <section className="relative py-24">
-          <div className="absolute inset-0 bg-dk-navy/95" />
-          <div className="container mx-auto px-4 relative z-10 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-wide uppercase">
-              VOTRE CONFIANCE, NOTRE ENGAGEMENT
-            </h2>
-            <p className="text-lg md:text-xl text-white/90 font-light max-w-3xl mx-auto leading-relaxed">
-              Chez DK Automotive, chaque parcours est une promesse de qualité et de fiabilité.
-            </p>
+        <section className="relative py-16">
+          <div className="absolute inset-0 bg-dk-navy" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-2xl md:text-3xl font-medium text-white mb-4 tracking-wide">
+                VOTRE CONFIANCE, NOTRE ENGAGEMENT
+              </h2>
+              <div className="w-24 h-0.5 bg-white mx-auto mb-6" />
+              <p className="text-base md:text-lg text-white/80 font-light leading-relaxed">
+                Chez DK Automotive, nous accordons une importance capitale à la confiance que nous témoignent nos clients. Notre engagement envers l'excellence et la qualité de service est le fondement de notre réputation. Chaque mission de convoyage est traitée avec le plus grand soin, garantissant une prestation à la hauteur de vos attentes.
+              </p>
+            </div>
           </div>
         </section>
 
