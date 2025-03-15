@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Plus, Car, Settings } from 'lucide-react';
+import { Home, Plus, Car, Settings, FileText, Truck, Receipt } from 'lucide-react';
 
 const ClientSidebar = () => {
   return <div className="h-screen w-52 bg-white border-r border-gray-200 fixed left-0 top-0">
@@ -30,6 +31,24 @@ const ClientSidebar = () => {
             <Link to="/client/quotes" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
               <Car className="mr-2 h-4 w-4" />
               Mes Devis
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/client/pending-quotes" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <FileText className="mr-2 h-4 w-4" />
+              Devis en Attente
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/client/ongoing-shipments" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <Truck className="mr-2 h-4 w-4" />
+              Livraisons en Cours
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/client/pending-invoices" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <Receipt className="mr-2 h-4 w-4" />
+              Factures en Attente
             </Link>
           </li>
           <li className="mb-2">
