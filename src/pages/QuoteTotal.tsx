@@ -1,3 +1,4 @@
+
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -114,8 +115,10 @@ const QuoteTotal = () => {
   const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
 
   return (
-    <div className="p-6 space-y-6">
-      <QuoteActions />
+    <div className="p-6 space-y-6 bg-background">
+      <div className="sticky top-0 z-20 -mx-6 px-6 py-4 backdrop-blur-lg border-b bg-background/80">
+        <QuoteActions />
+      </div>
       
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
