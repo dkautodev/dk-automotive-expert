@@ -1,4 +1,3 @@
-
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -115,55 +114,59 @@ const QuoteTotal = () => {
   const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
 
   return (
-    <div className="p-6 space-y-6 bg-background">
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-4 backdrop-blur-lg border-b bg-background/80">
-        <QuoteActions />
+    <div className="space-y-6">
+      <div className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-b z-50 shadow-sm">
+        <div className="container py-4">
+          <QuoteActions />
+        </div>
       </div>
       
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Récapitulatif de votre devis</CardTitle>
-          <div className="text-sm font-semibold text-muted-foreground">
-            DEV-00000100
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <DatesTimesSection 
-            orderDetails={orderDetails}
-            pickupTime={pickupTime}
-            deliveryTime={deliveryTime}
-            onPickupDateSelect={handlePickupDateSelect}
-            onDeliveryDateSelect={handleDeliveryDateSelect}
-            onPickupTimeChange={handlePickupTimeChange}
-            onDeliveryTimeChange={handleDeliveryTimeChange}
-          />
-          
-          <AddressesSection orderDetails={orderDetails} />
-          
-          <ContactsSection
-            pickupContact={orderDetails.pickupContact}
-            deliveryContact={orderDetails.deliveryContact}
-            onContactsUpdate={handleContactsUpdate}
-          />
-          
-          <VehiclesSection
-            vehicles={orderDetails.vehicles}
-            newFiles={newFiles}
-            onFileChange={handleFileChange}
-            onRemoveFile={handleRemoveFile}
-            onDeleteVehicle={handleDeleteVehicle}
-            onAddVehicle={handleAddVehicle}
-            showAddVehicleDialog={showAddVehicleDialog}
-            setShowAddVehicleDialog={setShowAddVehicleDialog}
-          />
-          
-          <QuoteFooter
-            totalPriceHT={totalPriceHT}
-            onSubmitQuote={handleSubmitQuote}
-            onGeneratePDF={() => generateQuotePDF(orderDetails, totalPriceHT)}
-          />
-        </CardContent>
-      </Card>
+      <div className="container pt-20 pb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Récapitulatif de votre devis</CardTitle>
+            <div className="text-sm font-semibold text-muted-foreground">
+              DEV-00000100
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <DatesTimesSection 
+              orderDetails={orderDetails}
+              pickupTime={pickupTime}
+              deliveryTime={deliveryTime}
+              onPickupDateSelect={handlePickupDateSelect}
+              onDeliveryDateSelect={handleDeliveryDateSelect}
+              onPickupTimeChange={handlePickupTimeChange}
+              onDeliveryTimeChange={handleDeliveryTimeChange}
+            />
+            
+            <AddressesSection orderDetails={orderDetails} />
+            
+            <ContactsSection
+              pickupContact={orderDetails.pickupContact}
+              deliveryContact={orderDetails.deliveryContact}
+              onContactsUpdate={handleContactsUpdate}
+            />
+            
+            <VehiclesSection
+              vehicles={orderDetails.vehicles}
+              newFiles={newFiles}
+              onFileChange={handleFileChange}
+              onRemoveFile={handleRemoveFile}
+              onDeleteVehicle={handleDeleteVehicle}
+              onAddVehicle={handleAddVehicle}
+              showAddVehicleDialog={showAddVehicleDialog}
+              setShowAddVehicleDialog={setShowAddVehicleDialog}
+            />
+            
+            <QuoteFooter
+              totalPriceHT={totalPriceHT}
+              onSubmitQuote={handleSubmitQuote}
+              onGeneratePDF={() => generateQuotePDF(orderDetails, totalPriceHT)}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
