@@ -1,7 +1,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, EuroIcon } from "lucide-react";
+import { MapPin, EuroIcon, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { fr } from 'date-fns/locale';
 
 interface OrderSummaryProps {
   pickupAddress: string;
@@ -11,6 +16,9 @@ interface OrderSummaryProps {
   priceHT: string;
   onShowContacts: () => void;
   getVehicleName: (id: string) => string;
+  onDateUpdate: (pickup: Date | undefined, delivery: Date | undefined) => void;
+  pickupDate: Date | undefined;
+  deliveryDate: Date | undefined;
 }
 
 export const OrderSummary = ({
@@ -20,8 +28,21 @@ export const OrderSummary = ({
   distance,
   priceHT,
   onShowContacts,
-  getVehicleName
+  getVehicleName,
+  onDateUpdate,
+  pickupDate,
+  deliveryDate
 }: OrderSummaryProps) => {
+  const handlePickupDateSelect = (date: Date | undefined) => {
+    onDateUpdate(date, deliveryDate);
+  };
+
+  const handleDeliveryDateSelect = (date: Date | undefined) => {
+    onDateUpdate(pickupDate, date);
+  };
+
+  const isNextButtonEnabled = pickupDate && deliveryDate;
+
   return (
     <Card>
       <CardHeader>
@@ -43,8 +64,66 @@ export const OrderSummary = ({
         </div>
         
         <div>
+          <h3 className="font-semibold mb-1">Date et heure de prise en charge</h3>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[280px] justify-start text-left font-normal",
+                  !pickupDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {pickupDate ? format(pickupDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={pickupDate}
+                onSelect={handlePickupDateSelect}
+                initialFocus
+                disabled={(date) => date < new Date()}
+                locale={fr}
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div>
           <h3 className="font-semibold mb-1">Adresse de livraison</h3>
           <p className="text-gray-600">{deliveryAddress}</p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold mb-1">Date et heure de livraison</h3>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[280px] justify-start text-left font-normal",
+                  !deliveryDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {deliveryDate ? format(deliveryDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={deliveryDate}
+                onSelect={handleDeliveryDateSelect}
+                initialFocus
+                disabled={(date) => date < (pickupDate || new Date())}
+                locale={fr}
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         {distance && (
@@ -60,7 +139,12 @@ export const OrderSummary = ({
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={onShowContacts}>Suivant</Button>
+          <Button 
+            onClick={onShowContacts}
+            disabled={!isNextButtonEnabled}
+          >
+            Suivant
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -37,6 +37,8 @@ interface OrderState {
   deliveryContact: Contact;
   vehicles: Vehicle[];
   priceHT: string;
+  pickupDate: Date;
+  deliveryDate: Date;
 }
 
 const QuoteTotal = () => {
@@ -74,6 +76,16 @@ const QuoteTotal = () => {
       ...prev,
       [vehicleIndex]: prev[vehicleIndex].filter((_, i) => i !== fileIndex)
     }));
+  };
+
+  const handleDateUpdate = (pickup: Date | undefined, delivery: Date | undefined) => {
+    if (orderDetails && pickup && delivery) {
+      setOrderDetails({
+        ...orderDetails,
+        pickupDate: pickup,
+        deliveryDate: delivery
+      });
+    }
   };
 
   const handleCancelQuote = () => {
@@ -149,9 +161,11 @@ const QuoteTotal = () => {
         <h1 style="color: #1a365d; margin-bottom: 20px;">Devis de transport</h1>
         
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #2c5282;">Adresses</h2>
+          <h2 style="color: #2c5282;">Adresses et dates</h2>
           <p><strong>Départ:</strong> ${orderDetails.pickupAddress}</p>
+          <p><strong>Date de prise en charge:</strong> ${format(orderDetails.pickupDate, "PPP", { locale: fr })}</p>
           <p><strong>Livraison:</strong> ${orderDetails.deliveryAddress}</p>
+          <p><strong>Date de livraison:</strong> ${format(orderDetails.deliveryDate, "PPP", { locale: fr })}</p>
           <p><strong>Distance:</strong> ${orderDetails.distance}</p>
         </div>
 
@@ -247,12 +261,20 @@ const QuoteTotal = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-blue-500" />
-              <h3 className="font-semibold">Adresses</h3>
+              <h3 className="font-semibold">Adresses et dates</h3>
             </div>
-            <div className="ml-7 space-y-2">
-              <p><span className="font-medium">Départ:</span> {orderDetails.pickupAddress}</p>
-              <p><span className="font-medium">Livraison:</span> {orderDetails.deliveryAddress}</p>
-              <p><span className="font-medium">Distance:</span> {orderDetails.distance}</p>
+            <div className="ml-7 space-y-4">
+              <div>
+                <p><span className="font-medium">Départ:</span> {orderDetails.pickupAddress}</p>
+                <p><span className="font-medium">Date de prise en charge:</span> {format(orderDetails.pickupDate, "PPP", { locale: fr })}</p>
+              </div>
+              <div>
+                <p><span className="font-medium">Livraison:</span> {orderDetails.deliveryAddress}</p>
+                <p><span className="font-medium">Date de livraison:</span> {format(orderDetails.deliveryDate, "PPP", { locale: fr })}</p>
+              </div>
+              <div>
+                <p><span className="font-medium">Distance:</span> {orderDetails.distance}</p>
+              </div>
             </div>
           </div>
 
