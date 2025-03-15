@@ -7,17 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { VehicleForm } from "@/components/VehicleForm";
+
 interface OrderState {
   pickupAddress: string;
   deliveryAddress: string;
   selectedVehicle: string;
 }
+
 interface ContactInfo {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
 }
+
 const OrderDetails = () => {
   const location = useLocation();
   const orderDetails = location.state as OrderState | null;
@@ -39,9 +42,12 @@ const OrderDetails = () => {
   });
   const [vehicleCount, setVehicleCount] = useState(0);
   const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
+  const [areContactFieldsValid, setAreContactFieldsValid] = useState(false);
+
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
   }
+
   useEffect(() => {
     const calculateDistance = async () => {
       const service = new google.maps.DistanceMatrixService();
@@ -63,10 +69,18 @@ const OrderDetails = () => {
       calculateDistance();
     }
   }, [orderDetails.pickupAddress, orderDetails.deliveryAddress]);
+
+  useEffect(() => {
+    const isPickupValid = pickupContact.firstName && pickupContact.lastName && pickupContact.email && pickupContact.phone;
+    const isDeliveryValid = deliveryContact.firstName && deliveryContact.lastName && deliveryContact.email && deliveryContact.phone;
+    setAreContactFieldsValid(isPickupValid && isDeliveryValid);
+  }, [pickupContact, deliveryContact]);
+
   const getVehicleName = (id: string) => {
     const vehicle = vehicleTypes.find(v => v.id === id);
     return vehicle ? vehicle.name : id;
   };
+
   const handleVehicleValidityChange = (index: number, isValid: boolean) => {
     setVehicleFormsValidity(prev => {
       const newValidity = [...prev];
@@ -74,14 +88,18 @@ const OrderDetails = () => {
       return newValidity;
     });
   };
+
   const canAddNewVehicle = vehicleCount === 0 || vehicleFormsValidity[vehicleCount - 1] === true;
+
   const deleteVehicle = (indexToDelete: number) => {
     setVehicleCount(prev => prev - 1);
     setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
   };
-  return <div className="p-6 space-y-6">
+
+  return (
+    <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
-      
+
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -122,7 +140,8 @@ const OrderDetails = () => {
         </CardContent>
       </Card>
 
-      {showContacts && <Card>
+      {showContacts && (
+        <Card>
           <CardHeader>
             <CardTitle>Coordonnées de livraison</CardTitle>
           </CardHeader>
@@ -132,32 +151,20 @@ const OrderDetails = () => {
                 <h3 className="font-semibold text-lg">Contact départ</h3>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="pickup-lastName">Nom</Label>
-                    <Input id="pickup-lastName" value={pickupContact.lastName} onChange={e => setPickupContact({
-                  ...pickupContact,
-                  lastName: e.target.value
-                })} />
+                    <Label htmlFor="pickup-lastName">Nom *</Label>
+                    <Input id="pickup-lastName" value={pickupContact.lastName} onChange={e => setPickupContact({...pickupContact, lastName: e.target.value})} required />
                   </div>
                   <div>
-                    <Label htmlFor="pickup-firstName">Prénom</Label>
-                    <Input id="pickup-firstName" value={pickupContact.firstName} onChange={e => setPickupContact({
-                  ...pickupContact,
-                  firstName: e.target.value
-                })} />
+                    <Label htmlFor="pickup-firstName">Prénom *</Label>
+                    <Input id="pickup-firstName" value={pickupContact.firstName} onChange={e => setPickupContact({...pickupContact, firstName: e.target.value})} required />
                   </div>
                   <div>
-                    <Label htmlFor="pickup-email">Adresse mail</Label>
-                    <Input id="pickup-email" type="email" value={pickupContact.email} onChange={e => setPickupContact({
-                  ...pickupContact,
-                  email: e.target.value
-                })} />
+                    <Label htmlFor="pickup-email">Adresse mail *</Label>
+                    <Input id="pickup-email" type="email" value={pickupContact.email} onChange={e => setPickupContact({...pickupContact, email: e.target.value})} required />
                   </div>
                   <div>
-                    <Label htmlFor="pickup-phone">Téléphone</Label>
-                    <Input id="pickup-phone" value={pickupContact.phone} onChange={e => setPickupContact({
-                  ...pickupContact,
-                  phone: e.target.value
-                })} />
+                    <Label htmlFor="pickup-phone">Téléphone *</Label>
+                    <Input id="pickup-phone" value={pickupContact.phone} onChange={e => setPickupContact({...pickupContact, phone: e.target.value})} required />
                   </div>
                 </div>
               </div>
@@ -166,51 +173,48 @@ const OrderDetails = () => {
                 <h3 className="font-semibold text-lg">Contact livraison</h3>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="delivery-lastName">Nom</Label>
-                    <Input id="delivery-lastName" value={deliveryContact.lastName} onChange={e => setDeliveryContact({
-                  ...deliveryContact,
-                  lastName: e.target.value
-                })} />
+                    <Label htmlFor="delivery-lastName">Nom *</Label>
+                    <Input id="delivery-lastName" value={deliveryContact.lastName} onChange={e => setDeliveryContact({...deliveryContact, lastName: e.target.value})} required />
                   </div>
                   <div>
-                    <Label htmlFor="delivery-firstName">Prénom</Label>
-                    <Input id="delivery-firstName" value={deliveryContact.firstName} onChange={e => setDeliveryContact({
-                  ...deliveryContact,
-                  firstName: e.target.value
-                })} />
+                    <Label htmlFor="delivery-firstName">Prénom *</Label>
+                    <Input id="delivery-firstName" value={deliveryContact.firstName} onChange={e => setDeliveryContact({...deliveryContact, firstName: e.target.value})} required />
                   </div>
                   <div>
-                    <Label htmlFor="delivery-email">Adresse mail</Label>
-                    <Input id="delivery-email" type="email" value={deliveryContact.email} onChange={e => setDeliveryContact({
-                  ...deliveryContact,
-                  email: e.target.value
-                })} />
+                    <Label htmlFor="delivery-email">Adresse mail *</Label>
+                    <Input id="delivery-email" type="email" value={deliveryContact.email} onChange={e => setDeliveryContact({...deliveryContact, email: e.target.value})} required />
                   </div>
                   <div>
-                    <Label htmlFor="delivery-phone">Téléphone</Label>
-                    <Input id="delivery-phone" value={deliveryContact.phone} onChange={e => setDeliveryContact({
-                  ...deliveryContact,
-                  phone: e.target.value
-                })} />
+                    <Label htmlFor="delivery-phone">Téléphone *</Label>
+                    <Input id="delivery-phone" value={deliveryContact.phone} onChange={e => setDeliveryContact({...deliveryContact, phone: e.target.value})} required />
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end mt-6">
-              <Button onClick={() => setShowVehicle(true)}>Ajouter le.s véhicule.s</Button>
+              <Button 
+                onClick={() => setShowVehicle(true)} 
+                disabled={!areContactFieldsValid}
+              >
+                Ajouter le.s véhicule.s
+              </Button>
             </div>
           </CardContent>
-        </Card>}
+        </Card>
+      )}
 
-      {showVehicle && <Card>
+      {showVehicle && (
+        <Card>
           <CardHeader>
             <CardTitle>Véhicule.s</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {Array.from({
-          length: vehicleCount
-        }).map((_, index) => <VehicleForm key={index} index={index} onDelete={() => deleteVehicle(index)} onChange={isValid => handleVehicleValidityChange(index, isValid)} />)}
+              length: vehicleCount
+            }).map((_, index) => (
+              <VehicleForm key={index} index={index} onDelete={() => deleteVehicle(index)} onChange={isValid => handleVehicleValidityChange(index, isValid)} />
+            ))}
             
             <div className="flex justify-end">
               <Button onClick={() => setVehicleCount(prev => prev + 1)} variant="outline" className="gap-2" disabled={!canAddNewVehicle}>
@@ -219,9 +223,12 @@ const OrderDetails = () => {
               </Button>
             </div>
           </CardContent>
-        </Card>}
-    </div>;
+        </Card>
+      )}
+    </div>
+  );
 };
+
 const vehicleTypes = [{
   id: "citadine",
   name: "Citadine"
@@ -247,4 +254,5 @@ const vehicleTypes = [{
   id: "utilitaire-20-plus",
   name: "Utilitaire + de 20m3"
 }];
+
 export default OrderDetails;
