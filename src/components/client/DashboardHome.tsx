@@ -49,15 +49,6 @@ const DashboardHome = () => {
           </Card>
         </Link>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Convoyages terminés</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-          </CardContent>
-        </Card>
-
         <Link to="pending-invoices">
           <Card className="hover:bg-accent transition-colors">
             <CardHeader>
@@ -71,6 +62,15 @@ const DashboardHome = () => {
             </CardContent>
           </Card>
         </Link>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Convoyages terminés</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">0</p>
+          </CardContent>
+        </Card>
       </div>
 
       <OrderForm />
