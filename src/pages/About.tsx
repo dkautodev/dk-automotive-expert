@@ -100,6 +100,68 @@ const About = () => {
           </div>
         </section>
 
+        {/* Services Section */}
+        <section className="py-16 px-4 bg-[#18257D] text-white">
+          <div className="container mx-auto">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center space-y-4">
+                <div className="flex justify-center">
+                  <img src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" alt="Écoconduite" className="w-16 h-16 mb-4" />
+                </div>
+                <h4 className="text-xl font-bold">ÉCOCONDUITE</h4>
+                <p className="text-sm">
+                  Nos chauffeurs sont formés à adopter des pratiques de conduite écologique pour réduire la consommation de carburant et minimiser l'impact environnemental.
+                </p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="flex justify-center">
+                  <img src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" alt="Expertise technique" className="w-16 h-16 mb-4" />
+                </div>
+                <h4 className="text-xl font-bold">EXPERTISE TECHNIQUE</h4>
+                <p className="text-sm">
+                  Les chauffeurs DK AUTOMOTIVE sont experts dans la connaissance technique des différents véhicules, leur permettant de s'adapter à toutes les situations et de garantir un convoyage sécurisé.
+                </p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="flex justify-center">
+                  <img src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" alt="Service sur-mesure" className="w-16 h-16 mb-4" />
+                </div>
+                <h4 className="text-xl font-bold">SERVICE SUR-MESURE</h4>
+                <p className="text-sm">
+                  Chez DK AUTOMOTIVE, nous nous adaptons à vos besoins spécifiques en matière de convoyage, offrant des solutions personnalisées pour assurer une expérience client optimale et un convoyage de véhicules en toute sérénité.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Expertise Section */}
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <img alt="Expertise en convoyage" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" />
+              </div>
+              <div className="space-y-6">
+                <h3 className="text-3xl font-bold text-[#18257D]">
+                  EXPERTISE EN CONVOYAGE AUTOMOBILE
+                </h3>
+                <h4 className="text-2xl font-bold">
+                  Assurez-vous d'un transport sécurisé et fiable pour vos véhicules
+                </h4>
+                <p className="text-gray-600 leading-relaxed">
+                  Chez DK AUTOMOTIVE, nous comprenons que la confiance et la satisfaction de nos clients sont essentielles. C'est pourquoi, nous nous efforçons d'offrir un service transparent, professionnel et adapté aux besoins individuels de chaque client. En choisissant DK AUTOMOTIVE, vous optez pour une entreprise qui met tout en œuvre pour vous offrir un service de qualité, capable d'inspirer confiance et de rassurer ses clients.
+                </p>
+                <div className="pt-4">
+                  <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
+                    RÉSERVEZ VOTRE TRANSPORT EN TOUTE CONFIANCE
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-16 px-4 bg-white">
           <div className="container mx-auto text-center">
