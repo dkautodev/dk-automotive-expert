@@ -7,6 +7,7 @@ import { VehiclesSection } from "@/components/order/VehiclesSection";
 import { vehicleTypes } from "@/lib/vehicleTypes";
 import { Button } from "@/components/ui/button";
 import { Calculator } from "lucide-react";
+import { useScrollToElement } from "@/hooks/useScrollToElement";
 
 interface OrderState {
   pickupAddress: string;
@@ -44,6 +45,7 @@ const OrderDetails = () => {
   const [pickupContact, setPickupContact] = useState<ContactInfo | null>(null);
   const [deliveryContact, setDeliveryContact] = useState<ContactInfo | null>(null);
   const [vehicles, setVehicles] = useState<VehicleInfo[]>([]);
+  const scrollToElement = useScrollToElement();
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -119,6 +121,21 @@ const OrderDetails = () => {
     }
   };
 
+  const handleShowContacts = () => {
+    setShowContacts(true);
+    setTimeout(() => scrollToElement('contacts-section'), 100);
+  };
+
+  const handleShowVehicle = () => {
+    setShowVehicle(true);
+    setTimeout(() => scrollToElement('vehicles-section'), 100);
+  };
+
+  const handleAddVehicle = () => {
+    setVehicleCount(prev => prev + 1);
+    setTimeout(() => scrollToElement('last-vehicle'), 100);
+  };
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
@@ -129,31 +146,35 @@ const OrderDetails = () => {
         selectedVehicle={orderDetails.selectedVehicle}
         distance={distance}
         priceHT={priceHT}
-        onShowContacts={() => setShowContacts(true)}
+        onShowContacts={handleShowContacts}
         getVehicleName={getVehicleName}
       />
 
       {showContacts && (
-        <ContactsForm
-          onContactsValid={setAreContactFieldsValid}
-          onShowVehicle={() => setShowVehicle(true)}
-          onContactsUpdate={handleContactsUpdate}
-        />
+        <div id="contacts-section">
+          <ContactsForm
+            onContactsValid={setAreContactFieldsValid}
+            onShowVehicle={handleShowVehicle}
+            onContactsUpdate={handleContactsUpdate}
+          />
+        </div>
       )}
 
       {showVehicle && (
-        <VehiclesSection
-          vehicleCount={vehicleCount}
-          vehicleFormsValidity={vehicleFormsValidity}
-          onVehicleValidityChange={handleVehicleValidityChange}
-          onDeleteVehicle={deleteVehicle}
-          onAddVehicle={() => setVehicleCount(prev => prev + 1)}
-          onVehicleUpdate={handleVehicleUpdate}
-        />
+        <div id="vehicles-section">
+          <VehiclesSection
+            vehicleCount={vehicleCount}
+            vehicleFormsValidity={vehicleFormsValidity}
+            onVehicleValidityChange={handleVehicleValidityChange}
+            onDeleteVehicle={deleteVehicle}
+            onAddVehicle={handleAddVehicle}
+            onVehicleUpdate={handleVehicleUpdate}
+          />
+        </div>
       )}
 
       {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && (
-        <div className="flex justify-end mt-6">
+        <div id="last-vehicle" className="flex justify-end mt-6">
           <Button
             onClick={navigateToQuoteTotal}
             className="gap-2"
