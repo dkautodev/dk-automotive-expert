@@ -1,6 +1,5 @@
-
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Receipt } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -24,7 +23,7 @@ const DashboardHome = () => {
         </Button>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Convoyages en cours</CardTitle>
@@ -46,6 +45,18 @@ const DashboardHome = () => {
         <Card>
           <CardHeader>
             <CardTitle>Devis en attente</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">0</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="h-6 w-6" />
+              Factures en attente
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">0</p>
