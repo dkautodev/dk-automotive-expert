@@ -12,16 +12,17 @@ import { ContactsSection } from "@/components/quote/ContactsSection";
 import { VehiclesSection } from "@/components/quote/VehiclesSection";
 import { QuoteFooter } from "@/components/quote/QuoteFooter";
 import { DatesTimesSection } from "@/components/quote/DatesTimesSection";
+import { useFileManagement } from "@/hooks/useFileManagement";
 
 const QuoteTotal = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [orderDetails, setOrderDetails] = useState(location.state as OrderState | null);
-  const [newFiles, setNewFiles] = useState<{ [key: number]: File[] }>({});
   const [showAddVehicleDialog, setShowAddVehicleDialog] = useState(false);
   const [pickupTime, setPickupTime] = useState<string>("");
   const [deliveryTime, setDeliveryTime] = useState<string>("");
+  const { newFiles, handleFileChange, handleRemoveFile, clearVehicleFiles } = useFileManagement();
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -71,31 +72,6 @@ const QuoteTotal = () => {
     }
   };
 
-  const handleFileChange = (vehicleIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const validFiles = Array.from(files).filter(file => 
-        file.type === 'application/pdf' || file.type === 'image/jpeg'
-      );
-      
-      if (validFiles.length !== files.length) {
-        alert("Seuls les fichiers PDF et JPG sont acceptés.");
-      }
-      
-      setNewFiles(prev => ({
-        ...prev,
-        [vehicleIndex]: [...(prev[vehicleIndex] || []), ...validFiles]
-      }));
-    }
-  };
-
-  const handleRemoveFile = (vehicleIndex: number, fileIndex: number) => {
-    setNewFiles(prev => ({
-      ...prev,
-      [vehicleIndex]: prev[vehicleIndex].filter((_, i) => i !== fileIndex)
-    }));
-  };
-
   const handleContactsUpdate = (pickup: any, delivery: any) => {
     if (orderDetails) {
       setOrderDetails({
@@ -113,10 +89,7 @@ const QuoteTotal = () => {
         ...orderDetails,
         vehicles: updatedVehicles
       });
-      
-      const updatedNewFiles = { ...newFiles };
-      delete updatedNewFiles[index];
-      setNewFiles(updatedNewFiles);
+      clearVehicleFiles(index);
     }
   };
 
