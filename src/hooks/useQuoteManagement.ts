@@ -1,6 +1,7 @@
 
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
+import { QuoteRow } from "@/types/database";
 
 export const useQuoteManagement = () => {
   const saveQuote = async (quote: Quote) => {
@@ -27,11 +28,13 @@ export const useQuoteManagement = () => {
     const { data, error } = await supabase
       .from('quotes')
       .select('*')
-      .eq('status', 'pending');
+      .eq('status', 'pending') as { data: QuoteRow[] | null; error: any };
 
     if (error) {
       throw new Error(`Error fetching quotes: ${error.message}`);
     }
+
+    if (!data) return [];
 
     return data.map((quote) => ({
       id: quote.id,
