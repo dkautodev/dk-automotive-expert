@@ -16,10 +16,7 @@ const ClientSidebar = () => {
             </Link>
           </li>
           <li className="mb-2">
-            <Link to="/client/new-quote" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <Plus className="mr-2 h-4 w-4" />
-              Nouveau Devis
-            </Link>
+            
           </li>
           <li className="mb-2">
             <Link to="/client/quotes" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
