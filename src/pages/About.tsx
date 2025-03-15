@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -75,13 +74,6 @@ const About = () => {
         <section className="py-16 px-4 bg-white">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <img 
-                  src="/lovable-uploads/cd68faa2-07bb-4407-a720-2b40ee2e8479.png" 
-                  alt="DK Automotive drivers" 
-                  className="rounded-lg shadow-lg w-full"
-                />
-              </div>
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
                   CHAUFFEURS EXPÉRIMENTÉS
@@ -97,6 +89,13 @@ const About = () => {
                     Contactez-nous
                   </Link>
                 </div>
+              </div>
+              <div>
+                <img 
+                  src="/lovable-uploads/cd68faa2-07bb-4407-a720-2b40ee2e8479.png" 
+                  alt="DK Automotive drivers" 
+                  className="rounded-lg shadow-lg w-full"
+                />
               </div>
             </div>
           </div>
