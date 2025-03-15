@@ -9,8 +9,32 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import OrderForm from "./OrderForm";
+import { useEffect, useState } from "react";
+import { Quote } from "@/types/order";
 
 const DashboardHome = () => {
+  const [counts, setCounts] = useState({
+    pendingQuotes: 0,
+    ongoingShipments: 0,
+    pendingInvoices: 0,
+    completedShipments: 0,
+  });
+
+  useEffect(() => {
+    // Récupérer les devis depuis le localStorage
+    const savedQuotes = localStorage.getItem('pendingQuotes');
+    if (savedQuotes) {
+      const parsedQuotes = JSON.parse(savedQuotes) as Quote[];
+      setCounts(prev => ({
+        ...prev,
+        pendingQuotes: parsedQuotes.length
+      }));
+    }
+
+    // TODO: Ajouter la récupération des autres données quand elles seront implémentées
+    // Pour l'instant on laisse les autres compteurs à 0
+  }, []);
+
   const handleLogout = () => {
     // TODO: Implement logout logic
     console.log("Logout clicked");
@@ -33,7 +57,7 @@ const DashboardHome = () => {
               <CardTitle className="text-lg">Devis en attente</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">0</p>
+              <p className="text-2xl font-bold">{counts.pendingQuotes}</p>
             </CardContent>
           </Card>
         </Link>
@@ -44,7 +68,7 @@ const DashboardHome = () => {
               <CardTitle className="text-lg">Convoyages en cours</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">0</p>
+              <p className="text-2xl font-bold">{counts.ongoingShipments}</p>
             </CardContent>
           </Card>
         </Link>
@@ -58,7 +82,7 @@ const DashboardHome = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">0</p>
+              <p className="text-2xl font-bold">{counts.pendingInvoices}</p>
             </CardContent>
           </Card>
         </Link>
@@ -68,7 +92,7 @@ const DashboardHome = () => {
             <CardTitle className="text-lg">Convoyages terminés</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">0</p>
+            <p className="text-2xl font-bold">{counts.completedShipments}</p>
           </CardContent>
         </Card>
       </div>
