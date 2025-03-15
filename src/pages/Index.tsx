@@ -1,7 +1,10 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -11,12 +14,33 @@ const Index = () => {
         <section className="relative h-[600px] bg-cover bg-center" style={{
         backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
       }}>
-          <div className="absolute inset-0 bg-black/40" /> {/* Overlay sombre pour la lisibilité */}
+          <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
-            <div className="max-w-2xl">
-              <h1 className="text-5xl font-bold mb-6 text-white">Convoyage de véhicules par route en France</h1>
-              <p className="text-xl mb-8 text-white">Confiez-nous le convoyage de vos véhicules, pour un service sur mesure,
-écologique et économique.</p>
+            <div className="max-w-3xl">
+              <h1 className="text-6xl font-bold mb-12 text-white leading-tight tracking-wide uppercase">
+                Convoyage de véhicules<br />par route en France
+              </h1>
+              
+              <div className="space-y-4 mb-12">
+                <div className="flex items-center gap-3 text-white">
+                  <Check className="w-6 h-6" />
+                  <span className="text-xl">Convoyage sur mesure et économique</span>
+                </div>
+                <div className="flex items-center gap-3 text-white">
+                  <Check className="w-6 h-6" />
+                  <span className="text-xl">Engagement Éco-responsable</span>
+                </div>
+                <div className="flex items-center gap-3 text-white">
+                  <Check className="w-6 h-6" />
+                  <span className="text-xl">Livraison rapide et sécurisée</span>
+                </div>
+              </div>
+
+              <p className="text-2xl text-white mb-8">
+                Confiez-nous le convoyage de vos véhicules, pour un service sur mesure,<br />
+                écologique et économique.
+              </p>
+              
               <Link to="/devis">
                 <Button className="bg-white text-dk-navy hover:bg-gray-100 transition-colors text-lg px-8 py-6">
                   Demander mon devis sur mesure
@@ -61,4 +85,5 @@ const Index = () => {
       </main>
     </div>;
 };
+
 export default Index;
