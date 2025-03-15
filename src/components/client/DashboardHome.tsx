@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardHeader,
