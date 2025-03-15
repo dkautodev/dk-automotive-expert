@@ -1,7 +1,7 @@
 
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Car, Users, FileText, EuroIcon } from "lucide-react";
+import { MapPin, Car, Users, FileText, EuroIcon, ArrowLeft } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +36,7 @@ interface OrderState {
 
 const QuoteTotal = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const orderDetails = location.state as OrderState | null;
   const [newFiles, setNewFiles] = useState<{ [key: number]: File[] }>({});
 
@@ -72,6 +73,17 @@ const QuoteTotal = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <div className="flex items-center gap-4 mb-4">
+        <Button
+          variant="outline"
+          onClick={() => navigate(-1)}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Récapitulatif de votre devis</CardTitle>
@@ -182,3 +194,4 @@ const QuoteTotal = () => {
 };
 
 export default QuoteTotal;
+
