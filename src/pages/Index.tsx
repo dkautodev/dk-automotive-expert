@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -174,6 +176,8 @@ const Index = () => {
         {/* CTA Section */}
         
       </main>
+      <Footer />
     </div>;
 };
+
 export default Index;
