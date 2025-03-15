@@ -50,21 +50,21 @@ export const useQuoteManagement = () => {
 
     if (!data) return [];
 
-    return data.map((quote) => ({
+    return data.map((quote): Quote => ({
       id: quote.id,
-      quote_number: quote.quote_number,
+      quote_number: quote.quote_number || '',
       pickupAddress: quote.pickup_address,
       deliveryAddress: quote.delivery_address,
       vehicles: quote.vehicles,
       totalPriceHT: quote.total_price_ht,
-      totalPriceTTC: quote.total_price_ttc,
-      distance: quote.distance,
-      status: quote.status,
-      dateCreated: new Date(quote.date_created),
+      totalPriceTTC: quote.total_price_ttc || quote.total_price_ht * 1.2,
+      distance: Number(quote.distance) || 0,
+      status: quote.status as 'pending' | 'accepted' | 'rejected',
+      dateCreated: new Date(quote.date_created || new Date()),
       pickupDate: quote.pickup_date ? new Date(quote.pickup_date) : undefined,
-      pickupTime: quote.pickup_time,
+      pickupTime: quote.pickup_time || undefined,
       deliveryDate: quote.delivery_date ? new Date(quote.delivery_date) : undefined,
-      deliveryTime: quote.delivery_time
+      deliveryTime: quote.delivery_time || undefined
     }));
   };
 

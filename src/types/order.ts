@@ -17,13 +17,30 @@ export interface Contact {
 export interface OrderState {
   pickupAddress: string;
   deliveryAddress: string;
-  distance: string;
+  distance: number;
   pickupContact: Contact;
   deliveryContact: Contact;
   vehicles: Vehicle[];
   priceHT: string;
   pickupDate: Date;
   deliveryDate: Date;
+}
+
+export interface Quote {
+  id: string;
+  quote_number: string;
+  pickupAddress: string;
+  deliveryAddress: string;
+  vehicles: Vehicle[];
+  totalPriceHT: number;
+  totalPriceTTC: number;
+  distance: number;
+  status: 'pending' | 'accepted' | 'rejected';
+  dateCreated: Date;
+  pickupDate?: Date;
+  pickupTime?: string;
+  deliveryDate?: Date;
+  deliveryTime?: string;
 }
 
 export interface OrderState {

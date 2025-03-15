@@ -93,7 +93,7 @@ const QuoteTotal = () => {
   const handleSubmitQuote = async () => {
     if (!orderDetails) return;
 
-    const newQuote: Quote = {
+    const quoteData: Quote = {
       id: crypto.randomUUID(),
       quote_number: '',
       pickupAddress: orderDetails.pickupAddress,
@@ -101,7 +101,7 @@ const QuoteTotal = () => {
       vehicles: orderDetails.vehicles,
       totalPriceHT: Number(totalPriceHT.toFixed(2)),
       totalPriceTTC: Number((totalPriceHT * 1.2).toFixed(2)),
-      distance: Number(orderDetails.distance) || 0,
+      distance: typeof orderDetails.distance === 'string' ? parseFloat(orderDetails.distance) : orderDetails.distance,
       status: 'pending',
       dateCreated: new Date(),
       pickupDate: orderDetails.pickupDate,
@@ -109,7 +109,7 @@ const QuoteTotal = () => {
     };
 
     try {
-      await saveQuote(newQuote);
+      await saveQuote(quoteData);
       
       await queryClient.invalidateQueries({ queryKey: ['pendingQuotes'] });
       
