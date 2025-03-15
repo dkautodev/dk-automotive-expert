@@ -1,14 +1,11 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 const Navbar = () => {
-  return (
-    <div className="w-full">
+  return <div className="w-full">
       <div className="bg-dk-navy text-white py-2 px-4">
-        <div className="container mx-auto flex justify-between items-center">
+        <div className="container flex justify-between items-center mx-0">
           <div className="flex gap-4">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-dk-blue transition-colors">
               <Facebook size={20} />
@@ -17,7 +14,7 @@ const Navbar = () => {
               <Instagram size={20} />
             </a>
           </div>
-          <p className="text-sm text-center flex-1">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
+          <p className="text-sm flex-1 text-center px-[50px]">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
           <div className="flex-1"></div>
         </div>
       </div>
@@ -39,8 +36,6 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-    </div>
-  );
+    </div>;
 };
-
 export default Navbar;
