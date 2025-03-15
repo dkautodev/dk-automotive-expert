@@ -1,24 +1,63 @@
 
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
+import { useAuthContext } from "@/context/AuthContext";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type FormData = {
-  email: string;
-  password: string;
-};
+const formSchema = z.object({
+  email: z.string().email("Adresse email invalide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const form = useForm<FormData>();
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, role } = useAuthContext();
+  const navigate = useNavigate();
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-    // TODO: Implement authentication logic
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsLoading(true);
+      await signIn(data.email, data.password);
+      
+      // Redirect based on user role
+      switch (role) {
+        case 'client':
+          navigate('/dashboard/client');
+          break;
+        case 'driver':
+          navigate('/dashboard/driver');
+          break;
+        case 'admin':
+          navigate('/dashboard/admin');
+          break;
+        default:
+          // If no role is set yet, we'll show an error
+          toast.error("Erreur d'authentification: Rôle non défini");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Une erreur est survenue lors de la connexion");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -83,8 +122,12 @@ const SignInForm = () => {
               )}
             />
             
-            <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue">
-              Se connecter
+            <Button 
+              type="submit" 
+              className="w-full bg-dk-navy hover:bg-dk-blue"
+              disabled={isLoading}
+            >
+              {isLoading ? "Connexion en cours..." : "Se connecter"}
             </Button>
           </form>
         </Form>
