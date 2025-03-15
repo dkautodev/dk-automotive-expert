@@ -70,9 +70,34 @@ const OrderDetails = () => {
     }
   }, [orderDetails.pickupAddress, orderDetails.deliveryAddress]);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+    return phoneRegex.test(phone);
+  };
+
   useEffect(() => {
-    const isPickupValid = pickupContact.firstName && pickupContact.lastName && pickupContact.email && pickupContact.phone;
-    const isDeliveryValid = deliveryContact.firstName && deliveryContact.lastName && deliveryContact.email && deliveryContact.phone;
+    const isPickupEmailValid = validateEmail(pickupContact.email);
+    const isPickupPhoneValid = validatePhone(pickupContact.phone);
+    const isDeliveryEmailValid = validateEmail(deliveryContact.email);
+    const isDeliveryPhoneValid = validatePhone(deliveryContact.phone);
+    
+    const isPickupValid = 
+      pickupContact.firstName && 
+      pickupContact.lastName && 
+      isPickupEmailValid && 
+      isPickupPhoneValid;
+      
+    const isDeliveryValid = 
+      deliveryContact.firstName && 
+      deliveryContact.lastName && 
+      isDeliveryEmailValid && 
+      isDeliveryPhoneValid;
+    
     setAreContactFieldsValid(isPickupValid && isDeliveryValid);
   }, [pickupContact, deliveryContact]);
 
@@ -160,11 +185,30 @@ const OrderDetails = () => {
                   </div>
                   <div>
                     <Label htmlFor="pickup-email">Adresse mail *</Label>
-                    <Input id="pickup-email" type="email" value={pickupContact.email} onChange={e => setPickupContact({...pickupContact, email: e.target.value})} required />
+                    <Input 
+                      id="pickup-email" 
+                      type="email" 
+                      value={pickupContact.email} 
+                      onChange={e => setPickupContact({...pickupContact, email: e.target.value})}
+                      className={!validateEmail(pickupContact.email) && pickupContact.email ? "border-red-500" : ""}
+                      required 
+                    />
+                    {!validateEmail(pickupContact.email) && pickupContact.email && (
+                      <p className="text-red-500 text-sm mt-1">Format d'email invalide</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="pickup-phone">Téléphone *</Label>
-                    <Input id="pickup-phone" value={pickupContact.phone} onChange={e => setPickupContact({...pickupContact, phone: e.target.value})} required />
+                    <Input 
+                      id="pickup-phone" 
+                      value={pickupContact.phone} 
+                      onChange={e => setPickupContact({...pickupContact, phone: e.target.value})}
+                      className={!validatePhone(pickupContact.phone) && pickupContact.phone ? "border-red-500" : ""}
+                      required 
+                    />
+                    {!validatePhone(pickupContact.phone) && pickupContact.phone && (
+                      <p className="text-red-500 text-sm mt-1">Format de téléphone invalide (ex: 0612345678 ou +33612345678)</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -182,11 +226,30 @@ const OrderDetails = () => {
                   </div>
                   <div>
                     <Label htmlFor="delivery-email">Adresse mail *</Label>
-                    <Input id="delivery-email" type="email" value={deliveryContact.email} onChange={e => setDeliveryContact({...deliveryContact, email: e.target.value})} required />
+                    <Input 
+                      id="delivery-email" 
+                      type="email" 
+                      value={deliveryContact.email} 
+                      onChange={e => setDeliveryContact({...deliveryContact, email: e.target.value})}
+                      className={!validateEmail(deliveryContact.email) && deliveryContact.email ? "border-red-500" : ""}
+                      required 
+                    />
+                    {!validateEmail(deliveryContact.email) && deliveryContact.email && (
+                      <p className="text-red-500 text-sm mt-1">Format d'email invalide</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="delivery-phone">Téléphone *</Label>
-                    <Input id="delivery-phone" value={deliveryContact.phone} onChange={e => setDeliveryContact({...deliveryContact, phone: e.target.value})} required />
+                    <Input 
+                      id="delivery-phone" 
+                      value={deliveryContact.phone} 
+                      onChange={e => setDeliveryContact({...deliveryContact, phone: e.target.value})}
+                      className={!validatePhone(deliveryContact.phone) && deliveryContact.phone ? "border-red-500" : ""}
+                      required 
+                    />
+                    {!validatePhone(deliveryContact.phone) && deliveryContact.phone && (
+                      <p className="text-red-500 text-sm mt-1">Format de téléphone invalide (ex: 0612345678 ou +33612345678)</p>
+                    )}
                   </div>
                 </div>
               </div>
