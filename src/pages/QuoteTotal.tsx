@@ -11,12 +11,7 @@ import { AddressesSection } from "@/components/quote/AddressesSection";
 import { ContactsSection } from "@/components/quote/ContactsSection";
 import { VehiclesSection } from "@/components/quote/VehiclesSection";
 import { QuoteFooter } from "@/components/quote/QuoteFooter";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Clock } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { DatesTimesSection } from "@/components/quote/DatesTimesSection";
 
 const QuoteTotal = () => {
   const location = useLocation();
@@ -227,86 +222,16 @@ const QuoteTotal = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="font-semibold">Date et heure de prise en charge</h3>
-            <div className="flex gap-4 items-start">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant={"outline"} 
-                    className={cn("w-[240px] justify-start text-left font-normal", 
-                      !orderDetails.pickupDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {orderDetails.pickupDate ? format(orderDetails.pickupDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar 
-                    mode="single" 
-                    selected={orderDetails.pickupDate} 
-                    onSelect={handlePickupDateSelect}
-                    disabled={(date) => date < new Date()} 
-                    initialFocus 
-                    locale={fr}
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <div className="relative">
-                <Input 
-                  type="time" 
-                  className="pl-10 w-[150px]" 
-                  value={pickupTime}
-                  onChange={handlePickupTimeChange}
-                />
-                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="font-semibold">Date et heure de livraison</h3>
-            <div className="flex gap-4 items-start">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant={"outline"} 
-                    className={cn("w-[240px] justify-start text-left font-normal", 
-                      !orderDetails.deliveryDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {orderDetails.deliveryDate ? format(orderDetails.deliveryDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar 
-                    mode="single" 
-                    selected={orderDetails.deliveryDate} 
-                    onSelect={handleDeliveryDateSelect}
-                    disabled={(date) => date < orderDetails.pickupDate} 
-                    initialFocus 
-                    locale={fr}
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <div className="relative">
-                <Input 
-                  type="time" 
-                  className="pl-10 w-[150px]" 
-                  value={deliveryTime}
-                  onChange={handleDeliveryTimeChange}
-                />
-                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-              </div>
-            </div>
-          </div>
-
+          <DatesTimesSection 
+            orderDetails={orderDetails}
+            pickupTime={pickupTime}
+            deliveryTime={deliveryTime}
+            onPickupDateSelect={handlePickupDateSelect}
+            onDeliveryDateSelect={handleDeliveryDateSelect}
+            onPickupTimeChange={handlePickupTimeChange}
+            onDeliveryTimeChange={handleDeliveryTimeChange}
+          />
+          
           <AddressesSection orderDetails={orderDetails} />
           
           <ContactsSection
