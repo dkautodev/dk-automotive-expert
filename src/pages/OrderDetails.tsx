@@ -70,7 +70,7 @@ const OrderDetails = () => {
 
           {distance && (
             <div>
-              <h3 className="font-semibold mb-1">Nombre de kilomètres</h3>
+              <h3 className="font-semibold mb-1">Distance</h3>
               <p className="text-gray-600">{distance}</p>
             </div>
           )}
