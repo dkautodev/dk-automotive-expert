@@ -47,16 +47,16 @@ const PendingQuotes = () => {
   if (quotes.length === 0) {
     return (
       <div className="p-6">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">Devis en attente</h1>
+        <div className="relative mb-6">
           <Button
             variant="outline"
             onClick={() => navigate("/dashboard/client")}
-            className="mt-4 gap-2"
+            className="absolute left-0 gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour au tableau de bord
           </Button>
+          <h1 className="text-3xl font-bold text-center">Devis en attente</h1>
         </div>
         <Card>
           <CardContent className="p-6 text-center text-gray-500">
@@ -69,16 +69,16 @@ const PendingQuotes = () => {
 
   return (
     <div className="p-6">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold">Devis en attente</h1>
+      <div className="relative mb-6">
         <Button
           variant="outline"
           onClick={() => navigate("/dashboard/client")}
-          className="mt-4 gap-2"
+          className="absolute left-0 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour au tableau de bord
         </Button>
+        <h1 className="text-3xl font-bold text-center">Devis en attente</h1>
       </div>
       <Card>
         <CardContent>
