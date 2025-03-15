@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, UserRound, Menu, X } from 'lucide-react';
+import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,14 +21,18 @@ const Navbar = () => {
       <div className="bg-dk-navy text-white py-2 px-4">
         <div className="container flex justify-between items-center mx-auto">
           <div className="flex gap-4">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-dk-blue transition-colors">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+               className="hover:text-dk-blue transition-colors hover-scale">
               <Facebook size={20} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-dk-blue transition-colors">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" 
+               className="hover:text-dk-blue transition-colors hover-scale">
               <Instagram size={20} />
             </a>
           </div>
-          <p className="text-sm text-center hidden md:block">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
+          <p className="text-sm text-center hidden md:block font-light">
+            Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.
+          </p>
           <div className="invisible flex gap-4 hidden md:flex">
             <Facebook size={20} />
             <Instagram size={20} />
@@ -39,28 +43,30 @@ const Navbar = () => {
         <div className="container mx-auto py-4 px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex-shrink-0">
-              <img src="/lovable-uploads/ea18e979-d5d3-4e98-9a6b-2979a5f6ce83.png" alt="DK AUTOMOTIVE" className="h-8 md:h-12" />
+              <img src="/lovable-uploads/ea18e979-d5d3-4e98-9a6b-2979a5f6ce83.png" 
+                   alt="DK AUTOMOTIVE" 
+                   className="h-8 md:h-12 hover-scale" />
             </Link>
             
             {isMobile ? (
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="hover-scale">
                     <Menu className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                  <nav className="flex flex-col gap-4">
+                <SheetContent side="right" className="w-[300px] sm:w-[400px] glass-effect">
+                  <nav className="flex flex-col gap-4 mt-8">
                     {navLinks.map((link) => (
                       <Link
                         key={link.to}
                         to={link.to}
-                        className="text-dk-navy hover:text-dk-blue transition-colors py-2 text-lg"
+                        className="text-dk-navy hover:text-dk-blue transition-colors py-2 text-lg font-medium hover-scale"
                       >
                         {link.text}
                       </Link>
                     ))}
-                    <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors w-full mt-4">
+                    <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors w-full mt-4 hover-scale">
                       <UserRound className="mr-2" />
                       Espace professionnel
                     </Button>
@@ -73,12 +79,12 @@ const Navbar = () => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="text-dk-navy hover:text-dk-blue transition-colors"
+                    className="text-dk-navy hover:text-dk-blue transition-colors font-medium hover-scale"
                   >
                     {link.text}
                   </Link>
                 ))}
-                <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors">
+                <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors hover-scale">
                   <UserRound className="mr-2" />
                   Espace professionnel
                 </Button>

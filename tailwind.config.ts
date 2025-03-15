@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       colors: {
-        'dk-navy': '#1a237e',
+        'dk-navy': '#18257D',
         'dk-blue': '#3f51b5',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -69,11 +69,16 @@ export default {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        slideIn: {
+          "0%": { transform: "translateY(10px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         fadeIn: "fadeIn 0.5s ease-out",
+        slideIn: "slideIn 0.5s ease-out",
       },
     },
   },

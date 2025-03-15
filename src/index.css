@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,6 +97,27 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+
+  .fade-up {
+    @apply transition-all duration-500 ease-out transform;
+  }
+
+  .fade-up-enter {
+    @apply opacity-0 translate-y-4;
+  }
+
+  .fade-up-enter-active {
+    @apply opacity-100 translate-y-0;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/90 shadow-lg;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
   }
 }
+
