@@ -55,11 +55,11 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
   const onSubmit = async (data: PickupFormValues) => {
     console.log('Pickup details:', data);
     try {
-      setIsSubmitted(true);
       toast({
-        title: "Demande envoyée",
-        description: "Votre demande de devis a été envoyée avec succès",
+        title: "Première étape validée",
+        description: "Veuillez remplir les informations de livraison",
       });
+      onNext();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -293,8 +293,7 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
             RETOUR
           </Button>
           <Button type="submit" className="bg-[#1a237e] hover:bg-[#3f51b5]">
-            ENVOYER
-            <Mail className="ml-2 h-4 w-4" />
+            SUIVANT
           </Button>
         </div>
       </form>
