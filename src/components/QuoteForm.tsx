@@ -1,7 +1,11 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 import {
   Select,
   SelectContent,
@@ -18,20 +22,40 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-type QuoteFormValues = {
-  vehicleType: string;
-  brand: string;
-  model: string;
-  year: string;
-  licensePlate: string;
-  fuelType: string;
-};
+const formSchema = z.object({
+  vehicleType: z.string({
+    required_error: "Le type de véhicule est requis",
+  }),
+  brand: z.string().min(1, "La marque est requise"),
+  model: z.string().min(1, "Le modèle est requis"),
+  year: z.string().min(4, "L'année est requise"),
+  licensePlate: z.string().min(1, "L'immatriculation est requise"),
+  fuelType: z.string({
+    required_error: "Le type de carburant est requis",
+  }),
+});
+
+type QuoteFormValues = z.infer<typeof formSchema>;
 
 const QuoteForm = () => {
-  const form = useForm<QuoteFormValues>();
+  const form = useForm<QuoteFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      vehicleType: '',
+      brand: '',
+      model: '',
+      year: '',
+      licensePlate: '',
+      fuelType: '',
+    },
+  });
 
   const onSubmit = (data: QuoteFormValues) => {
     console.log(data);
+    toast({
+      title: "Formulaire soumis",
+      description: "Vos informations ont été enregistrées",
+    });
   };
 
   return (
