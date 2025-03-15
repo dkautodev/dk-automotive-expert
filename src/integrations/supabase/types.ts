@@ -143,6 +143,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_user_role: {
+        Args: {
+          user_id: string
+          required_role: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
+      }
       generate_quote_number: {
         Args: Record<PropertyKey, never>
         Returns: string

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Mail, Lock, User, Briefcase, Phone } from "lucide-react";
@@ -11,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis"),
@@ -48,23 +48,34 @@ const SignUpForm = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await signUp(data.email, data.password, {
+      const { data: authData, error: signUpError } = await signUp(data.email, data.password, {
         first_name: data.firstName,
         last_name: data.lastName,
-        phone: data.phone,
-        role: 'client'
+        phone: data.phone
       });
 
-      toast({
-        title: "Inscription réussie",
-        description: "Votre compte a été créé avec succès."
-      });
-      
-      navigate('/dashboard/client');
+      if (signUpError) throw signUpError;
+
+      if (authData.user) {
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: 'client'
+          });
+
+        if (roleError) throw roleError;
+
+        toast({
+          title: "Inscription réussie",
+          description: "Votre compte a été créé avec succès."
+        });
+        
+        navigate('/dashboard/client');
+      }
     } catch (error: any) {
       let errorMessage = "Une erreur est survenue lors de l'inscription.";
       
-      // Handle specific error cases
       if (error.message.includes("over_email_send_rate_limit")) {
         errorMessage = "Veuillez attendre quelques secondes avant de réessayer.";
       } else if (error.message.includes("User already registered")) {
