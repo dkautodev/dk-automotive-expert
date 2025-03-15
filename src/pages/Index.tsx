@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
-
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -58,7 +57,7 @@ const Index = () => {
               
               
               <div className="mb-8">
-                <h3 className="text-2xl md:text-4xl font-bold mb-4 py-[16px]">
+                <h3 className="text-2xl md:text-4xl font-bold mb-4 py-[30px]">
                   FAITES CONFIANCE À DK AUTOMOTIVE
                 </h3>
                 <h4 className="text-xl md:text-3xl font-bold text-[#18257D] mb-4">
@@ -157,7 +156,9 @@ const Index = () => {
                 </ul>
               </div>
             </div>
-            <div className="mt-12 text-center mx-auto" style={{ maxWidth: "calc(100% - 2rem)" }}>
+            <div className="mt-12 text-center mx-auto" style={{
+            maxWidth: "calc(100% - 2rem)"
+          }}>
               <p className="text-gray-600 mb-8 text-xl">
                 Prêt à découvrir la différence avec nos services de convoyage professionnels ? Contactez-nous ou faites une demande de devis personnalisée adaptée à vos besoins de transport.
               </p>
@@ -184,5 +185,4 @@ const Index = () => {
       </main>
     </div>;
 };
-
 export default Index;
