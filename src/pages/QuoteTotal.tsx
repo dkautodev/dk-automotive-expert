@@ -96,7 +96,13 @@ const QuoteTotal = () => {
     const content = document.createElement('div');
     content.innerHTML = `
       <div style="padding: 20px; font-family: Arial, sans-serif;">
-        <h1 style="color: #1a365d; margin-bottom: 20px;">Devis de transport</h1>
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+          <h1 style="color: #1a365d;">Devis de transport</h1>
+          <div style="text-align: right;">
+            <p style="color: #64748b; margin: 0;">Devis n° DEV-00000100</p>
+            <p style="color: #64748b; margin: 0;">Date: ${format(new Date(), "dd/MM/yyyy")}</p>
+          </div>
+        </div>
         
         <div style="margin-bottom: 30px;">
           <h2 style="color: #2c5282;">Adresses et dates</h2>
