@@ -118,7 +118,7 @@ const PendingQuotes = () => {
                 <TableHead>Créé le</TableHead>
                 <TableHead>Départ</TableHead>
                 <TableHead>Arrivée</TableHead>
-                <TableHead>Véhicules</TableHead>
+                <TableHead>Prix HT</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -131,7 +131,7 @@ const PendingQuotes = () => {
                   </TableCell>
                   <TableCell>{quote.pickupAddress}</TableCell>
                   <TableCell>{quote.deliveryAddress}</TableCell>
-                  <TableCell>{quote.vehicles.length}</TableCell>
+                  <TableCell>{quote.totalPriceHT.toFixed(2)}€</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-2">
                       <Button
