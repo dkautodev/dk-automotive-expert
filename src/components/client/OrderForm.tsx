@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,35 @@ const OrderForm = () => {
     libraries,
   });
 
+  const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+
+  const onPickupLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    setPickupAutocomplete(autocomplete);
+  };
+
+  const onDeliveryLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    setDeliveryAutocomplete(autocomplete);
+  };
+
+  const handlePickupPlaceChanged = () => {
+    if (pickupAutocomplete) {
+      const place = pickupAutocomplete.getPlace();
+      if (place.formatted_address) {
+        setPickupAddress(place.formatted_address);
+      }
+    }
+  };
+
+  const handleDeliveryPlaceChanged = () => {
+    if (deliveryAutocomplete) {
+      const place = deliveryAutocomplete.getPlace();
+      if (place.formatted_address) {
+        setDeliveryAddress(place.formatted_address);
+      }
+    }
+  };
+
   if (!isLoaded) {
     return <Loader />;
   }
@@ -46,11 +75,8 @@ const OrderForm = () => {
               Adresse de départ
             </label>
             <Autocomplete
-              onPlaceSelected={(place) => {
-                if (place.formatted_address) {
-                  setPickupAddress(place.formatted_address);
-                }
-              }}
+              onLoad={onPickupLoad}
+              onPlaceChanged={handlePickupPlaceChanged}
             >
               <Input
                 type="text"
@@ -66,11 +92,8 @@ const OrderForm = () => {
               Adresse de livraison
             </label>
             <Autocomplete
-              onPlaceSelected={(place) => {
-                if (place.formatted_address) {
-                  setDeliveryAddress(place.formatted_address);
-                }
-              }}
+              onLoad={onDeliveryLoad}
+              onPlaceChanged={handleDeliveryPlaceChanged}
             >
               <Input
                 type="text"
