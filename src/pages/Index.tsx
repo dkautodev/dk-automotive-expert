@@ -76,6 +76,69 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Expertise Section */}
+        <section className="relative py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <img 
+                  src="/lovable-uploads/73c56853-cb0b-409d-a900-96a90a1dab00.png"
+                  alt="Voiture sur route" 
+                  className="rounded-lg w-full"
+                />
+              </div>
+              <div className="space-y-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-[#18257D]">
+                  EXPERTISE ET DÉVOUEMENT DES CHAUFFEURS
+                </h2>
+                <p className="text-gray-600">
+                  Chez DK AUTOMOTIVE, nos chauffeurs professionnels ont été sélectionnés pour leur expérience et leur engagement exceptionnels. Formés à des procédures strictes et à l'écoconduite, ils garantissent un convoyage sûr et écologique de votre véhicule.
+                </p>
+                <p className="text-gray-600">
+                  Prêt à découvrir la différence avec nos services de convoyage professionnels ? <Link to="/contact" className="text-[#18257D] hover:underline">Contactez-nous</Link> sans plus tarder !
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Délais Section */}
+        <section className="relative py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="space-y-6 order-2 md:order-1">
+                <h2 className="text-2xl md:text-3xl font-bold text-[#18257D]">
+                  DÉLAIS DE LIVRAISON RAPIDES
+                </h2>
+                <p className="text-gray-600">
+                  DK AUTOMOTIVE se distingue par la réduction significative des délais de livraison. Avec une garantie de prise en charge rapide sous 48h, nous offrons un service rapide et fiable partout en France.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <span className="w-2 h-2 rounded-full bg-[#18257D]"></span>
+                    Réduction significative des délais
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <span className="w-2 h-2 rounded-full bg-[#18257D]"></span>
+                    Prise en charge rapide sous 48h maximum
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <span className="w-2 h-2 rounded-full bg-[#18257D]"></span>
+                    Service fiable et étendu
+                  </li>
+                </ul>
+              </div>
+              <div className="order-1 md:order-2">
+                <img 
+                  src="/lovable-uploads/ba332028-1fb2-4ad1-a825-6305a46a5096.png"
+                  alt="Voiture dans un garage" 
+                  className="rounded-lg w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="bg-gray-100 py-20">
           <div className="container mx-auto px-4 text-center">
