@@ -1,5 +1,5 @@
 
-import { User, ListOrdered } from "lucide-react";
+import { User, ListOrdered, LayoutDashboard } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthContext } from "@/context/AuthContext";
 import {
@@ -16,6 +16,11 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    url: "/dashboard/client",
+  },
   {
     title: "Mon profil",
     icon: User,
