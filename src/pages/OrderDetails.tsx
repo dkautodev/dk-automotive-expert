@@ -13,6 +13,8 @@ interface OrderState {
   pickupAddress: string;
   deliveryAddress: string;
   selectedVehicle: string;
+  pickupDate: Date | undefined;
+  deliveryDate: Date | undefined;
 }
 
 interface ContactInfo {
@@ -45,6 +47,8 @@ const OrderDetails = () => {
   const [pickupContact, setPickupContact] = useState<ContactInfo | null>(null);
   const [deliveryContact, setDeliveryContact] = useState<ContactInfo | null>(null);
   const [vehicles, setVehicles] = useState<VehicleInfo[]>([]);
+  const [pickupDate, setPickupDate] = useState<Date | undefined>(orderDetails?.pickupDate);
+  const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(orderDetails?.deliveryDate);
   const scrollToElement = useScrollToElement();
 
   if (!orderDetails) {
@@ -115,7 +119,9 @@ const OrderDetails = () => {
           pickupContact,
           deliveryContact,
           vehicles,
-          priceHT
+          priceHT,
+          pickupDate,
+          deliveryDate
         }
       });
     }
@@ -136,6 +142,11 @@ const OrderDetails = () => {
     setTimeout(() => scrollToElement('last-vehicle'), 100);
   };
 
+  const handleDateUpdate = (pickup: Date | undefined, delivery: Date | undefined) => {
+    setPickupDate(pickup);
+    setDeliveryDate(delivery);
+  };
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
@@ -148,6 +159,9 @@ const OrderDetails = () => {
         priceHT={priceHT}
         onShowContacts={handleShowContacts}
         getVehicleName={getVehicleName}
+        onDateUpdate={handleDateUpdate}
+        pickupDate={pickupDate}
+        deliveryDate={deliveryDate}
       />
 
       {showContacts && (
@@ -173,7 +187,7 @@ const OrderDetails = () => {
         </div>
       )}
 
-      {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && (
+      {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && pickupDate && deliveryDate && (
         <div id="last-vehicle" className="flex justify-end mt-6">
           <Button
             onClick={navigateToQuoteTotal}
@@ -189,3 +203,4 @@ const OrderDetails = () => {
 };
 
 export default OrderDetails;
+
