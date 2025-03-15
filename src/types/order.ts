@@ -1,4 +1,3 @@
-
 export interface Vehicle {
   brand: string;
   model: string;
@@ -25,4 +24,28 @@ export interface OrderState {
   priceHT: string;
   pickupDate: Date;
   deliveryDate: Date;
+}
+
+export interface OrderState {
+  pickupAddress: string;
+  deliveryAddress: string;
+  selectedVehicle: string;
+  pickupDate: Date | undefined;
+  deliveryDate: Date | undefined;
+}
+
+export interface ContactInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+export interface VehicleInfo {
+  brand: string;
+  model: string;
+  year: string;
+  fuel: string;
+  licensePlate: string;
+  files: File[];
 }
