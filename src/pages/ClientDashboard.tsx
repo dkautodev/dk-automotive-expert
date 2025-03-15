@@ -1,15 +1,21 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 const ClientDashboard = () => {
+  const handleLogout = () => {
+    // TODO: Implement logout logic
+    console.log("Logout clicked");
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Tableau de bord Client</h1>
-        <Button asChild>
-          <Link to="/devis">Demander un devis</Link>
+        <Button variant="outline" onClick={handleLogout}>
+          <LogOut className="mr-2" />
+          Déconnexion
         </Button>
       </div>
       
