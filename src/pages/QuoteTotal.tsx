@@ -94,14 +94,18 @@ const QuoteTotal = () => {
     if (!orderDetails) return;
 
     const newQuote: Quote = {
+      id: crypto.randomUUID(),
+      quote_number: '',
       pickupAddress: orderDetails.pickupAddress,
       deliveryAddress: orderDetails.deliveryAddress,
       vehicles: orderDetails.vehicles,
-      totalPriceHT: totalPriceHT,
-      totalPriceTTC: totalPriceHT * 1.2,
-      distance: orderDetails.distance || "",
-      status: 'pending' as const,
-      dateCreated: new Date()
+      totalPriceHT: Number(totalPriceHT.toFixed(2)),
+      totalPriceTTC: Number((totalPriceHT * 1.2).toFixed(2)),
+      distance: Number(orderDetails.distance) || 0,
+      status: 'pending',
+      dateCreated: new Date(),
+      pickupDate: orderDetails.pickupDate,
+      deliveryDate: orderDetails.deliveryDate
     };
 
     try {
@@ -120,6 +124,20 @@ const QuoteTotal = () => {
         title: "Erreur",
         description: "Une erreur est survenue lors de l'envoi du devis.",
         variant: "destructive"
+      });
+    }
+  };
+
+  const onGeneratePDF = () => {
+    if (orderDetails) {
+      generateQuotePDF({
+        ...orderDetails,
+        id: '',
+        quote_number: '',
+        totalPriceHT: totalPriceHT,
+        totalPriceTTC: totalPriceHT * 1.2,
+        status: 'pending',
+        dateCreated: new Date()
       });
     }
   };
@@ -175,7 +193,7 @@ const QuoteTotal = () => {
             <QuoteFooter
               totalPriceHT={totalPriceHT}
               onSubmitQuote={handleSubmitQuote}
-              onGeneratePDF={() => generateQuotePDF(orderDetails, totalPriceHT)}
+              onGeneratePDF={onGeneratePDF}
             />
           </CardContent>
         </Card>
