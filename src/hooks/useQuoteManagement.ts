@@ -5,19 +5,20 @@ import { QuoteRow } from "@/types/database";
 
 export const useQuoteManagement = () => {
   const saveQuote = async (quote: Quote) => {
+    // Convert Date to ISO string for Supabase
+    const quoteData = {
+      id: quote.id,
+      pickup_address: quote.pickupAddress,
+      delivery_address: quote.deliveryAddress,
+      vehicles: quote.vehicles,
+      total_price_ht: quote.totalPriceHT,
+      status: quote.status,
+      date_created: quote.dateCreated.toISOString()
+    };
+
     const { error } = await supabase
       .from('quotes')
-      .insert([
-        {
-          id: quote.id,
-          pickup_address: quote.pickupAddress,
-          delivery_address: quote.deliveryAddress,
-          vehicles: quote.vehicles,
-          total_price_ht: quote.totalPriceHT,
-          status: quote.status,
-          date_created: quote.dateCreated
-        }
-      ]);
+      .insert([quoteData]);
 
     if (error) {
       throw new Error(`Error saving quote: ${error.message}`);
