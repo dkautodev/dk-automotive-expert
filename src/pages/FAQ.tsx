@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -39,7 +38,7 @@ const FAQ = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-2" className="bg-[#64B5F6] text-white rounded-lg shadow-sm">
+                <AccordionItem value="item-2" className="bg-[#1a237e] text-white rounded-lg shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     COMMENT ÇA MARCHE ?
                   </AccordionTrigger>
