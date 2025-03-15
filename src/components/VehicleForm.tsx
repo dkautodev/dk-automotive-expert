@@ -47,10 +47,9 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
                    model !== "" && 
                    year !== "" && 
                    fuel !== "" && 
-                   licensePlate !== "" &&
-                   files.length > 0;
+                   licensePlate !== "";
     onChange(isValid);
-  }, [brand, model, year, fuel, licensePlate, files, onChange]);
+  }, [brand, model, year, fuel, licensePlate, onChange]);
 
   return (
     <div className="space-y-4 border p-4 rounded-lg relative">
@@ -139,14 +138,13 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
         </div>
 
         <div>
-          <Label htmlFor={`file-${index}`}>Documents (PDF ou JPG) *</Label>
+          <Label htmlFor={`file-${index}`}>Documents (PDF ou JPG)</Label>
           <Input
             id={`file-${index}`}
             type="file"
             accept=".pdf,.jpg,.jpeg"
             onChange={handleFileChange}
             multiple
-            required
           />
           <div className="mt-2 space-y-2">
             {files.map((file, fileIndex) => (
