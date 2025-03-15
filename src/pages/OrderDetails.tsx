@@ -1,11 +1,12 @@
-
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 import { OrderSummary } from "@/components/order/OrderSummary";
 import { ContactsForm } from "@/components/order/ContactsForm";
 import { VehiclesSection } from "@/components/order/VehiclesSection";
 import { vehicleTypes } from "@/lib/vehicleTypes";
+import { Button } from "@/components/ui/button";
+import { Calculator } from "lucide-react";
 
 interface OrderState {
   pickupAddress: string;
@@ -15,6 +16,7 @@ interface OrderState {
 
 const OrderDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const orderDetails = location.state as OrderState | null;
   const [distance, setDistance] = useState<string>("");
   const [priceHT] = useState("150");
@@ -97,6 +99,18 @@ const OrderDetails = () => {
           onDeleteVehicle={deleteVehicle}
           onAddVehicle={() => setVehicleCount(prev => prev + 1)}
         />
+      )}
+
+      {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && (
+        <div className="flex justify-end mt-6">
+          <Button
+            onClick={() => navigate("/dashboard/client/quote-total")}
+            className="gap-2"
+          >
+            <Calculator className="h-4 w-4" />
+            Obtenir votre devis
+          </Button>
+        </div>
       )}
     </div>
   );

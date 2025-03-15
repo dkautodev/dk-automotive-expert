@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +19,7 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [fuel, setFuel] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
   const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +43,14 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
   };
 
   useEffect(() => {
-    const isValid = brand !== "" && model !== "" && year !== "" && fuel !== "" && files.length > 0;
+    const isValid = brand !== "" && 
+                   model !== "" && 
+                   year !== "" && 
+                   fuel !== "" && 
+                   licensePlate !== "" &&
+                   files.length > 0;
     onChange(isValid);
-  }, [brand, model, year, fuel, files, onChange]);
+  }, [brand, model, year, fuel, licensePlate, files, onChange]);
 
   return (
     <div className="space-y-4 border p-4 rounded-lg relative">
@@ -120,6 +125,17 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div>
+          <Label htmlFor={`license-${index}`}>Immatriculation *</Label>
+          <Input
+            id={`license-${index}`}
+            value={licensePlate}
+            onChange={(e) => setLicensePlate(e.target.value)}
+            placeholder="AA-123-BB"
+            required
+          />
         </div>
 
         <div>
