@@ -8,6 +8,7 @@ import OrderHistory from "@/components/client/OrderHistory";
 import OrderDetails from "./OrderDetails";
 import QuoteTotal from "./QuoteTotal";
 import PendingQuotes from "./PendingQuotes";
+import QuoteDetails from "./QuoteDetails";
 import OngoingShipments from "./OngoingShipments";
 import PendingInvoices from "./PendingInvoices";
 
@@ -24,6 +25,7 @@ const ClientDashboard = () => {
             <Route path="order-details" element={<OrderDetails />} />
             <Route path="quote-total" element={<QuoteTotal />} />
             <Route path="pending-quotes" element={<PendingQuotes />} />
+            <Route path="quotes/:id" element={<QuoteDetails />} />
             <Route path="ongoing-shipments" element={<OngoingShipments />} />
             <Route path="pending-invoices" element={<PendingInvoices />} />
             <Route path="*" element={<Navigate to="/dashboard/client" replace />} />
