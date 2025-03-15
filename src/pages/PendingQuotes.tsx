@@ -28,14 +28,7 @@ const PendingQuotes = () => {
   });
 
   const handleViewQuoteDetails = (quote: Quote) => {
-    navigate("/dashboard/client/quote-total", { 
-      state: {
-        pickupAddress: quote.pickupAddress,
-        deliveryAddress: quote.deliveryAddress,
-        vehicles: quote.vehicles,
-        priceHT: (quote.totalPriceHT / quote.vehicles.length).toString(),
-      }
-    });
+    navigate(`/dashboard/client/quotes/${quote.id}`);
   };
 
   if (isLoading) {

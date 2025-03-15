@@ -56,8 +56,45 @@ export const useQuoteManagement = () => {
     }));
   };
 
+  const fetchQuoteById = async (id: string): Promise<Quote | null> => {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle() as { data: QuoteRow | null; error: any };
+
+    if (error) {
+      throw new Error(`Error fetching quote: ${error.message}`);
+    }
+
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      pickupAddress: data.pickup_address,
+      deliveryAddress: data.delivery_address,
+      vehicles: data.vehicles,
+      totalPriceHT: data.total_price_ht,
+      status: data.status,
+      dateCreated: new Date(data.date_created)
+    };
+  };
+
+  const deleteQuote = async (id: string) => {
+    const { error } = await supabase
+      .from('quotes')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw new Error(`Error deleting quote: ${error.message}`);
+    }
+  };
+
   return {
     saveQuote,
-    fetchQuotes
+    fetchQuotes,
+    fetchQuoteById,
+    deleteQuote
   };
 };
