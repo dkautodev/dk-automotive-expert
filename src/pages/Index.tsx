@@ -1,22 +1,22 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       <Navbar />
       
       <main className="animate-fadeIn">
         {/* Hero Section */}
-        <section className="relative h-[600px] bg-cover bg-center" style={{ backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")' }}>
+        <section className="relative h-[600px] bg-cover bg-center" style={{
+        backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
+      }}>
           <div className="absolute inset-0 bg-black/40" /> {/* Overlay sombre pour la lisibilité */}
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
-              <h1 className="text-5xl font-bold mb-6 text-white">Leader du convoyage automobile professionnel</h1>
-              <p className="text-xl mb-8 text-white">Votre partenaire de confiance pour le transport de véhicules depuis 2018</p>
+              <h1 className="text-5xl font-bold mb-6 text-white">Convoyage de véhicules par route en France</h1>
+              <p className="text-xl mb-8 text-white">Confiez-nous le convoyage de vos véhicules, pour un service sur mesure,
+écologique et économique.</p>
               <Link to="/devis">
                 <Button className="bg-white text-dk-navy hover:bg-gray-100 transition-colors text-lg px-8 py-6">
                   Demander mon devis sur mesure
@@ -59,8 +59,6 @@ const Index = () => {
           </div>
         </section>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
