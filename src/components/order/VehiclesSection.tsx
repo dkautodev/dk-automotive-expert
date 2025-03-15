@@ -5,12 +5,22 @@ import { VehicleForm } from "@/components/VehicleForm";
 import { Plus, Car } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+interface VehicleInfo {
+  brand: string;
+  model: string;
+  year: string;
+  fuel: string;
+  licensePlate: string;
+  files: File[];
+}
+
 interface VehiclesSectionProps {
   vehicleCount: number;
   vehicleFormsValidity: boolean[];
   onVehicleValidityChange: (index: number, isValid: boolean) => void;
   onDeleteVehicle: (index: number) => void;
   onAddVehicle: () => void;
+  onVehicleUpdate: (index: number, vehicle: VehicleInfo) => void;
 }
 
 export const VehiclesSection = ({
@@ -18,7 +28,8 @@ export const VehiclesSection = ({
   vehicleFormsValidity,
   onVehicleValidityChange,
   onDeleteVehicle,
-  onAddVehicle
+  onAddVehicle,
+  onVehicleUpdate
 }: VehiclesSectionProps) => {
   const canAddNewVehicle = vehicleCount === 0 || vehicleFormsValidity[vehicleCount - 1] === true;
 
@@ -40,6 +51,7 @@ export const VehiclesSection = ({
             index={index}
             onDelete={() => onDeleteVehicle(index)}
             onChange={isValid => onVehicleValidityChange(index, isValid)}
+            onVehicleUpdate={(vehicle) => onVehicleUpdate(index, vehicle)}
           />
         ))}
         
