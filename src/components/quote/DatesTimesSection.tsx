@@ -29,7 +29,7 @@ export const DatesTimesSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Prise en charge section */}
         <div className="space-y-4">
-          <h3 className="font-semibold">Date et heure de prise en charge</h3>
+          <h3 className="font-semibold">Modifier prise en charge</h3>
           <div className="flex gap-4 items-start">
             <Popover>
               <PopoverTrigger asChild>
