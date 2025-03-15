@@ -1,11 +1,20 @@
-
 import { createContext, useContext, ReactNode } from "react";
 import { useAuth, UserRole } from "@/hooks/useAuth";
+
+interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  phone: string | null;
+  company?: string | null;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   role: UserRole | null;
+  profile: Profile | null;
   signIn: (email: string, password: string) => Promise<any>;
   signUp: (email: string, password: string, userData: {
     first_name: string;
