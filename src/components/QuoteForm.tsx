@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
@@ -54,9 +53,14 @@ const QuoteForm = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="car">Voiture</SelectItem>
-                    <SelectItem value="van">Camionnette</SelectItem>
-                    <SelectItem value="motorcycle">Moto</SelectItem>
+                    <SelectItem value="citadine">Citadine</SelectItem>
+                    <SelectItem value="berline">Berline</SelectItem>
+                    <SelectItem value="suv">4x4 (ou SUV)</SelectItem>
+                    <SelectItem value="utilitaire-3-5">Utilitaire 3-5m3</SelectItem>
+                    <SelectItem value="utilitaire-6-12">Utilitaire 6-12m3</SelectItem>
+                    <SelectItem value="utilitaire-12-15">Utilitaire 12-15m3</SelectItem>
+                    <SelectItem value="utilitaire-15-20">Utilitaire 15-20m3</SelectItem>
+                    <SelectItem value="utilitaire-20plus">Utilitaire + de 20m3</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
