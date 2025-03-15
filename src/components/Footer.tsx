@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -15,7 +14,7 @@ const Footer = () => {
             <img 
               src="/lovable-uploads/0569d88f-5ec1-4822-8cae-a5f0ba017d54.png" 
               alt="DK AUTOMOTIVE"
-              className="h-20 mb-4 mx-auto md:mx-0"
+              className="h-20 mb-4 mx-auto md:mx-0 brightness-0 invert"
             />
             <p className="text-sm text-white/80 leading-relaxed">
               Notre entreprise spécialisée dans le convoyage de véhicules propose un service sur mesure, écologique et économique pour les particuliers et les professionnels.
