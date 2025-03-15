@@ -12,6 +12,7 @@ import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
+import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient();
 

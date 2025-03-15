@@ -55,10 +55,10 @@ const Cookies = () => {
               
               <p className="mb-4">Voici comment gérer les cookies sur les principaux navigateurs :</p>
               <ul className="list-disc pl-6 space-y-2">
-                <li>Google Chrome : Menu > Paramètres > Confidentialité et sécurité > Cookies et autres données de site</li>
-                <li>Mozilla Firefox : Menu > Options > Vie privée et sécurité > Cookies et données de site</li>
-                <li>Microsoft Edge : Menu > Paramètres > Confidentialité, recherche et services > Cookies et données de site</li>
-                <li>Apple Safari : Menu > Préférences > Confidentialité > Cookies et données de site</li>
+                <li>Google Chrome : Menu {">"} Paramètres {">"} Confidentialité et sécurité {">"} Cookies et autres données de site</li>
+                <li>Mozilla Firefox : Menu {">"} Options {">"} Vie privée et sécurité {">"} Cookies et données de site</li>
+                <li>Microsoft Edge : Menu {">"} Paramètres {">"} Confidentialité, recherche et services {">"} Cookies et données de site</li>
+                <li>Apple Safari : Menu {">"} Préférences {">"} Confidentialité {">"} Cookies et données de site</li>
               </ul>
             </section>
 
