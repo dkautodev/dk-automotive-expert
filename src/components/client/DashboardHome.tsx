@@ -27,10 +27,10 @@ const DashboardHome = () => {
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Link to="pending-quotes">
-          <Card className="hover:bg-accent transition-colors">
+        <Link to="pending-quotes" className="block h-full">
+          <Card className="hover:bg-accent transition-colors h-full">
             <CardHeader>
-              <CardTitle>Devis en attente</CardTitle>
+              <CardTitle className="text-lg">Devis en attente</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">0</p>
@@ -38,10 +38,10 @@ const DashboardHome = () => {
           </Card>
         </Link>
 
-        <Link to="ongoing-shipments">
-          <Card className="hover:bg-accent transition-colors">
+        <Link to="ongoing-shipments" className="block h-full">
+          <Card className="hover:bg-accent transition-colors h-full">
             <CardHeader>
-              <CardTitle>Convoyages en cours</CardTitle>
+              <CardTitle className="text-lg">Convoyages en cours</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">0</p>
@@ -49,11 +49,11 @@ const DashboardHome = () => {
           </Card>
         </Link>
 
-        <Link to="pending-invoices">
-          <Card className="hover:bg-accent transition-colors">
+        <Link to="pending-invoices" className="block h-full">
+          <Card className="hover:bg-accent transition-colors h-full">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-6 w-6" />
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Receipt className="h-5 w-5" />
                 Factures en attente
               </CardTitle>
             </CardHeader>
@@ -63,9 +63,9 @@ const DashboardHome = () => {
           </Card>
         </Link>
 
-        <Card>
+        <Card className="h-full">
           <CardHeader>
-            <CardTitle>Convoyages terminés</CardTitle>
+            <CardTitle className="text-lg">Convoyages terminés</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">0</p>
