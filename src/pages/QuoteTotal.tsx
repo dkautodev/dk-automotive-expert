@@ -2,7 +2,7 @@ import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { OrderState } from "@/types/order";
+import { OrderState, Quote } from "@/types/order";
 import { QuoteActions } from "@/components/quote/QuoteActions";
 import { AddressesSection } from "@/components/quote/AddressesSection";
 import { ContactsSection } from "@/components/quote/ContactsSection";
