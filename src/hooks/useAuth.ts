@@ -70,7 +70,8 @@ export const useAuth = () => {
     role: UserRole;
   }) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // 1. Create the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -83,26 +84,43 @@ export const useAuth = () => {
         }
       });
 
-      if (error) throw error;
+      if (signUpError) {
+        console.error("Sign up error:", signUpError);
+        return { data: null, error: signUpError };
+      }
 
-      if (data.user) {
-        // Attendre que le trigger handle_new_user s'exécute
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!signUpData.user) {
+        console.error("No user data after signup");
+        return { data: null, error: new Error("Failed to create user") };
+      }
 
-        // Insérer le rôle utilisateur
+      console.log("User created successfully:", signUpData.user.id);
+
+      // 2. Wait a bit longer for the user to be fully created
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 3. Try to create the user role
+      try {
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
-            user_id: data.user.id,
+            user_id: signUpData.user.id,
             role: userData.role
           });
 
-        if (roleError) throw roleError;
-      }
+        if (roleError) {
+          console.error("Role assignment error:", roleError);
+          throw roleError;
+        }
 
-      return { data, error: null };
+        console.log("Role assigned successfully");
+        return { data: signUpData, error: null };
+      } catch (roleError) {
+        console.error("Failed to assign role:", roleError);
+        return { data: null, error: roleError };
+      }
     } catch (error) {
-      console.error("Error in signUp:", error);
+      console.error("Global signup error:", error);
       return { data: null, error };
     }
   };

@@ -19,7 +19,24 @@ export const useSignUpSubmit = () => {
         role: 'client' as UserRole
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        let errorMessage = "Une erreur est survenue lors de l'inscription.";
+        
+        if (signUpError.message?.includes("Email rate limit exceeded")) {
+          errorMessage = "Veuillez attendre quelques secondes avant de réessayer.";
+        } else if (signUpError.message?.includes("User already registered")) {
+          errorMessage = "Cette adresse email est déjà utilisée.";
+        }
+
+        console.error("Signup error details:", signUpError);
+        
+        toast({
+          title: "Erreur",
+          description: errorMessage,
+          variant: "destructive"
+        });
+        return;
+      }
 
       toast({
         title: "Inscription réussie",
@@ -28,17 +45,11 @@ export const useSignUpSubmit = () => {
       
       navigate('/dashboard/client');
     } catch (error: any) {
-      let errorMessage = "Une erreur est survenue lors de l'inscription.";
+      console.error("Unexpected error during signup:", error);
       
-      if (error.message.includes("Email rate limit exceeded")) {
-        errorMessage = "Veuillez attendre quelques secondes avant de réessayer.";
-      } else if (error.message.includes("User already registered")) {
-        errorMessage = "Cette adresse email est déjà utilisée.";
-      }
-
       toast({
         title: "Erreur",
-        description: errorMessage,
+        description: "Une erreur inattendue est survenue. Veuillez réessayer.",
         variant: "destructive"
       });
     }
