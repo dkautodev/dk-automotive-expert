@@ -18,19 +18,7 @@ const Devis = () => {
 
             <Card>
               
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Le formulaire sera implémenté dans la prochaine étape */}
-                  <p className="text-center text-gray-500">
-                    Le formulaire de devis sera bientôt disponible
-                  </p>
-                  <div className="flex justify-center">
-                    <Button className="bg-dk-navy hover:bg-dk-blue">
-                      Demander mon devis
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
+              
             </Card>
           </div>
         </div>
