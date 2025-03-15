@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
@@ -15,9 +14,10 @@ interface ContactInfo {
 interface ContactsFormProps {
   onContactsValid: (isValid: boolean) => void;
   onShowVehicle: () => void;
+  onContactsUpdate: (pickup: ContactInfo, delivery: ContactInfo) => void;
 }
 
-export const ContactsForm = ({ onContactsValid, onShowVehicle }: ContactsFormProps) => {
+export const ContactsForm = ({ onContactsValid, onShowVehicle, onContactsUpdate }: ContactsFormProps) => {
   const [pickupContact, setPickupContact] = useState<ContactInfo>({
     firstName: "",
     lastName: "",
@@ -60,7 +60,11 @@ export const ContactsForm = ({ onContactsValid, onShowVehicle }: ContactsFormPro
       isDeliveryPhoneValid;
     
     onContactsValid(isPickupValid && isDeliveryValid);
-  }, [pickupContact, deliveryContact, onContactsValid]);
+    
+    if (isPickupValid && isDeliveryValid) {
+      onContactsUpdate(pickupContact, deliveryContact);
+    }
+  }, [pickupContact, deliveryContact, onContactsValid, onContactsUpdate]);
 
   return (
     <Card>
