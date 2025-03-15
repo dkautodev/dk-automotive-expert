@@ -58,6 +58,8 @@ export interface Quote {
   totalPriceHT: number;
   status: 'pending' | 'accepted' | 'rejected';
   dateCreated: Date;
+  pickupDate?: Date;
+  pickupTime?: string;
   deliveryDate?: Date;
   deliveryTime?: string;
 }

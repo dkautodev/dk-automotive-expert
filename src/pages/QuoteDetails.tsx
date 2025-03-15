@@ -106,16 +106,19 @@ const QuoteDetails = () => {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-2">Date et heure de livraison</h3>
-              {quote.deliveryDate && (
+              <h3 className="font-semibold mb-2">Date et heure</h3>
+              {quote.pickupDate && (
                 <p>
-                  <span className="font-medium">Date:</span>{' '}
-                  {format(new Date(quote.deliveryDate), 'dd MMMM yyyy', { locale: fr })}
+                  <span className="font-medium">Prise en charge:</span>{' '}
+                  {format(new Date(quote.pickupDate), 'dd MMMM yyyy', { locale: fr })}
+                  {quote.pickupTime && ` à ${quote.pickupTime}`}
                 </p>
               )}
-              {quote.deliveryTime && (
+              {quote.deliveryDate && (
                 <p>
-                  <span className="font-medium">Heure:</span> {quote.deliveryTime}
+                  <span className="font-medium">Livraison:</span>{' '}
+                  {format(new Date(quote.deliveryDate), 'dd MMMM yyyy', { locale: fr })}
+                  {quote.deliveryTime && ` à ${quote.deliveryTime}`}
                 </p>
               )}
             </div>
