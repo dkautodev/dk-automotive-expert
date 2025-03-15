@@ -50,18 +50,14 @@ const Index = () => {
         </section>
 
         {/* Trust Section */}
-        <section className="relative py-16 bg-white">
+        <section className="relative bg-white py-0">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-[#18257D] mb-3">
-                VOTRE CONFIANCE, NOTRE ENGAGEMENT
-              </h2>
-              <p className="text-sm md:text-base text-gray-600 font-light mb-16">
-                Chez DK Automotive, chaque parcours est une promesse de qualité et de fiabilité.
-              </p>
+              
+              
               
               <div className="mb-8">
-                <h3 className="text-2xl md:text-4xl font-bold mb-4">
+                <h3 className="text-2xl md:text-4xl font-bold mb-4 py-[16px]">
                   FAITES CONFIANCE À DK AUTOMOTIVE
                 </h3>
                 <h4 className="text-xl md:text-3xl font-bold text-[#18257D] mb-4">
