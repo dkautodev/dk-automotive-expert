@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -96,4 +95,3 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
 };
 
 export default PickupForm;
-
