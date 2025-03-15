@@ -26,11 +26,12 @@ export const useTimeManagement = (
       const date = new Date(orderDetails.pickupDate);
       const [hours, minutes] = newTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
-      setOrderDetails({
+      const updatedOrderDetails = {
         ...orderDetails,
         pickupDate: date,
         pickupTime: newTime
-      });
+      };
+      setOrderDetails(updatedOrderDetails);
     }
   };
 
@@ -41,11 +42,12 @@ export const useTimeManagement = (
       const date = new Date(orderDetails.deliveryDate);
       const [hours, minutes] = newTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
-      setOrderDetails({
+      const updatedOrderDetails = {
         ...orderDetails,
         deliveryDate: date,
         deliveryTime: newTime
-      });
+      };
+      setOrderDetails(updatedOrderDetails);
     }
   };
 

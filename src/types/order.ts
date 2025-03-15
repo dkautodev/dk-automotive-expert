@@ -24,6 +24,8 @@ export interface OrderState {
   priceHT: string;
   pickupDate: Date;
   deliveryDate: Date;
+  pickupTime?: string;
+  deliveryTime?: string;
 }
 
 export interface Quote {
