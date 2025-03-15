@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { OrderState, Quote } from "@/types/order";
+import { OrderState } from "@/types/order";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { DatesTimesSection } from "./DatesTimesSection";
@@ -11,6 +11,7 @@ import { QuoteFooter } from "./QuoteFooter";
 import { useFileManagement } from "@/hooks/useFileManagement";
 import { useVehicleManagement } from "@/hooks/useVehicleManagement";
 import { useQuoteManagement } from "@/hooks/useQuoteManagement";
+import { useTimeManagement } from "@/hooks/useTimeManagement";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -23,8 +24,6 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showAddVehicleDialog, setShowAddVehicleDialog] = useState(false);
-  const [pickupTime, setPickupTime] = useState<string>("");
-  const [deliveryTime, setDeliveryTime] = useState<string>("");
   const { newFiles, handleFileChange, handleRemoveFile } = useFileManagement();
   const { handleDeleteVehicle, handleAddVehicle } = useVehicleManagement(
     orderDetails,
@@ -32,6 +31,12 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
     setShowAddVehicleDialog
   );
   const { saveQuote } = useQuoteManagement();
+  const { 
+    pickupTime, 
+    deliveryTime, 
+    handlePickupTimeChange, 
+    handleDeliveryTimeChange 
+  } = useTimeManagement(orderDetails, setOrderDetails);
   const queryClient = useQueryClient();
 
   const handlePickupDateSelect = (date: Date | undefined) => {
@@ -45,32 +50,6 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
 
   const handleDeliveryDateSelect = (date: Date | undefined) => {
     if (orderDetails && date) {
-      setOrderDetails({
-        ...orderDetails,
-        deliveryDate: date
-      });
-    }
-  };
-
-  const handlePickupTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPickupTime(e.target.value);
-    if (orderDetails) {
-      const date = new Date(orderDetails.pickupDate);
-      const [hours, minutes] = e.target.value.split(':');
-      date.setHours(parseInt(hours), parseInt(minutes));
-      setOrderDetails({
-        ...orderDetails,
-        pickupDate: date
-      });
-    }
-  };
-
-  const handleDeliveryTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryTime(e.target.value);
-    if (orderDetails) {
-      const date = new Date(orderDetails.deliveryDate);
-      const [hours, minutes] = e.target.value.split(':');
-      date.setHours(parseInt(hours), parseInt(minutes));
       setOrderDetails({
         ...orderDetails,
         deliveryDate: date
@@ -92,7 +71,7 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
     if (!orderDetails) return;
 
     const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
-    const quoteData: Quote = {
+    const quoteData = {
       id: crypto.randomUUID(),
       quote_number: '',
       pickupAddress: orderDetails.pickupAddress,
