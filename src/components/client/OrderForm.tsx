@@ -1,5 +1,5 @@
-
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,7 @@ const vehicleTypes = [
 ];
 
 const OrderForm = () => {
+  const navigate = useNavigate();
   const [pickupAddress, setPickupAddress] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState("");
@@ -58,6 +59,18 @@ const OrderForm = () => {
       if (place.formatted_address) {
         setDeliveryAddress(place.formatted_address);
       }
+    }
+  };
+
+  const handleSubmit = () => {
+    if (pickupAddress && deliveryAddress && selectedVehicle) {
+      navigate("/dashboard/client/order-details", {
+        state: {
+          pickupAddress,
+          deliveryAddress,
+          selectedVehicle,
+        }
+      });
     }
   };
 
@@ -132,7 +145,7 @@ const OrderForm = () => {
         </div>
 
         <div className="flex justify-end">
-          <Button>
+          <Button onClick={handleSubmit}>
             Suivant
           </Button>
         </div>
