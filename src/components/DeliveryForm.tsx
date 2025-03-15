@@ -45,6 +45,8 @@ const DeliveryForm = ({ onPrevious, vehicleData }: DeliveryFormProps) => {
         deliveryAddress: data.address,
         vehicles: vehicleData.vehicles,
         totalPriceHT: vehicleData.priceHT,
+        totalPriceTTC: vehicleData.priceHT * 1.2, // Calculate TTC (HT + 20% TVA)
+        distance: "", // Initialize with empty string, will be updated later
         status: 'pending' as const,
         dateCreated: new Date()
       };

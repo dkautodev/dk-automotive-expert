@@ -98,6 +98,8 @@ const QuoteTotal = () => {
       deliveryAddress: orderDetails.deliveryAddress,
       vehicles: orderDetails.vehicles,
       totalPriceHT: totalPriceHT,
+      totalPriceTTC: totalPriceHT * 1.2,
+      distance: orderDetails.distance || "",
       status: 'pending' as const,
       dateCreated: new Date()
     };
