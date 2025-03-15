@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -34,12 +33,12 @@ const FAQ = () => {
                   <AccordionItem 
                     key={`item-${index + 1}`} 
                     value={`item-${index + 1}`} 
-                    className={`${index === 1 ? 'bg-[#1a237e]' : 'bg-[#1a237e]'} rounded-none shadow-sm`}
+                    className="bg-[#1a237e] rounded-none shadow-sm"
                   >
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline text-base font-medium text-white">
+                    <AccordionTrigger className="px-6 py-4 hover:no-underline text-sm font-medium text-white">
                       {item.question}
                     </AccordionTrigger>
-                    <AccordionContent className="px-6 pb-6 text-white text-lg">
+                    <AccordionContent className="px-6 pb-6 text-white text-base">
                       {item.answer}
                     </AccordionContent>
                   </AccordionItem>
