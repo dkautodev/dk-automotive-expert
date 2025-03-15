@@ -1,6 +1,6 @@
 import { useLocation, Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, EuroIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 
@@ -14,6 +14,7 @@ const OrderDetails = () => {
   const location = useLocation();
   const orderDetails = location.state as OrderState | null;
   const [distance, setDistance] = useState<string>("");
+  const [priceHT] = useState("150");
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -55,10 +56,16 @@ const OrderDetails = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-6 w-6" />
-            Informations du trajet
-          </CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-6 w-6" />
+              Informations du trajet
+            </CardTitle>
+            <div className="flex items-center gap-2 text-xl">
+              <EuroIcon className="h-5 w-5" />
+              <span>Prix HT: {priceHT}€</span>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
