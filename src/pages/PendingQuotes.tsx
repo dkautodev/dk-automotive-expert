@@ -114,18 +114,18 @@ const PendingQuotes = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Numéro</TableHead>
+                <TableHead>Numéro de devis</TableHead>
                 <TableHead>Créé le</TableHead>
                 <TableHead>Départ</TableHead>
                 <TableHead>Arrivée</TableHead>
                 <TableHead>Prix HT</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {quotes.map((quote) => (
                 <TableRow key={quote.id}>
-                  <TableCell className="font-medium">{quote.quote_number}</TableCell>
+                  <TableCell className="font-medium">{quote.quote_number || 'N/A'}</TableCell>
                   <TableCell>
                     {format(new Date(quote.dateCreated), 'dd MMMM yyyy', { locale: fr })}
                   </TableCell>
@@ -133,7 +133,7 @@ const PendingQuotes = () => {
                   <TableCell>{quote.deliveryAddress}</TableCell>
                   <TableCell>{quote.totalPriceHT.toFixed(2)}€</TableCell>
                   <TableCell>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-center gap-2">
                       <Button
                         variant="outline"
                         size="icon"
