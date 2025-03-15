@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
+
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -154,6 +155,16 @@ const Index = () => {
                     Engagement éco-responsable
                   </li>
                 </ul>
+                <div className="mt-8 text-center">
+                  <p className="text-gray-600 mb-6">
+                    Prêt à découvrir la différence avec nos services de convoyage professionnels ? Contactez-nous ou faites une demande de devis personnalisée adaptée à vos besoins de transport.
+                  </p>
+                  <Link to="/devis">
+                    <Button className="bg-[#18257D] hover:bg-[#18257D]/90 text-white transition-colors px-8 py-3">
+                      Obtenez votre devis !
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -173,4 +184,5 @@ const Index = () => {
       </main>
     </div>;
 };
+
 export default Index;
