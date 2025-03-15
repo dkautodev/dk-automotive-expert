@@ -157,7 +157,7 @@ const Index = () => {
                 </ul>
               </div>
             </div>
-            <div className="mt-12 text-center max-w-2xl mx-auto">
+            <div className="mt-12 text-center mx-auto" style={{ maxWidth: "calc(100% - 2rem)" }}>
               <p className="text-gray-600 mb-8 text-xl">
                 Prêt à découvrir la différence avec nos services de convoyage professionnels ? Contactez-nous ou faites une demande de devis personnalisée adaptée à vos besoins de transport.
               </p>
