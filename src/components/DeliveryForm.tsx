@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from "date-fns";
-import { CalendarIcon, Clock } from "lucide-react";
+import { CalendarIcon, Clock, Mail } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -33,6 +36,7 @@ const deliveryFormSchema = z.object({
     required_error: "La date de livraison est requise",
   }),
   deliveryTime: z.string().min(1, "L'heure de livraison est requise"),
+  additionalMessage: z.string().optional(),
 });
 
 type DeliveryFormValues = z.infer<typeof deliveryFormSchema>;
@@ -43,19 +47,56 @@ interface DeliveryFormProps {
 }
 
 const DeliveryForm = ({ onPrevious, onNext }: DeliveryFormProps) => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const form = useForm<DeliveryFormValues>({
     resolver: zodResolver(deliveryFormSchema),
   });
 
-  const onSubmit = (data: DeliveryFormValues) => {
+  const onSubmit = async (data: DeliveryFormValues) => {
     console.log('Delivery details:', data);
-    onNext();
+    try {
+      setIsSubmitted(true);
+      toast({
+        title: "Demande envoyée",
+        description: "Votre demande de devis a été envoyée avec succès",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi du formulaire",
+      });
+    }
   };
+
+  if (isSubmitted) {
+    return (
+      <div className="space-y-6">
+        <Alert className="bg-[#F2FCE2] border-green-200">
+          <AlertTitle className="text-2xl font-bold text-[#40B058] mb-4">
+            NOUS AVONS BIEN REÇU VOTRE DEMANDE DE DEVIS.
+          </AlertTitle>
+          <AlertDescription className="space-y-4">
+            <p className="text-blue-700">
+              Pour toute question, n'hésitez pas à nous contacter à l'adresse suivante : {" "}
+              <a href="mailto:contact@dkautomotive.fr" className="underline">
+                contact@dkautomotive.fr
+              </a>
+            </p>
+            <p className="text-gray-700 text-center mt-4">
+              En vous remerciant de votre confiance.
+            </p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <h2 className="text-2xl font-bold text-dk-navy mb-6">Coordonnées de livraison</h2>
+        
         <div className="grid gap-6 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -221,6 +262,26 @@ const DeliveryForm = ({ onPrevious, onNext }: DeliveryFormProps) => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="additionalMessage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  MESSAGE COMPLÉMENTAIRE
+                </FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Ajoutez des informations complémentaires à votre demande..."
+                    className="bg-[#EEF1FF] min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="flex justify-between mt-6">
@@ -233,7 +294,8 @@ const DeliveryForm = ({ onPrevious, onNext }: DeliveryFormProps) => {
             RETOUR
           </Button>
           <Button type="submit" className="bg-[#1a237e] hover:bg-[#3f51b5]">
-            SUIVANT
+            ENVOYER
+            <Mail className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </form>
