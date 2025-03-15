@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VehicleForm } from "@/components/VehicleForm";
@@ -20,6 +21,8 @@ interface VehiclesSectionProps {
   onDeleteVehicle: (index: number) => void;
   onAddVehicle: () => void;
   onVehicleUpdate: (index: number, vehicle: VehicleInfo) => void;
+  onQuoteRequest?: () => void;
+  canRequestQuote?: boolean;
 }
 
 export const VehiclesSection = ({
@@ -28,7 +31,9 @@ export const VehiclesSection = ({
   onVehicleValidityChange,
   onDeleteVehicle,
   onAddVehicle,
-  onVehicleUpdate
+  onVehicleUpdate,
+  onQuoteRequest,
+  canRequestQuote
 }: VehiclesSectionProps) => {
   const canAddNewVehicle = vehicleCount === 0 || vehicleFormsValidity[vehicleCount - 1] === true;
 
@@ -64,8 +69,11 @@ export const VehiclesSection = ({
             Ajouter un véhicule
           </Button>
           
-          {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && (
-            <Button className="gap-2">
+          {canRequestQuote && (
+            <Button 
+              onClick={onQuoteRequest}
+              className="gap-2"
+            >
               <Calculator className="h-4 w-4" />
               Obtenir votre devis
             </Button>
