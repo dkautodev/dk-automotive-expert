@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { OrderState } from "@/types/order";
+import { format } from "date-fns";
 
 export const useTimeManagement = (
   orderDetails: OrderState,
@@ -9,28 +10,41 @@ export const useTimeManagement = (
   const [pickupTime, setPickupTime] = useState<string>("");
   const [deliveryTime, setDeliveryTime] = useState<string>("");
 
+  useEffect(() => {
+    if (orderDetails.pickupDate) {
+      setPickupTime(format(orderDetails.pickupDate, 'HH:mm'));
+    }
+    if (orderDetails.deliveryDate) {
+      setDeliveryTime(format(orderDetails.deliveryDate, 'HH:mm'));
+    }
+  }, [orderDetails.pickupDate, orderDetails.deliveryDate]);
+
   const handlePickupTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPickupTime(e.target.value);
-    if (orderDetails) {
+    const newTime = e.target.value;
+    setPickupTime(newTime);
+    if (orderDetails && orderDetails.pickupDate) {
       const date = new Date(orderDetails.pickupDate);
-      const [hours, minutes] = e.target.value.split(':');
+      const [hours, minutes] = newTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
       setOrderDetails({
         ...orderDetails,
-        pickupDate: date
+        pickupDate: date,
+        pickupTime: newTime
       });
     }
   };
 
   const handleDeliveryTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryTime(e.target.value);
-    if (orderDetails) {
+    const newTime = e.target.value;
+    setDeliveryTime(newTime);
+    if (orderDetails && orderDetails.deliveryDate) {
       const date = new Date(orderDetails.deliveryDate);
-      const [hours, minutes] = e.target.value.split(':');
+      const [hours, minutes] = newTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
       setOrderDetails({
         ...orderDetails,
-        deliveryDate: date
+        deliveryDate: date,
+        deliveryTime: newTime
       });
     }
   };

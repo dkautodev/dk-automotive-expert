@@ -1,4 +1,3 @@
-
 import html2pdf from 'html2pdf.js';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -14,7 +13,7 @@ export const generateQuotePDF = (quote: Quote) => {
           <p style="color: #64748b; margin: 5px 0;">Transport de véhicules</p>
         </div>
         <div style="text-align: right;">
-          <p style="color: #64748b; margin: 0; font-size: 16px;">${quote.quote_number}</p>
+          <p style="color: #1a365d; margin: 0; font-size: 18px; font-weight: bold;">Devis n° ${quote.quote_number}</p>
           <p style="color: #64748b; margin: 5px 0;">Créé le: ${format(new Date(quote.dateCreated), "dd/MM/yyyy")}</p>
         </div>
       </div>
@@ -74,7 +73,7 @@ export const generateQuotePDF = (quote: Quote) => {
 
   const opt = {
     margin: [10, 10],
-    filename: `${quote.quote_number}`,
+    filename: `DKAUTOMOTIVE-${quote.quote_number}`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
