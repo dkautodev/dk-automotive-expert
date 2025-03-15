@@ -51,6 +51,7 @@ interface PickupFormProps {
 
 const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [vehicleData, setVehicleData] = useState({});
   const form = useForm<PickupFormValues>({
     resolver: zodResolver(pickupFormSchema),
   });
@@ -81,6 +82,11 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
   const onSubmit = async (data: PickupFormValues) => {
     console.log('Pickup details:', data);
     try {
+      setVehicleData(prev => ({
+        ...prev,
+        pickupAddress: data.address
+      }));
+      
       toast({
         title: "Première étape validée",
         description: "Veuillez remplir les informations de livraison",

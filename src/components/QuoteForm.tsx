@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +12,17 @@ import { quoteFormSchema, type QuoteFormValues } from './quote-form/quoteFormSch
 
 const QuoteForm = () => {
   const [step, setStep] = useState(1);
-  const [vehicleData, setVehicleData] = useState<QuoteFormValues | null>(null);
+  const [vehicleData, setVehicleData] = useState<{
+    pickupAddress: string;
+    deliveryAddress: string;
+    vehicles: any[];
+    priceHT: number;
+  }>({
+    pickupAddress: '',
+    deliveryAddress: '',
+    vehicles: [],
+    priceHT: 0
+  });
 
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
@@ -26,8 +37,22 @@ const QuoteForm = () => {
   });
 
   const onSubmit = (data: QuoteFormValues) => {
-    console.log(data);
-    setVehicleData(data);
+    // Créer un objet véhicule à partir des données du formulaire
+    const vehicle = {
+      brand: data.brand,
+      model: data.model,
+      year: data.year,
+      fuel: data.fuelType,
+      licensePlate: data.licensePlate
+    };
+
+    // Mettre à jour vehicleData avec le nouveau véhicule
+    setVehicleData(prev => ({
+      ...prev,
+      vehicles: [vehicle], // Pour l'instant, on ne gère qu'un seul véhicule
+      priceHT: 150 // Prix fixe pour l'exemple
+    }));
+
     setStep(2);
     toast({
       title: "Première étape validée",
