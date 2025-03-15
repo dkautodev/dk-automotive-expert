@@ -1,9 +1,21 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, UserRound } from 'lucide-react';
+import { Facebook, Instagram, UserRound, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
+  const isMobile = useIsMobile();
+
+  const navLinks = [
+    { to: "/devis", text: "OBTENIR MON DEVIS" },
+    { to: "/about", text: "QUI SOMMES-NOUS" },
+    { to: "/contact", text: "CONTACTEZ-NOUS" },
+    { to: "/faq", text: "FAQ" },
+  ];
+
   return (
     <div className="w-full sticky top-0 z-50">
       <div className="bg-dk-navy text-white py-2 px-4">
@@ -16,8 +28,8 @@ const Navbar = () => {
               <Instagram size={20} />
             </a>
           </div>
-          <p className="text-sm text-center">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
-          <div className="invisible flex gap-4">
+          <p className="text-sm text-center hidden md:block">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
+          <div className="invisible flex gap-4 hidden md:flex">
             <Facebook size={20} />
             <Instagram size={20} />
           </div>
@@ -27,18 +39,51 @@ const Navbar = () => {
         <div className="container mx-auto py-4 px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex-shrink-0">
-              <img src="/lovable-uploads/ea18e979-d5d3-4e98-9a6b-2979a5f6ce83.png" alt="DK AUTOMOTIVE" className="h-12" />
+              <img src="/lovable-uploads/ea18e979-d5d3-4e98-9a6b-2979a5f6ce83.png" alt="DK AUTOMOTIVE" className="h-8 md:h-12" />
             </Link>
-            <div className="hidden md:flex space-x-8 items-center">
-              <Link to="/devis" className="text-dk-navy hover:text-dk-blue transition-colors">OBTENIR MON DEVIS</Link>
-              <Link to="/about" className="text-dk-navy hover:text-dk-blue transition-colors">QUI SOMMES-NOUS</Link>
-              <Link to="/contact" className="text-dk-navy hover:text-dk-blue transition-colors">CONTACTEZ-NOUS</Link>
-              <Link to="/faq" className="text-dk-navy hover:text-dk-blue transition-colors">FAQ</Link>
-              <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors">
-                <UserRound className="mr-2" />
-                Espace professionnel
-              </Button>
-            </div>
+            
+            {isMobile ? (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <nav className="flex flex-col gap-4">
+                    {navLinks.map((link) => (
+                      <Link
+                        key={link.to}
+                        to={link.to}
+                        className="text-dk-navy hover:text-dk-blue transition-colors py-2 text-lg"
+                      >
+                        {link.text}
+                      </Link>
+                    ))}
+                    <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors w-full mt-4">
+                      <UserRound className="mr-2" />
+                      Espace professionnel
+                    </Button>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            ) : (
+              <div className="hidden md:flex space-x-8 items-center">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="text-dk-navy hover:text-dk-blue transition-colors"
+                  >
+                    {link.text}
+                  </Link>
+                ))}
+                <Button className="bg-dk-navy hover:bg-dk-blue text-white transition-colors">
+                  <UserRound className="mr-2" />
+                  Espace professionnel
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </nav>
