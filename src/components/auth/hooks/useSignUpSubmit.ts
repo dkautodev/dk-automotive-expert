@@ -16,21 +16,13 @@ export const useSignUpSubmit = () => {
         first_name: data.firstName,
         last_name: data.lastName,
         phone: data.phone,
+        company: data.company,
         role: 'client' as UserRole
       });
 
       if (signUpError) throw signUpError;
 
       if (authData.user) {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: authData.user.id,
-            role: 'client'
-          });
-
-        if (roleError) throw roleError;
-
         toast({
           title: "Inscription réussie",
           description: "Votre compte a été créé avec succès."
