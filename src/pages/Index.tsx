@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -212,8 +212,54 @@ const Index = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        
+        {/* How it Works Section */}
+        <section className="relative py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-4xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                COMMENT ÇA MARCHE
+              </h2>
+              <h3 className="text-2xl md:text-3xl font-bold text-[#18257D] mb-12">
+                AVEC DK AUTOMOTIVE
+              </h3>
+
+              <div className="grid md:grid-cols-3 gap-8 mb-12">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-[#4A90E2] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ClipboardList className="w-12 h-12 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-[#18257D] mb-4">1. JE REMPLIS LE FORMULAIRE DE DEVIS</h4>
+                  <p className="text-gray-600">Je remplis le formulaire de devis en vérifiant correctement mes informations.</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-[#4A90E2] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <PhoneCall className="w-12 h-12 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-[#18257D] mb-4">2. APPEL AVEC UN CONSEILLER</h4>
+                  <p className="text-gray-600">Un conseiller vous rappelle sous 24h pour voir comment concrétiser votre convoyage.</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-[#4A90E2] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Truck className="w-12 h-12 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-[#18257D] mb-4">3. CONVOYAGE DE VOTRE VÉHICULE</h4>
+                  <p className="text-gray-600">J'accepte mon devis et votre projet est réalisé à la date et heure convenue.</p>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <h3 className="text-xl font-bold mb-4">Commencez dès maintenant !</h3>
+                <Link to="/devis">
+                  <Button className="bg-[#18257D] hover:bg-[#18257D]/90 text-white transition-colors px-8 py-6 text-lg">
+                    Demandez votre devis gratuitement
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>;
