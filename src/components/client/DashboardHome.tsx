@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -9,34 +8,19 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import OrderForm from "./OrderForm";
-import { useEffect, useState } from "react";
-import { Quote } from "@/types/order";
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useQuoteManagement } from "@/hooks/useQuoteManagement";
 
 const DashboardHome = () => {
-  const [counts, setCounts] = useState({
-    pendingQuotes: 0,
-    ongoingShipments: 0,
-    pendingInvoices: 0,
-    completedShipments: 0,
+  const { fetchQuotes } = useQuoteManagement();
+  
+  const { data: quotes = [] } = useQuery({
+    queryKey: ['pendingQuotes'],
+    queryFn: fetchQuotes
   });
 
-  useEffect(() => {
-    // Récupérer les devis depuis le localStorage
-    const savedQuotes = localStorage.getItem('pendingQuotes');
-    if (savedQuotes) {
-      const parsedQuotes = JSON.parse(savedQuotes) as Quote[];
-      setCounts(prev => ({
-        ...prev,
-        pendingQuotes: parsedQuotes.length
-      }));
-    }
-
-    // TODO: Ajouter la récupération des autres données quand elles seront implémentées
-    // Pour l'instant on laisse les autres compteurs à 0
-  }, []);
-
   const handleLogout = () => {
-    // TODO: Implement logout logic
     console.log("Logout clicked");
   };
 
@@ -57,7 +41,7 @@ const DashboardHome = () => {
               <CardTitle className="text-lg">Devis en attente</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{counts.pendingQuotes}</p>
+              <p className="text-2xl font-bold">{quotes.length}</p>
             </CardContent>
           </Card>
         </Link>
