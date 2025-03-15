@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, Clock } from "lucide-react";
@@ -23,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 interface PickupDetailsSectionProps {
   form: UseFormReturn<PickupFormValues>;
-  addressInputRef: React.RefObject<HTMLInputElement>;
+  addressInputRef: React.MutableRefObject<HTMLInputElement | null>;
 }
 
 const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionProps) => {
@@ -43,9 +42,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
                 {...field}
                 className="bg-[#EEF1FF]"
                 ref={(e) => {
-                  if (e) {
-                    addressInputRef.current = e;
-                  }
+                  addressInputRef.current = e;
                 }}
               />
             </FormControl>
