@@ -9,6 +9,7 @@ import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ContactsForm } from "@/components/order/ContactsForm";
+import { AddVehicleForm } from "@/components/order/AddVehicleForm";
 import { useToast } from "@/hooks/use-toast";
 
 interface Vehicle {
@@ -43,6 +44,7 @@ const QuoteTotal = () => {
   const { toast } = useToast();
   const [orderDetails, setOrderDetails] = useState(location.state as OrderState | null);
   const [newFiles, setNewFiles] = useState<{ [key: number]: File[] }>({});
+  const [showAddVehicleDialog, setShowAddVehicleDialog] = useState(false);
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -123,6 +125,16 @@ const QuoteTotal = () => {
       title: "Devis envoyé",
       description: "Votre devis a été envoyé avec succès et est en attente de validation.",
     });
+  };
+
+  const handleAddVehicleSubmit = (newVehicle: Vehicle) => {
+    if (orderDetails) {
+      setOrderDetails({
+        ...orderDetails,
+        vehicles: [...orderDetails.vehicles, newVehicle]
+      });
+      setShowAddVehicleDialog(false);
+    }
   };
 
   const totalPriceHT = Number(orderDetails.priceHT) * orderDetails.vehicles.length;
@@ -232,10 +244,23 @@ const QuoteTotal = () => {
                   {orderDetails.vehicles.length} véhicule{orderDetails.vehicles.length > 1 ? 's' : ''}
                 </span>
               </div>
-              <Button onClick={handleAddVehicle} variant="outline" size="sm" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Ajouter un véhicule
-              </Button>
+              <Dialog open={showAddVehicleDialog} onOpenChange={setShowAddVehicleDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Ajouter un véhicule
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Ajouter un véhicule</DialogTitle>
+                  </DialogHeader>
+                  <AddVehicleForm
+                    onSubmit={handleAddVehicleSubmit}
+                    onCancel={() => setShowAddVehicleDialog(false)}
+                  />
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="ml-7">
               <Table>
