@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -120,7 +119,6 @@ const PendingQuotes = () => {
                 <TableHead>Départ</TableHead>
                 <TableHead>Arrivée</TableHead>
                 <TableHead>Véhicules</TableHead>
-                <TableHead className="text-right">Prix HT</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -134,7 +132,6 @@ const PendingQuotes = () => {
                   <TableCell>{quote.pickupAddress}</TableCell>
                   <TableCell>{quote.deliveryAddress}</TableCell>
                   <TableCell>{quote.vehicles.length}</TableCell>
-                  <TableCell className="text-right">{quote.totalPriceHT.toFixed(2)}€</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-2">
                       <Button
