@@ -66,7 +66,7 @@ const Index = () => {
         </section>
 
         {/* Services Section */}
-        <section className="py-20">
+        <section className="py-12">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center text-dk-navy mb-16">Nos services de convoyage</h2>
             <div className="grid md:grid-cols-3 gap-12">
