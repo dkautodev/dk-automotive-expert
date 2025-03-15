@@ -7,6 +7,7 @@ import { VehiclesSection } from "@/components/order/VehiclesSection";
 import { vehicleTypes } from "@/lib/vehicleTypes";
 import { Button } from "@/components/ui/button";
 import { Calculator } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useScrollToElement } from "@/hooks/useScrollToElement";
 
 interface OrderState {
@@ -139,7 +140,7 @@ const OrderDetails = () => {
 
   const handleAddVehicle = () => {
     setVehicleCount(prev => prev + 1);
-    setTimeout(() => scrollToElement('last-vehicle'), 100);
+    setTimeout(() => scrollToElement('vehicles-section'), 100);
   };
 
   const handleDateUpdate = (pickup: Date | undefined, delivery: Date | undefined) => {
@@ -184,18 +185,27 @@ const OrderDetails = () => {
             onAddVehicle={handleAddVehicle}
             onVehicleUpdate={handleVehicleUpdate}
           />
-        </div>
-      )}
 
-      {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && pickupDate && deliveryDate && (
-        <div id="last-vehicle" className="flex justify-end mt-6">
-          <Button
-            onClick={navigateToQuoteTotal}
-            className="gap-2"
-          >
-            <Calculator className="h-4 w-4" />
-            Obtenir votre devis
-          </Button>
+          {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && pickupDate && deliveryDate && (
+            <div className="flex justify-end gap-4 mt-6">
+              <Button
+                onClick={handleAddVehicle}
+                variant="outline"
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Ajouter un véhicule
+              </Button>
+
+              <Button
+                onClick={navigateToQuoteTotal}
+                className="gap-2"
+              >
+                <Calculator className="h-4 w-4" />
+                Obtenir votre devis
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -203,4 +213,3 @@ const OrderDetails = () => {
 };
 
 export default OrderDetails;
-
