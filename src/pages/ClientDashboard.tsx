@@ -1,4 +1,3 @@
-
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ClientSidebar from "@/components/client/ClientSidebar";
@@ -17,7 +16,7 @@ const ClientDashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <ClientSidebar />
-        <main className="flex-1">
+        <main className="flex-1 pl-52">
           <Routes>
             <Route index element={<DashboardHome />} />
             <Route path="profile" element={<Profile />} />
