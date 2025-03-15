@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
 
 const Index = () => {
@@ -53,12 +54,13 @@ const Index = () => {
         <section className="relative py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-dk-blue mb-4 tracking-wide">
+              <h2 className="text-2xl md:text-3xl font-bold text-dk-blue mb-3 tracking-wide">
                 VOTRE CONFIANCE, NOTRE ENGAGEMENT
               </h2>
-              <p className="text-base md:text-lg text-gray-600 font-light">
+              <p className="text-sm md:text-base text-gray-600 font-light italic mb-10">
                 Chez DK Automotive, chaque parcours est une promesse de qualité et de fiabilité.
               </p>
+              <Separator className="max-w-xs mx-auto bg-gray-300" />
             </div>
           </div>
         </section>
