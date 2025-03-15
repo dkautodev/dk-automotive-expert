@@ -5,12 +5,22 @@ import { QuoteRow } from "@/types/database";
 
 export const useQuoteManagement = () => {
   const saveQuote = async (quote: Quote) => {
+    // Convert vehicles to a JSON-compatible format
+    const vehiclesJson = quote.vehicles.map(vehicle => ({
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      fuel: vehicle.fuel,
+      licensePlate: vehicle.licensePlate,
+      files: [] // Files are handled separately
+    }));
+
     // Convert Date to ISO string for Supabase
     const quoteData = {
       id: quote.id,
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
-      vehicles: quote.vehicles,
+      vehicles: vehiclesJson,
       total_price_ht: quote.totalPriceHT,
       status: quote.status,
       date_created: quote.dateCreated.toISOString()
