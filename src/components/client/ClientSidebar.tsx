@@ -1,82 +1,49 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Home, Plus, Car, Settings } from 'lucide-react';
 
-import { User, ListOrdered, LayoutDashboard } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { useAuthContext } from "@/context/AuthContext";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarSeparator,
-} from "@/components/ui/sidebar";
-
-const menuItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    url: "/dashboard/client",
-  },
-  {
-    title: "Mon profil",
-    icon: User,
-    url: "/dashboard/client/profile",
-  },
-  {
-    title: "Historique des commandes",
-    icon: ListOrdered,
-    url: "/dashboard/client/orders",
-  },
-];
-
-export function ClientSidebar() {
-  const location = useLocation();
-  const { profile } = useAuthContext();
-
+const ClientSidebar = () => {
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={location.pathname === item.url}
-                    tooltip={item.title}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarSeparator />
-        <div className="p-4 space-y-2">
-          <p className="text-sm font-medium text-foreground/70">
-            {profile?.company || 'Société non renseignée'}
-          </p>
-          <p className="text-sm text-foreground/70">
-            {profile?.first_name} {profile?.last_name}
-          </p>
-          <p className="text-sm text-foreground/70">
-            {profile?.email}
-          </p>
-        </div>
-      </SidebarFooter>
-    </Sidebar>
+    <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0">
+      <div className="p-4">
+        <img 
+          src="/dk-automotive-logo.png" 
+          alt="DK Automotive" 
+          className="w-full h-auto mb-2"
+        />
+        <p className="text-center text-sm text-gray-600">Convoyage | Livraisons | Restitutions</p>
+      </div>
+      
+      <nav className="mt-6">
+        <ul>
+          <li className="mb-2">
+            <Link to="/client/dashboard" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <Home className="mr-2 h-4 w-4" />
+              Dashboard
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/client/new-quote" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <Plus className="mr-2 h-4 w-4" />
+              Nouveau Devis
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/client/quotes" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <Car className="mr-2 h-4 w-4" />
+              Mes Devis
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/client/profile" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <Settings className="mr-2 h-4 w-4" />
+              Mon Profil
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
   );
-}
+};
+
+export default ClientSidebar;
