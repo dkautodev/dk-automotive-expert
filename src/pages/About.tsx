@@ -3,7 +3,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
-
 const About = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -106,7 +105,7 @@ const About = () => {
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <img src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" alt="Écoconduite" className="w-16 h-16 mb-4" />
+                  <img alt="Écoconduite" className="w-16 h-16 mb-4" src="/lovable-uploads/19f7f830-34f1-4f2b-91ed-e3517a2a87f6.jpg" />
                 </div>
                 <h4 className="text-xl font-bold">ÉCOCONDUITE</h4>
                 <p className="text-sm">
@@ -115,7 +114,7 @@ const About = () => {
               </div>
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <img src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" alt="Expertise technique" className="w-16 h-16 mb-4" />
+                  <img alt="Expertise technique" className="w-16 h-16 mb-4" src="/lovable-uploads/a527220b-aca5-4730-b21e-ec6177c7b83d.jpg" />
                 </div>
                 <h4 className="text-xl font-bold">EXPERTISE TECHNIQUE</h4>
                 <p className="text-sm">
@@ -124,7 +123,7 @@ const About = () => {
               </div>
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <img src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" alt="Service sur-mesure" className="w-16 h-16 mb-4" />
+                  <img alt="Service sur-mesure" className="w-16 h-16 mb-4" src="/lovable-uploads/2b49a059-d379-4b8f-847a-628ff2c1a7bc.jpg" />
                 </div>
                 <h4 className="text-xl font-bold">SERVICE SUR-MESURE</h4>
                 <p className="text-sm">
@@ -140,7 +139,7 @@ const About = () => {
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <img alt="Expertise en convoyage" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/7087d96a-bb37-407c-aefa-f828baefe417.png" />
+                <img alt="Expertise en convoyage" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/65f150ef-91b6-4e32-ac29-e59c718d1905.jpg" />
               </div>
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
@@ -177,5 +176,4 @@ const About = () => {
       <Footer />
     </div>;
 };
-
 export default About;
