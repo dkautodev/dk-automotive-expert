@@ -158,11 +158,11 @@ const Index = () => {
               </div>
             </div>
             <div className="mt-12 text-center max-w-2xl mx-auto">
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-8 text-xl">
                 Prêt à découvrir la différence avec nos services de convoyage professionnels ? Contactez-nous ou faites une demande de devis personnalisée adaptée à vos besoins de transport.
               </p>
               <Link to="/devis">
-                <Button className="bg-[#18257D] hover:bg-[#18257D]/90 text-white transition-colors px-8 py-3">
+                <Button className="bg-[#18257D] hover:bg-[#18257D]/90 text-white transition-colors px-8 py-6 text-lg">
                   Obtenez votre devis !
                 </Button>
               </Link>
