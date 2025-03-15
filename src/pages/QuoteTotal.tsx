@@ -1,4 +1,4 @@
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import html2pdf from 'html2pdf.js';
@@ -14,6 +14,7 @@ import { QuoteFooter } from "@/components/quote/QuoteFooter";
 
 const QuoteTotal = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [orderDetails, setOrderDetails] = useState(location.state as OrderState | null);
   const [newFiles, setNewFiles] = useState<{ [key: number]: File[] }>({});
@@ -154,7 +155,7 @@ const QuoteTotal = () => {
     html2pdf().set(opt).from(content).save();
   };
 
-  const totalPriceHT = Number(orderDetails.priceHT) * orderDetails.vehicles.length;
+  const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
 
   return (
     <div className="p-6 space-y-6">
