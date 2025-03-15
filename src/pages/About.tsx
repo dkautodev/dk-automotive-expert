@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -7,7 +8,6 @@ import { Check } from 'lucide-react';
 const About = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
-      
       <main className="animate-fadeIn">
         {/* Hero Section */}
         <section className="py-24 px-4">
@@ -71,6 +71,37 @@ const About = () => {
           </div>
         </section>
 
+        {/* Drivers Section */}
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <img 
+                  src="/lovable-uploads/cd68faa2-07bb-4407-a720-2b40ee2e8479.png" 
+                  alt="DK Automotive drivers" 
+                  className="rounded-lg shadow-lg w-full"
+                />
+              </div>
+              <div className="space-y-6">
+                <h3 className="text-3xl font-bold text-[#18257D]">
+                  CHAUFFEURS EXPÉRIMENTÉS
+                </h3>
+                <h3 className="text-3xl font-bold text-[#18257D]">
+                  Des convoyeurs rigoureusement sélectionnés
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Nos convoyeurs expérimentés et sélectionnés avec soin sont notre atout majeur. Tous de nos convoyeurs professionnels ont été sélectionnés rigoureusement pour leur expérience du métier, leur savoir-faire et leur engagement pour la satisfaction clientèle. Chez DK AUTOMOTIVE, nous ne faisons aucun compromis pour assurer la qualité de nos services.
+                </p>
+                <div className="pt-4">
+                  <Link to="/contact" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
+                    Contactez-nous
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-16 px-4 bg-white">
           <div className="container mx-auto text-center">
@@ -83,7 +114,6 @@ const About = () => {
           </div>
         </section>
       </main>
-
       <Footer />
     </div>;
 };
