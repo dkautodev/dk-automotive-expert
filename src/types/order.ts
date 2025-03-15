@@ -49,3 +49,13 @@ export interface VehicleInfo {
   licensePlate: string;
   files: File[];
 }
+
+export interface Quote {
+  id: string;
+  dateCreated: Date;
+  pickupAddress: string;
+  deliveryAddress: string;
+  vehicles: Vehicle[];
+  totalPriceHT: number;
+  status: 'pending' | 'accepted' | 'rejected';
+}
