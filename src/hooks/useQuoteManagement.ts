@@ -21,7 +21,9 @@ export const useQuoteManagement = () => {
       vehicles: vehiclesJson,
       total_price_ht: quote.totalPriceHT,
       status: quote.status,
-      date_created: quote.dateCreated.toISOString()
+      date_created: quote.dateCreated.toISOString(),
+      delivery_date: quote.deliveryDate,
+      delivery_time: quote.deliveryTime
     };
 
     const { error } = await supabase
@@ -52,7 +54,9 @@ export const useQuoteManagement = () => {
       vehicles: quote.vehicles,
       totalPriceHT: quote.total_price_ht,
       status: quote.status,
-      dateCreated: new Date(quote.date_created)
+      dateCreated: new Date(quote.date_created),
+      deliveryDate: quote.delivery_date ? new Date(quote.delivery_date) : undefined,
+      deliveryTime: quote.delivery_time
     }));
   };
 
@@ -76,7 +80,9 @@ export const useQuoteManagement = () => {
       vehicles: data.vehicles,
       totalPriceHT: data.total_price_ht,
       status: data.status,
-      dateCreated: new Date(data.date_created)
+      dateCreated: new Date(data.date_created),
+      deliveryDate: data.delivery_date ? new Date(data.delivery_date) : undefined,
+      deliveryTime: data.delivery_time
     };
   };
 
