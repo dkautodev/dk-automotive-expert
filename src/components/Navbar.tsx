@@ -14,7 +14,7 @@ const Navbar = () => {
               <Instagram size={20} />
             </a>
           </div>
-          <p className="text-sm flex-1 text-center px-[50px]">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
+          <p className="text-sm flex-1 text-center px-[150px]">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</p>
           <div className="flex-1"></div>
         </div>
       </div>
