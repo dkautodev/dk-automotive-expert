@@ -56,7 +56,7 @@ const Contact = () => {
       <main className="animate-fadeIn">
         <section className="py-16 px-4">
           <div className="container mx-auto">
-            <div className="max-w-4xl mx-auto text-center mb-16">
+            <div className="max-w-6xl mx-auto text-center mb-16">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 <span className="text-black">CONTACTEZ-NOUS POUR TOUTES</span>
                 <br />
@@ -69,7 +69,6 @@ const Contact = () => {
               </p>
             </div>
 
-            {/* Contact Form */}
             <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
               <h2 className="text-2xl font-bold text-dk-navy mb-6">
                 Envoyez-nous un message
@@ -197,3 +196,4 @@ const Contact = () => {
 };
 
 export default Contact;
+
