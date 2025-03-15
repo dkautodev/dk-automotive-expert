@@ -28,12 +28,12 @@ const FAQ = () => {
             </div>
 
             <div className="max-w-4xl mx-auto">
-              <Accordion type="single" collapsible className="space-y-4">
-                <AccordionItem value="item-1" className="bg-[#1a237e] text-white rounded-lg shadow-sm">
-                  <AccordionTrigger className="px-6 hover:no-underline">
+              <Accordion type="single" collapsible className="space-y-6">
+                <AccordionItem value="item-1" className="bg-[#1a237e] rounded-2xl shadow-lg overflow-hidden">
+                  <AccordionTrigger className="px-8 py-6 hover:no-underline text-xl font-medium text-white">
                     QU'EST-CE QUE LE CONVOYAGE DE VÉHICULES ?
                   </AccordionTrigger>
-                  <AccordionContent className="px-6 text-white">
+                  <AccordionContent className="px-8 pb-6 text-white text-lg">
                     Le convoyage de véhicules est un service professionnel qui consiste à transporter un véhicule d'un point A à un point B avec un chauffeur qualifié qui conduit directement votre véhicule jusqu'à sa destination.
                   </AccordionContent>
                 </AccordionItem>
