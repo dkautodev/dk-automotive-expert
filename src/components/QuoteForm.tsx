@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import PickupForm from './PickupForm';
 import {
   Select,
   SelectContent,
@@ -38,6 +39,9 @@ const formSchema = z.object({
 type QuoteFormValues = z.infer<typeof formSchema>;
 
 const QuoteForm = () => {
+  const [step, setStep] = useState(1);
+  const [vehicleData, setVehicleData] = useState<QuoteFormValues | null>(null);
+
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,11 +56,17 @@ const QuoteForm = () => {
 
   const onSubmit = (data: QuoteFormValues) => {
     console.log(data);
+    setVehicleData(data);
+    setStep(2);
     toast({
-      title: "Formulaire soumis",
-      description: "Vos informations ont été enregistrées",
+      title: "Première étape validée",
+      description: "Veuillez remplir les informations d'enlèvement",
     });
   };
+
+  if (step === 2) {
+    return <PickupForm onPrevious={() => setStep(1)} />;
+  }
 
   return (
     <Form {...form}>
