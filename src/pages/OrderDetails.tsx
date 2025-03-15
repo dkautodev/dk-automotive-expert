@@ -1,5 +1,6 @@
-
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Plus, Calculator } from "lucide-react";
 import { OrderSummary } from "@/components/order/OrderSummary";
 import { ContactsForm } from "@/components/order/ContactsForm";
 import { VehiclesSection } from "@/components/order/VehiclesSection";
@@ -7,6 +8,7 @@ import { vehicleTypes } from "@/lib/vehicleTypes";
 import { useScrollToElement } from "@/hooks/useScrollToElement";
 import { useOrderDetails } from "@/hooks/useOrderDetails";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
+import { OrderState } from "@/types/order";
 
 const OrderDetails = () => {
   const location = useLocation();
@@ -26,6 +28,8 @@ const OrderDetails = () => {
     setShowContacts,
     showVehicle,
     setShowVehicle,
+    areContactFieldsValid,
+    setAreContactFieldsValid,
     vehicleCount,
     setVehicleCount,
     vehicleFormsValidity,
