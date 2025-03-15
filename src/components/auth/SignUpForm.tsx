@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 type FormData = {
   firstName: string;
   lastName: string;
@@ -14,18 +15,23 @@ type FormData = {
   password: string;
   confirmPassword: string;
 };
+
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const form = useForm<FormData>();
+
   const onSubmit = (data: FormData) => {
     console.log(data);
     // TODO: Implement registration logic
   };
+
   return <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle>Inscription Professionnel</CardTitle>
-        <CardDescription>Créez votre compte professionnel pour commander vos convoyages</CardDescription>
+        <CardDescription className="whitespace-nowrap overflow-hidden text-ellipsis">
+          Créez votre compte professionnel pour commander vos convoyages
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -135,4 +141,5 @@ const SignUpForm = () => {
       </CardContent>
     </Card>;
 };
+
 export default SignUpForm;
