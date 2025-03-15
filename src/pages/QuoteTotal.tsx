@@ -1,4 +1,3 @@
-
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -88,12 +87,28 @@ const QuoteTotal = () => {
   };
 
   const handleSubmitQuote = () => {
+    if (!orderDetails) return;
+
+    const newQuote: Quote = {
+      id: Math.random().toString(36).substring(7),
+      dateCreated: new Date(),
+      pickupAddress: orderDetails.pickupAddress,
+      deliveryAddress: orderDetails.deliveryAddress,
+      vehicles: orderDetails.vehicles,
+      totalPriceHT: totalPriceHT,
+      status: 'pending'
+    };
+
+    const existingQuotes = JSON.parse(localStorage.getItem('pendingQuotes') || '[]');
+    
+    localStorage.setItem('pendingQuotes', JSON.stringify([...existingQuotes, newQuote]));
+
     toast({
       title: "Devis envoyé",
       description: "Votre devis a été envoyé avec succès et est en attente de validation.",
     });
     
-    navigate("/dashboard/client");
+    navigate("/dashboard/client/pending-quotes");
   };
 
   const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
