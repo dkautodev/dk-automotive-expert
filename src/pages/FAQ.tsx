@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -18,13 +17,13 @@ const FAQ = () => {
         <section className="py-16 px-4">
           <div className="container mx-auto">
             <div className="max-w-6xl mx-auto text-center mb-16">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                <span className="text-black">QUESTIONS</span>
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                <span className="text-black">FAQ</span>
                 <br />
-                <span className="text-dk-navy">FRÉQUENTES</span>
+                <span className="text-[#1a237e]">DK AUTOMOTIVE</span>
               </h1>
               <p className="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto">
-                Retrouvez ici les réponses aux questions les plus fréquemment posées sur nos services de convoyage.
+                Trouvez toutes les réponses à vos interrogations sur notre service de convoyage de véhicules
               </p>
             </div>
 
