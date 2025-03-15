@@ -1,12 +1,9 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
-
 const About = () => {
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       <Navbar />
       
       <main className="animate-fadeIn">
@@ -35,11 +32,7 @@ const About = () => {
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <img 
-                  src="/lovable-uploads/36e10c4a-a023-4147-a0b0-adc05679ea46.png" 
-                  alt="DK Automotive expertise" 
-                  className="rounded-lg shadow-lg w-full"
-                />
+                <img alt="DK Automotive expertise" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/68f33641-ed3b-4ff0-b6f3-288ab97beda1.jpg" />
               </div>
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
@@ -49,10 +42,7 @@ const About = () => {
                   Notre engagement envers l'excellence et notre compréhension approfondie du secteur du transport nous permettent de fournir des solutions sur mesure pour chaque client. Notre équipe expérimentée assure un service professionnel et fiable, adapté à vos besoins spécifiques.
                 </p>
                 <div className="pt-4">
-                  <Link 
-                    to="/devis" 
-                    className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors"
-                  >
+                  <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
                     Demander un devis
                   </Link>
                 </div>
@@ -67,10 +57,7 @@ const About = () => {
             <h2 className="text-4xl font-bold mb-4">FAITES LE CHOIX DE L'EXPERTISE</h2>
             <h3 className="text-4xl font-bold text-[#18257D] mb-4">DK AUTOMOTIVE</h3>
             <p className="text-lg text-gray-700 mb-8">UN PARTENAIRE FIABLE POUR VOS BESOINS EN CONVOYAGE</p>
-            <Link 
-              to="/devis" 
-              className="inline-block bg-[#18257D] text-white px-8 py-4 text-lg font-semibold hover:bg-[#18257D]/90 transition-colors"
-            >
+            <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 text-lg font-semibold hover:bg-[#18257D]/90 transition-colors">
               DEMANDEZ VOTRE DEVIS
             </Link>
           </div>
@@ -78,8 +65,6 @@ const About = () => {
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default About;
