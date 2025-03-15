@@ -9,12 +9,20 @@ interface VehicleFormProps {
   index: number;
   onDelete: () => void;
   onChange: (isValid: boolean) => void;
+  onVehicleUpdate: (vehicle: {
+    brand: string;
+    model: string;
+    year: string;
+    fuel: string;
+    licensePlate: string;
+    files: File[];
+  }) => void;
 }
 
 const FUEL_TYPES = ["Essence", "Diesel", "Électrique", "Hybride", "GPL"];
 const YEARS = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
 
-export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => {
+export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: VehicleFormProps) => {
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
@@ -49,7 +57,18 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
                    fuel !== "" && 
                    licensePlate !== "";
     onChange(isValid);
-  }, [brand, model, year, fuel, licensePlate, onChange]);
+    
+    if (isValid) {
+      onVehicleUpdate({
+        brand,
+        model,
+        year,
+        fuel,
+        licensePlate,
+        files
+      });
+    }
+  }, [brand, model, year, fuel, licensePlate, files, onChange, onVehicleUpdate]);
 
   return (
     <div className="space-y-4 border p-4 rounded-lg relative">

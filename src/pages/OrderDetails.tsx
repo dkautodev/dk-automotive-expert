@@ -14,6 +14,22 @@ interface OrderState {
   selectedVehicle: string;
 }
 
+interface ContactInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+interface VehicleInfo {
+  brand: string;
+  model: string;
+  year: string;
+  fuel: string;
+  licensePlate: string;
+  files: File[];
+}
+
 const OrderDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,6 +41,9 @@ const OrderDetails = () => {
   const [areContactFieldsValid, setAreContactFieldsValid] = useState(false);
   const [vehicleCount, setVehicleCount] = useState(0);
   const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
+  const [pickupContact, setPickupContact] = useState<ContactInfo | null>(null);
+  const [deliveryContact, setDeliveryContact] = useState<ContactInfo | null>(null);
+  const [vehicles, setVehicles] = useState<VehicleInfo[]>([]);
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -70,6 +89,35 @@ const OrderDetails = () => {
     setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
   };
 
+  const handleContactsUpdate = (pickup: ContactInfo, delivery: ContactInfo) => {
+    setPickupContact(pickup);
+    setDeliveryContact(delivery);
+  };
+
+  const handleVehicleUpdate = (index: number, vehicle: VehicleInfo) => {
+    setVehicles(prev => {
+      const newVehicles = [...prev];
+      newVehicles[index] = vehicle;
+      return newVehicles;
+    });
+  };
+
+  const navigateToQuoteTotal = () => {
+    if (orderDetails && pickupContact && deliveryContact) {
+      navigate("/dashboard/client/quote-total", {
+        state: {
+          pickupAddress: orderDetails.pickupAddress,
+          deliveryAddress: orderDetails.deliveryAddress,
+          distance,
+          pickupContact,
+          deliveryContact,
+          vehicles,
+          priceHT
+        }
+      });
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
@@ -88,6 +136,7 @@ const OrderDetails = () => {
         <ContactsForm
           onContactsValid={setAreContactFieldsValid}
           onShowVehicle={() => setShowVehicle(true)}
+          onContactsUpdate={handleContactsUpdate}
         />
       )}
 
@@ -98,13 +147,14 @@ const OrderDetails = () => {
           onVehicleValidityChange={handleVehicleValidityChange}
           onDeleteVehicle={deleteVehicle}
           onAddVehicle={() => setVehicleCount(prev => prev + 1)}
+          onVehicleUpdate={handleVehicleUpdate}
         />
       )}
 
       {vehicleCount > 0 && vehicleFormsValidity.some(validity => validity) && (
         <div className="flex justify-end mt-6">
           <Button
-            onClick={() => navigate("/dashboard/client/quote-total")}
+            onClick={navigateToQuoteTotal}
             className="gap-2"
           >
             <Calculator className="h-4 w-4" />
