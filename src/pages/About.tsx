@@ -3,7 +3,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
-
 const About = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -91,11 +90,7 @@ const About = () => {
                 </div>
               </div>
               <div>
-                <img 
-                  src="/lovable-uploads/cd68faa2-07bb-4407-a720-2b40ee2e8479.png" 
-                  alt="DK Automotive drivers" 
-                  className="rounded-lg shadow-lg w-full"
-                />
+                <img alt="DK Automotive drivers" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/95eb9367-8ef9-4af5-b92d-805ea0cdeca3.jpg" />
               </div>
             </div>
           </div>
@@ -116,5 +111,4 @@ const About = () => {
       <Footer />
     </div>;
 };
-
 export default About;
