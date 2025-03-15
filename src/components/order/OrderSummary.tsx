@@ -114,7 +114,7 @@ export const OrderSummary = ({
 
             <div className="relative">
               <Input type="time" placeholder="Heure" className="pl-10 w-[150px]" value={deliveryTime} onChange={handleDeliveryTimeChange} />
-              <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+              
             </div>
           </div>
         </div>
