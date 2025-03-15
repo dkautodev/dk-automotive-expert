@@ -43,6 +43,8 @@ export type Database = {
         Row: {
           date_created: string | null
           delivery_address: string
+          delivery_date: string | null
+          delivery_time: string | null
           id: string
           pickup_address: string
           status: string
@@ -52,6 +54,8 @@ export type Database = {
         Insert: {
           date_created?: string | null
           delivery_address: string
+          delivery_date?: string | null
+          delivery_time?: string | null
           id?: string
           pickup_address: string
           status?: string
@@ -61,6 +65,8 @@ export type Database = {
         Update: {
           date_created?: string | null
           delivery_address?: string
+          delivery_date?: string | null
+          delivery_time?: string | null
           id?: string
           pickup_address?: string
           status?: string
