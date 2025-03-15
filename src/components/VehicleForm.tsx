@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,15 +42,10 @@ export const VehicleForm = ({ index, onDelete, onChange }: VehicleFormProps) => 
     setFiles(files.filter((_, i) => i !== indexToRemove));
   };
 
-  const isFormValid = () => {
+  useEffect(() => {
     const isValid = brand !== "" && model !== "" && year !== "" && fuel !== "" && files.length > 0;
     onChange(isValid);
-    return isValid;
-  };
-
-  useEffect(() => {
-    isFormValid();
-  }, [brand, model, year, fuel, files]);
+  }, [brand, model, year, fuel, files, onChange]);
 
   return (
     <div className="space-y-4 border p-4 rounded-lg relative">
