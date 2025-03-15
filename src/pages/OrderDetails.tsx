@@ -2,6 +2,8 @@
 import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 
 interface OrderState {
   pickupAddress: string;
@@ -12,6 +14,32 @@ interface OrderState {
 const OrderDetails = () => {
   const location = useLocation();
   const orderDetails = location.state as OrderState;
+  const [distance, setDistance] = useState<string>("");
+
+  useEffect(() => {
+    const calculateDistance = async () => {
+      const service = new google.maps.DistanceMatrixService();
+      
+      try {
+        const response = await service.getDistanceMatrix({
+          origins: [orderDetails.pickupAddress],
+          destinations: [orderDetails.deliveryAddress],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC
+        });
+
+        if (response.rows[0].elements[0].status === "OK") {
+          setDistance(response.rows[0].elements[0].distance.text);
+        }
+      } catch (error) {
+        console.error("Error calculating distance:", error);
+      }
+    };
+
+    if (orderDetails.pickupAddress && orderDetails.deliveryAddress) {
+      calculateDistance();
+    }
+  }, [orderDetails.pickupAddress, orderDetails.deliveryAddress]);
 
   const getVehicleName = (id: string) => {
     const vehicle = vehicleTypes.find(v => v.id === id);
@@ -20,7 +48,7 @@ const OrderDetails = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Détails de la commande</h1>
+      <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
       
       <Card>
         <CardHeader>
@@ -39,6 +67,13 @@ const OrderDetails = () => {
             <h3 className="font-semibold mb-1">Adresse de livraison</h3>
             <p className="text-gray-600">{orderDetails.deliveryAddress}</p>
           </div>
+
+          {distance && (
+            <div>
+              <h3 className="font-semibold mb-1">Nombre de kilomètres</h3>
+              <p className="text-gray-600">{distance}</p>
+            </div>
+          )}
           
           <div>
             <h3 className="font-semibold mb-1">Type de véhicule</h3>
