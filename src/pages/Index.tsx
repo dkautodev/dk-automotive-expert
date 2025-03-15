@@ -172,16 +172,7 @@ const Index = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-gray-100 py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-dk-navy mb-8">Prêt à simplifier vos déplacements de véhicules ?</h2>
-            <Link to="/devis">
-              <Button className="bg-dk-blue hover:bg-dk-navy text-white transition-colors text-lg px-8 py-6">
-                Demander mon devis sur mesure
-              </Button>
-            </Link>
-          </div>
-        </section>
+        
       </main>
     </div>;
 };
