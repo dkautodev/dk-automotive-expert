@@ -41,6 +41,7 @@ const OrderDetails = () => {
     phone: "",
   });
   const [vehicleCount, setVehicleCount] = useState(0);
+  const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -74,6 +75,21 @@ const OrderDetails = () => {
   const getVehicleName = (id: string) => {
     const vehicle = vehicleTypes.find(v => v.id === id);
     return vehicle ? vehicle.name : id;
+  };
+
+  const handleVehicleValidityChange = (index: number, isValid: boolean) => {
+    setVehicleFormsValidity(prev => {
+      const newValidity = [...prev];
+      newValidity[index] = isValid;
+      return newValidity;
+    });
+  };
+
+  const canAddNewVehicle = vehicleCount === 0 || (vehicleFormsValidity[vehicleCount - 1] === true);
+
+  const deleteVehicle = (indexToDelete: number) => {
+    setVehicleCount(prev => prev - 1);
+    setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
   };
 
   return (
@@ -222,7 +238,12 @@ const OrderDetails = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             {Array.from({ length: vehicleCount }).map((_, index) => (
-              <VehicleForm key={index} index={index} />
+              <VehicleForm 
+                key={index} 
+                index={index}
+                onDelete={() => deleteVehicle(index)}
+                onChange={(isValid) => handleVehicleValidityChange(index, isValid)}
+              />
             ))}
             
             <div className="flex justify-end">
@@ -230,6 +251,7 @@ const OrderDetails = () => {
                 onClick={() => setVehicleCount((prev) => prev + 1)}
                 variant="outline"
                 className="gap-2"
+                disabled={!canAddNewVehicle}
               >
                 <Plus className="h-4 w-4" />
                 Ajouter un véhicule
