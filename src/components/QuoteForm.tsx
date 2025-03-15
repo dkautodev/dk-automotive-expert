@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,7 +36,7 @@ const QuoteForm = () => {
   };
 
   if (step === 3) {
-    return <DeliveryForm onPrevious={() => setStep(2)} onNext={() => setStep(4)} />;
+    return <DeliveryForm onPrevious={() => setStep(2)} vehicleData={vehicleData} />;
   }
 
   if (step === 2) {
