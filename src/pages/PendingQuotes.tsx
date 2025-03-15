@@ -182,6 +182,13 @@ const PendingQuotes = () => {
               ))}
             </TableBody>
           </Table>
+          <div className="mt-6 border-t pt-4">
+            <div className="space-y-1">
+              <p className="text-sm text-gray-600">DK Automotive</p>
+              <p className="text-sm font-semibold">KOUAKOU David</p>
+              <p className="text-sm text-gray-600">contact@dk-automotive.fr</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
