@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -158,7 +157,7 @@ const DeliveryForm = ({ onPrevious, onNext }: DeliveryFormProps) => {
             control={form.control}
             name="deliveryDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem>
                 <FormLabel className="text-dk-navy font-semibold">
                   DATE DE LIVRAISON <span className="text-blue-500">*</span>
                 </FormLabel>
