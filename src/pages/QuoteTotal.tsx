@@ -1,3 +1,4 @@
+
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -104,7 +105,7 @@ const QuoteTotal = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Récapitulatif de votre devis</CardTitle>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm font-semibold text-muted-foreground">
             DEV-00000100
           </div>
         </CardHeader>
