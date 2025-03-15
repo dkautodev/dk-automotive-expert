@@ -7,6 +7,8 @@ export type QuoteRow = {
   delivery_address: string;
   vehicles: any[];
   total_price_ht: number;
+  total_price_ttc: number;
+  distance: string;
   status: 'pending' | 'accepted' | 'rejected';
   date_created: string;
   pickup_date: string | null;

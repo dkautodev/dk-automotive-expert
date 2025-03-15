@@ -45,12 +45,14 @@ export type Database = {
           delivery_address: string
           delivery_date: string | null
           delivery_time: string | null
+          distance: string | null
           id: string
           pickup_address: string
           pickup_date: string | null
           pickup_time: string | null
           status: string
           total_price_ht: number
+          total_price_ttc: number | null
           vehicles: Json
         }
         Insert: {
@@ -58,12 +60,14 @@ export type Database = {
           delivery_address: string
           delivery_date?: string | null
           delivery_time?: string | null
+          distance?: string | null
           id?: string
           pickup_address: string
           pickup_date?: string | null
           pickup_time?: string | null
           status?: string
           total_price_ht: number
+          total_price_ttc?: number | null
           vehicles: Json
         }
         Update: {
@@ -71,12 +75,14 @@ export type Database = {
           delivery_address?: string
           delivery_date?: string | null
           delivery_time?: string | null
+          distance?: string | null
           id?: string
           pickup_address?: string
           pickup_date?: string | null
           pickup_time?: string | null
           status?: string
           total_price_ht?: number
+          total_price_ttc?: number | null
           vehicles?: Json
         }
         Relationships: []
