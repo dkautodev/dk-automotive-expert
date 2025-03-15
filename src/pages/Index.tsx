@@ -172,6 +172,20 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Trust Engagement Section */}
+        <section className="relative py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto">
+              <h2 className="text-2xl md:text-4xl font-bold text-[#18257D] mb-6">
+                VOTRE CONFIANCE, NOTRE ENGAGEMENT
+              </h2>
+              <p className="text-gray-600 text-lg md:text-xl">
+                Chez DK Automotive, chaque parcours est une promesse de qualité et de fiabilité.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         
       </main>
