@@ -9,8 +9,8 @@ export const generateQuotePDF = (quote: Quote) => {
     <div style="padding: 40px; font-family: Arial, sans-serif; max-width: 210mm;">
       <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 30px; border-bottom: 2px solid #1a365d; padding-bottom: 20px;">
         <div>
-          <h1 style="color: #1a365d; font-size: 28px; margin: 0;">DK Automotive</h1>
-          <p style="color: #64748b; margin: 5px 0;">Transport de véhicules</p>
+          <img src="/dk-automotive-logo.png" alt="DK Automotive" style="height: 60px; margin-bottom: 10px;" />
+          <p style="color: #64748b; margin: 5px 0;">Convoyage | Livraisons | Restitutions</p>
         </div>
         <div style="text-align: right;">
           <p style="color: #1a365d; margin: 0; font-size: 18px; font-weight: bold;">Devis n° ${quote.quote_number}</p>
@@ -63,7 +63,8 @@ export const generateQuotePDF = (quote: Quote) => {
 
       <div style="margin-top: 30px; border-top: 2px solid #1a365d; padding-top: 20px;">
         <div style="text-align: right;">
-          <h2 style="color: #2c5282; font-size: 20px; margin: 0;">Prix Total HT: ${quote.totalPriceHT.toFixed(2)}€</h2>
+          <p style="color: #1a365d; margin: 0; font-size: 16px;">Numéro de devis: ${quote.quote_number}</p>
+          <h2 style="color: #2c5282; font-size: 20px; margin: 10px 0;">Prix Total HT: ${quote.totalPriceHT.toFixed(2)}€</h2>
           <h2 style="color: #2c5282; font-size: 20px; margin: 5px 0;">Prix Total TTC: ${quote.totalPriceTTC.toFixed(2)}€</h2>
           <p style="color: #64748b; margin: 10px 0; font-size: 12px;">Ce devis est valable 30 jours à compter de sa date d'émission.</p>
         </div>
