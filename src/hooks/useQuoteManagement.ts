@@ -18,8 +18,8 @@ export const useQuoteManagement = () => {
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
       vehicles: vehiclesJson,
-      total_price_ht: quote.totalPriceHT,
-      total_price_ttc: quote.totalPriceTTC,
+      total_price_ht: Number(quote.totalPriceHT.toFixed(2)),
+      total_price_ttc: Number(quote.totalPriceTTC.toFixed(2)),
       distance: quote.distance,
       status: quote.status,
       date_created: quote.dateCreated.toISOString(),
@@ -52,6 +52,7 @@ export const useQuoteManagement = () => {
 
     return data.map((quote) => ({
       id: quote.id,
+      quote_number: quote.quote_number,
       pickupAddress: quote.pickup_address,
       deliveryAddress: quote.delivery_address,
       vehicles: quote.vehicles,
@@ -82,6 +83,7 @@ export const useQuoteManagement = () => {
 
     return {
       id: data.id,
+      quote_number: data.quote_number,
       pickupAddress: data.pickup_address,
       deliveryAddress: data.delivery_address,
       vehicles: data.vehicles,

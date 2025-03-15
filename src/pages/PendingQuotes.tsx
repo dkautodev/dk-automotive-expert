@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,16 +12,29 @@ import {
 import { Quote } from "@/types/order";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, Download, X } from "lucide-react";
 import { useQuoteManagement } from "@/hooks/useQuoteManagement";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { generateQuotePDF } from "@/utils/pdfGenerator";
+import { useToast } from "@/hooks/use-toast";
 
 const PendingQuotes = () => {
-  const { fetchQuotes } = useQuoteManagement();
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const { fetchQuotes, deleteQuote } = useQuoteManagement();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: quotes = [], isLoading, error } = useQuery({
     queryKey: ['pendingQuotes'],
@@ -29,6 +43,27 @@ const PendingQuotes = () => {
 
   const handleViewQuoteDetails = (quote: Quote) => {
     navigate(`/dashboard/client/quotes/${quote.id}`);
+  };
+
+  const handleGeneratePDF = (quote: Quote) => {
+    generateQuotePDF(quote);
+  };
+
+  const handleDeleteQuote = async (id: string) => {
+    try {
+      await deleteQuote(id);
+      await queryClient.invalidateQueries({ queryKey: ['pendingQuotes'] });
+      toast({
+        title: "Devis supprimé",
+        description: "Le devis a été supprimé avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la suppression du devis.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) {
@@ -81,32 +116,70 @@ const PendingQuotes = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Numéro</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Créé le</TableHead>
                 <TableHead>Départ</TableHead>
                 <TableHead>Arrivée</TableHead>
                 <TableHead>Véhicules</TableHead>
                 <TableHead className="text-right">Prix HT</TableHead>
-                <TableHead></TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {quotes.map((quote) => (
                 <TableRow key={quote.id}>
-                  <TableCell className="font-medium">DEV-{quote.id}</TableCell>
+                  <TableCell className="font-medium">{quote.quote_number}</TableCell>
                   <TableCell>
-                    {format(quote.dateCreated, 'dd MMMM yyyy', { locale: fr })}
+                    {format(new Date(quote.dateCreated), 'dd MMMM yyyy', { locale: fr })}
                   </TableCell>
                   <TableCell>{quote.pickupAddress}</TableCell>
                   <TableCell>{quote.deliveryAddress}</TableCell>
                   <TableCell>{quote.vehicles.length}</TableCell>
-                  <TableCell className="text-right">{quote.totalPriceHT}€</TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      variant="outline"
-                      onClick={() => handleViewQuoteDetails(quote)}
-                    >
-                      Voir le détail
-                    </Button>
+                  <TableCell className="text-right">{quote.totalPriceHT.toFixed(2)}€</TableCell>
+                  <TableCell>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleViewQuoteDetails(quote)}
+                        title="Voir les détails"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleGeneratePDF(quote)}
+                        title="Télécharger le PDF"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="text-red-500 hover:text-red-600"
+                            title="Supprimer"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteQuote(quote.id)}>
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

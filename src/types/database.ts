@@ -3,6 +3,7 @@ import { Database } from "@/integrations/supabase/types";
 
 export type QuoteRow = {
   id: string;
+  quote_number: string;
   pickup_address: string;
   delivery_address: string;
   vehicles: any[];

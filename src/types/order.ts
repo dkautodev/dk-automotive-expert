@@ -51,7 +51,8 @@ export interface VehicleInfo {
 }
 
 export interface Quote {
-  id?: string;
+  id: string;
+  quote_number: string;
   pickupAddress: string;
   deliveryAddress: string;
   vehicles: Vehicle[];
