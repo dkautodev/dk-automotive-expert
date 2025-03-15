@@ -2,7 +2,6 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import type { SignUpFormData } from "../schemas/signUpSchema";
 import type { UserRole } from "@/hooks/useAuth";
 
