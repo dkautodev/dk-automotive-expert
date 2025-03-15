@@ -10,6 +10,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
+import { useQuoteManagement } from '@/hooks/useQuoteManagement';
+import { useNavigate } from 'react-router-dom';
 import {
   Form,
   FormControl,
@@ -46,28 +48,49 @@ type DeliveryFormValues = z.infer<typeof deliveryFormSchema>;
 
 interface DeliveryFormProps {
   onPrevious: () => void;
-  onNext: () => void;
+  vehicleData: {
+    pickupAddress: string;
+    deliveryAddress: string;
+    vehicles: any[];
+    priceHT: number;
+  };
 }
 
-const DeliveryForm = ({ onPrevious }: DeliveryFormProps) => {
+const DeliveryForm = ({ onPrevious, vehicleData }: DeliveryFormProps) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { saveQuote } = useQuoteManagement();
+  const navigate = useNavigate();
+  
   const form = useForm<DeliveryFormValues>({
     resolver: zodResolver(deliveryFormSchema),
   });
 
   const onSubmit = async (data: DeliveryFormValues) => {
-    console.log('Delivery details:', data);
     try {
-      setIsSubmitted(true);
+      const quoteData = {
+        id: crypto.randomUUID(),
+        pickupAddress: vehicleData.pickupAddress,
+        deliveryAddress: data.address,
+        vehicles: vehicleData.vehicles,
+        totalPriceHT: vehicleData.priceHT,
+        status: 'pending',
+        dateCreated: new Date()
+      };
+
+      await saveQuote(quoteData);
+      
       toast({
-        title: "Demande envoyée",
-        description: "Votre demande de devis a été envoyée avec succès",
+        title: "Devis envoyé",
+        description: "Votre devis a été envoyé avec succès",
       });
+      
+      navigate("/dashboard/client/pending-quotes");
     } catch (error) {
+      console.error('Error saving quote:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi du formulaire",
+        description: "Une erreur est survenue lors de l'envoi du devis",
       });
     }
   };
