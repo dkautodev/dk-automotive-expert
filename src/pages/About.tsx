@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
+
 const About = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
@@ -83,6 +84,9 @@ const About = () => {
                 <p className="text-gray-600 leading-relaxed">
                   Nos convoyeurs expérimentés et sélectionnés avec soin sont notre atout majeur. Tous de nos convoyeurs professionnels ont été sélectionnés rigoureusement pour leur expérience du métier, leur savoir-faire et leur engagement pour la satisfaction clientèle. Chez DK AUTOMOTIVE, nous ne faisons aucun compromis pour assurer la qualité de nos services.
                 </p>
+                <p className="text-gray-600 leading-relaxed">
+                  Nous accordons une importance primordiale à la formation continue de nos chauffeurs. En effet, nos différents sont formés aux différentes procédures indispensables pour assurer un transport sûr et respectueux de l'environnement. L'écoconduite, la connaissance technique des différents véhicules et la réalisation de mises en main véhicules font partie intégrante de leur formation.
+                </p>
                 <div className="pt-4">
                   <Link to="/contact" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
                     Contactez-nous
@@ -111,4 +115,5 @@ const About = () => {
       <Footer />
     </div>;
 };
+
 export default About;
