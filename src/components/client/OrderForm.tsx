@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Autocomplete } from "@react-google-maps/api";
-import { Car } from "lucide-react";
+import { Car, AlertCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import { Loader } from "@/components/ui/loader";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const vehicleTypes = [
   { id: "citadine", name: "Citadine" },
@@ -29,7 +31,21 @@ const OrderForm = () => {
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  const { isLoaded, loadError, calculateDistance, distance, duration } = useGoogleMaps();
+  const { isLoaded, loadError, calculateDistance, distance, duration, error } = useGoogleMaps();
+
+  // Message d'erreur spécifique pour informer l'utilisateur du problème d'API
+  const getErrorMessage = () => {
+    if (loadError?.message?.includes('ApiNotActivatedMapError')) {
+      return "L'API Google Maps Places n'est pas activée. Veuillez contacter l'administrateur pour activer cette API.";
+    }
+    if (loadError?.message?.includes('InvalidKeyMapError')) {
+      return "La clé API Google Maps n'est pas valide. Veuillez contacter l'administrateur pour vérifier la configuration.";
+    }
+    if (error) {
+      return error;
+    }
+    return "Une erreur est survenue avec le service Google Maps.";
+  };
 
   useEffect(() => {
     if (pickupAddress && deliveryAddress) {
@@ -47,18 +63,26 @@ const OrderForm = () => {
 
   const handlePickupPlaceChanged = () => {
     if (pickupAutocomplete) {
-      const place = pickupAutocomplete.getPlace();
-      if (place.formatted_address) {
-        setPickupAddress(place.formatted_address);
+      try {
+        const place = pickupAutocomplete.getPlace();
+        if (place.formatted_address) {
+          setPickupAddress(place.formatted_address);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la sélection du lieu de départ:", error);
       }
     }
   };
 
   const handleDeliveryPlaceChanged = () => {
     if (deliveryAutocomplete) {
-      const place = deliveryAutocomplete.getPlace();
-      if (place.formatted_address) {
-        setDeliveryAddress(place.formatted_address);
+      try {
+        const place = deliveryAutocomplete.getPlace();
+        if (place.formatted_address) {
+          setDeliveryAddress(place.formatted_address);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la sélection du lieu d'arrivée:", error);
       }
     }
   };
@@ -91,17 +115,83 @@ const OrderForm = () => {
     });
   };
 
-  if (loadError) {
-    return (
-      <Card className="mt-8">
-        <CardContent className="pt-6">
-          <div className="text-red-500 text-center">
-            Erreur de chargement de Google Maps. Veuillez vérifier vos paramètres API Google Maps.
+  const renderAddressInputs = () => {
+    // Si l'API n'est pas activée, afficher les champs de saisie simple
+    if (loadError?.message?.includes('ApiNotActivatedMapError')) {
+      return (
+        <>
+          <div>
+            <label className="text-sm font-medium mb-1 block">
+              Adresse de départ
+            </label>
+            <Input
+              placeholder="Entrez l'adresse de départ"
+              value={pickupAddress}
+              onChange={(e) => setPickupAddress(e.target.value)}
+            />
           </div>
-        </CardContent>
-      </Card>
+
+          <div>
+            <label className="text-sm font-medium mb-1 block">
+              Adresse de livraison
+            </label>
+            <Input
+              placeholder="Entrez l'adresse de livraison"
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+            />
+          </div>
+        </>
+      );
+    }
+
+    // Sinon afficher l'autocomplétion
+    return (
+      <>
+        <div>
+          <label className="text-sm font-medium mb-1 block">
+            Adresse de départ
+          </label>
+          <Autocomplete
+            onLoad={onPickupLoad}
+            onPlaceChanged={handlePickupPlaceChanged}
+            options={{ 
+              componentRestrictions: { country: 'fr' },
+              types: ['address'],
+              fields: ['formatted_address', 'geometry']
+            }}
+          >
+            <Input
+              placeholder="Entrez l'adresse de départ"
+              value={pickupAddress}
+              onChange={(e) => setPickupAddress(e.target.value)}
+            />
+          </Autocomplete>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-1 block">
+            Adresse de livraison
+          </label>
+          <Autocomplete
+            onLoad={onDeliveryLoad}
+            onPlaceChanged={handleDeliveryPlaceChanged}
+            options={{ 
+              componentRestrictions: { country: 'fr' },
+              types: ['address'],
+              fields: ['formatted_address', 'geometry']
+            }}
+          >
+            <Input
+              placeholder="Entrez l'adresse de livraison"
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+            />
+          </Autocomplete>
+        </div>
+      </>
     );
-  }
+  };
 
   if (!isLoaded) {
     return (
@@ -122,48 +212,17 @@ const OrderForm = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-1 block">
-              Adresse de départ
-            </label>
-            <Autocomplete
-              onLoad={onPickupLoad}
-              onPlaceChanged={handlePickupPlaceChanged}
-              options={{ 
-                componentRestrictions: { country: 'fr' },
-                types: ['address'],
-                fields: ['formatted_address', 'geometry']
-              }}
-            >
-              <Input
-                placeholder="Entrez l'adresse de départ"
-                value={pickupAddress}
-                onChange={(e) => setPickupAddress(e.target.value)}
-              />
-            </Autocomplete>
-          </div>
+        {loadError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {getErrorMessage()}
+            </AlertDescription>
+          </Alert>
+        )}
 
-          <div>
-            <label className="text-sm font-medium mb-1 block">
-              Adresse de livraison
-            </label>
-            <Autocomplete
-              onLoad={onDeliveryLoad}
-              onPlaceChanged={handleDeliveryPlaceChanged}
-              options={{ 
-                componentRestrictions: { country: 'fr' },
-                types: ['address'],
-                fields: ['formatted_address', 'geometry']
-              }}
-            >
-              <Input
-                placeholder="Entrez l'adresse de livraison"
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-              />
-            </Autocomplete>
-          </div>
+        <div className="space-y-4">
+          {renderAddressInputs()}
 
           {distance && duration && (
             <div className="text-sm text-gray-600">
