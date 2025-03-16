@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
@@ -39,6 +40,7 @@ export const QuoteDetailsBanner = ({
     <Card className="bg-secondary/50 p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
+          <p className="text-lg font-medium">Numéro de devis</p>
           <p className="text-2xl font-bold">{quoteNumber || "Génération en cours..."}</p>
         </div>
         <div className="space-y-2">
