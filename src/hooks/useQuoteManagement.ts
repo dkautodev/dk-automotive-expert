@@ -1,4 +1,3 @@
-
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
@@ -11,19 +10,10 @@ export const useQuoteManagement = () => {
       throw new Error("User must be authenticated to save a quote");
     }
 
-    const vehiclesJson = quote.vehicles.map(vehicle => ({
-      brand: vehicle.brand,
-      model: vehicle.model,
-      year: vehicle.year,
-      fuel: vehicle.fuel,
-      licensePlate: vehicle.licensePlate,
-      files: []
-    }));
-
     const quoteData = {
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
-      vehicles: vehiclesJson,
+      vehicles: quote.vehicles,
       total_price_ht: Number(quote.totalPriceHT.toFixed(2)),
       total_price_ttc: Number(quote.totalPriceTTC.toFixed(2)),
       distance: Number(quote.distance),
@@ -103,14 +93,16 @@ export const useQuoteManagement = () => {
       deliveryAddress: data.delivery_address,
       vehicles: data.vehicles,
       totalPriceHT: data.total_price_ht,
-      totalPriceTTC: data.total_price_ttc || data.total_price_ht * 1.2,
-      distance: Number(data.distance) || 0,
+      totalPriceTTC: data.total_price_ttc,
+      distance: Number(data.distance),
       status: data.status as 'pending' | 'accepted' | 'rejected',
       dateCreated: new Date(data.date_created || new Date()),
-      pickupDate: data.pickup_date ? new Date(data.pickup_date) : undefined,
-      pickupTime: data.pickup_time || undefined,
-      deliveryDate: data.delivery_date ? new Date(data.delivery_date) : undefined,
-      deliveryTime: data.delivery_time || undefined
+      pickupDate: new Date(data.pickup_date),
+      pickupTime: data.pickup_time,
+      deliveryDate: new Date(data.delivery_date),
+      deliveryTime: data.delivery_time,
+      pickupContact: data.pickup_contact,
+      deliveryContact: data.delivery_contact
     };
   };
 
