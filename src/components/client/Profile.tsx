@@ -13,12 +13,14 @@ import { toast } from "@/components/ui/use-toast";
 import { LogoUpload } from "./LogoUpload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
+
 interface ProfileFormData {
   email: string;
   phone: string;
   siret: string;
   vat_number: string;
 }
+
 const Profile = () => {
   const {
     profile
@@ -26,6 +28,7 @@ const Profile = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [fieldToLock, setFieldToLock] = useState<'siret' | 'vat_number' | null>(null);
   const [tempValue, setTempValue] = useState('');
+
   const form = useForm<ProfileFormData>({
     defaultValues: {
       email: profile?.email || "",
@@ -34,6 +37,7 @@ const Profile = () => {
       vat_number: profile?.vat_number || ""
     }
   });
+
   useEffect(() => {
     if (profile) {
       form.reset({
@@ -44,13 +48,15 @@ const Profile = () => {
       });
     }
   }, [profile, form]);
+
   const handleLogoUpdate = async (logoUrl: string) => {
     try {
-      const {
-        error
-      } = await supabase.from('profiles').update({
-        logo_url: logoUrl
-      }).eq('id', profile?.id);
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          profile_picture: logoUrl
+        })
+        .eq('id', profile?.id);
       if (error) throw error;
     } catch (error) {
       console.error('Error updating logo:', error);
@@ -61,20 +67,23 @@ const Profile = () => {
       });
     }
   };
+
   const confirmLockField = (field: 'siret' | 'vat_number', value: string) => {
     setFieldToLock(field);
     setTempValue(value);
     setShowConfirmDialog(true);
   };
+
   const handleConfirmLock = async () => {
     if (!fieldToLock || !profile?.id) return;
     try {
-      const {
-        error
-      } = await supabase.from('profiles').update({
-        [fieldToLock]: tempValue,
-        [`${fieldToLock}_locked`]: true
-      }).eq('id', profile.id);
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          [fieldToLock]: tempValue,
+          [`${fieldToLock}_locked`]: true
+        })
+        .eq('id', profile.id);
       if (error) throw error;
       toast({
         title: "Succès",
@@ -90,6 +99,7 @@ const Profile = () => {
       });
     }
   };
+
   const onSubmit = async (data: ProfileFormData) => {
     try {
       const updateData: any = {
@@ -97,16 +107,14 @@ const Profile = () => {
         phone: data.phone
       };
 
-      // Only update unlocked fields
       if (!profile?.siret_locked) {
         updateData.siret = data.siret;
       }
       if (!profile?.vat_number_locked) {
         updateData.vat_number = data.vat_number;
       }
-      const {
-        error
-      } = await supabase.from('profiles').update(updateData).eq('id', profile?.id);
+
+      const { error } = await supabase.from('user_profiles').update(updateData).eq('id', profile?.id);
       if (error) throw error;
       toast({
         title: "Profil mis à jour",
@@ -120,6 +128,7 @@ const Profile = () => {
       });
     }
   };
+
   return <div className="p-6">
       <Button variant="ghost" size="sm" asChild className="mb-4">
         
@@ -225,4 +234,5 @@ const Profile = () => {
       </Dialog>
     </div>;
 };
+
 export default Profile;
