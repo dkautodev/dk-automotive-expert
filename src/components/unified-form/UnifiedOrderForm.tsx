@@ -1,4 +1,4 @@
-
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { OrderState, Vehicle, Contact } from "@/types/order";
 import { VehiclesSection } from "@/components/order/VehiclesSection";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -330,7 +329,7 @@ export const UnifiedOrderForm = ({
           <VehiclesSection vehicleCount={vehicleCount} vehicleFormsValidity={vehicleFormsValidity} onVehicleValidityChange={handleVehicleValidityChange} onDeleteVehicle={handleDeleteVehicle} onVehicleUpdate={handleVehicleUpdate} setVehicleCount={setVehicleCount} />
 
           <div className="flex justify-end mt-6">
-            <Button onClick={handleSubmit} disabled={!canSubmit}>
+            <Button onClick={handleSubmit} disabled={!isFormValid()}>
               <Calculator className="h-4 w-4" />
               Générer le devis
             </Button>
