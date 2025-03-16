@@ -353,7 +353,14 @@ export const UnifiedOrderForm = ({
         </Card>
 
         <div className="md:col-span-2">
-          <VehiclesSection vehicleCount={vehicleCount} vehicleFormsValidity={vehicleFormsValidity} onVehicleValidityChange={handleVehicleValidityChange} onDeleteVehicle={handleDeleteVehicle} onVehicleUpdate={handleVehicleUpdate} setVehicleCount={setVehicleCount} />
+          <VehiclesSection 
+            vehicleCount={vehicleCount} 
+            vehicleFormsValidity={vehicleFormsValidity} 
+            onVehicleValidityChange={handleVehicleValidityChange} 
+            onDeleteVehicle={handleDeleteVehicle} 
+            onVehicleUpdate={handleVehicleUpdate} 
+            setVehicleCount={setVehicleCount} 
+          />
 
           <div className="flex justify-end gap-4 mt-6 items-center">
             <Tooltip content="PDF ou JPG uniquement">
@@ -382,5 +389,15 @@ export const UnifiedOrderForm = ({
                 <Button variant="outline" type="button" size="icon">
                   <Paperclip className="h-4 w-4" />
                 </Button>
-              </label
-
+              </label>
+            </Tooltip>
+            <Button onClick={handleSubmit} disabled={!isFormValid()}>
+              <Calculator className="h-4 w-4" />
+              Générer le devis
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
