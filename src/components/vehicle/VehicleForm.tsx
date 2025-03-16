@@ -1,31 +1,20 @@
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Trash2, Upload, Calculator } from "lucide-react";
+import { Trash2, Calculator } from "lucide-react";
 import { capitalizeFirstLetter, toUpperCase } from "@/utils/textFormatters";
-
-interface VehicleFormProps {
-  index: number;
-  onDelete: () => void;
-  onChange: (isValid: boolean) => void;
-  onVehicleUpdate: (vehicle: {
-    brand: string;
-    model: string;
-    year: string;
-    fuel: string;
-    licensePlate: string;
-    files: File[];
-  }) => void;
-  onQuoteRequest?: () => void;
-}
+import { FileUpload } from "./FileUpload";
+import { VehicleFormProps } from "./types";
 
 export const VehicleForm = ({
   index,
   onDelete,
   onChange,
-  onVehicleUpdate
+  onVehicleUpdate,
+  onQuoteRequest
 }: VehicleFormProps) => {
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -33,10 +22,6 @@ export const VehicleForm = ({
   const [fuel, setFuel] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-
-  const capitalizeFirstLetter = (str: string) => {
-    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-  };
 
   const handleBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBrand(toUpperCase(e.target.value));
@@ -48,33 +33,6 @@ export const VehicleForm = ({
 
   const handleLicensePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLicensePlate(toUpperCase(e.target.value));
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newFiles = event.target.files;
-    if (newFiles) {
-      const filesArray = Array.from(newFiles);
-      const validFiles = filesArray.filter(file => 
-        file.type === 'application/pdf' || 
-        file.type === 'image/jpeg' || 
-        file.type === 'image/jpg'
-      );
-      
-      if (validFiles.length !== filesArray.length) {
-        alert("Seuls les fichiers PDF et JPG sont acceptés.");
-        return;
-      }
-      
-      setFiles(prevFiles => [...prevFiles, ...validFiles]);
-    }
-  };
-
-  const removeFile = (indexToRemove: number) => {
-    setFiles(files.filter((_, i) => i !== indexToRemove));
-  };
-
-  const onQuoteRequest = () => {
-    // Implement quote request logic here
   };
 
   useEffect(() => {
@@ -173,37 +131,11 @@ export const VehicleForm = ({
           </Select>
         </div>
 
-        <div className="md:col-span-2">
-          <Label htmlFor={`file-${index}`}>Documents (PDF ou JPG uniquement)</Label>
-          <div className="mt-2">
-            <label className="flex items-center gap-2 cursor-pointer border rounded-md p-3 hover:bg-gray-50">
-              <Upload className="h-5 w-5" />
-              <span>Ajouter des documents</span>
-              <Input 
-                id={`file-${index}`} 
-                type="file" 
-                accept=".pdf,.jpg,.jpeg" 
-                onChange={handleFileChange} 
-                multiple 
-                className="hidden"
-              />
-            </label>
-          </div>
-          <div className="mt-2 space-y-2">
-            {files.map((file, fileIndex) => (
-              <div key={fileIndex} className="flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-2 rounded">
-                <span>{file.name}</span>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => removeFile(fileIndex)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
+        <FileUpload 
+          index={index}
+          files={files}
+          onFilesChange={setFiles}
+        />
       </div>
 
       <div className="flex justify-end mt-6">
@@ -215,3 +147,4 @@ export const VehicleForm = ({
     </div>
   );
 };
+
