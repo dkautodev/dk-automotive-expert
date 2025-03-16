@@ -1,3 +1,4 @@
+
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
@@ -25,7 +26,8 @@ export const useQuoteManagement = () => {
       delivery_time: quote.deliveryTime,
       pickup_contact: quote.pickupContact,
       delivery_contact: quote.deliveryContact,
-      user_id: user.id
+      user_id: user.id,
+      quote_number: await generateQuoteNumber()
     };
 
     const { error, data } = await supabase
@@ -38,6 +40,12 @@ export const useQuoteManagement = () => {
       throw new Error(`Error saving quote: ${error.message}`);
     }
 
+    return data;
+  };
+
+  const generateQuoteNumber = async (): Promise<string> => {
+    const { data, error } = await supabase.rpc('generate_quote_number');
+    if (error) throw error;
     return data;
   };
 

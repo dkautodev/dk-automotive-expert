@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 interface OrderSummaryProps {
   pickupAddress: string;
   deliveryAddress: string;
-  selectedVehicle: string;
   distance: string;
   priceHT: string;
   onShowContacts: () => void;
@@ -26,7 +25,6 @@ interface OrderSummaryProps {
 export const OrderSummary = ({
   pickupAddress,
   deliveryAddress,
-  selectedVehicle,
   distance,
   priceHT,
   onShowContacts,
