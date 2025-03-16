@@ -100,7 +100,6 @@ const OrderDetails = () => {
     <OrderSummary 
       pickupAddress={orderDetails.pickupAddress} 
       deliveryAddress={orderDetails.deliveryAddress} 
-      selectedVehicle={orderDetails.selectedVehicle} 
       distance={distance} 
       priceHT={priceHT} 
       onShowContacts={handleShowContacts}

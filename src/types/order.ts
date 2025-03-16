@@ -47,3 +47,6 @@ export interface Quote {
   pickupContact: Contact;
   deliveryContact: Contact;
 }
+
+export type ContactInfo = Contact;
+export type VehicleInfo = Vehicle;
