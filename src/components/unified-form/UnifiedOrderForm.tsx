@@ -174,10 +174,10 @@ export const UnifiedOrderForm = ({ orderDetails }: UnifiedOrderFormProps) => {
     pickupDate && deliveryDate;
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="max-w-[1200px] mx-auto space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Colonne de gauche - Détails de prise en charge */}
-        <Card className="p-6 space-y-6">
+        <Card className="p-6 space-y-6 w-full">
           <h2 className="text-xl font-semibold">Détails de prise en charge</h2>
           
           <div className="space-y-4">
@@ -253,7 +253,7 @@ export const UnifiedOrderForm = ({ orderDetails }: UnifiedOrderFormProps) => {
         </Card>
 
         {/* Colonne de droite - Détails de livraison */}
-        <Card className="p-6 space-y-6">
+        <Card className="p-6 space-y-6 w-full">
           <h2 className="text-xl font-semibold">Détails de livraison</h2>
           
           <div className="space-y-4">
