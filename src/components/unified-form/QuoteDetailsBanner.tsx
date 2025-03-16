@@ -16,13 +16,12 @@ export const QuoteDetailsBanner = ({
 }: QuoteDetailsBannerProps) => {
   const [distance, setDistance] = useState("");
   const [priceHT, setPriceHT] = useState(0);
-  const PRICE_PER_KM = 2.5; // Prix fixe par kilomètre
+  const PRICE_PER_KM = 2.5;
   
   useDistanceCalculation(pickupAddress, deliveryAddress, setDistance);
 
   useEffect(() => {
     if (distance) {
-      // Extract numeric value from distance string (e.g., "100 km" -> 100)
       const distanceValue = parseFloat(distance.split(' ')[0]);
       const calculatedPriceHT = distanceValue * PRICE_PER_KM;
       setPriceHT(calculatedPriceHT);
@@ -37,18 +36,17 @@ export const QuoteDetailsBanner = ({
           <p className="text-2xl font-bold">{quoteNumber || "Génération en cours..."}</p>
         </div>
         <div className="space-y-2">
+          <p className="text-lg font-medium">Distance totale</p>
+          <p className="text-2xl font-bold">{distance || "Calcul en cours..."}</p>
+        </div>
+        <div className="space-y-2 text-right">
           <p className="text-lg font-medium">Prix</p>
           <div>
             <p className="text-xl">HT: {priceHT ? `${priceHT.toFixed(2)} €` : "Calcul en cours..."}</p>
             <p className="text-xl">TTC: {priceHT ? `${(priceHT * 1.20).toFixed(2)} €` : "Calcul en cours..."}</p>
           </div>
         </div>
-        <div className="space-y-2 text-right">
-          <p className="text-lg font-medium">Distance totale</p>
-          <p className="text-2xl font-bold">{distance || "Calcul en cours..."}</p>
-        </div>
       </div>
     </Card>
   );
 };
-
