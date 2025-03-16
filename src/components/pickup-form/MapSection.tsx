@@ -26,7 +26,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     let errorMsg = "Erreur de chargement de Google Maps";
     
     if (loadError.message?.includes('ApiNotActivatedMapError')) {
-      errorMsg = "L'API Google Maps Places n'est pas activée. Activez-la dans la console Google Cloud.";
+      errorMsg = "L'API Google Maps Places n'est pas activée pour le projet 'vigilant-shell-453812-d7'. Activez-la dans la console Google Cloud.";
       console.error("Places API error:", loadError);
       
       // Afficher une seule fois le toast d'erreur
@@ -35,7 +35,29 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         toast({
           variant: "destructive",
           title: "API Google Maps non activée",
-          description: "Activez l'API Places dans la console Google Cloud pour utiliser cette fonctionnalité."
+          description: "Activez l'API Places dans la console Google Cloud pour le projet 'vigilant-shell-453812-d7'."
+        });
+      }
+    } else if (loadError.message?.includes('InvalidKeyMapError')) {
+      errorMsg = "La clé API Google Maps n'est pas valide ou n'est pas associée au projet 'vigilant-shell-453812-d7'.";
+      
+      if (!errorMessage) {
+        setErrorMessage(errorMsg);
+        toast({
+          variant: "destructive", 
+          title: "Clé API invalide",
+          description: "Vérifiez que votre clé API est correcte et associée au bon projet."
+        });
+      }
+    } else if (loadError.message?.includes('RefererNotAllowedMapError')) {
+      errorMsg = "Le domaine actuel n'est pas autorisé pour cette clé API. Vérifiez les restrictions de votre projet 'vigilant-shell-453812-d7'.";
+      
+      if (!errorMessage) {
+        setErrorMessage(errorMsg);
+        toast({
+          variant: "destructive", 
+          title: "Domaine non autorisé",
+          description: "Ajoutez ce domaine aux restrictions de votre projet Google Cloud."
         });
       }
     }
@@ -57,7 +79,11 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         </Alert>
         
         <div className="h-[300px] bg-red-50 flex items-center justify-center rounded-lg text-red-500 border border-red-200">
-          {errorMsg}
+          <div className="text-center p-4">
+            <p className="font-medium mb-2">{errorMsg}</p>
+            <p className="text-sm">ID du projet: vigilant-shell-453812-d7</p>
+            <p className="text-sm mt-2">Vérifiez que les APIs nécessaires sont bien activées dans la <a href="https://console.cloud.google.com/apis/dashboard" target="_blank" className="underline">Console Google Cloud</a>.</p>
+          </div>
         </div>
       </div>
     );
