@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import PickupForm from './PickupForm';
-import DeliveryForm from './DeliveryForm';
 import { Form } from '@/components/ui/form';
 import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
 import { quoteFormSchema, type QuoteFormValues } from './quote-form/quoteFormSchema';
@@ -37,7 +36,6 @@ const QuoteForm = () => {
   });
 
   const onSubmit = (data: QuoteFormValues) => {
-    // Créer un objet véhicule à partir des données du formulaire
     const vehicle = {
       brand: data.brand,
       model: data.model,
@@ -46,11 +44,10 @@ const QuoteForm = () => {
       licensePlate: data.licensePlate
     };
 
-    // Mettre à jour vehicleData avec le nouveau véhicule
     setVehicleData(prev => ({
       ...prev,
-      vehicles: [vehicle], // Pour l'instant, on ne gère qu'un seul véhicule
-      priceHT: 150 // Prix fixe pour l'exemple
+      vehicles: [vehicle],
+      priceHT: 150
     }));
 
     setStep(2);
@@ -59,10 +56,6 @@ const QuoteForm = () => {
       description: "Veuillez remplir les informations d'enlèvement",
     });
   };
-
-  if (step === 3) {
-    return <DeliveryForm onPrevious={() => setStep(2)} vehicleData={vehicleData} />;
-  }
 
   if (step === 2) {
     return <PickupForm onPrevious={() => setStep(1)} onNext={() => setStep(3)} />;
