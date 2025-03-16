@@ -8,11 +8,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import Footer from "@/components/Footer";
 import { VehicleSelectionForm } from "@/components/quote-details/VehicleSelectionForm";
 import { QuoteDetailsBanner } from "@/components/unified-form/QuoteDetailsBanner";
+import { useState } from "react";
 
 const OrderDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const orderDetails = location.state as OrderState | null;
+  const [quoteNumber, setQuoteNumber] = useState<string>("");
 
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
@@ -49,11 +51,11 @@ const OrderDetails = () => {
         <QuoteDetailsBanner 
           pickupAddress={orderDetails.pickupAddress}
           deliveryAddress={orderDetails.deliveryAddress}
-          quoteNumber={orderDetails.quoteNumber || ""}
+          quoteNumber={quoteNumber}
           selectedVehicle={orderDetails.selectedVehicle}
         />
         <VehicleSelectionForm />
-        <UnifiedOrderForm orderDetails={orderDetails} />
+        <UnifiedOrderForm orderDetails={orderDetails} onQuoteNumberGenerated={setQuoteNumber} />
       </div>
       <Footer />
     </div>

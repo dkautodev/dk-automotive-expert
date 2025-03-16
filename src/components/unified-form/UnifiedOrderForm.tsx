@@ -20,10 +20,12 @@ import { Json } from "@/integrations/supabase/types";
 
 interface UnifiedOrderFormProps {
   orderDetails: OrderState;
+  onQuoteNumberGenerated: (quoteNumber: string) => void;
 }
 
 export const UnifiedOrderForm = ({
-  orderDetails
+  orderDetails,
+  onQuoteNumberGenerated
 }: UnifiedOrderFormProps) => {
   const navigate = useNavigate();
   const [pickupDate, setPickupDate] = useState<Date | undefined>(orderDetails.pickupDate);
@@ -109,11 +111,13 @@ export const UnifiedOrderForm = ({
         .select('id', { count: 'exact' });
       
       const nextNumber = 101 + (quotesCount?.length || 0);
-      setCurrentQuoteNumber(`DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`);
+      const generatedNumber = `DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`;
+      setCurrentQuoteNumber(generatedNumber);
+      onQuoteNumberGenerated(generatedNumber);
     };
     
     getNextQuoteNumber();
-  }, []);
+  }, [onQuoteNumberGenerated]);
 
   const handleSubmit = async () => {
     try {
