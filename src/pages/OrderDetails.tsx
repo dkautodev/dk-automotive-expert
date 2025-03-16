@@ -90,23 +90,28 @@ const OrderDetails = () => {
           phone: deliveryContact.phone
         } as Json;
 
+        const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
+
+        const orderData = {
+          pickup_address: orderDetails.pickupAddress,
+          delivery_address: orderDetails.deliveryAddress,
+          vehicles: vehiclesJson,
+          total_price_ht: totalPriceHT,
+          total_price_ttc: totalPriceTTC,
+          distance: distance,
+          pickup_date: pickupDateStr,
+          delivery_date: deliveryDateStr,
+          pickup_time: pickupTime,
+          delivery_time: deliveryTime,
+          pickup_contact: pickupContactJson,
+          delivery_contact: deliveryContactJson,
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          quote_number: quoteNumber
+        };
+
         const { data: quoteData, error: quoteError } = await supabase
           .from('quotes')
-          .insert({
-            pickup_address: orderDetails.pickupAddress,
-            delivery_address: orderDetails.deliveryAddress,
-            vehicles: vehiclesJson,
-            total_price_ht: totalPriceHT,
-            total_price_ttc: totalPriceTTC,
-            distance: distance,
-            pickup_date: pickupDateStr,
-            delivery_date: deliveryDateStr,
-            pickup_time: pickupTime,
-            delivery_time: deliveryTime,
-            pickup_contact: pickupContactJson,
-            delivery_contact: deliveryContactJson,
-            user_id: (await supabase.auth.getUser()).data.user?.id
-          })
+          .insert(orderData)
           .select()
           .single();
 
