@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 const formSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -18,6 +19,7 @@ const formSchema = z.object({
   companyName: z.string().min(2, "Le nom de la société doit contenir au moins 2 caractères"),
   message: z.string().min(10, "Le message doit contenir au moins 10 caractères")
 });
+
 const Contact = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,11 +32,13 @@ const Contact = () => {
       message: ""
     }
   });
+
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=Nouveau message de contact&body=${encodeURIComponent(`Nom: ${values.lastName}\nPrénom: ${values.firstName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nMessage:\n${values.message}`)}`;
     window.location.href = mailtoLink;
     toast.success("Message envoyé avec succès!");
   };
+
   return <div className="min-h-screen bg-white">
       <Navbar />
       
@@ -55,12 +59,8 @@ const Contact = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              {/* Informations de contact */}
-              
-
-              {/* Formulaire de contact */}
-              <div className="bg-white p-8 rounded-lg shadow-md">
+            <div className="flex justify-center max-w-6xl mx-auto">
+              <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
                 <h2 className="text-2xl font-bold text-dk-navy mb-6">
                   Envoyez-nous un message
                 </h2>
@@ -145,4 +145,5 @@ const Contact = () => {
       <Footer />
     </div>;
 };
+
 export default Contact;
