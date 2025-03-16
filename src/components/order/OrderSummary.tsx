@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { fr } from 'date-fns/locale';
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+
 interface OrderSummaryProps {
   pickupAddress: string;
   deliveryAddress: string;
@@ -16,10 +16,13 @@ interface OrderSummaryProps {
   priceHT: string;
   onShowContacts: () => void;
   getVehicleName: (id: string) => string;
-  onDateUpdate: (pickup: Date | undefined, delivery: Date | undefined) => void;
+  onDateTimeUpdate: (pickup: Date | undefined, delivery: Date | undefined, pickupTime: string, deliveryTime: string) => void;
   pickupDate: Date | undefined;
   deliveryDate: Date | undefined;
+  pickupTime: string;
+  deliveryTime: string;
 }
+
 export const OrderSummary = ({
   pickupAddress,
   deliveryAddress,
@@ -28,26 +31,32 @@ export const OrderSummary = ({
   priceHT,
   onShowContacts,
   getVehicleName,
-  onDateUpdate,
+  onDateTimeUpdate,
   pickupDate,
-  deliveryDate
+  deliveryDate,
+  pickupTime,
+  deliveryTime
 }: OrderSummaryProps) => {
-  const [pickupTime, setPickupTime] = useState<string>("");
-  const [deliveryTime, setDeliveryTime] = useState<string>("");
   const quoteNumber = "DEV-00000100";
+
   const handlePickupDateSelect = (date: Date | undefined) => {
-    onDateUpdate(date, date);
+    onDateTimeUpdate(date, deliveryDate, pickupTime, deliveryTime);
   };
+
   const handleDeliveryDateSelect = (date: Date | undefined) => {
-    onDateUpdate(pickupDate, date);
+    onDateTimeUpdate(pickupDate, date, pickupTime, deliveryTime);
   };
+
   const handlePickupTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPickupTime(e.target.value);
+    onDateTimeUpdate(pickupDate, deliveryDate, e.target.value, deliveryTime);
   };
+
   const handleDeliveryTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeliveryTime(e.target.value);
+    onDateTimeUpdate(pickupDate, deliveryDate, pickupTime, e.target.value);
   };
+
   const isNextButtonEnabled = pickupDate && deliveryDate && pickupTime && deliveryTime;
+
   return <Card>
     <CardHeader>
       <div className="flex justify-between items-center">
@@ -85,13 +94,27 @@ export const OrderSummary = ({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={pickupDate} onSelect={handlePickupDateSelect} disabled={date => date < new Date()} initialFocus locale={fr} className={cn("p-3 pointer-events-auto")} />
+              <Calendar 
+                mode="single" 
+                selected={pickupDate} 
+                onSelect={handlePickupDateSelect} 
+                disabled={(date) => date < new Date()} 
+                initialFocus 
+                locale={fr} 
+                className={cn("p-3 pointer-events-auto")} 
+              />
             </PopoverContent>
           </Popover>
 
           <div className="relative">
-            <Input type="time" placeholder="Heure" className="pl-10 w-[150px]" value={pickupTime} onChange={handlePickupTimeChange} />
-            
+            <Input 
+              type="time" 
+              placeholder="Heure" 
+              className="pl-10 w-[150px]" 
+              value={pickupTime} 
+              onChange={handlePickupTimeChange} 
+            />
+            <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
           </div>
         </div>
       </div>
@@ -114,13 +137,27 @@ export const OrderSummary = ({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={deliveryDate} onSelect={handleDeliveryDateSelect} disabled={date => date < (pickupDate || new Date())} initialFocus locale={fr} className={cn("p-3 pointer-events-auto")} />
+              <Calendar 
+                mode="single" 
+                selected={deliveryDate} 
+                onSelect={handleDeliveryDateSelect} 
+                disabled={(date) => date < (pickupDate || new Date())} 
+                initialFocus 
+                locale={fr} 
+                className={cn("p-3 pointer-events-auto")} 
+              />
             </PopoverContent>
           </Popover>
 
           <div className="relative">
-            <Input type="time" placeholder="Heure" className="pl-10 w-[150px]" value={deliveryTime} onChange={handleDeliveryTimeChange} />
-            
+            <Input 
+              type="time" 
+              placeholder="Heure" 
+              className="pl-10 w-[150px]" 
+              value={deliveryTime} 
+              onChange={handleDeliveryTimeChange} 
+            />
+            <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
           </div>
         </div>
       </div>

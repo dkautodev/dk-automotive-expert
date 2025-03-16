@@ -36,11 +36,14 @@ const OrderDetails = () => {
     vehicles,
     pickupDate,
     deliveryDate,
+    pickupTime,
+    deliveryTime,
     handleVehicleValidityChange,
     deleteVehicle,
     handleContactsUpdate,
     handleVehicleUpdate,
-    handleDateUpdate
+    handleDateUpdate,
+    handleDateTimeUpdate
   } = useOrderDetails(orderDetails);
   useDistanceCalculation(orderDetails.pickupAddress, orderDetails.deliveryAddress, setDistance);
 
@@ -60,8 +63,10 @@ const OrderDetails = () => {
           deliveryContact,
           vehicles,
           priceHT,
-          pickupDate,
-          deliveryDate
+          pickupDate: orderDetails.pickupDate,
+          deliveryDate: orderDetails.deliveryDate,
+          pickupTime: pickupTime,
+          deliveryTime: deliveryTime
         }
       });
     }
@@ -98,9 +103,11 @@ const OrderDetails = () => {
         priceHT={priceHT} 
         onShowContacts={handleShowContacts}
         getVehicleName={getVehicleName}
-        onDateUpdate={handleDateUpdate}
+        onDateTimeUpdate={handleDateTimeUpdate}
         pickupDate={pickupDate}
         deliveryDate={deliveryDate}
+        pickupTime={pickupTime}
+        deliveryTime={deliveryTime}
       />
 
       {showContacts && (
