@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { OrderState, Vehicle, Contact } from "@/types/order";
 import { VehiclesSection } from "@/components/order/VehiclesSection";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -115,6 +116,10 @@ export const UnifiedOrderForm = ({
 
       const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
 
+      // Cast contacts to Json type for database storage
+      const pickupContactJson = pickupContact as unknown as Json;
+      const deliveryContactJson = deliveryContact as unknown as Json;
+
       const orderData = {
         quote_number: quoteNumber,
         user_id: (await supabase.auth.getUser()).data.user?.id,
@@ -128,8 +133,8 @@ export const UnifiedOrderForm = ({
         delivery_date: deliveryDateStr,
         pickup_time: pickupTime,
         delivery_time: deliveryTime,
-        pickup_contact: pickupContact as unknown as Json,
-        delivery_contact: deliveryContact as unknown as Json,
+        pickup_contact: pickupContactJson,
+        delivery_contact: deliveryContactJson,
         status: 'pending' as const
       };
 
@@ -141,6 +146,7 @@ export const UnifiedOrderForm = ({
 
       if (quoteError) throw quoteError;
 
+      // Convert the stored Json back to Contact type for the quote object
       const quote = {
         id: quoteData.id,
         quote_number: quoteData.quote_number,
@@ -307,3 +313,4 @@ export const UnifiedOrderForm = ({
       </div>
     </div>;
 };
+
