@@ -2,6 +2,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 interface ErrorDisplayProps {
   error: string | null;
@@ -10,6 +11,13 @@ interface ErrorDisplayProps {
 }
 
 export const ErrorDisplay = ({ error, solution, projectId }: ErrorDisplayProps) => {
+  const [currentDomain, setCurrentDomain] = useState<string>("");
+  
+  useEffect(() => {
+    // Capture le domaine actuel pour faciliter la configuration
+    setCurrentDomain(window.location.origin);
+  }, []);
+  
   if (!error) return null;
   
   const isRefererError = error.includes("domaine") || error.includes("Referer") || error.includes("RefererNotAllowedMapError");
@@ -48,6 +56,14 @@ export const ErrorDisplay = ({ error, solution, projectId }: ErrorDisplayProps) 
             <div className="mt-2 text-xs bg-destructive/10 p-2 rounded">
               <span className="font-medium">Solution: </span>
               {solution}
+            </div>
+          )}
+          
+          {isRefererError && currentDomain && (
+            <div className="mt-2 text-xs bg-destructive/10 p-2 rounded">
+              <span className="font-medium">Domaine à ajouter: </span>
+              <code className="bg-black/10 p-1 rounded">{currentDomain}</code>
+              <p className="mt-1">Ajoutez ce domaine dans "Authorized JavaScript origins" dans la console Google Cloud.</p>
             </div>
           )}
           
