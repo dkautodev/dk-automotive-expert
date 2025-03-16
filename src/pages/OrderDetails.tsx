@@ -1,3 +1,4 @@
+
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { OrderState } from "@/types/order";
 import { UnifiedOrderForm } from "@/components/unified-form/UnifiedOrderForm";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Footer from "@/components/Footer";
 import { VehicleSelectionForm } from "@/components/quote-details/VehicleSelectionForm";
+import { QuoteDetailsBanner } from "@/components/quote-details/QuoteDetailsBanner";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
