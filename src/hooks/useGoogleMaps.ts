@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
@@ -25,13 +26,18 @@ export const useGoogleMaps = () => {
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
-      if (response.routes.length > 0 && response.routes[0].legs.length > 0) {
-        const leg = response.routes[0].legs[0];
-        setDistance(leg.distance?.text || "");
-        setDuration(leg.duration?.text || "");
+      const route = response.routes[0];
+      if (route && route.legs && route.legs[0]) {
+        const leg = route.legs[0];
+        if (leg.distance && leg.duration) {
+          setDistance(leg.distance.text);
+          setDuration(leg.duration.text);
+        }
       }
     } catch (error) {
       console.error("Erreur lors du calcul de la distance:", error);
+      setDistance("");
+      setDuration("");
     }
   }, []);
 
