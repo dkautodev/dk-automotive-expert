@@ -17,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { Json } from "@/integrations/supabase/types";
-import { QuoteDetailsBanner } from "./QuoteDetailsBanner";
 
 interface UnifiedOrderFormProps {
   orderDetails: OrderState;
@@ -207,13 +206,6 @@ export const UnifiedOrderForm = ({
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-6">
-      <QuoteDetailsBanner 
-        pickupAddress={orderDetails.pickupAddress}
-        deliveryAddress={orderDetails.deliveryAddress}
-        quoteNumber={currentQuoteNumber}
-        selectedVehicle={orderDetails.selectedVehicle}
-      />
-      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 space-y-6 w-full">
           <h2 className="text-xl font-semibold">Détails de prise en charge</h2>
