@@ -12,6 +12,7 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { Button } from '@/components/ui/button';
 
 interface MapSectionProps {
   onAddressSelect?: (address: string) => void;
@@ -22,6 +23,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
   const [searchBox, setSearchBox] = useState<google.maps.places.Autocomplete | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [manualAddress, setManualAddress] = useState<string>("");
+  const projectId = "vigilant-shell-453812-d7";
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -44,15 +46,34 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     }
   };
 
+  const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth') => {
+    let url = `https://console.cloud.google.com/apis`;
+    
+    switch (page) {
+      case 'oauth':
+        url = `https://console.cloud.google.com/apis/credentials/oauthclient?project=${projectId}`;
+        break;
+      case 'api':
+        url = `https://console.cloud.google.com/apis/library?project=${projectId}`;
+        break;
+      case 'credentials':
+      default:
+        url = `https://console.cloud.google.com/apis/credentials?project=${projectId}`;
+    }
+    
+    window.open(url, '_blank');
+  };
+
   // Gestion des erreurs Google Maps
   if (loadError) {
     let errorMsg = "Erreur de chargement de Google Maps";
     let solutionMsg = "Vérifiez votre connexion internet et réessayez.";
-    let projectId = "vigilant-shell-453812-d7";
+    let errorType: 'credentials' | 'api' | 'oauth' = 'credentials';
     
     if (loadError.message?.includes('ApiNotActivatedMapError')) {
       errorMsg = `L'API Google Maps Places n'est pas activée pour le projet '${projectId}'.`;
       solutionMsg = "Activez l'API Places et l'API JavaScript Maps dans la console Google Cloud.";
+      errorType = 'api';
       
       if (!errorMessage) {
         setErrorMessage(errorMsg);
@@ -65,6 +86,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     } else if (loadError.message?.includes('InvalidKeyMapError')) {
       errorMsg = `La clé API Google Maps n'est pas valide ou n'est pas associée au projet '${projectId}'.`;
       solutionMsg = "Vérifiez que votre clé API est correcte et associée au bon projet.";
+      errorType = 'credentials';
       
       if (!errorMessage) {
         setErrorMessage(errorMsg);
@@ -75,8 +97,9 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         });
       }
     } else if (loadError.message?.includes('RefererNotAllowedMapError')) {
-      errorMsg = `Le domaine actuel n'est pas autorisé pour cette clé API. Vérifiez les restrictions de votre projet '${projectId}'.`;
-      solutionMsg = "Ajoutez ce domaine aux restrictions dans les paramètres de la clé API.";
+      errorMsg = `Le domaine actuel (${window.location.origin}) n'est pas autorisé pour cette clé API. Vérifiez les restrictions de votre projet '${projectId}'.`;
+      solutionMsg = `Ajoutez "${window.location.origin}" aux origines JavaScript autorisées dans les paramètres OAuth.`;
+      errorType = 'oauth';
       
       if (!errorMessage) {
         setErrorMessage(errorMsg);
@@ -99,6 +122,20 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
               <div className="mt-2 text-xs bg-destructive/10 p-2 rounded">
                 <span className="font-medium">Solution: </span>
                 {solutionMsg}
+              </div>
+              <div className="mt-3">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs" 
+                  onClick={() => openGoogleCloudConsole(errorType)}
+                >
+                  {errorType === 'oauth' 
+                    ? "Configurer les origines autorisées" 
+                    : errorType === 'api'
+                      ? "Activer les APIs requises"
+                      : "Vérifier la clé API"}
+                </Button>
               </div>
             </AlertDescription>
           </div>
