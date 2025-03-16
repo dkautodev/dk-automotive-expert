@@ -16,7 +16,18 @@ export const useGoogleMaps = () => {
     libraries,
   });
 
-  // Si l'API n'est pas chargée correctement, on affiche un toast d'erreur
+  // Gestion spécifique de l'erreur d'API non activée
+  if (loadError?.message?.includes('ApiNotActivatedMapError')) {
+    console.error("Google Maps API not activated:", loadError);
+    toast({
+      variant: "destructive",
+      title: "Configuration Google Maps incorrecte",
+      description: "Certaines APIs Google Maps ne sont pas activées. Veuillez contacter l'administrateur."
+    });
+    return { isLoaded: false, loadError, calculateDistance: () => {}, distance: "", duration: "", error: "Configuration API incorrecte" };
+  }
+
+  // Autres erreurs de chargement
   if (loadError) {
     console.error("Google Maps load error:", loadError);
     toast({
@@ -42,9 +53,9 @@ export const useGoogleMaps = () => {
     }
 
     console.log("Calcul de la distance entre:", origin, destination);
-    const directionsService = new google.maps.DirectionsService();
     
     try {
+      const directionsService = new google.maps.DirectionsService();
       const result = await directionsService.route({
         origin,
         destination,
@@ -53,37 +64,35 @@ export const useGoogleMaps = () => {
 
       console.log("Résultat des directions:", result);
 
-      if (!result.routes?.length) {
-        console.log("Aucun itinéraire trouvé");
+      const leg = result.routes?.[0]?.legs?.[0];
+      if (!leg?.distance || !leg?.duration) {
+        console.log("Aucun itinéraire trouvé ou détails manquants");
         setError("Aucun itinéraire trouvé");
         setDistance("");
         setDuration("");
         return;
       }
 
-      const leg = result.routes[0].legs?.[0];
-      if (!leg) {
-        console.log("Détails de l'itinéraire non disponibles");
-        setError("Détails de l'itinéraire non disponibles");
-        setDistance("");
-        setDuration("");
-        return;
-      }
-
-      if (leg.distance && leg.duration) {
-        console.log("Distance:", leg.distance.text);
-        console.log("Durée:", leg.duration.text);
-        setDistance(leg.distance.text);
-        setDuration(leg.duration.text);
-        setError(null);
-      }
-    } catch (error) {
+      console.log("Distance:", leg.distance.text);
+      console.log("Durée:", leg.duration.text);
+      setDistance(leg.distance.text);
+      setDuration(leg.duration.text);
+      setError(null);
+      
+    } catch (error: any) {
       console.error("Erreur lors du calcul de la distance:", error);
+      
+      // Message d'erreur plus spécifique basé sur le type d'erreur
+      const errorMessage = error.message?.includes('NOT_FOUND') 
+        ? "Adresse introuvable. Veuillez vérifier les adresses saisies."
+        : "Impossible de calculer l'itinéraire. Veuillez réessayer.";
+
       toast({
         variant: "destructive",
         title: "Erreur de calcul",
-        description: "Impossible de calculer l'itinéraire. Veuillez vérifier les adresses."
+        description: errorMessage
       });
+      
       setError("Erreur lors du calcul de la distance");
       setDistance("");
       setDuration("");
