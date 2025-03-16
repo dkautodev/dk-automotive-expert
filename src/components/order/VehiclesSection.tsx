@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VehicleForm } from "@/components/VehicleForm";
-import { Calculator } from "lucide-react";
+import { Calculator, Plus } from "lucide-react";
 
 interface VehicleInfo {
   brand: string;
@@ -33,22 +33,35 @@ export const VehiclesSection = ({
   canRequestQuote
 }: VehiclesSectionProps) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Véhicule</CardTitle>
+    <Card className="border-0 shadow-none">
+      <CardHeader className="px-0">
+        <CardTitle>Véhicule{vehicleCount > 1 ? 's' : ''}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-8 p-0">
         {Array.from({ length: vehicleCount }).map((_, index) => (
-          <VehicleForm
-            key={index}
-            index={index}
-            onDelete={() => onDeleteVehicle(index)}
-            onChange={isValid => onVehicleValidityChange(index, isValid)}
-            onVehicleUpdate={vehicle => onVehicleUpdate(index, vehicle)}
-          />
+          <div key={index} className="relative">
+            <h3 className="text-lg font-medium mb-4">
+              Véhicule {index + 1}
+            </h3>
+            <VehicleForm
+              index={index}
+              onDelete={() => onDeleteVehicle(index)}
+              onChange={isValid => onVehicleValidityChange(index, isValid)}
+              onVehicleUpdate={vehicle => onVehicleUpdate(index, vehicle)}
+            />
+          </div>
         ))}
         
-        <div className="flex justify-end">
+        <div className="flex flex-col gap-4">
+          <Button 
+            variant="outline" 
+            className="w-full gap-2 border-dashed"
+            onClick={() => onQuoteRequest?.()}
+          >
+            <Plus className="h-4 w-4" />
+            Ajouter un véhicule
+          </Button>
+
           {canRequestQuote && (
             <Button 
               onClick={onQuoteRequest}
@@ -63,3 +76,4 @@ export const VehiclesSection = ({
     </Card>
   );
 };
+
