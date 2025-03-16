@@ -15,7 +15,7 @@ const ClientDashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <ClientSidebar />
-        <main className="flex-1 pl-52">
+        <main className={`flex-1 ${location.pathname !== '/dashboard/client/order-details' ? 'pl-52' : ''}`}>
           <Routes>
             <Route index element={<DashboardHome />} />
             <Route path="profile" element={<Profile />} />
