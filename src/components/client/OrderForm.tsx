@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 import { Loader } from "@/components/ui/loader";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import { Car } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 const libraries: ("places")[] = ["places"];
 
@@ -27,14 +29,13 @@ const OrderForm = () => {
   const [pickupAddress, setPickupAddress] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState("");
+  const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  const { isLoaded } = useLoadScript({
+  const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries,
   });
-
-  const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-  const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
   const onPickupLoad = (autocomplete: google.maps.places.Autocomplete) => {
     setPickupAutocomplete(autocomplete);
@@ -63,16 +64,44 @@ const OrderForm = () => {
   };
 
   const handleSubmit = () => {
-    if (pickupAddress && deliveryAddress && selectedVehicle) {
-      navigate("/dashboard/client/order-details", {
-        state: {
-          pickupAddress,
-          deliveryAddress,
-          selectedVehicle,
-        }
+    if (!pickupAddress || !deliveryAddress) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir les adresses de départ et d'arrivée",
+        variant: "destructive"
       });
+      return;
     }
+
+    if (!selectedVehicle) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un type de véhicule",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    navigate("/dashboard/client/order-details", {
+      state: {
+        pickupAddress,
+        deliveryAddress,
+        selectedVehicle,
+      }
+    });
   };
+
+  if (loadError) {
+    return (
+      <Card className="mt-8">
+        <CardContent className="pt-6">
+          <div className="text-red-500 text-center">
+            Erreur de chargement de Google Maps
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!isLoaded) {
     return <Loader />;
@@ -95,12 +124,12 @@ const OrderForm = () => {
             <Autocomplete
               onLoad={onPickupLoad}
               onPlaceChanged={handlePickupPlaceChanged}
+              options={{ componentRestrictions: { country: 'fr' } }}
             >
               <Input
-                type="text"
+                placeholder="Entrez l'adresse de départ"
                 value={pickupAddress}
                 onChange={(e) => setPickupAddress(e.target.value)}
-                placeholder="Entrez l'adresse de départ"
               />
             </Autocomplete>
           </div>
@@ -112,12 +141,12 @@ const OrderForm = () => {
             <Autocomplete
               onLoad={onDeliveryLoad}
               onPlaceChanged={handleDeliveryPlaceChanged}
+              options={{ componentRestrictions: { country: 'fr' } }}
             >
               <Input
-                type="text"
+                placeholder="Entrez l'adresse de livraison"
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
-                placeholder="Entrez l'adresse de livraison"
               />
             </Autocomplete>
           </div>
