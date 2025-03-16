@@ -1,4 +1,3 @@
-
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { OrderState } from "@/types/order";
 import { UnifiedOrderForm } from "@/components/unified-form/UnifiedOrderForm";
@@ -17,10 +16,10 @@ const OrderDetails = () => {
 
   return <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4">
-        <div className="flex items-center gap-4 py-6">
+        <div className="flex flex-col items-center gap-4 py-6">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="self-start">
                 <ArrowLeft className="h-6 w-6" />
               </Button>
             </AlertDialogTrigger>
@@ -39,7 +38,7 @@ const OrderDetails = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <h1 className="text-3xl font-bold">Complétez votre demande</h1>
+          <h1 className="text-3xl font-bold text-center">Complétez votre demande</h1>
         </div>
         
         <UnifiedOrderForm orderDetails={orderDetails} />
