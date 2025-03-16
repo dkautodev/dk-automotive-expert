@@ -1,6 +1,6 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import ClientSidebar from "@/components/client/ClientSidebar";
 import DashboardHome from "@/components/client/DashboardHome";
 import Profile from "@/components/client/Profile";
@@ -11,11 +11,14 @@ import PendingInvoices from "./PendingInvoices";
 import CompletedShipments from "./CompletedShipments";
 
 const ClientDashboard = () => {
+  const location = useLocation();
+  const isOrderDetails = location.pathname.includes('/order-details');
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <ClientSidebar />
-        <main className={`flex-1 ${location.pathname !== '/dashboard/client/order-details' ? 'pl-52' : ''}`}>
+        {!isOrderDetails && <ClientSidebar />}
+        <main className={`flex-1 ${!isOrderDetails ? 'pl-52' : ''}`}>
           <Routes>
             <Route index element={<DashboardHome />} />
             <Route path="profile" element={<Profile />} />
