@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { Json } from "@/integrations/supabase/types";
+import { QuoteDetailsBanner } from "./QuoteDetailsBanner";
 
 interface UnifiedOrderFormProps {
   orderDetails: OrderState;
@@ -113,7 +115,13 @@ export const UnifiedOrderForm = ({
       const totalPriceHT = 150;
       const totalPriceTTC = totalPriceHT * 1.20;
 
-      const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
+      // Get the current count of quotes and generate the next number
+      const { data: quotesCount } = await supabase
+        .from('quotes')
+        .select('id', { count: 'exact' });
+      
+      const nextNumber = 101 + (quotesCount?.length || 0);
+      const quoteNumber = `DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`;
 
       const pickupContactJson = pickupContact as unknown as Json;
       const deliveryContactJson = deliveryContact as unknown as Json;
@@ -144,7 +152,7 @@ export const UnifiedOrderForm = ({
 
       if (quoteError) throw quoteError;
 
-      const quote: Quote = {
+      const quote = {
         id: quoteData.id,
         quote_number: quoteData.quote_number,
         pickupAddress: orderDetails.pickupAddress,
@@ -181,9 +189,30 @@ export const UnifiedOrderForm = ({
     }
   };
 
-  const canSubmit = isFormValid();
+  const [currentQuoteNumber, setCurrentQuoteNumber] = useState<string>("");
 
-  return <div className="max-w-[1200px] mx-auto space-y-6">
+  // Get initial quote number on mount
+  useEffect(() => {
+    const getNextQuoteNumber = async () => {
+      const { data: quotesCount } = await supabase
+        .from('quotes')
+        .select('id', { count: 'exact' });
+      
+      const nextNumber = 101 + (quotesCount?.length || 0);
+      setCurrentQuoteNumber(`DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`);
+    };
+    
+    getNextQuoteNumber();
+  }, []);
+
+  return (
+    <div className="max-w-[1200px] mx-auto space-y-6">
+      <QuoteDetailsBanner 
+        pickupAddress={orderDetails.pickupAddress}
+        deliveryAddress={orderDetails.deliveryAddress}
+        quoteNumber={currentQuoteNumber}
+      />
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 space-y-6 w-full">
           <h2 className="text-xl font-semibold">Détails de prise en charge</h2>
@@ -308,5 +337,6 @@ export const UnifiedOrderForm = ({
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
