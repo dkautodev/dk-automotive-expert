@@ -114,7 +114,6 @@ export const UnifiedOrderForm = ({
       const totalPriceHT = 150;
       const totalPriceTTC = totalPriceHT * 1.20;
 
-      // Get the current count of quotes and generate the next number
       const { data: quotesCount } = await supabase
         .from('quotes')
         .select('id', { count: 'exact' });
@@ -190,7 +189,6 @@ export const UnifiedOrderForm = ({
 
   const [currentQuoteNumber, setCurrentQuoteNumber] = useState<string>("");
 
-  // Get initial quote number on mount
   useEffect(() => {
     const getNextQuoteNumber = async () => {
       const { data: quotesCount } = await supabase
@@ -210,6 +208,7 @@ export const UnifiedOrderForm = ({
         pickupAddress={orderDetails.pickupAddress}
         deliveryAddress={orderDetails.deliveryAddress}
         quoteNumber={currentQuoteNumber}
+        selectedVehicle={orderDetails.selectedVehicle}
       />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
