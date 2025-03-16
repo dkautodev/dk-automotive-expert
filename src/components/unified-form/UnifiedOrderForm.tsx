@@ -150,7 +150,7 @@ export const UnifiedOrderForm = ({
         totalPriceHT,
         totalPriceTTC,
         distance: orderDetails.distance,
-        status: quoteData.status,
+        status: quoteData.status as 'pending' | 'accepted' | 'rejected',
         dateCreated: new Date(quoteData.date_created),
         pickupDate: pickupDate as Date,
         pickupTime,
