@@ -13,7 +13,9 @@ const OrderDetails = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold p-6">Complétez votre demande</h1>
+      <div className="flex justify-between items-center p-6">
+        <h1 className="text-3xl font-bold">Complétez votre demande</h1>
+      </div>
       <UnifiedOrderForm orderDetails={orderDetails} />
     </div>
   );
