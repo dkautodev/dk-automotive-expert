@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { VehicleForm } from "@/components/VehicleForm";
+import { VehicleForm } from "@/components/vehicle/VehicleForm";
 import { Calculator, Plus } from "lucide-react";
+
 interface VehicleInfo {
   brand: string;
   model: string;
@@ -10,6 +11,7 @@ interface VehicleInfo {
   licensePlate: string;
   files: File[];
 }
+
 interface VehiclesSectionProps {
   vehicleCount: number;
   vehicleFormsValidity: boolean[];
@@ -20,6 +22,7 @@ interface VehiclesSectionProps {
   canRequestQuote?: boolean;
   setVehicleCount: React.Dispatch<React.SetStateAction<number>>;
 }
+
 export const VehiclesSection = ({
   vehicleCount,
   vehicleFormsValidity,
