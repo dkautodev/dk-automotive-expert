@@ -1,6 +1,7 @@
 
 import { createContext, useContext, ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import type { User, Session } from '@supabase/supabase-js';
 import type { UserRole } from "@/hooks/useAuth";
 
 interface Profile {
@@ -23,8 +24,10 @@ interface AuthContextType {
   role: UserRole | null;
   profile: Profile | null;
   signOut: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, metadata: Record<string, any>) => Promise<any>;
   user: User | null;
-  session: any;
+  session: Session | null;
   error: string | null;
   fetchUserProfile: (userId: string) => Promise<Profile | null>;
 }

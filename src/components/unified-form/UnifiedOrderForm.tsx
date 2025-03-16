@@ -120,7 +120,7 @@ export const UnifiedOrderForm = ({
         user_id: (await supabase.auth.getUser()).data.user?.id,
         pickup_address: orderDetails.pickupAddress,
         delivery_address: orderDetails.deliveryAddress,
-        vehicles: vehicles,
+        vehicles: vehicles as unknown as Json,
         total_price_ht: totalPriceHT,
         total_price_ttc: totalPriceTTC,
         distance: orderDetails.distance.toString(),
@@ -128,9 +128,9 @@ export const UnifiedOrderForm = ({
         delivery_date: deliveryDateStr,
         pickup_time: pickupTime,
         delivery_time: deliveryTime,
-        pickup_contact: pickupContact,
-        delivery_contact: deliveryContact,
-        status: 'pending'
+        pickup_contact: pickupContact as unknown as Json,
+        delivery_contact: deliveryContact as unknown as Json,
+        status: 'pending' as const
       };
 
       const { data: quoteData, error: quoteError } = await supabase

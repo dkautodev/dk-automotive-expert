@@ -139,7 +139,7 @@ const Profile = () => {
           <CardTitle>Mon profil</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <LogoUpload currentLogo={profile?.logo_url} onUploadSuccess={handleLogoUpdate} />
+          <LogoUpload currentLogo={profile?.profile_picture} onUploadSuccess={handleLogoUpdate} />
 
           <div className="space-y-4">
             <div>
