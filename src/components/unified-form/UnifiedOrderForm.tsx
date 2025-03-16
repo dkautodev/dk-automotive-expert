@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { OrderState, Vehicle, Contact } from "@/types/order";
 import { VehiclesSection } from "@/components/order/VehiclesSection";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -44,6 +44,26 @@ export const UnifiedOrderForm = ({
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehicleCount, setVehicleCount] = useState(0);
   const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
+
+  const validateContact = (contact: Contact): boolean => {
+    return !!(contact.firstName && 
+      contact.lastName && 
+      contact.email && 
+      contact.phone && 
+      contact.email.includes('@') && 
+      contact.phone.length >= 10);
+  };
+
+  const isFormValid = (): boolean => {
+    return !!(pickupDate && 
+      deliveryDate && 
+      pickupTime && 
+      deliveryTime && 
+      validateContact(pickupContact) && 
+      validateContact(deliveryContact) && 
+      vehicles.length > 0 && 
+      vehicleFormsValidity.some(v => v));
+  };
 
   const handleVehicleValidityChange = (index: number, isValid: boolean) => {
     setVehicleFormsValidity(prev => {
@@ -79,10 +99,20 @@ export const UnifiedOrderForm = ({
 
   const handleSubmit = async () => {
     try {
+      if (!isFormValid()) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez remplir tous les champs obligatoires",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const pickupDateStr = pickupDate?.toISOString().split('T')[0];
       const deliveryDateStr = deliveryDate?.toISOString().split('T')[0];
       const totalPriceHT = 150;
       const totalPriceTTC = totalPriceHT * 1.20;
+
       const vehiclesJson = vehicles.map(vehicle => ({
         brand: vehicle.brand,
         model: vehicle.model,
@@ -91,21 +121,23 @@ export const UnifiedOrderForm = ({
         licensePlate: vehicle.licensePlate,
         files: []
       })) as Json;
+
       const pickupContactJson = {
         firstName: pickupContact.firstName,
         lastName: pickupContact.lastName,
         email: pickupContact.email,
         phone: pickupContact.phone
       } as Json;
+
       const deliveryContactJson = {
         firstName: deliveryContact.firstName,
         lastName: deliveryContact.lastName,
         email: deliveryContact.email,
         phone: deliveryContact.phone
       } as Json;
-      const {
-        data: quoteNumber
-      } = await supabase.rpc('generate_quote_number');
+
+      const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
+
       const orderData = {
         pickup_address: orderDetails.pickupAddress,
         delivery_address: orderDetails.deliveryAddress,
@@ -120,13 +152,18 @@ export const UnifiedOrderForm = ({
         pickup_contact: pickupContactJson,
         delivery_contact: deliveryContactJson,
         user_id: (await supabase.auth.getUser()).data.user?.id,
-        quote_number: quoteNumber
+        quote_number: quoteNumber,
+        status: 'pending'
       };
-      const {
-        data: quoteData,
-        error: quoteError
-      } = await supabase.from('quotes').insert(orderData).select().single();
+
+      const { data: quoteData, error: quoteError } = await supabase
+        .from('quotes')
+        .insert(orderData)
+        .select()
+        .single();
+
       if (quoteError) throw quoteError;
+
       const quote = {
         id: quoteData.id,
         quote_number: quoteData.quote_number,
@@ -145,12 +182,15 @@ export const UnifiedOrderForm = ({
         pickupContact,
         deliveryContact
       };
+
       generateQuotePDF(quote);
+      
       toast({
         title: "Devis créé avec succès",
         description: "Le PDF a été généré et téléchargé"
       });
-      navigate("/dashboard/client/pending-invoices");
+
+      navigate("/dashboard/client/pending-quotes");
     } catch (error) {
       console.error("Error creating quote:", error);
       toast({
@@ -161,7 +201,7 @@ export const UnifiedOrderForm = ({
     }
   };
 
-  const canSubmit = pickupContact && deliveryContact && vehicles.length > 0 && vehicleFormsValidity.some(v => v) && pickupDate && deliveryDate;
+  const canSubmit = isFormValid();
 
   return <div className="max-w-[1200px] mx-auto space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
