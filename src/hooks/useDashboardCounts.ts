@@ -6,6 +6,7 @@ interface DashboardCounts {
   ongoingShipments: number;
   pendingInvoices: number;
   completedShipments: number;
+  pendingQuotes: number;
 }
 
 export const useDashboardCounts = () => {
@@ -19,14 +20,21 @@ export const useDashboardCounts = () => {
           ongoingShipments: 0,
           pendingInvoices: 0,
           completedShipments: 0,
+          pendingQuotes: 0
         };
       }
 
-      // Pour l'instant, on retourne des valeurs par défaut puisque les tables n'existent pas encore
+      const { count: pendingQuotesCount } = await supabase
+        .from('quotes')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .eq('user_id', user.id);
+
       return {
         ongoingShipments: 0,
         pendingInvoices: 0,
         completedShipments: 0,
+        pendingQuotes: pendingQuotesCount || 0
       };
     } catch (error) {
       console.error("Error in fetchCounts:", error);

@@ -1,6 +1,5 @@
-
 import { Button } from "@/components/ui/button";
-import { LogOut, Receipt } from "lucide-react";
+import { LogOut, Receipt, FileText } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
@@ -16,7 +15,7 @@ import OrderForm from "./OrderForm";
 const DashboardHome = () => {
   const { signOut } = useAuthContext();
   const navigate = useNavigate();
-  const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0 } } = useDashboardCounts();
+  const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0, pendingQuotes: 0 } } = useDashboardCounts();
 
   const handleLogout = async () => {
     try {
@@ -53,6 +52,20 @@ const DashboardHome = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{counts.ongoingShipments}</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="pending-quotes" className="block h-full">
+          <Card className="hover:bg-accent transition-colors h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <FileText className="h-5 w-5" />
+                Devis en attente
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{counts.pendingQuotes}</p>
             </CardContent>
           </Card>
         </Link>
