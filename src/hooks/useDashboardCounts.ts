@@ -29,7 +29,7 @@ export const useDashboardCounts = () => {
     return {
       ongoingShipments: 0,
       pendingInvoices: 0,
-      completedShipments: 0,
+      completedShipments: pendingQuotesCount || 0,
     };
   };
 
