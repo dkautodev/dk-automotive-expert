@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,7 +115,6 @@ export const UnifiedOrderForm = ({
 
       const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
 
-      // Cast contacts to Json type for database storage
       const pickupContactJson = pickupContact as unknown as Json;
       const deliveryContactJson = deliveryContact as unknown as Json;
 
@@ -146,8 +144,7 @@ export const UnifiedOrderForm = ({
 
       if (quoteError) throw quoteError;
 
-      // Convert the stored Json back to Contact type for the quote object
-      const quote = {
+      const quote: Quote = {
         id: quoteData.id,
         quote_number: quoteData.quote_number,
         pickupAddress: orderDetails.pickupAddress,
@@ -162,8 +159,8 @@ export const UnifiedOrderForm = ({
         pickupTime,
         deliveryDate: deliveryDate as Date,
         deliveryTime,
-        pickupContact: quoteData.pickup_contact as unknown as Contact,
-        deliveryContact: quoteData.delivery_contact as unknown as Contact
+        pickupContact: quoteData.pickup_contact as Json,
+        deliveryContact: quoteData.delivery_contact as Json
       };
 
       generateQuotePDF(quote);
@@ -313,4 +310,3 @@ export const UnifiedOrderForm = ({
       </div>
     </div>;
 };
-
