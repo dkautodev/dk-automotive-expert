@@ -28,6 +28,7 @@ const OrderForm = () => {
     handleDeliveryPlaceChanged,
     isLoaded,
     loadError,
+    loadErrorMessage,
     distance,
     duration,
     error,
@@ -56,7 +57,7 @@ const OrderForm = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {loadError && projectId && <DomainOriginHelper projectId={projectId} />}
+        {projectId && <DomainOriginHelper projectId={projectId} error={loadErrorMessage} />}
         
         <ErrorDisplay error={error} solution={errorSolution} projectId={projectId} />
 
