@@ -10,12 +10,13 @@ interface Profile {
   last_name: string | null;
   email: string;
   phone: string | null;
-  company?: string | null;
-  profile_picture?: string | null;
-  siret?: string | null;
-  vat_number?: string | null;
-  siret_locked?: boolean | null;
-  vat_number_locked?: boolean | null;
+  company: string | null;
+  profile_picture: string | null;
+  siret: string | null;
+  vat_number: string | null;
+  siret_locked: boolean | null;
+  vat_number_locked: boolean | null;
+  billing_address: string | null;
 }
 
 interface AuthContextType {
@@ -37,12 +38,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuth();
 
-  // Type assertion to ensure auth matches AuthContextType
   const contextValue: AuthContextType = {
     ...auth,
     isAuthenticated: !!auth.user,
     isLoading: auth.loading,
-    profile: null, // You'll need to implement profile loading logic
+    profile: null
   };
 
   return (
