@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { toast } from '@/components/ui/use-toast';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
@@ -11,29 +11,41 @@ export const useGoogleMaps = () => {
   const [duration, setDuration] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
+  // Chargement de l'API avec plus de logging
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
+  useEffect(() => {
+    console.log("État du chargement de l'API:", { isLoaded, loadError });
+  }, [isLoaded, loadError]);
+
   // Gestion spécifique de l'erreur d'API non activée
   if (loadError?.message?.includes('ApiNotActivatedMapError')) {
-    console.error("Google Maps API not activated:", loadError);
+    console.error("Google Maps API non activée:", loadError);
     toast({
       variant: "destructive",
       title: "Configuration Google Maps incorrecte",
-      description: "Certaines APIs Google Maps ne sont pas activées. Veuillez contacter l'administrateur."
+      description: "API Google Maps non activée. Veuillez contacter l'administrateur."
     });
-    return { isLoaded: false, loadError, calculateDistance: () => {}, distance: "", duration: "", error: "Configuration API incorrecte" };
+    return { 
+      isLoaded: false, 
+      loadError, 
+      calculateDistance: () => {}, 
+      distance: "", 
+      duration: "", 
+      error: "API non activée" 
+    };
   }
 
   // Autres erreurs de chargement
   if (loadError) {
-    console.error("Google Maps load error:", loadError);
+    console.error("Erreur de chargement Google Maps:", loadError);
     toast({
       variant: "destructive",
       title: "Erreur Google Maps",
-      description: "Erreur lors du chargement de Google Maps. Veuillez réessayer plus tard."
+      description: "Erreur lors du chargement de Google Maps. Veuillez réessayer."
     });
   }
 
@@ -52,9 +64,9 @@ export const useGoogleMaps = () => {
       return;
     }
 
-    console.log("Calcul de la distance entre:", origin, destination);
-    
     try {
+      console.log("Tentative de calcul d'itinéraire entre:", origin, destination);
+      
       const directionsService = new google.maps.DirectionsService();
       const result = await directionsService.route({
         origin,
@@ -62,7 +74,7 @@ export const useGoogleMaps = () => {
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
-      console.log("Résultat des directions:", result);
+      console.log("Résultat du calcul d'itinéraire:", result);
 
       const leg = result.routes?.[0]?.legs?.[0];
       if (!leg?.distance || !leg?.duration) {
@@ -73,8 +85,9 @@ export const useGoogleMaps = () => {
         return;
       }
 
-      console.log("Distance:", leg.distance.text);
-      console.log("Durée:", leg.duration.text);
+      console.log("Distance calculée:", leg.distance.text);
+      console.log("Durée calculée:", leg.duration.text);
+      
       setDistance(leg.distance.text);
       setDuration(leg.duration.text);
       setError(null);
@@ -82,7 +95,6 @@ export const useGoogleMaps = () => {
     } catch (error: any) {
       console.error("Erreur lors du calcul de la distance:", error);
       
-      // Message d'erreur plus spécifique basé sur le type d'erreur
       const errorMessage = error.message?.includes('NOT_FOUND') 
         ? "Adresse introuvable. Veuillez vérifier les adresses saisies."
         : "Impossible de calculer l'itinéraire. Veuillez réessayer.";
@@ -93,7 +105,7 @@ export const useGoogleMaps = () => {
         description: errorMessage
       });
       
-      setError("Erreur lors du calcul de la distance");
+      setError(errorMessage);
       setDistance("");
       setDuration("");
     }
@@ -101,3 +113,4 @@ export const useGoogleMaps = () => {
 
   return { isLoaded, loadError, calculateDistance, distance, duration, error };
 };
+
