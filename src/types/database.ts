@@ -6,7 +6,7 @@ export type QuoteRow = {
   quote_number: string;
   pickup_address: string;
   delivery_address: string;
-  vehicles: any[];
+  vehicles: any; // Changed from any[] to any to match jsonb type
   total_price_ht: number;
   total_price_ttc: number;
   distance: string;
