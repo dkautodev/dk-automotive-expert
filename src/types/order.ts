@@ -27,6 +27,8 @@ export interface OrderState {
   pickupTime: string;
   deliveryTime: string;
   selectedVehicle: string;
+  handleSubmit: () => void;
+  canSubmit: boolean;
 }
 
 export interface Quote {
