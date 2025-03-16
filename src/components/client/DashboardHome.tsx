@@ -1,29 +1,22 @@
+
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
-import OrderForm from "./OrderForm";
-import { useQuoteManagement } from "@/hooks/useQuoteManagement";
-import { useDashboardCounts } from "@/hooks/useDashboardCounts";
 import { useAuthContext } from "@/context/AuthContext";
+import { useDashboardCounts } from "@/hooks/useDashboardCounts";
 import { toast } from "@/components/ui/use-toast";
+import OrderForm from "./OrderForm";
 
 const DashboardHome = () => {
   const { signOut } = useAuthContext();
   const navigate = useNavigate();
-  const { fetchQuotes } = useQuoteManagement();
   const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0 } } = useDashboardCounts();
-  
-  const { data: quotes = [] } = useQuery({
-    queryKey: ['pendingQuotes'],
-    queryFn: fetchQuotes
-  });
 
   const handleLogout = async () => {
     try {
@@ -53,17 +46,6 @@ const DashboardHome = () => {
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Link to="pending-quotes" className="block h-full">
-          <Card className="hover:bg-accent transition-colors h-full">
-            <CardHeader>
-              <CardTitle className="text-lg">Devis en attente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{quotes.length}</p>
-            </CardContent>
-          </Card>
-        </Link>
-
         <Link to="ongoing-shipments" className="block h-full">
           <Card className="hover:bg-accent transition-colors h-full">
             <CardHeader>

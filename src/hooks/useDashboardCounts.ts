@@ -22,25 +22,11 @@ export const useDashboardCounts = () => {
         };
       }
 
-      console.log("Fetching counts for user:", user.id);
-
-      const { count: pendingQuotesCount, error } = await supabase
-        .from('quotes')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error("Error fetching counts:", error);
-        throw error;
-      }
-
-      console.log("Fetched pending quotes count:", pendingQuotesCount);
-
+      // Pour l'instant, on retourne des valeurs par défaut puisque les tables n'existent pas encore
       return {
         ongoingShipments: 0,
         pendingInvoices: 0,
-        completedShipments: pendingQuotesCount || 0,
+        completedShipments: 0,
       };
     } catch (error) {
       console.error("Error in fetchCounts:", error);
