@@ -52,7 +52,7 @@ const OrderDetails = () => {
           </AlertDialog>
           
           <Button
-            onClick={orderDetails.handleSubmit}
+            onClick={() => orderDetails.handleSubmit?.()}
             disabled={!orderDetails.canSubmit}
             className="bg-primary hover:bg-primary/90"
           >
