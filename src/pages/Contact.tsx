@@ -51,11 +51,8 @@ const Contact = () => {
                 <br className="hidden md:block" />
                 <span className="text-dk-navy">VOS DEMANDES</span>
               </h1>
-              <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto">
-                Besoin d'un devis personnalisé ? Des questions sur nos prestations de convoyage de véhicules ?
-              </p>
-              <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto mt-2">
-                Contactez-nous dès maintenant pour obtenir toutes les informations dont vous avez besoin.
+              <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto mb-2">
+                Besoin d'un devis personnalisé ? Des questions sur nos prestations de convoyage de véhicules ? Contactez-nous dès maintenant pour obtenir toutes les informations dont vous avez besoin.
               </p>
             </div>
 
