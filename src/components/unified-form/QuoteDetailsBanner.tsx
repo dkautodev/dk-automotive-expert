@@ -33,8 +33,8 @@ export const QuoteDetailsBanner = ({
     <Card className="bg-dk-navy text-white p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <p className="text-lg font-medium">Distance totale</p>
-          <p className="text-2xl font-bold">{distance || "Calcul en cours..."}</p>
+          <p className="text-lg font-medium">Numéro de devis</p>
+          <p className="text-2xl font-bold">{quoteNumber || "Génération en cours..."}</p>
         </div>
         <div className="space-y-2">
           <p className="text-lg font-medium">Prix</p>
@@ -44,8 +44,8 @@ export const QuoteDetailsBanner = ({
           </div>
         </div>
         <div className="space-y-2 text-right">
-          <p className="text-lg font-medium">Numéro de devis</p>
-          <p className="text-2xl font-bold">{quoteNumber || "Génération en cours..."}</p>
+          <p className="text-lg font-medium">Distance totale</p>
+          <p className="text-2xl font-bold">{distance || "Calcul en cours..."}</p>
         </div>
       </div>
     </Card>
