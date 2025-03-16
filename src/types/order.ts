@@ -1,4 +1,3 @@
-
 export interface Vehicle {
   brand: string;
   model: string;
@@ -27,6 +26,7 @@ export interface OrderState {
   deliveryDate: Date;
   pickupTime: string;
   deliveryTime: string;
+  selectedVehicle: string;
 }
 
 export interface Quote {
