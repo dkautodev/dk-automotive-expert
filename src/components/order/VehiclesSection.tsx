@@ -41,19 +41,19 @@ export const VehiclesSection = ({
         {Array.from({
         length: vehicleCount
       }).map((_, index) => <div key={index} className="relative">
-            
-            <VehicleForm index={index} onDelete={() => onDeleteVehicle(index)} onChange={isValid => onVehicleValidityChange(index, isValid)} onVehicleUpdate={vehicle => onVehicleUpdate(index, vehicle)} />
+            <VehicleForm 
+              index={index} 
+              onDelete={() => onDeleteVehicle(index)} 
+              onChange={isValid => onVehicleValidityChange(index, isValid)} 
+              onVehicleUpdate={vehicle => onVehicleUpdate(index, vehicle)}
+              onQuoteRequest={onQuoteRequest}
+            />
           </div>)}
         
         <div className="flex flex-col gap-4">
           {vehicleCount === 0 && <Button variant="outline" onClick={handleAddVehicle} className="border-dashed border-2 gap-2">
               <Plus className="h-4 w-4" />
               Ajouter un véhicule
-            </Button>}
-
-          {canRequestQuote && <Button onClick={onQuoteRequest} className="gap-2">
-              <Calculator className="h-4 w-4" />
-              Obtenir votre devis
             </Button>}
         </div>
       </CardContent>
