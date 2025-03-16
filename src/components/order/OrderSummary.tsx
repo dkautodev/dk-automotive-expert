@@ -167,7 +167,7 @@ export const OrderSummary = ({
       
       <div>
         <h3 className="font-semibold mb-1">Type de véhicule</h3>
-        <p className="text-gray-600">{getVehicleName(selectedVehicle)}</p>
+        <p className="text-gray-600">{getVehicleName("1")}</p>
       </div>
 
       <div className="flex justify-end">

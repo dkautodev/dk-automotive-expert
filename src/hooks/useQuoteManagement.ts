@@ -2,6 +2,7 @@
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
+import { Json } from "@/integrations/supabase/types";
 
 export const useQuoteManagement = () => {
   const saveQuote = async (quote: Quote) => {
@@ -14,7 +15,7 @@ export const useQuoteManagement = () => {
     const quoteData = {
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
-      vehicles: quote.vehicles,
+      vehicles: quote.vehicles as Json,
       total_price_ht: Number(quote.totalPriceHT.toFixed(2)),
       total_price_ttc: Number(quote.totalPriceTTC.toFixed(2)),
       distance: Number(quote.distance),
@@ -24,8 +25,8 @@ export const useQuoteManagement = () => {
       pickup_time: quote.pickupTime,
       delivery_date: quote.deliveryDate.toISOString().split('T')[0],
       delivery_time: quote.deliveryTime,
-      pickup_contact: quote.pickupContact,
-      delivery_contact: quote.deliveryContact,
+      pickup_contact: quote.pickupContact as Json,
+      delivery_contact: quote.deliveryContact as Json,
       user_id: user.id,
       quote_number: await generateQuoteNumber()
     };
