@@ -1,3 +1,4 @@
+
 import html2pdf from 'html2pdf.js';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

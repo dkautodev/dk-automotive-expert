@@ -57,6 +57,66 @@ export type Database = {
         }
         Relationships: []
       }
+      quotes: {
+        Row: {
+          date_created: string
+          delivery_address: string
+          delivery_contact: Json
+          delivery_date: string | null
+          delivery_time: string | null
+          distance: string
+          id: string
+          pickup_address: string
+          pickup_contact: Json
+          pickup_date: string | null
+          pickup_time: string | null
+          quote_number: string
+          status: Database["public"]["Enums"]["quote_status"]
+          total_price_ht: number
+          total_price_ttc: number
+          user_id: string
+          vehicles: Json
+        }
+        Insert: {
+          date_created?: string
+          delivery_address: string
+          delivery_contact: Json
+          delivery_date?: string | null
+          delivery_time?: string | null
+          distance: string
+          id?: string
+          pickup_address: string
+          pickup_contact: Json
+          pickup_date?: string | null
+          pickup_time?: string | null
+          quote_number: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          total_price_ht: number
+          total_price_ttc: number
+          user_id: string
+          vehicles: Json
+        }
+        Update: {
+          date_created?: string
+          delivery_address?: string
+          delivery_contact?: Json
+          delivery_date?: string | null
+          delivery_time?: string | null
+          distance?: string
+          id?: string
+          pickup_address?: string
+          pickup_contact?: Json
+          pickup_date?: string | null
+          pickup_time?: string | null
+          quote_number?: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          total_price_ht?: number
+          total_price_ttc?: number
+          user_id?: string
+          vehicles?: Json
+        }
+        Relationships: []
+      }
       user_files: {
         Row: {
           created_at: string
@@ -117,6 +177,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      generate_quote_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_role: {
         Args: {
           user_id: string
@@ -131,6 +195,7 @@ export type Database = {
       }
     }
     Enums: {
+      quote_status: "pending" | "accepted" | "rejected"
       user_role: "client" | "driver" | "admin"
     }
     CompositeTypes: {

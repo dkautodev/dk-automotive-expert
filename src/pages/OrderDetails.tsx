@@ -9,6 +9,9 @@ import { useScrollToElement } from "@/hooks/useScrollToElement";
 import { useOrderDetails } from "@/hooks/useOrderDetails";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { OrderState } from "@/types/order";
+import { supabase } from "@/integrations/supabase/client";
+import { generateQuotePDF } from "@/utils/pdfGenerator";
+import { toast } from "@/components/ui/use-toast";
 
 const OrderDetails = () => {
   const location = useLocation();
@@ -54,23 +57,68 @@ const OrderDetails = () => {
     return vehicle ? vehicle.name : id;
   };
 
-  const navigateToQuoteTotal = () => {
+  const navigateToQuoteTotal = async () => {
     if (orderDetails && pickupContact && deliveryContact) {
-      navigate("/dashboard/client/quote-total", {
-        state: {
+      try {
+        const totalPriceHT = parseFloat(priceHT);
+        const totalPriceTTC = totalPriceHT * 1.20;
+
+        const { data: quoteData, error: quoteError } = await supabase
+          .from('quotes')
+          .insert({
+            pickup_address: orderDetails.pickupAddress,
+            delivery_address: orderDetails.deliveryAddress,
+            vehicles: vehicles,
+            total_price_ht: totalPriceHT,
+            total_price_ttc: totalPriceTTC,
+            distance: distance,
+            pickup_date: pickupDate,
+            delivery_date: deliveryDate,
+            pickup_time: pickupTime,
+            delivery_time: deliveryTime,
+            pickup_contact: pickupContact,
+            delivery_contact: deliveryContact
+          })
+          .select()
+          .single();
+
+        if (quoteError) throw quoteError;
+
+        const quote = {
+          id: quoteData.id,
+          quote_number: quoteData.quote_number,
           pickupAddress: orderDetails.pickupAddress,
           deliveryAddress: orderDetails.deliveryAddress,
-          distance,
-          pickupContact,
-          deliveryContact,
           vehicles,
-          priceHT,
-          pickupDate,
-          deliveryDate,
+          totalPriceHT,
+          totalPriceTTC,
+          distance: parseFloat(distance),
+          status: quoteData.status,
+          dateCreated: new Date(quoteData.date_created),
+          pickupDate: pickupDate as Date,
           pickupTime,
-          deliveryTime
-        }
-      });
+          deliveryDate: deliveryDate as Date,
+          deliveryTime,
+          pickupContact,
+          deliveryContact
+        };
+
+        generateQuotePDF(quote);
+
+        toast({
+          title: "Devis créé avec succès",
+          description: "Le PDF a été généré et téléchargé"
+        });
+
+        navigate("/dashboard/client/pending-invoices");
+      } catch (error) {
+        console.error("Error creating quote:", error);
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors de la création du devis",
+          variant: "destructive"
+        });
+      }
     }
   };
 
