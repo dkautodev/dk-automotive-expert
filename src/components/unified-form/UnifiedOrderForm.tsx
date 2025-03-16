@@ -34,13 +34,15 @@ export const UnifiedOrderForm = ({
     firstName: "",
     lastName: "",
     email: "",
-    phone: ""
+    phone: "",
+    message: ""
   });
   const [deliveryContact, setDeliveryContact] = useState<Contact>({
     firstName: "",
     lastName: "",
     email: "",
-    phone: ""
+    phone: "",
+    message: ""
   });
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehicleCount, setVehicleCount] = useState(0);
@@ -264,6 +266,22 @@ export const UnifiedOrderForm = ({
               ...pickupContact,
               phone: e.target.value
             })} className={cn(!validatePhone(pickupContact.phone) && pickupContact.phone && "border-red-500")} />
+              <div>
+                <Label>Message complémentaire</Label>
+                <Textarea 
+                  placeholder="Ajoutez un message (60 caractères max)"
+                  maxLength={60}
+                  className="resize-none"
+                  value={pickupContact.message}
+                  onChange={e => setPickupContact({
+                    ...pickupContact,
+                    message: e.target.value.slice(0, 60)
+                  })}
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {(pickupContact.message?.length || 0)}/60 caractères
+                </p>
+              </div>
             </div>
           </div>
         </Card>
@@ -320,6 +338,22 @@ export const UnifiedOrderForm = ({
               ...deliveryContact,
               phone: e.target.value
             })} className={cn(!validatePhone(deliveryContact.phone) && deliveryContact.phone && "border-red-500")} />
+              <div>
+                <Label>Message complémentaire</Label>
+                <Textarea 
+                  placeholder="Ajoutez un message (60 caractères max)"
+                  maxLength={60}
+                  className="resize-none"
+                  value={deliveryContact.message}
+                  onChange={e => setDeliveryContact({
+                    ...deliveryContact,
+                    message: e.target.value.slice(0, 60)
+                  })}
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {(deliveryContact.message?.length || 0)}/60 caractères
+                </p>
+              </div>
             </div>
           </div>
         </Card>
