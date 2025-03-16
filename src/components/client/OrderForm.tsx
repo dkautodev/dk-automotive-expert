@@ -8,6 +8,7 @@ import { Autocomplete } from "@react-google-maps/api";
 import { Car } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { Loader } from "@/components/ui/loader";
 
 const vehicleTypes = [
   { id: "citadine", name: "Citadine" },
@@ -95,7 +96,7 @@ const OrderForm = () => {
       <Card className="mt-8">
         <CardContent className="pt-6">
           <div className="text-red-500 text-center">
-            Erreur de chargement de Google Maps. Veuillez vérifier que l'API Places est activée.
+            Erreur de chargement de Google Maps. Veuillez vérifier vos paramètres API Google Maps.
           </div>
         </CardContent>
       </Card>
@@ -103,7 +104,13 @@ const OrderForm = () => {
   }
 
   if (!isLoaded) {
-    return <Loader />;
+    return (
+      <Card className="mt-8">
+        <CardContent className="pt-6">
+          <Loader className="w-full" />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -125,7 +132,8 @@ const OrderForm = () => {
               onPlaceChanged={handlePickupPlaceChanged}
               options={{ 
                 componentRestrictions: { country: 'fr' },
-                types: ['address']
+                types: ['address'],
+                fields: ['formatted_address', 'geometry']
               }}
             >
               <Input
@@ -145,7 +153,8 @@ const OrderForm = () => {
               onPlaceChanged={handleDeliveryPlaceChanged}
               options={{ 
                 componentRestrictions: { country: 'fr' },
-                types: ['address']
+                types: ['address'],
+                fields: ['formatted_address', 'geometry']
               }}
             >
               <Input
