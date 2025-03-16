@@ -1,3 +1,4 @@
+
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ClientSidebar from "@/components/client/ClientSidebar";
@@ -10,6 +11,7 @@ import PendingQuotes from "./PendingQuotes";
 import QuoteDetails from "./QuoteDetails";
 import OngoingShipments from "./OngoingShipments";
 import PendingInvoices from "./PendingInvoices";
+import CompletedShipments from "./CompletedShipments";
 
 const ClientDashboard = () => {
   return (
@@ -26,6 +28,7 @@ const ClientDashboard = () => {
             <Route path="pending-quotes" element={<PendingQuotes />} />
             <Route path="quotes/:id" element={<QuoteDetails />} />
             <Route path="ongoing-shipments" element={<OngoingShipments />} />
+            <Route path="completed-shipments" element={<CompletedShipments />} />
             <Route path="pending-invoices" element={<PendingInvoices />} />
             <Route path="*" element={<Navigate to="/dashboard/client" replace />} />
           </Routes>
