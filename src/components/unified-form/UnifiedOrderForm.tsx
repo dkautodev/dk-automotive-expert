@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { fr } from 'date-fns/locale';
-import { Clock, CalendarIcon } from "lucide-react";
+import { Clock, CalendarIcon, Calculator } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { OrderState, Vehicle, Contact } from "@/types/order";
@@ -16,9 +16,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { Json } from "@/integrations/supabase/types";
+
 interface UnifiedOrderFormProps {
   orderDetails: OrderState;
 }
+
 export const UnifiedOrderForm = ({
   orderDetails
 }: UnifiedOrderFormProps) => {
@@ -42,6 +44,7 @@ export const UnifiedOrderForm = ({
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehicleCount, setVehicleCount] = useState(0);
   const [vehicleFormsValidity, setVehicleFormsValidity] = useState<boolean[]>([]);
+
   const handleVehicleValidityChange = (index: number, isValid: boolean) => {
     setVehicleFormsValidity(prev => {
       const newValidity = [...prev];
@@ -49,6 +52,7 @@ export const UnifiedOrderForm = ({
       return newValidity;
     });
   };
+
   const handleVehicleUpdate = (index: number, vehicle: Vehicle) => {
     setVehicles(prev => {
       const newVehicles = [...prev];
@@ -56,19 +60,23 @@ export const UnifiedOrderForm = ({
       return newVehicles;
     });
   };
+
   const handleDeleteVehicle = (indexToDelete: number) => {
     setVehicleCount(prev => prev - 1);
     setVehicleFormsValidity(prev => prev.filter((_, i) => i !== indexToDelete));
     setVehicles(prev => prev.filter((_, i) => i !== indexToDelete));
   };
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
   const validatePhone = (phone: string): boolean => {
     const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
     return phoneRegex.test(phone);
   };
+
   const handleSubmit = async () => {
     try {
       const pickupDateStr = pickupDate?.toISOString().split('T')[0];
@@ -152,10 +160,11 @@ export const UnifiedOrderForm = ({
       });
     }
   };
+
   const canSubmit = pickupContact && deliveryContact && vehicles.length > 0 && vehicleFormsValidity.some(v => v) && pickupDate && deliveryDate;
+
   return <div className="max-w-[1200px] mx-auto space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Colonne de gauche - Détails de prise en charge */}
         <Card className="p-6 space-y-6 w-full">
           <h2 className="text-xl font-semibold">Détails de prise en charge</h2>
           
@@ -212,7 +221,6 @@ export const UnifiedOrderForm = ({
           </div>
         </Card>
 
-        {/* Colonne de droite - Détails de livraison */}
         <Card className="p-6 space-y-6 w-full">
           <h2 className="text-xl font-semibold">Détails de livraison</h2>
           
@@ -269,12 +277,12 @@ export const UnifiedOrderForm = ({
           </div>
         </Card>
 
-        {/* Section des véhicules en bas */}
         <div className="md:col-span-2">
           <VehiclesSection vehicleCount={vehicleCount} vehicleFormsValidity={vehicleFormsValidity} onVehicleValidityChange={handleVehicleValidityChange} onDeleteVehicle={handleDeleteVehicle} onVehicleUpdate={handleVehicleUpdate} setVehicleCount={setVehicleCount} />
 
           <div className="flex justify-end mt-6">
-            <Button onClick={handleSubmit} disabled={!canSubmit} className="py-0 my-0 px-[16px]">
+            <Button onClick={handleSubmit} disabled={!canSubmit}>
+              <Calculator className="h-4 w-4" />
               Générer le devis
             </Button>
           </div>
