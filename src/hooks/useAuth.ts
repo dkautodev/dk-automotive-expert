@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 
 export type UserRole = 'client' | 'admin' | 'chauffeur';
 
 interface AuthState {
   user: User | null;
-  session: any | null;
+  session: Session | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -27,37 +27,62 @@ export const useAuth = () => {
   useEffect(() => {
     const getSession = async () => {
       try {
-        setAuthState(prevState => ({ ...prevState, loading: true, error: null }));
-
         const { data: { session } } = await supabase.auth.getSession();
-
+        
         setAuthState({
           user: session?.user || null,
-          session: session || null,
+          session: session,
           loading: false,
           error: null,
+          isAuthenticated: !!session,
+          role: (session?.user?.user_metadata?.role as UserRole) || null
         });
       } catch (error: any) {
         setAuthState({
           user: null,
           session: null,
           loading: false,
-          error: error.message || 'Failed to get session',
+          error: error.message,
+          isAuthenticated: false,
+          role: null
         });
       }
     };
 
     getSession();
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange((_event, session) => {
       setAuthState({
         user: session?.user || null,
-        session: session || null,
+        session: session,
         loading: false,
         error: null,
+        isAuthenticated: !!session,
+        role: (session?.user?.user_metadata?.role as UserRole) || null
       });
     });
   }, []);
+
+  const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const signUp = async (email: string, password: string, metadata: Record<string, any>) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata
+      }
+    });
+    if (error) throw error;
+    return data;
+  };
 
   const fetchUserProfile = async (userId: string) => {
     const { data: profileData, error: profileError } = await supabase
@@ -74,33 +99,21 @@ export const useAuth = () => {
     return profileData;
   };
 
-  const signOut = async () => {
-    try {
-      setAuthState(prevState => ({ ...prevState, loading: true, error: null }));
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setAuthState({ 
-        user: null, 
-        session: null, 
-        loading: false, 
+  return {
+    ...authState,
+    signIn,
+    signUp,
+    signOut: async () => {
+      await supabase.auth.signOut();
+      setAuthState({
+        user: null,
+        session: null,
+        loading: false,
         error: null,
         isAuthenticated: false,
         role: null
       });
-    } catch (error: any) {
-      setAuthState(prevState => ({ 
-        ...prevState, 
-        loading: false, 
-        error: error.message,
-        isAuthenticated: false,
-        role: null
-      }));
-    }
-  };
-
-  return {
-    ...authState,
-    signOut,
+    },
     fetchUserProfile
   };
 };

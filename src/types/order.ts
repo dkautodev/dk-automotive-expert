@@ -1,3 +1,6 @@
+
+import { Json } from '@/integrations/supabase/types';
+
 export interface Vehicle {
   brand: string;
   model: string;
