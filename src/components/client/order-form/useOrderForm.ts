@@ -12,7 +12,19 @@ export const useOrderForm = () => {
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  const { isLoaded, loadError, calculateDistance, distance, duration, error, errorSolution, projectId } = useGoogleMaps();
+  const { 
+    isLoaded, 
+    loadError, 
+    calculateDistance, 
+    distance, 
+    duration, 
+    error, 
+    errorSolution, 
+    projectId 
+  } = useGoogleMaps();
+
+  // Capture le message d'erreur complet pour le partager avec DomainOriginHelper
+  const loadErrorMessage = loadError?.message || null;
 
   useEffect(() => {
     if (pickupAddress && deliveryAddress) {
@@ -110,6 +122,7 @@ export const useOrderForm = () => {
     handleDeliveryPlaceChanged,
     isLoaded,
     loadError,
+    loadErrorMessage,
     distance,
     duration,
     error,

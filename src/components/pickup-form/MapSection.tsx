@@ -46,7 +46,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     }
   };
 
-  const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth') => {
+  const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth' | 'places' = 'credentials') => {
     let url = `https://console.cloud.google.com/apis`;
     
     switch (page) {
@@ -55,6 +55,9 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         break;
       case 'api':
         url = `https://console.cloud.google.com/apis/library?project=${projectId}`;
+        break;
+      case 'places':
+        url = `https://console.cloud.google.com/apis/library/places-backend.googleapis.com?project=${projectId}`;
         break;
       case 'credentials':
       default:
@@ -68,12 +71,12 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
   if (loadError) {
     let errorMsg = "Erreur de chargement de Google Maps";
     let solutionMsg = "Vérifiez votre connexion internet et réessayez.";
-    let errorType: 'credentials' | 'api' | 'oauth' = 'credentials';
+    let errorType: 'credentials' | 'api' | 'oauth' | 'places' = 'credentials';
     
     if (loadError.message?.includes('ApiNotActivatedMapError')) {
       errorMsg = `L'API Google Maps Places n'est pas activée pour le projet '${projectId}'.`;
       solutionMsg = "Activez l'API Places et l'API JavaScript Maps dans la console Google Cloud.";
-      errorType = 'api';
+      errorType = 'places';
       
       if (!errorMessage) {
         setErrorMessage(errorMsg);
@@ -123,7 +126,15 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
                 <span className="font-medium">Solution: </span>
                 {solutionMsg}
               </div>
-              <div className="mt-3">
+              
+              {errorType === 'places' && (
+                <div className="mt-2 text-xs bg-destructive/10 p-2 rounded">
+                  <span className="font-medium">Activation de l'API Places requise: </span>
+                  <p>Vous devez activer l'API Places dans la console Google Cloud.</p>
+                </div>
+              )}
+              
+              <div className="mt-3 space-x-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -132,10 +143,23 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
                 >
                   {errorType === 'oauth' 
                     ? "Configurer les origines autorisées" 
-                    : errorType === 'api'
-                      ? "Activer les APIs requises"
-                      : "Vérifier la clé API"}
+                    : errorType === 'places'
+                      ? "Activer l'API Places"
+                      : errorType === 'api'
+                        ? "Activer les APIs requises"
+                        : "Vérifier la clé API"}
                 </Button>
+                
+                {errorType === 'places' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs" 
+                    onClick={() => openGoogleCloudConsole('oauth')}
+                  >
+                    Configurer les origines autorisées
+                  </Button>
+                )}
               </div>
             </AlertDescription>
           </div>
@@ -180,9 +204,13 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
             <p className="text-sm">ID du projet: {projectId}</p>
             <p className="text-sm mt-2">
               Vérifiez que les APIs nécessaires sont bien activées dans la 
-              <a href="https://console.cloud.google.com/apis/dashboard" target="_blank" className="underline ml-1">
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-sm ml-1 text-blue-500"
+                onClick={() => openGoogleCloudConsole('places')}
+              >
                 Console Google Cloud
-              </a>
+              </Button>
             </p>
           </div>
         </div>
