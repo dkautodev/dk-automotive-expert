@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { capitalizeFirstLetter } from "@/utils/textFormatters";
+import { Textarea } from "@/components/ui/textarea";
+
 interface ContactInfo {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
+  message?: string;
 }
+
 interface ContactsFormProps {
   onContactsValid: (isValid: boolean) => void;
   onShowVehicle: () => void;
@@ -17,6 +21,7 @@ interface ContactsFormProps {
   initialPickupContact?: ContactInfo;
   initialDeliveryContact?: ContactInfo;
 }
+
 export const ContactsForm = ({
   onContactsValid,
   onShowVehicle,
@@ -28,22 +33,27 @@ export const ContactsForm = ({
     firstName: "",
     lastName: "",
     email: "",
-    phone: ""
+    phone: "",
+    message: ""
   });
   const [deliveryContact, setDeliveryContact] = useState<ContactInfo>(initialDeliveryContact || {
     firstName: "",
     lastName: "",
     email: "",
-    phone: ""
+    phone: "",
+    message: ""
   });
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
   const validatePhone = (phone: string): boolean => {
     const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
     return phoneRegex.test(phone);
   };
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>, contact: 'pickup' | 'delivery', field: 'firstName' | 'lastName') => {
     const value = capitalizeFirstLetter(e.target.value);
     if (contact === 'pickup') {
@@ -58,6 +68,7 @@ export const ContactsForm = ({
       }));
     }
   };
+
   useEffect(() => {
     const isPickupEmailValid = validateEmail(pickupContact.email);
     const isPickupPhoneValid = validatePhone(pickupContact.phone);
@@ -70,6 +81,7 @@ export const ContactsForm = ({
       onContactsUpdate(pickupContact, deliveryContact);
     }
   }, [pickupContact, deliveryContact, onContactsValid, onContactsUpdate]);
+
   return <Card>
       <CardHeader>
         <CardTitle>Coordonnées de livraison</CardTitle>
@@ -103,6 +115,23 @@ export const ContactsForm = ({
               })} className={!validatePhone(pickupContact.phone) && pickupContact.phone ? "border-red-500" : ""} required />
                 {!validatePhone(pickupContact.phone) && pickupContact.phone && <p className="text-red-500 text-sm mt-1">Format de téléphone invalide (ex: 0612345678 ou +33612345678)</p>}
               </div>
+              <div>
+                <Label htmlFor="pickup-message">Message complémentaire</Label>
+                <Textarea 
+                  id="pickup-message" 
+                  value={pickupContact.message} 
+                  onChange={e => setPickupContact({
+                    ...pickupContact,
+                    message: e.target.value.slice(0, 60)
+                  })}
+                  placeholder="Ajoutez un message (60 caractères max)"
+                  maxLength={60}
+                  className="resize-none"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {(pickupContact.message?.length || 0)}/60 caractères
+                </p>
+              </div>
             </div>
           </div>
 
@@ -132,6 +161,23 @@ export const ContactsForm = ({
                 phone: e.target.value
               })} className={!validatePhone(deliveryContact.phone) && deliveryContact.phone ? "border-red-500" : ""} required />
                 {!validatePhone(deliveryContact.phone) && deliveryContact.phone && <p className="text-red-500 text-sm mt-1">Format de téléphone invalide (ex: 0612345678 ou +33612345678)</p>}
+              </div>
+              <div>
+                <Label htmlFor="delivery-message">Message complémentaire</Label>
+                <Textarea 
+                  id="delivery-message" 
+                  value={deliveryContact.message} 
+                  onChange={e => setDeliveryContact({
+                    ...deliveryContact,
+                    message: e.target.value.slice(0, 60)
+                  })}
+                  placeholder="Ajoutez un message (60 caractères max)"
+                  maxLength={60}
+                  className="resize-none"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {(deliveryContact.message?.length || 0)}/60 caractères
+                </p>
               </div>
             </div>
           </div>
