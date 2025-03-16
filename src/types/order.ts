@@ -85,3 +85,22 @@ export interface Quote {
   deliveryDate?: Date;
   deliveryTime?: string;
 }
+
+export interface Quote {
+  id: string;
+  quote_number: string;
+  pickupAddress: string;
+  deliveryAddress: string;
+  vehicles: Vehicle[];
+  totalPriceHT: number;
+  totalPriceTTC: number;
+  distance: number;
+  status: 'pending' | 'accepted' | 'rejected';
+  dateCreated: Date;
+  pickupDate: Date;
+  pickupTime: string;
+  deliveryDate: Date;
+  deliveryTime: string;
+  pickupContact: Contact;
+  deliveryContact: Contact;
+}
