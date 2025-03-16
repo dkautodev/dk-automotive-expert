@@ -44,7 +44,13 @@ export const useGoogleMaps = () => {
         toast({
           variant: "destructive",
           title: "API non activée",
-          description: "L'API Google Maps n'est pas activée. Veuillez l'activer dans la console Google Cloud."
+          description: "L'API Google Maps Places n'est pas activée. Veuillez l'activer dans la console Google Cloud."
+        });
+      } else if (loadError.message?.includes('RefererNotAllowedMapError')) {
+        toast({
+          variant: "destructive",
+          title: "Domaine non autorisé",
+          description: "Le domaine actuel n'est pas autorisé à utiliser cette clé API. Veuillez vérifier les restrictions de la clé."
         });
       }
     }
@@ -55,16 +61,18 @@ export const useGoogleMaps = () => {
     console.error("Google Maps API non activée:", loadError);
     toast({
       variant: "destructive",
-      title: "Configuration Google Maps incorrecte",
-      description: "API Google Maps non activée. Veuillez contacter l'administrateur."
+      title: "API Google Maps non activée",
+      description: "L'API Places n'est pas activée pour cette clé. Veuillez l'activer dans la console Google Cloud (https://console.cloud.google.com)."
     });
+    
+    // Retourner des valeurs par défaut pour ne pas bloquer l'application
     return { 
       isLoaded: false, 
       loadError, 
       calculateDistance: () => {}, 
       distance: "", 
       duration: "", 
-      error: "API non activée" 
+      error: "API Places non activée" 
     };
   }
 
