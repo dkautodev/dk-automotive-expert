@@ -23,11 +23,13 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 interface UnifiedOrderFormProps {
   orderDetails: OrderState;
   onQuoteNumberGenerated: (quoteNumber: string) => void;
+  onSubmit: (formData: OrderState) => void;
 }
 
 export const UnifiedOrderForm = ({
   orderDetails,
-  onQuoteNumberGenerated
+  onQuoteNumberGenerated,
+  onSubmit
 }: UnifiedOrderFormProps) => {
   const navigate = useNavigate();
   const [pickupDate, setPickupDate] = useState<Date | undefined>(orderDetails.pickupDate);
@@ -134,72 +136,25 @@ export const UnifiedOrderForm = ({
         return;
       }
 
-      const pickupDateStr = pickupDate?.toISOString().split('T')[0];
-      const deliveryDateStr = deliveryDate?.toISOString().split('T')[0];
-      const totalPriceHT = 150;
-      const totalPriceTTC = totalPriceHT * 1.20;
-
-      const pickupContactJson = pickupContact as unknown as Json;
-      const deliveryContactJson = deliveryContact as unknown as Json;
-
-      const orderData = {
-        quote_number: currentQuoteNumber,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        pickup_address: orderDetails.pickupAddress,
-        delivery_address: orderDetails.deliveryAddress,
-        vehicles: vehicles as unknown as Json,
-        total_price_ht: totalPriceHT,
-        total_price_ttc: totalPriceTTC,
-        distance: orderDetails.distance.toString(),
-        pickup_date: pickupDateStr,
-        delivery_date: deliveryDateStr,
-        pickup_time: pickupTime,
-        delivery_time: deliveryTime,
-        pickup_contact: pickupContactJson,
-        delivery_contact: deliveryContactJson,
-        status: 'pending' as const
-      };
-
-      const { data: quoteData, error: quoteError } = await supabase
-        .from('quotes')
-        .insert(orderData)
-        .select()
-        .single();
-
-      if (quoteError) throw quoteError;
-
-      const quote = {
-        id: quoteData.id,
-        quote_number: quoteData.quote_number,
-        pickupAddress: orderDetails.pickupAddress,
-        deliveryAddress: orderDetails.deliveryAddress,
+      const formData: OrderState = {
+        ...orderDetails,
+        pickupContact,
+        deliveryContact,
         vehicles,
-        totalPriceHT,
-        totalPriceTTC,
-        distance: orderDetails.distance,
-        status: quoteData.status as 'pending' | 'accepted' | 'rejected',
-        dateCreated: new Date(quoteData.date_created),
         pickupDate: pickupDate as Date,
-        pickupTime,
         deliveryDate: deliveryDate as Date,
+        pickupTime,
         deliveryTime,
-        pickupContact: quoteData.pickup_contact as Json,
-        deliveryContact: quoteData.delivery_contact as Json
+        quoteNumber: currentQuoteNumber
       };
 
-      generateQuotePDF(quote);
+      await onSubmit(formData);
       
-      toast({
-        title: "Devis créé avec succès",
-        description: "Le PDF a été généré et téléchargé"
-      });
-
-      navigate("/dashboard/client/pending-quotes");
     } catch (error) {
-      console.error("Error creating quote:", error);
+      console.error("Error submitting form:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création du devis",
+        description: "Une erreur est survenue lors de la soumission du formulaire",
         variant: "destructive"
       });
     }
