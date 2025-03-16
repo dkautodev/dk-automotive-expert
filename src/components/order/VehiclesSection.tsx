@@ -24,7 +24,6 @@ interface VehiclesSectionProps {
 }
 
 export const VehiclesSection = ({
-  vehicleCount,
   vehicleFormsValidity,
   onVehicleValidityChange,
   onDeleteVehicle,
