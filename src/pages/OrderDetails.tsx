@@ -15,9 +15,11 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const scrollToElement = useScrollToElement();
   const orderDetails = location.state as OrderState | null;
+
   if (!orderDetails) {
     return <Navigate to="/dashboard/client" replace />;
   }
+
   const {
     distance,
     setDistance,
@@ -42,9 +44,9 @@ const OrderDetails = () => {
     deleteVehicle,
     handleContactsUpdate,
     handleVehicleUpdate,
-    handleDateUpdate,
     handleDateTimeUpdate
   } = useOrderDetails(orderDetails);
+
   useDistanceCalculation(orderDetails.pickupAddress, orderDetails.deliveryAddress, setDistance);
 
   const getVehicleName = (id: string) => {
@@ -63,10 +65,10 @@ const OrderDetails = () => {
           deliveryContact,
           vehicles,
           priceHT,
-          pickupDate: orderDetails.pickupDate,
-          deliveryDate: orderDetails.deliveryDate,
-          pickupTime: pickupTime,
-          deliveryTime: deliveryTime
+          pickupDate,
+          deliveryDate,
+          pickupTime,
+          deliveryTime
         }
       });
     }
@@ -93,48 +95,48 @@ const OrderDetails = () => {
     deliveryDate instanceof Date;
 
   return <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
+    <h1 className="text-3xl font-bold mb-6">Complétez votre demande</h1>
 
-      <OrderSummary 
-        pickupAddress={orderDetails.pickupAddress} 
-        deliveryAddress={orderDetails.deliveryAddress} 
-        selectedVehicle={orderDetails.selectedVehicle} 
-        distance={distance} 
-        priceHT={priceHT} 
-        onShowContacts={handleShowContacts}
-        getVehicleName={getVehicleName}
-        onDateTimeUpdate={handleDateTimeUpdate}
-        pickupDate={pickupDate}
-        deliveryDate={deliveryDate}
-        pickupTime={pickupTime}
-        deliveryTime={deliveryTime}
-      />
+    <OrderSummary 
+      pickupAddress={orderDetails.pickupAddress} 
+      deliveryAddress={orderDetails.deliveryAddress} 
+      selectedVehicle={orderDetails.selectedVehicle} 
+      distance={distance} 
+      priceHT={priceHT} 
+      onShowContacts={handleShowContacts}
+      getVehicleName={getVehicleName}
+      onDateTimeUpdate={handleDateTimeUpdate}
+      pickupDate={pickupDate}
+      deliveryDate={deliveryDate}
+      pickupTime={pickupTime}
+      deliveryTime={deliveryTime}
+    />
 
-      {showContacts && (
-        <div id="contacts-section">
-          <ContactsForm 
-            onContactsValid={setAreContactFieldsValid} 
-            onShowVehicle={handleShowVehicle} 
-            onContactsUpdate={handleContactsUpdate} 
-          />
-        </div>
-      )}
+    {showContacts && (
+      <div id="contacts-section">
+        <ContactsForm 
+          onContactsValid={setAreContactFieldsValid} 
+          onShowVehicle={handleShowVehicle} 
+          onContactsUpdate={handleContactsUpdate} 
+        />
+      </div>
+    )}
 
-      {showVehicle && (
-        <div id="vehicles-section">
-          <VehiclesSection 
-            vehicleCount={vehicleCount}
-            vehicleFormsValidity={vehicleFormsValidity}
-            onVehicleValidityChange={handleVehicleValidityChange}
-            onDeleteVehicle={deleteVehicle}
-            onAddVehicle={handleAddVehicle}
-            onVehicleUpdate={handleVehicleUpdate}
-            onQuoteRequest={navigateToQuoteTotal}
-            canRequestQuote={canRequestQuote}
-          />
-        </div>
-      )}
-    </div>;
+    {showVehicle && (
+      <div id="vehicles-section">
+        <VehiclesSection 
+          vehicleCount={vehicleCount}
+          vehicleFormsValidity={vehicleFormsValidity}
+          onVehicleValidityChange={handleVehicleValidityChange}
+          onDeleteVehicle={deleteVehicle}
+          onAddVehicle={handleAddVehicle}
+          onVehicleUpdate={handleVehicleUpdate}
+          onQuoteRequest={navigateToQuoteTotal}
+          canRequestQuote={canRequestQuote}
+        />
+      </div>
+    )}
+  </div>;
 };
 
 export default OrderDetails;
