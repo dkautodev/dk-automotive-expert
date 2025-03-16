@@ -63,6 +63,9 @@ const OrderDetails = () => {
         const totalPriceHT = parseFloat(priceHT);
         const totalPriceTTC = totalPriceHT * 1.20;
 
+        const pickupDateStr = pickupDate?.toISOString().split('T')[0];
+        const deliveryDateStr = deliveryDate?.toISOString().split('T')[0];
+
         const { data: quoteData, error: quoteError } = await supabase
           .from('quotes')
           .insert([{
@@ -72,12 +75,13 @@ const OrderDetails = () => {
             total_price_ht: totalPriceHT,
             total_price_ttc: totalPriceTTC,
             distance: distance,
-            pickup_date: pickupDate,
-            delivery_date: deliveryDate,
+            pickup_date: pickupDateStr,
+            delivery_date: deliveryDateStr,
             pickup_time: pickupTime,
             delivery_time: deliveryTime,
-            pickup_contact: pickupContact,
-            delivery_contact: deliveryContact
+            pickup_contact: pickupContact as any,
+            delivery_contact: deliveryContact as any,
+            user_id: (await supabase.auth.getUser()).data.user?.id
           }])
           .select()
           .single();
