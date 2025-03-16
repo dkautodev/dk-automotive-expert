@@ -10,6 +10,7 @@ import { DistanceDisplay } from "./order-form/DistanceDisplay";
 import { useOrderForm } from "./order-form/useOrderForm";
 import { vehicleTypes } from "./order-form/vehicleTypesData";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DomainOriginHelper } from "./order-form/DomainOriginHelper";
 
 const OrderForm = () => {
   const {
@@ -26,10 +27,12 @@ const OrderForm = () => {
     handlePickupPlaceChanged,
     handleDeliveryPlaceChanged,
     isLoaded,
+    loadError,
     distance,
     duration,
     error,
     errorSolution,
+    projectId,
     useAutocomplete,
     handleSubmit
   } = useOrderForm();
@@ -53,7 +56,9 @@ const OrderForm = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ErrorDisplay error={error} solution={errorSolution} />
+        {loadError && projectId && <DomainOriginHelper projectId={projectId} />}
+        
+        <ErrorDisplay error={error} solution={errorSolution} projectId={projectId} />
 
         <div className="space-y-4">
           <AddressInputs
