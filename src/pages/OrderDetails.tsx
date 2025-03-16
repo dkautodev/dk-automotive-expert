@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Footer from "@/components/Footer";
 import { VehicleSelectionForm } from "@/components/quote-details/VehicleSelectionForm";
+import { QuoteDetailsBanner } from "@/components/unified-form/QuoteDetailsBanner";
 
 const OrderDetails = () => {
   const location = useLocation();
@@ -43,6 +44,12 @@ const OrderDetails = () => {
             </AlertDialogContent>
           </AlertDialog>
           <h1 className="text-3xl font-bold text-center">Complétez votre demande</h1>
+          <QuoteDetailsBanner 
+            pickupAddress={orderDetails.pickupAddress}
+            deliveryAddress={orderDetails.deliveryAddress}
+            quoteNumber={orderDetails.quoteNumber}
+            selectedVehicle={orderDetails.selectedVehicle}
+          />
         </div>
         
         <VehicleSelectionForm />
