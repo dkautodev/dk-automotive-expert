@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +20,6 @@ interface VehicleFormProps {
   }) => void;
 }
 
-const FUEL_TYPES = ["Essence", "Diesel", "Électrique", "Hybride", "GPL"];
-const YEARS = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
-
 export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: VehicleFormProps) => {
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -29,6 +27,24 @@ export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: Vehi
   const [fuel, setFuel] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+
+  const capitalizeFirstLetter = (str: string) => {
+    return str.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
+  const handleBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBrand(e.target.value.toUpperCase());
+  };
+
+  const handleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setModel(capitalizeFirstLetter(e.target.value));
+  };
+
+  const handleLicensePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLicensePlate(e.target.value.toUpperCase());
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = event.target.files;
@@ -90,7 +106,7 @@ export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: Vehi
           <Input
             id={`brand-${index}`}
             value={brand}
-            onChange={(e) => setBrand(e.target.value)}
+            onChange={handleBrandChange}
             required
           />
         </div>
@@ -100,7 +116,7 @@ export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: Vehi
           <Input
             id={`model-${index}`}
             value={model}
-            onChange={(e) => setModel(e.target.value)}
+            onChange={handleModelChange}
             required
           />
         </div>
@@ -116,7 +132,7 @@ export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: Vehi
               <SelectValue placeholder="Sélectionnez l'année" />
             </SelectTrigger>
             <SelectContent>
-              {YEARS.map((y) => (
+              {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i).map((y) => (
                 <SelectItem key={y} value={y.toString()}>
                   {y}
                 </SelectItem>
@@ -136,7 +152,7 @@ export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: Vehi
               <SelectValue placeholder="Sélectionnez le carburant" />
             </SelectTrigger>
             <SelectContent>
-              {FUEL_TYPES.map((f) => (
+              {["Essence", "Diesel", "Électrique", "Hybride"].map((f) => (
                 <SelectItem key={f} value={f}>
                   {f}
                 </SelectItem>
@@ -150,7 +166,7 @@ export const VehicleForm = ({ index, onDelete, onChange, onVehicleUpdate }: Vehi
           <Input
             id={`license-${index}`}
             value={licensePlate}
-            onChange={(e) => setLicensePlate(e.target.value)}
+            onChange={handleLicensePlateChange}
             placeholder="AA-123-BB"
             required
           />
