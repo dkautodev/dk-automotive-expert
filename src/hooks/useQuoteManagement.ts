@@ -1,4 +1,3 @@
-
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
@@ -36,14 +35,18 @@ export const useQuoteManagement = () => {
       user_id: user.id
     };
 
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from('quotes')
-      .insert(quoteData);
+      .insert([quoteData])
+      .select()
+      .single();
 
     if (error) {
       console.error("Error saving quote:", error);
       throw new Error(`Error saving quote: ${error.message}`);
     }
+
+    return data;
   };
 
   const fetchQuotes = async (): Promise<Quote[]> => {
