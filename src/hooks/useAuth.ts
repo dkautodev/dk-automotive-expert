@@ -85,7 +85,7 @@ export const useAuth = () => {
   const fetchUserProfile = async (userId: string) => {
     const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
-      .select('*')
+      .select('*, users(email)')
       .eq('id', userId)
       .single();
 
@@ -94,9 +94,11 @@ export const useAuth = () => {
       return null;
     }
 
+    const userEmail = (profileData.users as { email: string })?.email || '';
+
     return {
       ...profileData,
-      email: profileData.email || '',
+      email: userEmail,
       company: profileData.company_name,
       siret: profileData.siret_number,
       siret_locked: false,
