@@ -1,17 +1,13 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
-import { Loader } from "@/components/ui/loader";
-import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import { Autocomplete } from "@react-google-maps/api";
 import { Car } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-
-const libraries: ("places")[] = ["places"];
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 const vehicleTypes = [
   { id: "citadine", name: "Citadine" },
@@ -32,10 +28,13 @@ const OrderForm = () => {
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
+  const { isLoaded, loadError, calculateDistance, distance, duration } = useGoogleMaps();
+
+  useEffect(() => {
+    if (pickupAddress && deliveryAddress) {
+      calculateDistance(pickupAddress, deliveryAddress);
+    }
+  }, [pickupAddress, deliveryAddress, calculateDistance]);
 
   const onPickupLoad = (autocomplete: google.maps.places.Autocomplete) => {
     setPickupAutocomplete(autocomplete);
@@ -96,7 +95,7 @@ const OrderForm = () => {
       <Card className="mt-8">
         <CardContent className="pt-6">
           <div className="text-red-500 text-center">
-            Erreur de chargement de Google Maps
+            Erreur de chargement de Google Maps. Veuillez vérifier que l'API Places est activée.
           </div>
         </CardContent>
       </Card>
@@ -124,7 +123,10 @@ const OrderForm = () => {
             <Autocomplete
               onLoad={onPickupLoad}
               onPlaceChanged={handlePickupPlaceChanged}
-              options={{ componentRestrictions: { country: 'fr' } }}
+              options={{ 
+                componentRestrictions: { country: 'fr' },
+                types: ['address']
+              }}
             >
               <Input
                 placeholder="Entrez l'adresse de départ"
@@ -141,7 +143,10 @@ const OrderForm = () => {
             <Autocomplete
               onLoad={onDeliveryLoad}
               onPlaceChanged={handleDeliveryPlaceChanged}
-              options={{ componentRestrictions: { country: 'fr' } }}
+              options={{ 
+                componentRestrictions: { country: 'fr' },
+                types: ['address']
+              }}
             >
               <Input
                 placeholder="Entrez l'adresse de livraison"
@@ -150,6 +155,12 @@ const OrderForm = () => {
               />
             </Autocomplete>
           </div>
+
+          {distance && duration && (
+            <div className="text-sm text-gray-600">
+              Distance: {distance} - Durée estimée: {duration}
+            </div>
+          )}
 
           <div>
             <label className="text-sm font-medium mb-1 block">
