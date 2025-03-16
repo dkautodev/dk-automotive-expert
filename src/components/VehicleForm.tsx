@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import { capitalizeFirstLetter, toUpperCase } from "@/utils/textFormatters";
 
 interface VehicleFormProps {
@@ -53,10 +54,17 @@ export const VehicleForm = ({
     const newFiles = event.target.files;
     if (newFiles) {
       const filesArray = Array.from(newFiles);
-      const validFiles = filesArray.filter(file => file.type === 'application/pdf' || file.type === 'image/jpeg');
+      const validFiles = filesArray.filter(file => 
+        file.type === 'application/pdf' || 
+        file.type === 'image/jpeg' || 
+        file.type === 'image/jpg'
+      );
+      
       if (validFiles.length !== filesArray.length) {
         alert("Seuls les fichiers PDF et JPG sont acceptés.");
+        return;
       }
+      
       setFiles(prevFiles => [...prevFiles, ...validFiles]);
     }
   };
@@ -81,24 +89,25 @@ export const VehicleForm = ({
   }, [brand, model, year, fuel, licensePlate, files, onChange, onVehicleUpdate]);
 
   return (
-    <div className="space-y-4 bg-white rounded-lg relative">
+    <div className="space-y-4 bg-white rounded-lg p-6 border">
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-0 top-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+        className="absolute right-2 top-2 text-red-500 hover:text-red-700 hover:bg-red-50"
         onClick={onDelete}
       >
         <Trash2 className="h-5 w-5" />
       </Button>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <Label htmlFor={`brand-${index}`}>Marque du véhicule *</Label>
           <Input 
             id={`brand-${index}`} 
             value={brand} 
             onChange={handleBrandChange}
-            placeholder="Marque"
+            placeholder="RENAULT"
+            className="uppercase"
             required 
           />
         </div>
@@ -109,7 +118,19 @@ export const VehicleForm = ({
             id={`model-${index}`} 
             value={model} 
             onChange={handleModelChange}
-            placeholder="Modèle"
+            placeholder="Clio"
+            required 
+          />
+        </div>
+
+        <div>
+          <Label htmlFor={`license-${index}`}>Immatriculation *</Label>
+          <Input 
+            id={`license-${index}`} 
+            value={licensePlate} 
+            onChange={handleLicensePlateChange}
+            placeholder="AA-123-BB"
+            className="uppercase"
             required 
           />
         </div>
@@ -148,26 +169,22 @@ export const VehicleForm = ({
           </Select>
         </div>
 
-        <div>
-          <Label htmlFor={`license-${index}`}>Immatriculation *</Label>
-          <Input 
-            id={`license-${index}`} 
-            value={licensePlate} 
-            onChange={handleLicensePlateChange} 
-            placeholder="AA-123-BB"
-            required 
-          />
-        </div>
-
-        <div>
-          <Label htmlFor={`file-${index}`}>Documents (PDF ou JPG)</Label>
-          <Input 
-            id={`file-${index}`} 
-            type="file" 
-            accept=".pdf,.jpg,.jpeg" 
-            onChange={handleFileChange} 
-            multiple 
-          />
+        <div className="md:col-span-2">
+          <Label htmlFor={`file-${index}`}>Documents (PDF ou JPG uniquement)</Label>
+          <div className="mt-2">
+            <label className="flex items-center gap-2 cursor-pointer border rounded-md p-3 hover:bg-gray-50">
+              <Upload className="h-5 w-5" />
+              <span>Ajouter des documents</span>
+              <Input 
+                id={`file-${index}`} 
+                type="file" 
+                accept=".pdf,.jpg,.jpeg" 
+                onChange={handleFileChange} 
+                multiple 
+                className="hidden"
+              />
+            </label>
+          </div>
           <div className="mt-2 space-y-2">
             {files.map((file, fileIndex) => (
               <div key={fileIndex} className="flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-2 rounded">
