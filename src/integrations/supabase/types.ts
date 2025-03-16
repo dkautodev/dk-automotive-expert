@@ -62,6 +62,44 @@ export type Database = {
         }
         Relationships: []
       }
+      missions: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          driver_id: string | null
+          id: string
+          quote_id: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          quote_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          quote_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           date_created: string | null

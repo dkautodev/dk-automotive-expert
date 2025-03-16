@@ -9,6 +9,13 @@ interface DashboardCounts {
   completedShipments: number;
 }
 
+interface Mission {
+  id: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  client_id: string;
+  driver_id: string | null;
+}
+
 export const useDashboardCounts = (userId: string | undefined) => {
   return useQuery({
     queryKey: ['dashboard-counts', userId],
@@ -39,8 +46,8 @@ export const useDashboardCounts = (userId: string | undefined) => {
         console.error('Error fetching missions:', missionsError);
       }
 
-      const ongoingShipments = missions?.filter(m => m.status === 'in_progress').length || 0;
-      const completedShipments = missions?.filter(m => m.status === 'completed').length || 0;
+      const ongoingShipments = (missions as Mission[] || []).filter(m => m.status === 'in_progress').length;
+      const completedShipments = (missions as Mission[] || []).filter(m => m.status === 'completed').length;
 
       return {
         pendingQuotes: quotes?.length || 0,
