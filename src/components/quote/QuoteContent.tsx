@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { OrderState, Quote } from "@/types/order";
 import { useToast } from "@/hooks/use-toast";
@@ -90,6 +91,7 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
     try {
       await saveQuote(quoteData);
       await queryClient.invalidateQueries({ queryKey: ['pendingQuotes'] });
+      await queryClient.invalidateQueries({ queryKey: ['dashboardCounts'] });
       
       toast({
         title: "Devis envoyé",
