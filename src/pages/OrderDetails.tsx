@@ -132,6 +132,7 @@ const OrderDetails = () => {
           onVehicleUpdate={handleVehicleUpdate}
           onQuoteRequest={navigateToQuoteTotal}
           canRequestQuote={canRequestQuote}
+          setVehicleCount={setVehicleCount}
         />
       </div>
     )}
