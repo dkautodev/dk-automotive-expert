@@ -10,11 +10,15 @@ interface DashboardCounts {
 
 export const useDashboardCounts = () => {
   const fetchCounts = async (): Promise<DashboardCounts> => {
-    // For now, we'll return dummy data until we implement the actual counts
+    const { count: pendingQuotesCount } = await supabase
+      .from('quotes')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending');
+
     return {
       ongoingShipments: 0,
       pendingInvoices: 0,
-      completedShipments: 0
+      completedShipments: 0,
     };
   };
 
