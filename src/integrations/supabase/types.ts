@@ -136,6 +136,74 @@ export type Database = {
           },
         ]
       }
+      quotes: {
+        Row: {
+          date_created: string | null
+          delivery_address: string
+          delivery_contact: Json | null
+          delivery_date: string | null
+          delivery_time: string | null
+          distance: string
+          id: string
+          pickup_address: string
+          pickup_contact: Json | null
+          pickup_date: string | null
+          pickup_time: string | null
+          quote_number: string
+          status: string
+          total_price_ht: number
+          total_price_ttc: number
+          user_id: string | null
+          vehicles: Json
+        }
+        Insert: {
+          date_created?: string | null
+          delivery_address: string
+          delivery_contact?: Json | null
+          delivery_date?: string | null
+          delivery_time?: string | null
+          distance: string
+          id?: string
+          pickup_address: string
+          pickup_contact?: Json | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          quote_number: string
+          status?: string
+          total_price_ht: number
+          total_price_ttc: number
+          user_id?: string | null
+          vehicles: Json
+        }
+        Update: {
+          date_created?: string | null
+          delivery_address?: string
+          delivery_contact?: Json | null
+          delivery_date?: string | null
+          delivery_time?: string | null
+          distance?: string
+          id?: string
+          pickup_address?: string
+          pickup_contact?: Json | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          quote_number?: string
+          status?: string
+          total_price_ht?: number
+          total_price_ttc?: number
+          user_id?: string | null
+          vehicles?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           billing_address: string | null
@@ -215,7 +283,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_quote_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       document_type: "kbis" | "driving_license" | "id_card"
