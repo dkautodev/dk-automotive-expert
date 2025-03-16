@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, EuroIcon, CalendarIcon, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface OrderSummaryProps {
   deliveryDate: Date | undefined;
   pickupTime: string;
   deliveryTime: string;
+  selectedVehicleType?: string;
 }
 
 export const OrderSummary = ({
@@ -33,7 +35,8 @@ export const OrderSummary = ({
   pickupDate,
   deliveryDate,
   pickupTime,
-  deliveryTime
+  deliveryTime,
+  selectedVehicleType
 }: OrderSummaryProps) => {
   const quoteNumber = "DEV-00000100";
 
@@ -167,7 +170,9 @@ export const OrderSummary = ({
       
       <div>
         <h3 className="font-semibold mb-1">Type de véhicule</h3>
-        <p className="text-gray-600">{getVehicleName("1")}</p>
+        <p className="text-gray-600">
+          {selectedVehicleType ? getVehicleName(selectedVehicleType) : "Aucun véhicule sélectionné"}
+        </p>
       </div>
 
       <div className="flex justify-end">

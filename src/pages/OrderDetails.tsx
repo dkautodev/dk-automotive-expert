@@ -109,6 +109,7 @@ const OrderDetails = () => {
       deliveryDate={deliveryDate}
       pickupTime={pickupTime}
       deliveryTime={deliveryTime}
+      selectedVehicleType={orderDetails.selectedVehicle}
     />
 
     {showContacts && (
