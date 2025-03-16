@@ -12,13 +12,13 @@ const PendingInvoices = () => {
   useEffect(() => {
     const fetchQuotes = async () => {
       const { data, error } = await supabase
-        .from("quotes")
-        .select("*")
-        .eq("status", "pending")
-        .order("date_created", { ascending: false });
+        .from('quotes')
+        .select('*')
+        .eq('status', 'pending')
+        .order('date_created', { ascending: false });
 
       if (!error && data) {
-        setQuotes(data);
+        setQuotes(data as QuoteRow[]);
       }
     };
 

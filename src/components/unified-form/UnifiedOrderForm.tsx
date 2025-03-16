@@ -113,35 +113,14 @@ export const UnifiedOrderForm = ({
       const totalPriceHT = 150;
       const totalPriceTTC = totalPriceHT * 1.20;
 
-      const vehiclesJson = vehicles.map(vehicle => ({
-        brand: vehicle.brand,
-        model: vehicle.model,
-        year: vehicle.year,
-        fuel: vehicle.fuel,
-        licensePlate: vehicle.licensePlate,
-        files: []
-      })) as Json;
-
-      const pickupContactJson = {
-        firstName: pickupContact.firstName,
-        lastName: pickupContact.lastName,
-        email: pickupContact.email,
-        phone: pickupContact.phone
-      } as Json;
-
-      const deliveryContactJson = {
-        firstName: deliveryContact.firstName,
-        lastName: deliveryContact.lastName,
-        email: deliveryContact.email,
-        phone: deliveryContact.phone
-      } as Json;
-
       const { data: quoteNumber } = await supabase.rpc('generate_quote_number');
 
       const orderData = {
+        quote_number: quoteNumber,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
         pickup_address: orderDetails.pickupAddress,
         delivery_address: orderDetails.deliveryAddress,
-        vehicles: vehiclesJson,
+        vehicles: vehicles,
         total_price_ht: totalPriceHT,
         total_price_ttc: totalPriceTTC,
         distance: orderDetails.distance.toString(),
@@ -149,10 +128,8 @@ export const UnifiedOrderForm = ({
         delivery_date: deliveryDateStr,
         pickup_time: pickupTime,
         delivery_time: deliveryTime,
-        pickup_contact: pickupContactJson,
-        delivery_contact: deliveryContactJson,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        quote_number: quoteNumber,
+        pickup_contact: pickupContact,
+        delivery_contact: deliveryContact,
         status: 'pending'
       };
 
