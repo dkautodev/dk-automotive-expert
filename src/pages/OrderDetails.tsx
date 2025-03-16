@@ -8,10 +8,11 @@ import { vehicleTypes } from "@/lib/vehicleTypes";
 import { useScrollToElement } from "@/hooks/useScrollToElement";
 import { useOrderDetails } from "@/hooks/useOrderDetails";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
-import { OrderState } from "@/types/order";
+import { OrderState, Vehicle, Contact } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { toast } from "@/components/ui/use-toast";
+import { Json } from "@/integrations/supabase/types";
 
 const OrderDetails = () => {
   const location = useLocation();
@@ -66,12 +67,21 @@ const OrderDetails = () => {
         const pickupDateStr = pickupDate?.toISOString().split('T')[0];
         const deliveryDateStr = deliveryDate?.toISOString().split('T')[0];
 
+        const vehiclesJson: Json = vehicles.map(vehicle => ({
+          brand: vehicle.brand,
+          model: vehicle.model,
+          year: vehicle.year,
+          fuel: vehicle.fuel,
+          licensePlate: vehicle.licensePlate,
+          files: []  // files are handled separately
+        }));
+
         const { data: quoteData, error: quoteError } = await supabase
           .from('quotes')
           .insert([{
-            delivery_address: orderDetails.deliveryAddress,
             pickup_address: orderDetails.pickupAddress,
-            vehicles: vehicles,
+            delivery_address: orderDetails.deliveryAddress,
+            vehicles: vehiclesJson,
             total_price_ht: totalPriceHT,
             total_price_ttc: totalPriceTTC,
             distance: distance,
@@ -79,8 +89,8 @@ const OrderDetails = () => {
             delivery_date: deliveryDateStr,
             pickup_time: pickupTime,
             delivery_time: deliveryTime,
-            pickup_contact: pickupContact as any,
-            delivery_contact: deliveryContact as any,
+            pickup_contact: pickupContact as Json,
+            delivery_contact: deliveryContact as Json,
             user_id: (await supabase.auth.getUser()).data.user?.id
           }])
           .select()
