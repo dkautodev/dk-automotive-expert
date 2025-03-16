@@ -14,6 +14,7 @@ import { useQuoteManagement } from "@/hooks/useQuoteManagement";
 import { useTimeManagement } from "@/hooks/useTimeManagement";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface QuoteContentProps {
   orderDetails: OrderState;
@@ -23,6 +24,7 @@ interface QuoteContentProps {
 export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthContext();
   const [showAddVehicleDialog, setShowAddVehicleDialog] = useState(false);
   const { newFiles, handleFileChange, handleRemoveFile } = useFileManagement();
   const { handleDeleteVehicle, handleAddVehicle } = useVehicleManagement(
@@ -69,6 +71,16 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
 
   const handleSubmitQuote = async () => {
     if (!orderDetails) return;
+    
+    if (!isAuthenticated) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour envoyer un devis.",
+        variant: "destructive"
+      });
+      navigate("/auth");
+      return;
+    }
 
     const totalPriceHT = Number(orderDetails?.priceHT) * orderDetails?.vehicles.length;
     const quoteData: Quote = {
@@ -100,9 +112,10 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
       
       navigate("/dashboard/client/pending-quotes");
     } catch (error) {
+      console.error("Error submitting quote:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi du devis.",
+        description: "Une erreur est survenue lors de l'envoi du devis. Veuillez réessayer.",
         variant: "destructive"
       });
     }
