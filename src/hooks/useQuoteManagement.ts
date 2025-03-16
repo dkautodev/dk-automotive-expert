@@ -40,7 +40,7 @@ export const useQuoteManagement = () => {
 
     const { error, data } = await supabase
       .from('quotes')
-      .insert([quoteData])
+      .insert(quoteData)
       .select()
       .single();
 
@@ -73,7 +73,7 @@ export const useQuoteManagement = () => {
       totalPriceTTC: quote.total_price_ttc,
       distance: Number(quote.distance),
       status: quote.status as 'pending' | 'accepted' | 'rejected',
-      dateCreated: new Date(quote.date_created),
+      dateCreated: new Date(quote.date_created || new Date()),
       pickupDate: new Date(quote.pickup_date),
       pickupTime: quote.pickup_time,
       deliveryDate: new Date(quote.delivery_date),
