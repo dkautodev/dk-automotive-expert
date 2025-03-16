@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -100,6 +99,8 @@ export const useAuth = () => {
       email: profileData.email || '',
       company: profileData.company_name,
       siret: profileData.siret_number,
+      siret_locked: false,
+      vat_number_locked: false
     };
   };
 
