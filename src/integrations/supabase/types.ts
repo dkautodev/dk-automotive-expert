@@ -81,6 +81,8 @@ export type Database = {
           id: string
           license_plate: string
           pickup_address: string
+          prix_ht: number
+          prix_ttc: number
           start_datetime: string
           status: Database["public"]["Enums"]["mission_status"]
           updated_at: string | null
@@ -97,6 +99,8 @@ export type Database = {
           id?: string
           license_plate: string
           pickup_address: string
+          prix_ht: number
+          prix_ttc: number
           start_datetime: string
           status?: Database["public"]["Enums"]["mission_status"]
           updated_at?: string | null
@@ -113,6 +117,8 @@ export type Database = {
           id?: string
           license_plate?: string
           pickup_address?: string
+          prix_ht?: number
+          prix_ttc?: number
           start_datetime?: string
           status?: Database["public"]["Enums"]["mission_status"]
           updated_at?: string | null

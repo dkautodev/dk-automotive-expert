@@ -14,6 +14,7 @@ export interface Contact {
   lastName: string;
   email: string;
   phone: string;
+  message?: string;
 }
 
 export interface OrderState {
