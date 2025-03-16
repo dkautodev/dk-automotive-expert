@@ -11,14 +11,43 @@ export const useGoogleMaps = () => {
   const [duration, setDuration] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
-  // Chargement de l'API avec plus de logging
+  // Chargement de l'API avec plus de logging détaillé
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
   useEffect(() => {
-    console.log("État du chargement de l'API:", { isLoaded, loadError });
+    // Log détaillé de l'état et des erreurs potentielles
+    console.log("Détails du chargement de l'API Google Maps:", {
+      isLoaded,
+      loadError,
+      apiKey: GOOGLE_MAPS_API_KEY,
+      keyLength: GOOGLE_MAPS_API_KEY.length,
+    });
+
+    if (loadError) {
+      console.error("Erreur détaillée de chargement:", {
+        message: loadError.message,
+        name: loadError.name,
+        stack: loadError.stack,
+      });
+
+      // Gestion spécifique des erreurs de clé API
+      if (loadError.message?.includes('InvalidKeyMapError')) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de configuration",
+          description: "La clé API Google Maps n'est pas valide. Veuillez vérifier votre configuration."
+        });
+      } else if (loadError.message?.includes('ApiNotActivatedMapError')) {
+        toast({
+          variant: "destructive",
+          title: "API non activée",
+          description: "L'API Google Maps n'est pas activée. Veuillez l'activer dans la console Google Cloud."
+        });
+      }
+    }
   }, [isLoaded, loadError]);
 
   // Gestion spécifique de l'erreur d'API non activée
@@ -113,4 +142,3 @@ export const useGoogleMaps = () => {
 
   return { isLoaded, loadError, calculateDistance, distance, duration, error };
 };
-
