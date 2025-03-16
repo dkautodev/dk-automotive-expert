@@ -6,8 +6,6 @@ import DashboardHome from "@/components/client/DashboardHome";
 import Profile from "@/components/client/Profile";
 import OrderHistory from "@/components/client/OrderHistory";
 import OrderDetails from "./OrderDetails";
-import PendingQuotes from "./PendingQuotes";
-import QuoteDetails from "./QuoteDetails";
 import OngoingShipments from "./OngoingShipments";
 import PendingInvoices from "./PendingInvoices";
 import CompletedShipments from "./CompletedShipments";
@@ -23,8 +21,6 @@ const ClientDashboard = () => {
             <Route path="profile" element={<Profile />} />
             <Route path="orders" element={<OrderHistory />} />
             <Route path="order-details" element={<OrderDetails />} />
-            <Route path="pending-quotes" element={<PendingQuotes />} />
-            <Route path="quotes/:id" element={<QuoteDetails />} />
             <Route path="ongoing-shipments" element={<OngoingShipments />} />
             <Route path="completed-shipments" element={<CompletedShipments />} />
             <Route path="pending-invoices" element={<PendingInvoices />} />
