@@ -14,6 +14,7 @@ interface VehicleInfo {
 }
 
 interface VehiclesSectionProps {
+  vehicleCount: number;
   vehicleFormsValidity: boolean[];
   onVehicleValidityChange: (index: number, isValid: boolean) => void;
   onDeleteVehicle: (index: number) => void;
@@ -23,6 +24,7 @@ interface VehiclesSectionProps {
 }
 
 export const VehiclesSection = ({
+  vehicleCount,
   vehicleFormsValidity,
   onVehicleValidityChange,
   onDeleteVehicle,
@@ -30,12 +32,13 @@ export const VehiclesSection = ({
   onQuoteRequest,
   canRequestQuote
 }: VehiclesSectionProps) => {
-  return <Card>
+  return (
+    <Card>
       <CardHeader>
         <CardTitle>Véhicule</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {Array.from({ length: 1 }).map((_, index) => (
+        {Array.from({ length: vehicleCount }).map((_, index) => (
           <VehicleForm
             key={index}
             index={index}
@@ -57,5 +60,6 @@ export const VehiclesSection = ({
           )}
         </div>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };
