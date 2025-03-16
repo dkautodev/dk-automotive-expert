@@ -57,66 +57,6 @@ export type Database = {
         }
         Relationships: []
       }
-      quotes: {
-        Row: {
-          date_created: string | null
-          delivery_address: string
-          delivery_contact: Json
-          delivery_date: string
-          delivery_time: string
-          distance: number
-          id: string
-          pickup_address: string
-          pickup_contact: Json
-          pickup_date: string
-          pickup_time: string
-          quote_number: string
-          status: string
-          total_price_ht: number
-          total_price_ttc: number
-          user_id: string | null
-          vehicles: Json
-        }
-        Insert: {
-          date_created?: string | null
-          delivery_address: string
-          delivery_contact: Json
-          delivery_date: string
-          delivery_time: string
-          distance: number
-          id?: string
-          pickup_address: string
-          pickup_contact: Json
-          pickup_date: string
-          pickup_time: string
-          quote_number: string
-          status?: string
-          total_price_ht: number
-          total_price_ttc: number
-          user_id?: string | null
-          vehicles: Json
-        }
-        Update: {
-          date_created?: string | null
-          delivery_address?: string
-          delivery_contact?: Json
-          delivery_date?: string
-          delivery_time?: string
-          distance?: number
-          id?: string
-          pickup_address?: string
-          pickup_contact?: Json
-          pickup_date?: string
-          pickup_time?: string
-          quote_number?: string
-          status?: string
-          total_price_ht?: number
-          total_price_ttc?: number
-          user_id?: string | null
-          vehicles?: Json
-        }
-        Relationships: []
-      }
       user_files: {
         Row: {
           created_at: string
@@ -176,10 +116,6 @@ export type Database = {
           required_role: Database["public"]["Enums"]["user_role"]
         }
         Returns: boolean
-      }
-      generate_quote_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
       }
       get_user_role: {
         Args: {
