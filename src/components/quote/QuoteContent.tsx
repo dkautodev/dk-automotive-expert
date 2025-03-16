@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { OrderState, Quote } from "@/types/order";
 import { useToast } from "@/hooks/use-toast";
@@ -92,24 +91,14 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
       totalPriceHT: Number(totalPriceHT.toFixed(2)),
       totalPriceTTC: Number((totalPriceHT * 1.2).toFixed(2)),
       distance: typeof orderDetails.distance === 'string' ? parseFloat(orderDetails.distance) : orderDetails.distance,
-      status: 'pending' as const,
+      status: 'pending',
       dateCreated: new Date(),
       pickupDate: orderDetails.pickupDate || new Date(),
       pickupTime: pickupTime,
       deliveryDate: orderDetails.deliveryDate || new Date(),
       deliveryTime: deliveryTime,
-      pickupContact: pickupContact || {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: ''
-      },
-      deliveryContact: deliveryContact || {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: ''
-      }
+      pickupContact: orderDetails.pickupContact,
+      deliveryContact: orderDetails.deliveryContact
     };
 
     try {
