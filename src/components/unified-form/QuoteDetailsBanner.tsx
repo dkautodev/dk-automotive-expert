@@ -1,23 +1,28 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { vehicleTypes } from "@/lib/vehicleTypes";
+
 interface QuoteDetailsBannerProps {
   pickupAddress: string;
   deliveryAddress: string;
   quoteNumber: string;
   selectedVehicle: string;
 }
-export const QuoteDetailsBanner = ({
-  pickupAddress,
+
+export const QuoteDetailsBanner = ({ 
+  pickupAddress, 
   deliveryAddress,
   quoteNumber,
-  selectedVehicle
+  selectedVehicle 
 }: QuoteDetailsBannerProps) => {
   const [distance, setDistance] = useState("");
   const [priceHT, setPriceHT] = useState(0);
   const PRICE_PER_KM = 2.5;
+  
   useDistanceCalculation(pickupAddress, deliveryAddress, setDistance);
+
   useEffect(() => {
     if (distance) {
       const distanceValue = parseFloat(distance.split(' ')[0]);
@@ -25,14 +30,17 @@ export const QuoteDetailsBanner = ({
       setPriceHT(calculatedPriceHT);
     }
   }, [distance]);
+
   const getVehicleTypeName = (id: string) => {
     const vehicleType = vehicleTypes.find(type => type.id === id);
     return vehicleType ? vehicleType.name : "Non spécifié";
   };
-  return <Card className="bg-dk-navy text-white p-6 mb-6">
+
+  return (
+    <Card className="bg-dk-navy text-white p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
-          
+          <p className="text-lg font-medium">Numéro de devis</p>
           <p className="text-2xl font-bold">{quoteNumber || "Génération en cours..."}</p>
         </div>
         <div className="space-y-2">
@@ -51,5 +59,6 @@ export const QuoteDetailsBanner = ({
           </div>
         </div>
       </div>
-    </Card>;
+    </Card>
+  );
 };
