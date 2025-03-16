@@ -65,9 +65,9 @@ const OrderDetails = () => {
 
         const { data: quoteData, error: quoteError } = await supabase
           .from('quotes')
-          .insert({
-            pickup_address: orderDetails.pickupAddress,
+          .insert([{
             delivery_address: orderDetails.deliveryAddress,
+            pickup_address: orderDetails.pickupAddress,
             vehicles: vehicles,
             total_price_ht: totalPriceHT,
             total_price_ttc: totalPriceTTC,
@@ -78,7 +78,7 @@ const OrderDetails = () => {
             delivery_time: deliveryTime,
             pickup_contact: pickupContact,
             delivery_contact: deliveryContact
-          })
+          }])
           .select()
           .single();
 
