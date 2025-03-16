@@ -9,6 +9,7 @@ import { ErrorDisplay } from "./order-form/ErrorDisplay";
 import { DistanceDisplay } from "./order-form/DistanceDisplay";
 import { useOrderForm } from "./order-form/useOrderForm";
 import { vehicleTypes } from "./order-form/vehicleTypesData";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const OrderForm = () => {
   const {
@@ -28,6 +29,7 @@ const OrderForm = () => {
     distance,
     duration,
     error,
+    errorSolution,
     useAutocomplete,
     handleSubmit
   } = useOrderForm();
@@ -51,7 +53,7 @@ const OrderForm = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ErrorDisplay error={error} />
+        <ErrorDisplay error={error} solution={errorSolution} />
 
         <div className="space-y-4">
           <AddressInputs
@@ -77,7 +79,41 @@ const OrderForm = () => {
           />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Besoin d'aide?</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Aide pour la commande</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 text-sm">
+                <div>
+                  <h3 className="font-medium">Problèmes de carte Google Maps</h3>
+                  <p className="text-muted-foreground mt-1">
+                    Si vous rencontrez des problèmes avec la carte ou l'autocomplétion d'adresses, 
+                    vous pouvez saisir manuellement les adresses complètes.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Adresses non trouvées</h3>
+                  <p className="text-muted-foreground mt-1">
+                    Assurez-vous d'inclure le numéro, la rue, le code postal et la ville pour
+                    que le système puisse calculer correctement l'itinéraire.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Calcul de distance</h3>
+                  <p className="text-muted-foreground mt-1">
+                    Le calcul de distance et de durée utilise l'API Google Maps pour fournir des estimations.
+                    Ces valeurs sont indicatives et peuvent varier en fonction des conditions réelles.
+                  </p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <Button onClick={handleSubmit}>
             Suivant
           </Button>

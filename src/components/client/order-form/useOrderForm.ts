@@ -12,7 +12,7 @@ export const useOrderForm = () => {
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  const { isLoaded, loadError, calculateDistance, distance, duration, error } = useGoogleMaps();
+  const { isLoaded, loadError, calculateDistance, distance, duration, error, errorSolution } = useGoogleMaps();
 
   useEffect(() => {
     if (pickupAddress && deliveryAddress) {
@@ -37,6 +37,11 @@ export const useOrderForm = () => {
         }
       } catch (error) {
         console.error("Erreur lors de la sélection du lieu de départ:", error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de récupérer les détails de l'adresse de départ"
+        });
       }
     }
   };
@@ -50,12 +55,17 @@ export const useOrderForm = () => {
         }
       } catch (error) {
         console.error("Erreur lors de la sélection du lieu d'arrivée:", error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de récupérer les détails de l'adresse de livraison"
+        });
       }
     }
   };
 
   // Détermine si on peut utiliser l'autocomplétion Google
-  const useAutocomplete = !loadError?.message?.includes('ApiNotActivatedMapError');
+  const useAutocomplete = isLoaded && !loadError;
 
   const handleSubmit = () => {
     if (!pickupAddress || !deliveryAddress) {
@@ -85,19 +95,6 @@ export const useOrderForm = () => {
     });
   };
 
-  const getErrorMessage = () => {
-    if (loadError?.message?.includes('ApiNotActivatedMapError')) {
-      return "L'API Google Maps Places n'est pas activée. Veuillez contacter l'administrateur pour activer cette API.";
-    }
-    if (loadError?.message?.includes('InvalidKeyMapError')) {
-      return "La clé API Google Maps n'est pas valide. Veuillez contacter l'administrateur pour vérifier la configuration.";
-    }
-    if (error) {
-      return error;
-    }
-    return "Une erreur est survenue avec le service Google Maps.";
-  };
-
   return {
     pickupAddress,
     setPickupAddress,
@@ -115,7 +112,8 @@ export const useOrderForm = () => {
     loadError,
     distance,
     duration,
-    error: loadError || error ? getErrorMessage() : null,
+    error,
+    errorSolution,
     useAutocomplete,
     handleSubmit
   };
