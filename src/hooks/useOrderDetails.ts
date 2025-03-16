@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { OrderState, ContactInfo, VehicleInfo } from "@/types/order";
 
@@ -15,6 +14,8 @@ export const useOrderDetails = (orderDetails: OrderState | null) => {
   const [vehicles, setVehicles] = useState<VehicleInfo[]>([]);
   const [pickupDate, setPickupDate] = useState<Date | undefined>(orderDetails?.pickupDate);
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(orderDetails?.deliveryDate);
+  const [pickupTime, setPickupTime] = useState<string>("08:00");
+  const [deliveryTime, setDeliveryTime] = useState<string>("08:00");
 
   const handleVehicleValidityChange = (index: number, isValid: boolean) => {
     setVehicleFormsValidity(prev => {
@@ -43,9 +44,16 @@ export const useOrderDetails = (orderDetails: OrderState | null) => {
     });
   };
 
-  const handleDateUpdate = (pickup: Date | undefined, delivery: Date | undefined) => {
+  const handleDateTimeUpdate = (
+    pickup: Date | undefined,
+    delivery: Date | undefined,
+    newPickupTime: string,
+    newDeliveryTime: string
+  ) => {
     setPickupDate(pickup);
     setDeliveryDate(delivery);
+    setPickupTime(newPickupTime);
+    setDeliveryTime(newDeliveryTime);
   };
 
   return {
@@ -66,10 +74,12 @@ export const useOrderDetails = (orderDetails: OrderState | null) => {
     vehicles,
     pickupDate,
     deliveryDate,
+    pickupTime,
+    deliveryTime,
     handleVehicleValidityChange,
     deleteVehicle,
     handleContactsUpdate,
     handleVehicleUpdate,
-    handleDateUpdate,
+    handleDateTimeUpdate
   };
 };
