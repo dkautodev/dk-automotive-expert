@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -175,174 +174,186 @@ export const UnifiedOrderForm = ({ orderDetails }: UnifiedOrderFormProps) => {
     pickupDate && deliveryDate;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-      {/* Colonne de gauche - Détails de prise en charge */}
-      <Card className="p-6 space-y-6">
-        <h2 className="text-xl font-semibold">Détails de prise en charge</h2>
-        
-        <div className="space-y-4">
-          <div>
-            <Label>Adresse de prise en charge</Label>
-            <p className="mt-1 text-gray-600">{orderDetails.pickupAddress}</p>
-          </div>
+    <div className="space-y-6 p-6">
+      <div className="flex justify-end mb-6">
+        <Button 
+          onClick={handleSubmit} 
+          disabled={!canSubmit}
+          className="bg-primary hover:bg-primary/90"
+        >
+          Générer le devis
+        </Button>
+      </div>
 
-          <div className="space-y-2">
-            <Label>Date de prise en charge</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !pickupDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {pickupDate ? format(pickupDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={pickupDate}
-                  onSelect={setPickupDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  locale={fr}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Colonne de gauche - Détails de prise en charge */}
+        <Card className="p-6 space-y-6">
+          <h2 className="text-xl font-semibold">Détails de prise en charge</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <Label>Adresse de prise en charge</Label>
+              <p className="mt-1 text-gray-600">{orderDetails.pickupAddress}</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Date de prise en charge</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !pickupDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {pickupDate ? format(pickupDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={pickupDate}
+                    onSelect={setPickupDate}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    locale={fr}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div>
+              <Label>Heure de prise en charge</Label>
+              <div className="relative mt-1">
+                <Input
+                  type="time"
+                  value={pickupTime}
+                  onChange={(e) => setPickupTime(e.target.value)}
+                  className="pl-10"
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
+                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+              </div>
+            </div>
 
-          <div>
-            <Label>Heure de prise en charge</Label>
-            <div className="relative mt-1">
+            <div className="space-y-2">
+              <Label>Contact pour la prise en charge</Label>
               <Input
-                type="time"
-                value={pickupTime}
-                onChange={(e) => setPickupTime(e.target.value)}
-                className="pl-10"
+                placeholder="Prénom"
+                value={pickupContact.firstName}
+                onChange={(e) => setPickupContact({ ...pickupContact, firstName: e.target.value })}
+                className="mb-2"
               />
-              <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+              <Input
+                placeholder="Nom"
+                value={pickupContact.lastName}
+                onChange={(e) => setPickupContact({ ...pickupContact, lastName: e.target.value })}
+                className="mb-2"
+              />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={pickupContact.email}
+                onChange={(e) => setPickupContact({ ...pickupContact, email: e.target.value })}
+                className={cn("mb-2", !validateEmail(pickupContact.email) && pickupContact.email && "border-red-500")}
+              />
+              <Input
+                placeholder="Téléphone"
+                value={pickupContact.phone}
+                onChange={(e) => setPickupContact({ ...pickupContact, phone: e.target.value })}
+                className={cn(!validatePhone(pickupContact.phone) && pickupContact.phone && "border-red-500")}
+              />
             </div>
           </div>
+        </Card>
 
-          <div className="space-y-2">
-            <Label>Contact pour la prise en charge</Label>
-            <Input
-              placeholder="Prénom"
-              value={pickupContact.firstName}
-              onChange={(e) => setPickupContact({ ...pickupContact, firstName: e.target.value })}
-              className="mb-2"
-            />
-            <Input
-              placeholder="Nom"
-              value={pickupContact.lastName}
-              onChange={(e) => setPickupContact({ ...pickupContact, lastName: e.target.value })}
-              className="mb-2"
-            />
-            <Input
-              type="email"
-              placeholder="Email"
-              value={pickupContact.email}
-              onChange={(e) => setPickupContact({ ...pickupContact, email: e.target.value })}
-              className={cn("mb-2", !validateEmail(pickupContact.email) && pickupContact.email && "border-red-500")}
-            />
-            <Input
-              placeholder="Téléphone"
-              value={pickupContact.phone}
-              onChange={(e) => setPickupContact({ ...pickupContact, phone: e.target.value })}
-              className={cn(!validatePhone(pickupContact.phone) && pickupContact.phone && "border-red-500")}
-            />
-          </div>
-        </div>
-      </Card>
+        {/* Colonne de droite - Détails de livraison */}
+        <Card className="p-6 space-y-6">
+          <h2 className="text-xl font-semibold">Détails de livraison</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <Label>Adresse de livraison</Label>
+              <p className="mt-1 text-gray-600">{orderDetails.deliveryAddress}</p>
+            </div>
 
-      {/* Colonne de droite - Détails de livraison */}
-      <Card className="p-6 space-y-6">
-        <h2 className="text-xl font-semibold">Détails de livraison</h2>
-        
-        <div className="space-y-4">
-          <div>
-            <Label>Adresse de livraison</Label>
-            <p className="mt-1 text-gray-600">{orderDetails.deliveryAddress}</p>
-          </div>
+            <div className="space-y-2">
+              <Label>Date de livraison</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !deliveryDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {deliveryDate ? format(deliveryDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={deliveryDate}
+                    onSelect={setDeliveryDate}
+                    disabled={(date) => date < (pickupDate || new Date())}
+                    initialFocus
+                    locale={fr}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          <div className="space-y-2">
-            <Label>Date de livraison</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !deliveryDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {deliveryDate ? format(deliveryDate, "PPP", { locale: fr }) : <span>Sélectionner une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={deliveryDate}
-                  onSelect={setDeliveryDate}
-                  disabled={(date) => date < (pickupDate || new Date())}
-                  initialFocus
-                  locale={fr}
+            <div>
+              <Label>Heure de livraison</Label>
+              <div className="relative mt-1">
+                <Input
+                  type="time"
+                  value={deliveryTime}
+                  onChange={(e) => setDeliveryTime(e.target.value)}
+                  className="pl-10"
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
+                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+              </div>
+            </div>
 
-          <div>
-            <Label>Heure de livraison</Label>
-            <div className="relative mt-1">
+            <div className="space-y-2">
+              <Label>Contact pour la livraison</Label>
               <Input
-                type="time"
-                value={deliveryTime}
-                onChange={(e) => setDeliveryTime(e.target.value)}
-                className="pl-10"
+                placeholder="Prénom"
+                value={deliveryContact.firstName}
+                onChange={(e) => setDeliveryContact({ ...deliveryContact, firstName: e.target.value })}
+                className="mb-2"
               />
-              <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+              <Input
+                placeholder="Nom"
+                value={deliveryContact.lastName}
+                onChange={(e) => setDeliveryContact({ ...deliveryContact, lastName: e.target.value })}
+                className="mb-2"
+              />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={deliveryContact.email}
+                onChange={(e) => setDeliveryContact({ ...deliveryContact, email: e.target.value })}
+                className={cn("mb-2", !validateEmail(deliveryContact.email) && deliveryContact.email && "border-red-500")}
+              />
+              <Input
+                placeholder="Téléphone"
+                value={deliveryContact.phone}
+                onChange={(e) => setDeliveryContact({ ...deliveryContact, phone: e.target.value })}
+                className={cn(!validatePhone(deliveryContact.phone) && deliveryContact.phone && "border-red-500")}
+              />
             </div>
           </div>
+        </Card>
 
-          <div className="space-y-2">
-            <Label>Contact pour la livraison</Label>
-            <Input
-              placeholder="Prénom"
-              value={deliveryContact.firstName}
-              onChange={(e) => setDeliveryContact({ ...deliveryContact, firstName: e.target.value })}
-              className="mb-2"
-            />
-            <Input
-              placeholder="Nom"
-              value={deliveryContact.lastName}
-              onChange={(e) => setDeliveryContact({ ...deliveryContact, lastName: e.target.value })}
-              className="mb-2"
-            />
-            <Input
-              type="email"
-              placeholder="Email"
-              value={deliveryContact.email}
-              onChange={(e) => setDeliveryContact({ ...deliveryContact, email: e.target.value })}
-              className={cn("mb-2", !validateEmail(deliveryContact.email) && deliveryContact.email && "border-red-500")}
-            />
-            <Input
-              placeholder="Téléphone"
-              value={deliveryContact.phone}
-              onChange={(e) => setDeliveryContact({ ...deliveryContact, phone: e.target.value })}
-              className={cn(!validatePhone(deliveryContact.phone) && deliveryContact.phone && "border-red-500")}
-            />
+        {/* Section des véhicules en bas */}
+        <div className="md:col-span-2">
+          <VehiclesSection
+            vehicleCount={vehicleCount}
+            vehicleFormsValidity={vehicleFormsValidity}
+            onVehicleValidityChange={handleVehicleValidityChange}
+            onDeleteVehicle={handleDeleteVehicle}
+            onVehicleUpdate={handleVehicleUpdate}
+            setVehicleCount={setVehicleCount}
+          />
+
+          <div className="flex justify-end mt-6">
+            <Button onClick={handleSubmit} disabled={!canSubmit}>
+              Générer le devis
+            </Button>
           </div>
-        </div>
-      </Card>
-
-      {/* Section des véhicules en bas */}
-      <div className="md:col-span-2">
-        <VehiclesSection
-          vehicleCount={vehicleCount}
-          vehicleFormsValidity={vehicleFormsValidity}
-          onVehicleValidityChange={handleVehicleValidityChange}
-          onDeleteVehicle={handleDeleteVehicle}
-          onVehicleUpdate={handleVehicleUpdate}
-          setVehicleCount={setVehicleCount}
-        />
-
-        <div className="flex justify-end mt-6">
-          <Button onClick={handleSubmit} disabled={!canSubmit}>
-            Générer le devis
-          </Button>
         </div>
       </div>
     </div>
