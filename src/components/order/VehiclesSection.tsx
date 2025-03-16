@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VehicleForm } from "@/components/VehicleForm";
@@ -20,7 +21,7 @@ interface VehiclesSectionProps {
   onVehicleUpdate: (index: number, vehicle: VehicleInfo) => void;
   onQuoteRequest?: () => void;
   canRequestQuote?: boolean;
-  setVehicleCount: (count: number) => void;
+  setVehicleCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const VehiclesSection = ({
