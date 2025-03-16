@@ -24,6 +24,7 @@ export const useGoogleMaps = () => {
       loadError,
       apiKey: GOOGLE_MAPS_API_KEY,
       keyLength: GOOGLE_MAPS_API_KEY.length,
+      projectId: "vigilant-shell-453812-d7", // ID du projet ajouté
     });
 
     if (loadError) {
@@ -33,37 +34,43 @@ export const useGoogleMaps = () => {
         stack: loadError.stack,
       });
 
+      // Message plus détaillé pour aider au diagnostic
+      let errorDescription = "Erreur lors du chargement de Google Maps";
+      
       // Gestion spécifique des erreurs de clé API
       if (loadError.message?.includes('InvalidKeyMapError')) {
+        errorDescription = "La clé API Google Maps n'est pas valide. Vérifiez que la clé est correcte et associée au projet 'vigilant-shell-453812-d7'.";
+        
         toast({
           variant: "destructive",
           title: "Erreur de configuration",
-          description: "La clé API Google Maps n'est pas valide. Veuillez vérifier votre configuration."
+          description: errorDescription
         });
       } else if (loadError.message?.includes('ApiNotActivatedMapError')) {
+        errorDescription = "L'API Google Maps Places n'est pas activée pour le projet 'vigilant-shell-453812-d7'. Activez-la dans la console Google Cloud.";
+        
         toast({
           variant: "destructive",
           title: "API non activée",
-          description: "L'API Google Maps Places n'est pas activée. Veuillez l'activer dans la console Google Cloud."
+          description: errorDescription
         });
       } else if (loadError.message?.includes('RefererNotAllowedMapError')) {
+        errorDescription = "Le domaine actuel n'est pas autorisé à utiliser cette clé API. Ajoutez-le aux restrictions du projet 'vigilant-shell-453812-d7'.";
+        
         toast({
           variant: "destructive",
           title: "Domaine non autorisé",
-          description: "Le domaine actuel n'est pas autorisé à utiliser cette clé API. Veuillez vérifier les restrictions de la clé."
+          description: errorDescription
         });
       }
+      
+      setError(errorDescription);
     }
   }, [isLoaded, loadError]);
 
   // Gestion spécifique de l'erreur d'API non activée
   if (loadError?.message?.includes('ApiNotActivatedMapError')) {
     console.error("Google Maps API non activée:", loadError);
-    toast({
-      variant: "destructive",
-      title: "API Google Maps non activée",
-      description: "L'API Places n'est pas activée pour cette clé. Veuillez l'activer dans la console Google Cloud (https://console.cloud.google.com)."
-    });
     
     // Retourner des valeurs par défaut pour ne pas bloquer l'application
     return { 
@@ -72,18 +79,13 @@ export const useGoogleMaps = () => {
       calculateDistance: () => {}, 
       distance: "", 
       duration: "", 
-      error: "API Places non activée" 
+      error: "API Places non activée pour le projet vigilant-shell-453812-d7" 
     };
   }
 
   // Autres erreurs de chargement
   if (loadError) {
     console.error("Erreur de chargement Google Maps:", loadError);
-    toast({
-      variant: "destructive",
-      title: "Erreur Google Maps",
-      description: "Erreur lors du chargement de Google Maps. Veuillez réessayer."
-    });
   }
 
   const calculateDistance = useCallback(async (origin: string, destination: string) => {
