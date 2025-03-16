@@ -287,6 +287,15 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      register_user: {
+        Args: {
+          email: string
+          password: string
+          user_type: string
+          profile: Json
+        }
+        Returns: string
+      }
     }
     Enums: {
       document_type: "kbis" | "driving_license" | "id_card"
