@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { capitalizeFirstLetter } from "@/utils/textFormatters";
 
 interface ContactInfo {
   firstName: string;
@@ -53,6 +54,15 @@ export const ContactsForm = ({
     return phoneRegex.test(phone);
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>, contact: 'pickup' | 'delivery', field: 'firstName' | 'lastName') => {
+    const value = capitalizeFirstLetter(e.target.value);
+    if (contact === 'pickup') {
+      setPickupContact(prev => ({ ...prev, [field]: value }));
+    } else {
+      setDeliveryContact(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
   useEffect(() => {
     const isPickupEmailValid = validateEmail(pickupContact.email);
     const isPickupPhoneValid = validatePhone(pickupContact.phone);
@@ -93,7 +103,7 @@ export const ContactsForm = ({
                 <Input 
                   id="pickup-lastName" 
                   value={pickupContact.lastName} 
-                  onChange={e => setPickupContact({...pickupContact, lastName: e.target.value})} 
+                  onChange={(e) => handleNameChange(e, 'pickup', 'lastName')} 
                   required 
                 />
               </div>
@@ -102,7 +112,7 @@ export const ContactsForm = ({
                 <Input 
                   id="pickup-firstName" 
                   value={pickupContact.firstName} 
-                  onChange={e => setPickupContact({...pickupContact, firstName: e.target.value})} 
+                  onChange={(e) => handleNameChange(e, 'pickup', 'firstName')} 
                   required 
                 />
               </div>
@@ -144,7 +154,7 @@ export const ContactsForm = ({
                 <Input 
                   id="delivery-lastName" 
                   value={deliveryContact.lastName} 
-                  onChange={e => setDeliveryContact({...deliveryContact, lastName: e.target.value})} 
+                  onChange={(e) => handleNameChange(e, 'delivery', 'lastName')} 
                   required 
                 />
               </div>
@@ -153,7 +163,7 @@ export const ContactsForm = ({
                 <Input 
                   id="delivery-firstName" 
                   value={deliveryContact.firstName} 
-                  onChange={e => setDeliveryContact({...deliveryContact, firstName: e.target.value})} 
+                  onChange={(e) => handleNameChange(e, 'delivery', 'firstName')} 
                   required 
                 />
               </div>
