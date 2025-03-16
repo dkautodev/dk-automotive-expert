@@ -156,8 +156,8 @@ export const UnifiedOrderForm = ({
         pickupTime,
         deliveryDate: deliveryDate as Date,
         deliveryTime,
-        pickupContact,
-        deliveryContact
+        pickupContact: quoteData.pickup_contact as unknown as Contact,
+        deliveryContact: quoteData.delivery_contact as unknown as Contact
       };
 
       generateQuotePDF(quote);
