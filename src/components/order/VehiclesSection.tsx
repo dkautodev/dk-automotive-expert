@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VehicleForm } from "@/components/vehicle/VehicleForm";
 import { Calculator, Plus } from "lucide-react";
-
 interface VehicleInfo {
   brand: string;
   model: string;
@@ -11,7 +10,6 @@ interface VehicleInfo {
   licensePlate: string;
   files: File[];
 }
-
 interface VehiclesSectionProps {
   vehicleCount: number;
   vehicleFormsValidity: boolean[];
@@ -22,7 +20,6 @@ interface VehiclesSectionProps {
   canRequestQuote?: boolean;
   setVehicleCount: React.Dispatch<React.SetStateAction<number>>;
 }
-
 export const VehiclesSection = ({
   vehicleCount,
   vehicleFormsValidity,
@@ -37,27 +34,16 @@ export const VehiclesSection = ({
     setVehicleCount(prev => prev + 1);
   };
   return <Card className="border-0 shadow-none">
-      <CardHeader className="px-0">
-        <CardTitle className="text-2xl font-bold">Véhicules à transporter</CardTitle>
-      </CardHeader>
+      
       <CardContent className="space-y-8 p-0">
         {Array.from({
         length: vehicleCount
       }).map((_, index) => <div key={index} className="relative">
-            <VehicleForm 
-              index={index} 
-              onDelete={() => onDeleteVehicle(index)} 
-              onChange={isValid => onVehicleValidityChange(index, isValid)} 
-              onVehicleUpdate={vehicle => onVehicleUpdate(index, vehicle)}
-              onQuoteRequest={onQuoteRequest}
-            />
+            <VehicleForm index={index} onDelete={() => onDeleteVehicle(index)} onChange={isValid => onVehicleValidityChange(index, isValid)} onVehicleUpdate={vehicle => onVehicleUpdate(index, vehicle)} onQuoteRequest={onQuoteRequest} />
           </div>)}
         
         <div className="flex flex-col gap-4">
-          {vehicleCount === 0 && <Button variant="outline" onClick={handleAddVehicle} className="border-dashed border-2 gap-2">
-              <Plus className="h-4 w-4" />
-              Ajouter un véhicule
-            </Button>}
+          {vehicleCount === 0}
         </div>
       </CardContent>
     </Card>;
