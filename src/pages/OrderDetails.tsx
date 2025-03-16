@@ -1,9 +1,11 @@
+
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { OrderState } from "@/types/order";
 import { UnifiedOrderForm } from "@/components/unified-form/UnifiedOrderForm";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import Footer from "@/components/Footer";
 
 const OrderDetails = () => {
   const location = useLocation();
@@ -14,8 +16,9 @@ const OrderDetails = () => {
     return <Navigate to="/dashboard/client" replace />;
   }
 
-  return <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4">
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="container mx-auto px-4 flex-grow">
         <div className="flex flex-col items-center gap-4 py-6">
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -43,7 +46,9 @@ const OrderDetails = () => {
         
         <UnifiedOrderForm orderDetails={orderDetails} />
       </div>
-    </div>;
+      <Footer />
+    </div>
+  );
 };
 
 export default OrderDetails;
