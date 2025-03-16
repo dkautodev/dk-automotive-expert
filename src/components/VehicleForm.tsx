@@ -18,6 +18,7 @@ interface VehicleFormProps {
     licensePlate: string;
     files: File[];
   }) => void;
+  onQuoteRequest?: () => void;
 }
 
 export const VehicleForm = ({
