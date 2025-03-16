@@ -18,11 +18,15 @@ export const AddressesSection = ({ orderDetails }: AddressesSectionProps) => {
       <div className="ml-7 space-y-4">
         <div>
           <p><span className="font-medium">Départ:</span> {orderDetails.pickupAddress}</p>
-          <p><span className="font-medium">Date de prise en charge:</span> {format(orderDetails.pickupDate, "PPP 'à' HH:mm", { locale: fr })}</p>
+          <p><span className="font-medium">Date de prise en charge:</span> {orderDetails.pickupDate && orderDetails.pickupTime && 
+            format(orderDetails.pickupDate, "d MMMM yyyy 'à' ", { locale: fr }) + orderDetails.pickupTime}
+          </p>
         </div>
         <div>
           <p><span className="font-medium">Livraison:</span> {orderDetails.deliveryAddress}</p>
-          <p><span className="font-medium">Date de livraison:</span> {format(orderDetails.deliveryDate, "PPP 'à' HH:mm", { locale: fr })}</p>
+          <p><span className="font-medium">Date de livraison:</span> {orderDetails.deliveryDate && orderDetails.deliveryTime && 
+            format(orderDetails.deliveryDate, "d MMMM yyyy 'à' ", { locale: fr }) + orderDetails.deliveryTime}
+          </p>
         </div>
         <div>
           <p><span className="font-medium">Distance:</span> {orderDetails.distance}</p>
