@@ -17,19 +17,21 @@ export const useGoogleMaps = () => {
   const calculateDistance = useCallback(async (origin: string, destination: string) => {
     if (!origin || !destination) return;
 
-    const service = new google.maps.DistanceMatrixService();
+    const directionsService = new google.maps.DirectionsService();
     
     try {
-      const response = await service.getDistanceMatrix({
-        origins: [origin],
-        destinations: [destination],
+      const response = await directionsService.route({
+        origin,
+        destination,
         travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC,
       });
 
-      if (response.rows[0]?.elements[0]?.status === "OK") {
-        setDistance(response.rows[0].elements[0].distance.text);
-        setDuration(response.rows[0].elements[0].duration.text);
+      if (response.status === "OK" && response.routes[0]) {
+        const route = response.routes[0];
+        if (route.legs[0]) {
+          setDistance(route.legs[0].distance?.text || "");
+          setDuration(route.legs[0].duration?.text || "");
+        }
       }
     } catch (error) {
       console.error("Erreur lors du calcul de la distance:", error);
