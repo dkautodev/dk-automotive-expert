@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VehicleForm } from "@/components/VehicleForm";
@@ -14,7 +13,6 @@ interface VehicleInfo {
 }
 
 interface VehiclesSectionProps {
-  vehicleCount: number;
   vehicleFormsValidity: boolean[];
   onVehicleValidityChange: (index: number, isValid: boolean) => void;
   onDeleteVehicle: (index: number) => void;

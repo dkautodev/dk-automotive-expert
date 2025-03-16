@@ -1,0 +1,8 @@
+
+export const capitalizeFirstLetter = (str: string) => {
+  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+};
+
+export const toUpperCase = (str: string) => {
+  return str.toUpperCase();
+};

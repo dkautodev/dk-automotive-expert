@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { capitalizeFirstLetter, toUpperCase } from "@/utils/textFormatters";
+
 interface VehicleFormProps {
   index: number;
   onDelete: () => void;
@@ -17,6 +19,7 @@ interface VehicleFormProps {
     files: File[];
   }) => void;
 }
+
 export const VehicleForm = ({
   index,
   onDelete,
@@ -29,18 +32,23 @@ export const VehicleForm = ({
   const [fuel, setFuel] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+
   const capitalizeFirstLetter = (str: string) => {
     return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
   };
+
   const handleBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBrand(e.target.value.toUpperCase());
+    setBrand(toUpperCase(e.target.value));
   };
+
   const handleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setModel(capitalizeFirstLetter(e.target.value));
   };
+
   const handleLicensePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLicensePlate(e.target.value.toUpperCase());
+    setLicensePlate(toUpperCase(e.target.value));
   };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = event.target.files;
     if (newFiles) {
@@ -52,9 +60,11 @@ export const VehicleForm = ({
       setFiles(prevFiles => [...prevFiles, ...validFiles]);
     }
   };
+
   const removeFile = (indexToRemove: number) => {
     setFiles(files.filter((_, i) => i !== indexToRemove));
   };
+
   useEffect(() => {
     const isValid = brand !== "" && model !== "" && year !== "" && fuel !== "" && licensePlate !== "";
     onChange(isValid);
@@ -69,9 +79,8 @@ export const VehicleForm = ({
       });
     }
   }, [brand, model, year, fuel, licensePlate, files, onChange, onVehicleUpdate]);
+
   return <div className="space-y-4 border p-4 rounded-lg relative">
-      
-      
       <div className="space-y-4">
         <div>
           <Label htmlFor={`brand-${index}`}>Marque du véhicule *</Label>
