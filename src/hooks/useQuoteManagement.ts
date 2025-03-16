@@ -15,7 +15,7 @@ export const useQuoteManagement = () => {
     const quoteData = {
       pickup_address: quote.pickupAddress,
       delivery_address: quote.deliveryAddress,
-      vehicles: quote.vehicles as Json,
+      vehicles: quote.vehicles as unknown as Json,
       total_price_ht: Number(quote.totalPriceHT.toFixed(2)),
       total_price_ttc: Number(quote.totalPriceTTC.toFixed(2)),
       distance: Number(quote.distance),
@@ -25,8 +25,8 @@ export const useQuoteManagement = () => {
       pickup_time: quote.pickupTime,
       delivery_date: quote.deliveryDate.toISOString().split('T')[0],
       delivery_time: quote.deliveryTime,
-      pickup_contact: quote.pickupContact as Json,
-      delivery_contact: quote.deliveryContact as Json,
+      pickup_contact: quote.pickupContact as unknown as Json,
+      delivery_contact: quote.deliveryContact as unknown as Json,
       user_id: user.id,
       quote_number: await generateQuoteNumber()
     };
@@ -67,7 +67,7 @@ export const useQuoteManagement = () => {
       quote_number: quote.quote_number,
       pickupAddress: quote.pickup_address,
       deliveryAddress: quote.delivery_address,
-      vehicles: quote.vehicles,
+      vehicles: quote.vehicles as unknown as Vehicle[],
       totalPriceHT: quote.total_price_ht,
       totalPriceTTC: quote.total_price_ttc,
       distance: Number(quote.distance),
@@ -77,8 +77,8 @@ export const useQuoteManagement = () => {
       pickupTime: quote.pickup_time,
       deliveryDate: new Date(quote.delivery_date),
       deliveryTime: quote.delivery_time,
-      pickupContact: quote.pickup_contact,
-      deliveryContact: quote.delivery_contact
+      pickupContact: quote.pickup_contact as unknown as Contact,
+      deliveryContact: quote.delivery_contact as unknown as Contact
     }));
   };
 
