@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Trash2, Upload } from "lucide-react";
+import { Trash2, Upload, Calculator } from "lucide-react";
 import { capitalizeFirstLetter, toUpperCase } from "@/utils/textFormatters";
 
 interface VehicleFormProps {
@@ -71,6 +70,10 @@ export const VehicleForm = ({
 
   const removeFile = (indexToRemove: number) => {
     setFiles(files.filter((_, i) => i !== indexToRemove));
+  };
+
+  const onQuoteRequest = () => {
+    // Implement quote request logic here
   };
 
   useEffect(() => {
@@ -200,6 +203,13 @@ export const VehicleForm = ({
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-end mt-6">
+        <Button variant="default" className="gap-2" onClick={onQuoteRequest}>
+          <Calculator className="h-4 w-4" />
+          Votre devis
+        </Button>
       </div>
     </div>
   );
