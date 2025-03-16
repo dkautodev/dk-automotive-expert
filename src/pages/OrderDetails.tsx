@@ -67,18 +67,32 @@ const OrderDetails = () => {
         const pickupDateStr = pickupDate?.toISOString().split('T')[0];
         const deliveryDateStr = deliveryDate?.toISOString().split('T')[0];
 
-        const vehiclesJson: Json = vehicles.map(vehicle => ({
+        const vehiclesJson = vehicles.map(vehicle => ({
           brand: vehicle.brand,
           model: vehicle.model,
           year: vehicle.year,
           fuel: vehicle.fuel,
           licensePlate: vehicle.licensePlate,
-          files: []  // files are handled separately
-        }));
+          files: []
+        })) as Json;
+
+        const pickupContactJson = {
+          firstName: pickupContact.firstName,
+          lastName: pickupContact.lastName,
+          email: pickupContact.email,
+          phone: pickupContact.phone
+        } as Json;
+
+        const deliveryContactJson = {
+          firstName: deliveryContact.firstName,
+          lastName: deliveryContact.lastName,
+          email: deliveryContact.email,
+          phone: deliveryContact.phone
+        } as Json;
 
         const { data: quoteData, error: quoteError } = await supabase
           .from('quotes')
-          .insert([{
+          .insert({
             pickup_address: orderDetails.pickupAddress,
             delivery_address: orderDetails.deliveryAddress,
             vehicles: vehiclesJson,
@@ -89,10 +103,10 @@ const OrderDetails = () => {
             delivery_date: deliveryDateStr,
             pickup_time: pickupTime,
             delivery_time: deliveryTime,
-            pickup_contact: pickupContact as Json,
-            delivery_contact: deliveryContact as Json,
+            pickup_contact: pickupContactJson,
+            delivery_contact: deliveryContactJson,
             user_id: (await supabase.auth.getUser()).data.user?.id
-          }])
+          })
           .select()
           .single();
 
