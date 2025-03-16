@@ -1,6 +1,7 @@
 
 import { useState, useCallback } from 'react';
-import { useLoadScript, DirectionsService } from '@react-google-maps/api';
+import { useLoadScript } from '@react-google-maps/api';
+import { toast } from '@/components/ui/use-toast';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 
 const libraries: ("places")[] = ["places"];
@@ -15,16 +16,32 @@ export const useGoogleMaps = () => {
     libraries,
   });
 
+  // Si l'API n'est pas chargée correctement, on affiche un toast d'erreur
+  if (loadError) {
+    console.error("Google Maps load error:", loadError);
+    toast({
+      variant: "destructive",
+      title: "Erreur Google Maps",
+      description: "Erreur lors du chargement de Google Maps. Veuillez réessayer plus tard."
+    });
+  }
+
   const calculateDistance = useCallback(async (origin: string, destination: string) => {
+    if (!isLoaded) {
+      console.log("Google Maps n'est pas encore chargé");
+      setError("Service temporairement indisponible");
+      return;
+    }
+
     if (!origin || !destination) {
-      console.log("Origin or destination missing");
-      setError("Addresses are required");
+      console.log("Adresse de départ ou d'arrivée manquante");
+      setError("Les adresses sont requises");
       setDistance("");
       setDuration("");
       return;
     }
 
-    console.log("Calculating distance between:", origin, destination);
+    console.log("Calcul de la distance entre:", origin, destination);
     const directionsService = new google.maps.DirectionsService();
     
     try {
@@ -34,47 +51,44 @@ export const useGoogleMaps = () => {
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
-      console.log("Directions result:", result);
+      console.log("Résultat des directions:", result);
 
-      if (!result.routes || result.routes.length === 0) {
-        console.log("No routes found");
-        setError("No route found");
+      if (!result.routes?.length) {
+        console.log("Aucun itinéraire trouvé");
+        setError("Aucun itinéraire trouvé");
         setDistance("");
         setDuration("");
         return;
       }
 
-      const route = result.routes[0];
-      if (!route.legs || route.legs.length === 0) {
-        console.log("No legs found in route");
-        setError("Route details not available");
+      const leg = result.routes[0].legs?.[0];
+      if (!leg) {
+        console.log("Détails de l'itinéraire non disponibles");
+        setError("Détails de l'itinéraire non disponibles");
         setDistance("");
         setDuration("");
         return;
       }
-
-      const leg = route.legs[0];
-      console.log("Route leg:", leg);
 
       if (leg.distance && leg.duration) {
-        console.log("Setting distance:", leg.distance.text);
-        console.log("Setting duration:", leg.duration.text);
+        console.log("Distance:", leg.distance.text);
+        console.log("Durée:", leg.duration.text);
         setDistance(leg.distance.text);
         setDuration(leg.duration.text);
         setError(null);
-      } else {
-        console.log("Distance or duration information missing");
-        setError("Distance calculation failed");
-        setDistance("");
-        setDuration("");
       }
     } catch (error) {
-      console.error("Error calculating distance:", error);
-      setError("Error calculating distance");
+      console.error("Erreur lors du calcul de la distance:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur de calcul",
+        description: "Impossible de calculer l'itinéraire. Veuillez vérifier les adresses."
+      });
+      setError("Erreur lors du calcul de la distance");
       setDistance("");
       setDuration("");
     }
-  }, []);
+  }, [isLoaded]);
 
   return { isLoaded, loadError, calculateDistance, distance, duration, error };
 };
