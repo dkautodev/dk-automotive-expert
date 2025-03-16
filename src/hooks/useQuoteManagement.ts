@@ -5,6 +5,12 @@ import { QuoteRow } from "@/types/database";
 
 export const useQuoteManagement = () => {
   const saveQuote = async (quote: Quote) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User must be authenticated to save a quote");
+    }
+
     const vehiclesJson = quote.vehicles.map(vehicle => ({
       brand: vehicle.brand,
       model: vehicle.model,
@@ -26,7 +32,8 @@ export const useQuoteManagement = () => {
       pickup_date: quote.pickupDate?.toISOString().split('T')[0] || null,
       pickup_time: quote.pickupTime || null,
       delivery_date: quote.deliveryDate?.toISOString().split('T')[0] || null,
-      delivery_time: quote.deliveryTime || null
+      delivery_time: quote.deliveryTime || null,
+      user_id: user.id
     };
 
     const { error } = await supabase
@@ -34,6 +41,7 @@ export const useQuoteManagement = () => {
       .insert(quoteData);
 
     if (error) {
+      console.error("Error saving quote:", error);
       throw new Error(`Error saving quote: ${error.message}`);
     }
   };
