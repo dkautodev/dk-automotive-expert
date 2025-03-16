@@ -100,6 +100,21 @@ export const UnifiedOrderForm = ({
     return phoneRegex.test(phone);
   };
 
+  const [currentQuoteNumber, setCurrentQuoteNumber] = useState<string>("");
+
+  useEffect(() => {
+    const getNextQuoteNumber = async () => {
+      const { data: quotesCount } = await supabase
+        .from('quotes')
+        .select('id', { count: 'exact' });
+      
+      const nextNumber = 101 + (quotesCount?.length || 0);
+      setCurrentQuoteNumber(`DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`);
+    };
+    
+    getNextQuoteNumber();
+  }, []);
+
   const handleSubmit = async () => {
     try {
       if (!isFormValid()) {
@@ -116,18 +131,11 @@ export const UnifiedOrderForm = ({
       const totalPriceHT = 150;
       const totalPriceTTC = totalPriceHT * 1.20;
 
-      const { data: quotesCount } = await supabase
-        .from('quotes')
-        .select('id', { count: 'exact' });
-      
-      const nextNumber = 101 + (quotesCount?.length || 0);
-      const quoteNumber = `DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`;
-
       const pickupContactJson = pickupContact as unknown as Json;
       const deliveryContactJson = deliveryContact as unknown as Json;
 
       const orderData = {
-        quote_number: quoteNumber,
+        quote_number: currentQuoteNumber,
         user_id: (await supabase.auth.getUser()).data.user?.id,
         pickup_address: orderDetails.pickupAddress,
         delivery_address: orderDetails.deliveryAddress,
@@ -188,21 +196,6 @@ export const UnifiedOrderForm = ({
       });
     }
   };
-
-  const [currentQuoteNumber, setCurrentQuoteNumber] = useState<string>("");
-
-  useEffect(() => {
-    const getNextQuoteNumber = async () => {
-      const { data: quotesCount } = await supabase
-        .from('quotes')
-        .select('id', { count: 'exact' });
-      
-      const nextNumber = 101 + (quotesCount?.length || 0);
-      setCurrentQuoteNumber(`DK-DEVIS-${nextNumber.toString().padStart(10, '0')}`);
-    };
-    
-    getNextQuoteNumber();
-  }, []);
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-6">
