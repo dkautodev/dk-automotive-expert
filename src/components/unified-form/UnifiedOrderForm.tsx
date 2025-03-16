@@ -175,16 +175,6 @@ export const UnifiedOrderForm = ({ orderDetails }: UnifiedOrderFormProps) => {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex justify-end mb-6">
-        <Button 
-          onClick={handleSubmit} 
-          disabled={!canSubmit}
-          className="bg-primary hover:bg-primary/90"
-        >
-          Générer le devis
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Colonne de gauche - Détails de prise en charge */}
         <Card className="p-6 space-y-6">
