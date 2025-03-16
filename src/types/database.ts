@@ -16,6 +16,8 @@ export type QuoteRow = {
   pickup_time: string | null;
   delivery_date: string | null;
   delivery_time: string | null;
+  pickup_contact: any;
+  delivery_contact: any;
 };
 
 export type Tables = Database['public']['Tables'];
