@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -86,7 +87,7 @@ export const useAuth = () => {
     const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
-      .eq('user_id', userId)
+      .eq('id', userId)
       .single();
 
     if (profileError) {
@@ -94,7 +95,12 @@ export const useAuth = () => {
       return null;
     }
 
-    return profileData;
+    return {
+      ...profileData,
+      email: profileData.email || '',
+      company: profileData.company_name,
+      siret: profileData.siret_number,
+    };
   };
 
   return {
