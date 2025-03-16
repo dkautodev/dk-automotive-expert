@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, Phone, Building } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -10,32 +11,39 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
 const formSchema = z.object({
-  fullName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  companyName: z.string().min(2, "Le nom de la société doit contenir au moins 2 caractères"),
+  firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
+  lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Adresse email invalide"),
   phone: z.string().regex(/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/, "Numéro de téléphone invalide"),
-  subject: z.string().min(3, "Le sujet doit contenir au moins 3 caractères"),
+  companyName: z.string().min(2, "Le nom de la société doit contenir au moins 2 caractères"),
   message: z.string().min(10, "Le message doit contenir au moins 10 caractères")
 });
+
 const Contact = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
-      companyName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
-      subject: "",
+      companyName: "",
       message: ""
     }
   });
+
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=${encodeURIComponent(values.subject)}&body=${encodeURIComponent(`Nom: ${values.fullName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nMessage:\n${values.message}`)}`;
+    const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=Nouveau message de contact&body=${encodeURIComponent(
+      `Nom: ${values.lastName}\nPrénom: ${values.firstName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nMessage:\n${values.message}`
+    )}`;
     window.location.href = mailtoLink;
-    toast.success("Formulaire envoyé avec succès!");
+    toast.success("Message envoyé avec succès!");
   };
-  return <div className="min-h-screen bg-white">
+
+  return (
+    <div className="min-h-screen bg-white">
       <Navbar />
       
       <main className="animate-fadeIn">
@@ -57,7 +65,32 @@ const Contact = () => {
 
             <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
               {/* Informations de contact */}
-              
+              <div className="bg-dk-navy p-8 rounded-lg text-white">
+                <h2 className="text-2xl font-bold mb-8">Nos coordonnées</h2>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <Phone className="h-6 w-6" />
+                    <div>
+                      <p className="font-semibold">Téléphone</p>
+                      <p>07 00 00 00 00</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Mail className="h-6 w-6" />
+                    <div>
+                      <p className="font-semibold">Email</p>
+                      <p>dkautomotive70@gmail.com</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Building className="h-6 w-6" />
+                    <div>
+                      <p className="font-semibold">Adresse</p>
+                      <p>70000 VESOUL</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Formulaire de contact */}
               <div className="bg-white p-8 rounded-lg shadow-md">
@@ -67,69 +100,102 @@ const Contact = () => {
                 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                    <FormField control={form.control} name="fullName" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Nom complet</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Votre nom" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField 
+                        control={form.control} 
+                        name="firstName" 
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Prénom</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Votre prénom" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} 
+                      />
 
-                    <FormField control={form.control} name="companyName" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Nom de la société</FormLabel>
+                      <FormField 
+                        control={form.control} 
+                        name="lastName" 
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nom</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Votre nom" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} 
+                      />
+                    </div>
+
+                    <FormField 
+                      control={form.control} 
+                      name="companyName" 
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Société</FormLabel>
                           <FormControl>
                             <Input placeholder="Nom de votre société" {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>} />
+                        </FormItem>
+                      )} 
+                    />
 
                     <div className="grid grid-cols-2 gap-4">
-                      <FormField control={form.control} name="email" render={({
-                      field
-                    }) => <FormItem>
+                      <FormField 
+                        control={form.control} 
+                        name="email" 
+                        render={({ field }) => (
+                          <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="votre@email.com" {...field} />
                             </FormControl>
                             <FormMessage />
-                          </FormItem>} />
+                          </FormItem>
+                        )} 
+                      />
 
-                      <FormField control={form.control} name="phone" render={({
-                      field
-                    }) => <FormItem>
+                      <FormField 
+                        control={form.control} 
+                        name="phone" 
+                        render={({ field }) => (
+                          <FormItem>
                             <FormLabel>Téléphone</FormLabel>
                             <FormControl>
                               <Input placeholder="06 12 34 56 78" {...field} />
                             </FormControl>
                             <FormMessage />
-                          </FormItem>} />
+                          </FormItem>
+                        )} 
+                      />
                     </div>
 
-                    <FormField control={form.control} name="subject" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Sujet</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Sujet de votre message" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
-
-                    <FormField control={form.control} name="message" render={({
-                    field
-                  }) => <FormItem>
+                    <FormField 
+                      control={form.control} 
+                      name="message" 
+                      render={({ field }) => (
+                        <FormItem>
                           <FormLabel>Message</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="Votre message..." className="min-h-[150px]" {...field} />
+                            <Textarea 
+                              placeholder="Votre message..." 
+                              className="min-h-[150px]" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>} />
+                        </FormItem>
+                      )} 
+                    />
 
-                    <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors">
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-dk-navy hover:bg-dk-blue transition-colors"
+                    >
                       Envoyer le message
                     </Button>
                   </form>
@@ -141,6 +207,8 @@ const Contact = () => {
       </main>
 
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Contact;
