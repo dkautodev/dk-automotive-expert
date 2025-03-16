@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VehicleForm } from "@/components/VehicleForm";
@@ -21,6 +20,7 @@ interface VehiclesSectionProps {
   onVehicleUpdate: (index: number, vehicle: VehicleInfo) => void;
   onQuoteRequest?: () => void;
   canRequestQuote?: boolean;
+  setVehicleCount: (count: number) => void;
 }
 
 export const VehiclesSection = ({
@@ -30,7 +30,8 @@ export const VehiclesSection = ({
   onDeleteVehicle,
   onVehicleUpdate,
   onQuoteRequest,
-  canRequestQuote
+  canRequestQuote,
+  setVehicleCount
 }: VehiclesSectionProps) => {
   return (
     <Card className="border-0 shadow-none">
@@ -56,7 +57,7 @@ export const VehiclesSection = ({
           <Button 
             variant="outline" 
             className="w-full gap-2 border-dashed"
-            onClick={() => onQuoteRequest?.()}
+            onClick={() => setVehicleCount(prev => prev + 1)}
           >
             <Plus className="h-4 w-4" />
             Ajouter un véhicule
@@ -76,4 +77,3 @@ export const VehiclesSection = ({
     </Card>
   );
 };
-
