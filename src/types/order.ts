@@ -46,8 +46,8 @@ export interface Quote {
   pickupTime: string;
   deliveryDate: Date;
   deliveryTime: string;
-  pickupContact: Contact;
-  deliveryContact: Contact;
+  pickupContact: Json;
+  deliveryContact: Json;
 }
 
 export type ContactInfo = Contact;

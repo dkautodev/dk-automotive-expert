@@ -1,12 +1,17 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+
+export type UserRole = 'client' | 'admin' | 'chauffeur';
 
 interface AuthState {
   user: User | null;
   session: any | null;
   loading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
+  role: UserRole | null;
 }
 
 export const useAuth = () => {
@@ -15,6 +20,8 @@ export const useAuth = () => {
     session: null,
     loading: true,
     error: null,
+    isAuthenticated: false,
+    role: null
   });
 
   useEffect(() => {
@@ -72,9 +79,22 @@ export const useAuth = () => {
       setAuthState(prevState => ({ ...prevState, loading: true, error: null }));
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      setAuthState({ user: null, session: null, loading: false, error: null });
+      setAuthState({ 
+        user: null, 
+        session: null, 
+        loading: false, 
+        error: null,
+        isAuthenticated: false,
+        role: null
+      });
     } catch (error: any) {
-      setAuthState(prevState => ({ ...prevState, loading: false, error: error.message }));
+      setAuthState(prevState => ({ 
+        ...prevState, 
+        loading: false, 
+        error: error.message,
+        isAuthenticated: false,
+        role: null
+      }));
     }
   };
 
