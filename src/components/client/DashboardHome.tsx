@@ -13,9 +13,9 @@ import { toast } from "@/components/ui/use-toast";
 import OrderForm from "./OrderForm";
 
 const DashboardHome = () => {
-  const { signOut } = useAuthContext();
+  const { signOut, user } = useAuthContext();
   const navigate = useNavigate();
-  const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0, pendingQuotes: 0 } } = useDashboardCounts();
+  const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0, pendingQuotes: 0 } } = useDashboardCounts(user?.id);
 
   const handleLogout = async () => {
     try {

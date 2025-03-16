@@ -37,8 +37,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuth();
 
+  // Type assertion to ensure auth matches AuthContextType
+  const contextValue: AuthContextType = {
+    ...auth,
+    isAuthenticated: !!auth.user,
+    isLoading: auth.loading,
+    profile: null, // You'll need to implement profile loading logic
+  };
+
   return (
-    <AuthContext.Provider value={auth as AuthContextType}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
