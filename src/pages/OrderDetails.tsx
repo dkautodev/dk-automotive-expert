@@ -47,7 +47,7 @@ const OrderDetails = () => {
           <QuoteDetailsBanner 
             pickupAddress={orderDetails.pickupAddress}
             deliveryAddress={orderDetails.deliveryAddress}
-            quoteNumber={orderDetails.quoteNumber}
+            quoteNumber={orderDetails.quoteNumber || 'N/A'}
             selectedVehicle={orderDetails.selectedVehicle}
           />
         </div>
