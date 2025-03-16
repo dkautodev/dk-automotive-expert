@@ -1,4 +1,3 @@
-
 import { createContext, useContext, ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import type { User, Session } from '@supabase/supabase-js';
@@ -14,8 +13,8 @@ interface Profile {
   profile_picture: string | null;
   siret: string | null;
   vat_number: string | null;
-  siret_locked: boolean | null;
-  vat_number_locked: boolean | null;
+  siret_locked: boolean;
+  vat_number_locked: boolean;
   billing_address: string | null;
 }
 
@@ -38,15 +37,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuth();
 
-  const contextValue: AuthContextType = {
-    ...auth,
-    isAuthenticated: !!auth.user,
-    isLoading: auth.loading,
-    profile: null
-  };
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{
+      ...auth,
+      isAuthenticated: !!auth.user,
+      isLoading: auth.loading,
+      profile: null
+    }}>
       {children}
     </AuthContext.Provider>
   );
