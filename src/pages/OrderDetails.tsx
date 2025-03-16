@@ -125,6 +125,7 @@ const OrderDetails = () => {
     {showVehicle && (
       <div id="vehicles-section">
         <VehiclesSection 
+          vehicleCount={vehicleCount}
           vehicleFormsValidity={vehicleFormsValidity}
           onVehicleValidityChange={handleVehicleValidityChange}
           onDeleteVehicle={deleteVehicle}
