@@ -7,8 +7,11 @@ export const useQuoteManagement = () => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
+      console.error("Authentication error: No user found");
       throw new Error("User must be authenticated to save a quote");
     }
+
+    console.log("Saving quote for user:", user.id);
 
     const vehiclesJson = quote.vehicles.map(vehicle => ({
       brand: vehicle.brand,
@@ -35,18 +38,26 @@ export const useQuoteManagement = () => {
       user_id: user.id
     };
 
-    const { error, data } = await supabase
-      .from('quotes')
-      .insert([quoteData])
-      .select()
-      .single();
+    console.log("Quote data to be inserted:", quoteData);
 
-    if (error) {
-      console.error("Error saving quote:", error);
-      throw new Error(`Error saving quote: ${error.message}`);
+    try {
+      const { error, data } = await supabase
+        .from('quotes')
+        .insert([quoteData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase error saving quote:", error);
+        throw new Error(`Error saving quote: ${error.message}`);
+      }
+
+      console.log("Quote saved successfully:", data);
+      return data;
+    } catch (error) {
+      console.error("Error in saveQuote:", error);
+      throw error;
     }
-
-    return data;
   };
 
   const fetchQuotes = async (): Promise<Quote[]> => {
