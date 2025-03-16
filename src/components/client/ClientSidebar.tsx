@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, FileText, Truck, Receipt, History, Settings } from 'lucide-react';
@@ -36,7 +37,7 @@ const ClientSidebar = () => {
           <li className="mb-2">
             <Link to="/dashboard/client/completed-shipments" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
               <History className="mr-2 h-4 w-4" />
-              Historique des Convoyages
+              Historique
             </Link>
           </li>
           <li className="mb-2">
