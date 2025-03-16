@@ -80,16 +80,38 @@ export const VehicleForm = ({
     }
   }, [brand, model, year, fuel, licensePlate, files, onChange, onVehicleUpdate]);
 
-  return <div className="space-y-4 border p-4 rounded-lg relative">
+  return (
+    <div className="space-y-4 bg-white rounded-lg relative">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-0 top-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+        onClick={onDelete}
+      >
+        <Trash2 className="h-5 w-5" />
+      </Button>
+
       <div className="space-y-4">
         <div>
           <Label htmlFor={`brand-${index}`}>Marque du véhicule *</Label>
-          <Input id={`brand-${index}`} value={brand} onChange={handleBrandChange} required />
+          <Input 
+            id={`brand-${index}`} 
+            value={brand} 
+            onChange={handleBrandChange}
+            placeholder="Marque"
+            required 
+          />
         </div>
 
         <div>
           <Label htmlFor={`model-${index}`}>Modèle du véhicule *</Label>
-          <Input id={`model-${index}`} value={model} onChange={handleModelChange} required />
+          <Input 
+            id={`model-${index}`} 
+            value={model} 
+            onChange={handleModelChange}
+            placeholder="Modèle"
+            required 
+          />
         </div>
 
         <div>
@@ -99,11 +121,13 @@ export const VehicleForm = ({
               <SelectValue placeholder="Sélectionnez l'année" />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({
-              length: 30
-            }, (_, i) => new Date().getFullYear() - i).map(y => <SelectItem key={y} value={y.toString()}>
-                  {y}
-                </SelectItem>)}
+              {Array.from({length: 30}, (_, i) => new Date().getFullYear() - i)
+                .map(y => (
+                  <SelectItem key={y} value={y.toString()}>
+                    {y}
+                  </SelectItem>
+                ))
+              }
             </SelectContent>
           </Select>
         </div>
@@ -115,30 +139,51 @@ export const VehicleForm = ({
               <SelectValue placeholder="Sélectionnez le carburant" />
             </SelectTrigger>
             <SelectContent>
-              {["Essence", "Diesel", "Électrique", "Hybride"].map(f => <SelectItem key={f} value={f}>
+              {["Essence", "Diesel", "Électrique", "Hybride"].map(f => (
+                <SelectItem key={f} value={f}>
                   {f}
-                </SelectItem>)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label htmlFor={`license-${index}`}>Immatriculation *</Label>
-          <Input id={`license-${index}`} value={licensePlate} onChange={handleLicensePlateChange} placeholder="AA-123-BB" required />
+          <Input 
+            id={`license-${index}`} 
+            value={licensePlate} 
+            onChange={handleLicensePlateChange} 
+            placeholder="AA-123-BB"
+            required 
+          />
         </div>
 
         <div>
           <Label htmlFor={`file-${index}`}>Documents (PDF ou JPG)</Label>
-          <Input id={`file-${index}`} type="file" accept=".pdf,.jpg,.jpeg" onChange={handleFileChange} multiple />
+          <Input 
+            id={`file-${index}`} 
+            type="file" 
+            accept=".pdf,.jpg,.jpeg" 
+            onChange={handleFileChange} 
+            multiple 
+          />
           <div className="mt-2 space-y-2">
-            {files.map((file, fileIndex) => <div key={fileIndex} className="flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-2 rounded">
+            {files.map((file, fileIndex) => (
+              <div key={fileIndex} className="flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-2 rounded">
                 <span>{file.name}</span>
-                <Button variant="ghost" size="icon" onClick={() => removeFile(fileIndex)}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => removeFile(fileIndex)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
