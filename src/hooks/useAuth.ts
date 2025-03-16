@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -28,10 +27,9 @@ export const useAuth = () => {
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
         setAuthState({
           user: session?.user || null,
-          session: session,
+          session,
           loading: false,
           error: null,
           isAuthenticated: !!session,
@@ -54,7 +52,7 @@ export const useAuth = () => {
     supabase.auth.onAuthStateChange((_event, session) => {
       setAuthState({
         user: session?.user || null,
-        session: session,
+        session,
         loading: false,
         error: null,
         isAuthenticated: !!session,
