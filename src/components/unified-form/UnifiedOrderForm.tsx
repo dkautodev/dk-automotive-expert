@@ -18,7 +18,7 @@ import { toast } from "@/components/ui/use-toast";
 import { generateQuotePDF } from "@/utils/pdfGenerator";
 import { Json } from "@/integrations/supabase/types";
 import { useFileManagement } from "@/hooks/useFileManagement";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface UnifiedOrderFormProps {
   orderDetails: OrderState;
