@@ -30,6 +30,7 @@ export interface OrderState {
   pickupTime: string;
   deliveryTime: string;
   selectedVehicle: string;
+  quoteNumber?: string;
   handleSubmit: () => void;
   canSubmit: boolean;
 }
