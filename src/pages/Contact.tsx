@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -46,7 +47,7 @@ const Contact = () => {
     )}`;
     
     window.location.href = mailtoLink;
-    toast.success("Formulaire validé avec succès!");
+    toast.success("Formulaire envoyé avec succès!");
   };
 
   return (
@@ -70,22 +71,51 @@ const Contact = () => {
               </p>
             </div>
 
-            <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold text-dk-navy mb-6">
-                Envoyez-nous un message
-              </h2>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {/* Informations de contact */}
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold text-dk-navy mb-6">
+                  Nos coordonnées
+                </h2>
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-4">
+                    <MapPin className="w-6 h-6 text-dk-navy mt-1" />
+                    <div>
+                      <h3 className="font-semibold">Adresse</h3>
+                      <p className="text-gray-600">123 Rue du Convoyage<br />75000 Paris</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <Phone className="w-6 h-6 text-dk-navy mt-1" />
+                    <div>
+                      <h3 className="font-semibold">Téléphone</h3>
+                      <p className="text-gray-600">01 23 45 67 89</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <Mail className="w-6 h-6 text-dk-navy mt-1" />
+                    <div>
+                      <h3 className="font-semibold">Email</h3>
+                      <p className="text-gray-600">contact@dkautomotive.fr</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Formulaire de contact */}
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold text-dk-navy mb-6">
+                  Envoyez-nous un message
+                </h2>
+                
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                     <FormField
                       control={form.control}
                       name="fullName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Nom complet <span className="text-red-500">*</span>
-                          </FormLabel>
+                          <FormLabel>Nom complet</FormLabel>
                           <FormControl>
                             <Input placeholder="Votre nom" {...field} />
                           </FormControl>
@@ -99,9 +129,7 @@ const Contact = () => {
                       name="companyName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Nom de la société <span className="text-red-500">*</span>
-                          </FormLabel>
+                          <FormLabel>Nom de la société</FormLabel>
                           <FormControl>
                             <Input placeholder="Nom de votre société" {...field} />
                           </FormControl>
@@ -109,19 +137,45 @@ const Contact = () => {
                         </FormItem>
                       )}
                     />
-                  </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="votre@email.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Téléphone</FormLabel>
+                            <FormControl>
+                              <Input placeholder="06 12 34 56 78" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     <FormField
                       control={form.control}
-                      name="email"
+                      name="subject"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Email <span className="text-red-500">*</span>
-                          </FormLabel>
+                          <FormLabel>Sujet</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="votre@email.com" {...field} />
+                            <Input placeholder="Sujet de votre message" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -130,62 +184,28 @@ const Contact = () => {
 
                     <FormField
                       control={form.control}
-                      name="phone"
+                      name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Téléphone <span className="text-red-500">*</span>
-                          </FormLabel>
+                          <FormLabel>Message</FormLabel>
                           <FormControl>
-                            <Input placeholder="06 12 34 56 78" {...field} />
+                            <Textarea 
+                              placeholder="Votre message..." 
+                              className="min-h-[150px]"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Sujet <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="Sujet de votre message" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Message <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Votre message..." 
-                            className="min-h-[150px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors">
-                    Envoyer le message
-                  </Button>
-                </form>
-              </Form>
+                    <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors">
+                      Envoyer le message
+                    </Button>
+                  </form>
+                </Form>
+              </div>
             </div>
           </div>
         </section>
