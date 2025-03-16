@@ -94,10 +94,22 @@ export const QuoteContent = ({ orderDetails, setOrderDetails }: QuoteContentProp
       distance: typeof orderDetails.distance === 'string' ? parseFloat(orderDetails.distance) : orderDetails.distance,
       status: 'pending' as const,
       dateCreated: new Date(),
-      pickupDate: orderDetails.pickupDate,
-      deliveryDate: orderDetails.deliveryDate,
+      pickupDate: orderDetails.pickupDate || new Date(),
       pickupTime: pickupTime,
-      deliveryTime: deliveryTime
+      deliveryDate: orderDetails.deliveryDate || new Date(),
+      deliveryTime: deliveryTime,
+      pickupContact: pickupContact || {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: ''
+      },
+      deliveryContact: deliveryContact || {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: ''
+      }
     };
 
     try {

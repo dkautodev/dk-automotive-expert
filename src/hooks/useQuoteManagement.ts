@@ -1,3 +1,4 @@
+
 import { Quote } from "@/types/order";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow } from "@/types/database";
@@ -25,13 +26,15 @@ export const useQuoteManagement = () => {
       vehicles: vehiclesJson,
       total_price_ht: Number(quote.totalPriceHT.toFixed(2)),
       total_price_ttc: Number(quote.totalPriceTTC.toFixed(2)),
-      distance: Number(quote.distance) || null,
+      distance: Number(quote.distance),
       status: quote.status,
       date_created: quote.dateCreated.toISOString(),
-      pickup_date: quote.pickupDate?.toISOString().split('T')[0] || null,
-      pickup_time: quote.pickupTime || null,
-      delivery_date: quote.deliveryDate?.toISOString().split('T')[0] || null,
-      delivery_time: quote.deliveryTime || null,
+      pickup_date: quote.pickupDate.toISOString().split('T')[0],
+      pickup_time: quote.pickupTime,
+      delivery_date: quote.deliveryDate.toISOString().split('T')[0],
+      delivery_time: quote.deliveryTime,
+      pickup_contact: quote.pickupContact,
+      delivery_contact: quote.deliveryContact,
       user_id: user.id
     };
 
@@ -62,19 +65,21 @@ export const useQuoteManagement = () => {
 
     return data.map((quote): Quote => ({
       id: quote.id,
-      quote_number: quote.quote_number || '',
+      quote_number: quote.quote_number,
       pickupAddress: quote.pickup_address,
       deliveryAddress: quote.delivery_address,
       vehicles: quote.vehicles,
       totalPriceHT: quote.total_price_ht,
-      totalPriceTTC: quote.total_price_ttc || quote.total_price_ht * 1.2,
-      distance: Number(quote.distance) || 0,
+      totalPriceTTC: quote.total_price_ttc,
+      distance: Number(quote.distance),
       status: quote.status as 'pending' | 'accepted' | 'rejected',
-      dateCreated: new Date(quote.date_created || new Date()),
-      pickupDate: quote.pickup_date ? new Date(quote.pickup_date) : undefined,
-      pickupTime: quote.pickup_time || undefined,
-      deliveryDate: quote.delivery_date ? new Date(quote.delivery_date) : undefined,
-      deliveryTime: quote.delivery_time || undefined
+      dateCreated: new Date(quote.date_created),
+      pickupDate: new Date(quote.pickup_date),
+      pickupTime: quote.pickup_time,
+      deliveryDate: new Date(quote.delivery_date),
+      deliveryTime: quote.delivery_time,
+      pickupContact: quote.pickup_contact,
+      deliveryContact: quote.delivery_contact
     }));
   };
 

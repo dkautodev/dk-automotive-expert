@@ -61,51 +61,57 @@ export type Database = {
         Row: {
           date_created: string | null
           delivery_address: string
-          delivery_date: string | null
-          delivery_time: string | null
-          distance: number | null
+          delivery_contact: Json
+          delivery_date: string
+          delivery_time: string
+          distance: number
           id: string
           pickup_address: string
-          pickup_date: string | null
-          pickup_time: string | null
-          quote_number: string | null
+          pickup_contact: Json
+          pickup_date: string
+          pickup_time: string
+          quote_number: string
           status: string
           total_price_ht: number
-          total_price_ttc: number | null
+          total_price_ttc: number
           user_id: string | null
           vehicles: Json
         }
         Insert: {
           date_created?: string | null
           delivery_address: string
-          delivery_date?: string | null
-          delivery_time?: string | null
-          distance?: number | null
+          delivery_contact: Json
+          delivery_date: string
+          delivery_time: string
+          distance: number
           id?: string
           pickup_address: string
-          pickup_date?: string | null
-          pickup_time?: string | null
-          quote_number?: string | null
+          pickup_contact: Json
+          pickup_date: string
+          pickup_time: string
+          quote_number: string
           status?: string
           total_price_ht: number
-          total_price_ttc?: number | null
+          total_price_ttc: number
           user_id?: string | null
           vehicles: Json
         }
         Update: {
           date_created?: string | null
           delivery_address?: string
-          delivery_date?: string | null
-          delivery_time?: string | null
-          distance?: number | null
+          delivery_contact?: Json
+          delivery_date?: string
+          delivery_time?: string
+          distance?: number
           id?: string
           pickup_address?: string
-          pickup_date?: string | null
-          pickup_time?: string | null
-          quote_number?: string | null
+          pickup_contact?: Json
+          pickup_date?: string
+          pickup_time?: string
+          quote_number?: string
           status?: string
           total_price_ht?: number
-          total_price_ttc?: number | null
+          total_price_ttc?: number
           user_id?: string | null
           vehicles?: Json
         }
