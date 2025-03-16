@@ -12,7 +12,7 @@ export const useOrderForm = () => {
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [deliveryAutocomplete, setDeliveryAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  const { isLoaded, loadError, calculateDistance, distance, duration, error, errorSolution } = useGoogleMaps();
+  const { isLoaded, loadError, calculateDistance, distance, duration, error, errorSolution, projectId } = useGoogleMaps();
 
   useEffect(() => {
     if (pickupAddress && deliveryAddress) {
@@ -114,6 +114,7 @@ export const useOrderForm = () => {
     duration,
     error,
     errorSolution,
+    projectId,
     useAutocomplete,
     handleSubmit
   };

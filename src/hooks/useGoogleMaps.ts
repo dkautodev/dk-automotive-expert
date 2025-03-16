@@ -11,12 +11,14 @@ interface MapError {
 }
 
 const libraries: ("places")[] = ["places"];
+const PROJECT_ID = "vigilant-shell-453812-d7";
 
 export const useGoogleMaps = () => {
   const [distance, setDistance] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [errorSolution, setErrorSolution] = useState<string | null>(null);
+  const [projectId, setProjectId] = useState<string>(PROJECT_ID);
 
   // Chargement de l'API avec plus de logging détaillé
   const { isLoaded, loadError } = useLoadScript({
@@ -29,9 +31,9 @@ export const useGoogleMaps = () => {
     console.log("Détails du chargement de l'API Google Maps:", {
       isLoaded,
       loadError,
-      apiKey: GOOGLE_MAPS_API_KEY,
+      apiKey: GOOGLE_MAPS_API_KEY.substring(0, 5) + "...",
       keyLength: GOOGLE_MAPS_API_KEY.length,
-      projectId: "vigilant-shell-453812-d7",
+      projectId,
     });
 
     if (loadError) {
@@ -59,25 +61,25 @@ export const useGoogleMaps = () => {
     if (error.message?.includes('ApiNotActivatedMapError')) {
       return {
         message: "L'API Google Maps Places n'est pas activée pour ce projet.",
-        solution: "Activez l'API Places et l'API Directions dans la console Google Cloud pour le projet 'vigilant-shell-453812-d7'.",
+        solution: `Activez l'API Places et l'API Directions dans la console Google Cloud pour le projet '${projectId}'.`,
         details: "API Places non activée"
       };
     } else if (error.message?.includes('InvalidKeyMapError')) {
       return {
         message: "La clé API Google Maps n'est pas valide ou est restreinte.",
-        solution: "Vérifiez que votre clé API est correcte et configurée pour autoriser le domaine actuel dans la console Google Cloud.",
+        solution: `Vérifiez que votre clé API est correcte et configurée pour autoriser le domaine actuel dans la console Google Cloud pour le projet '${projectId}'.`,
         details: "Clé API invalide"
       };
     } else if (error.message?.includes('RefererNotAllowedMapError')) {
       return {
-        message: "Le domaine actuel n'est pas autorisé à utiliser cette clé API Google Maps.",
-        solution: "Ajoutez ce domaine aux restrictions de la clé API dans la console Google Cloud pour le projet 'vigilant-shell-453812-d7'.",
+        message: `Le domaine actuel (${window.location.origin}) n'est pas autorisé à utiliser cette clé API Google Maps.`,
+        solution: `Ajoutez "${window.location.origin}" aux origines JavaScript autorisées dans les paramètres OAuth de votre projet Google Cloud '${projectId}'.`,
         details: "Domaine non autorisé"
       };
     } else if (error.message?.includes('QuotaExceededMapError')) {
       return {
         message: "Le quota d'utilisation de l'API Google Maps a été dépassé.",
-        solution: "Augmentez votre quota ou attendez que celui-ci soit réinitialisé. Vous pouvez aussi créer un compte de facturation dans Google Cloud.",
+        solution: `Augmentez votre quota ou attendez que celui-ci soit réinitialisé. Vous pouvez aussi créer un compte de facturation dans Google Cloud pour le projet '${projectId}'.`,
         details: "Quota dépassé"
       };
     } else {
@@ -190,6 +192,7 @@ export const useGoogleMaps = () => {
     distance, 
     duration, 
     error: getErrorMessage(), 
-    errorSolution: getErrorSolution()
+    errorSolution: getErrorSolution(),
+    projectId
   };
 };
