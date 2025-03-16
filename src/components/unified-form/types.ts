@@ -1,4 +1,3 @@
-
 import { OrderState, Contact, Vehicle } from "@/types/order";
 
 export interface UnifiedOrderFormProps {
@@ -18,5 +17,6 @@ export interface FormActions {
   handleSubmit: () => void;
   isFormValid: boolean;
   globalFiles: File[];
-  setGlobalFiles: (files: File[]) => void;
+  setGlobalFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
+

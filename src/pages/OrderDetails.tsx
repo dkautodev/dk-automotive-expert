@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Footer from "@/components/Footer";
 import { VehicleSelectionForm } from "@/components/quote-details/VehicleSelectionForm";
-import { QuoteDetailsBanner } from "@/components/unified-form/QuoteDetailsBanner";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,14 +37,14 @@ const OrderDetails = () => {
         user_id: user.id,
         pickup_address: formData.pickupAddress,
         delivery_address: formData.deliveryAddress,
-        pickup_contact: formData.pickupContact,
-        delivery_contact: formData.deliveryContact,
+        pickup_contact: JSON.parse(JSON.stringify(formData.pickupContact)),
+        delivery_contact: JSON.parse(JSON.stringify(formData.deliveryContact)),
         pickup_date: formData.pickupDate.toISOString(),
         pickup_time: formData.pickupTime,
         delivery_date: formData.deliveryDate.toISOString(),
         delivery_time: formData.deliveryTime,
         distance: formData.distance.toString(),
-        vehicles: formData.vehicles,
+        vehicles: JSON.parse(JSON.stringify(formData.vehicles)),
         total_price_ht: parseFloat(formData.priceHT),
         total_price_ttc: parseFloat(formData.priceHT) * 1.2,
         quote_number: quoteNumber,

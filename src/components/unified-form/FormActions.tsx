@@ -11,6 +11,24 @@ import {
 import { FormActions as FormActionsProps } from "./types";
 
 export const FormActions = ({ handleSubmit, isFormValid, globalFiles, setGlobalFiles }: FormActionsProps) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(
+      file => file.type === 'application/pdf' || file.type.startsWith('image/jpeg')
+    );
+    
+    if (validFiles.length !== files.length) {
+      toast({
+        title: "Format non supporté",
+        description: "Seuls les fichiers PDF et JPG sont acceptés",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setGlobalFiles(prev => [...prev, ...validFiles]);
+  };
+
   return (
     <div className="flex justify-end gap-4 mt-6 items-center">
       <Tooltip>
@@ -19,21 +37,7 @@ export const FormActions = ({ handleSubmit, isFormValid, globalFiles, setGlobalF
             <Input
               type="file"
               className="hidden"
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                const validFiles = files.filter(
-                  file => file.type === 'application/pdf' || file.type.startsWith('image/jpeg')
-                );
-                if (validFiles.length !== files.length) {
-                  toast({
-                    title: "Format non supporté",
-                    description: "Seuls les fichiers PDF et JPG sont acceptés",
-                    variant: "destructive"
-                  });
-                  return;
-                }
-                setGlobalFiles(prev => [...prev, ...validFiles]);
-              }}
+              onChange={handleFileChange}
               accept=".pdf,.jpg,.jpeg"
               multiple
             />
