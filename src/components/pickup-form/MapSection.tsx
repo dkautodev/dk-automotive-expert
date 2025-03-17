@@ -46,6 +46,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     }
   };
 
+  // Fixed type casting for errorType parameter
   const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth' | 'places' = 'credentials') => {
     let url = `https://console.cloud.google.com/apis`;
     
