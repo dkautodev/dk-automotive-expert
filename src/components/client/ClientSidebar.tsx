@@ -1,21 +1,11 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, FileText, Truck, Receipt, History, Settings, ArrowLeft } from 'lucide-react';
-
 const ClientSidebar = () => {
-  return (
-    <div className="h-screen w-52 bg-white border-r border-gray-200 fixed left-0 top-0">
+  return <div className="h-screen w-52 bg-white border-r border-gray-200 fixed left-0 top-0">
       <div className="p-2 my-[25px]">
-        <img 
-          alt="DK Automotive" 
-          className="w-36 h-auto mx-auto mb-2" 
-          src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" 
-        />
-        <Link to="/" className="flex items-center justify-center p-2 text-dk-navy hover:bg-gray-100 rounded-md mt-2">
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          Retour à l'accueil
-        </Link>
+        <img alt="DK Automotive" className="w-36 h-auto mx-auto mb-2" src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" />
+        
       </div>
       
       <nav className="mt-4">
@@ -58,8 +48,6 @@ const ClientSidebar = () => {
           </li>
         </ul>
       </nav>
-    </div>
-  );
+    </div>;
 };
-
 export default ClientSidebar;
