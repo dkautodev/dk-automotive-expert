@@ -46,8 +46,8 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     }
   };
 
-  // Fixed type casting for errorType parameter
-  const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth' | 'places' = 'credentials') => {
+  // Fix the TypeScript error by properly typing the parameter
+  const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth' | 'places') => {
     let url = `https://console.cloud.google.com/apis`;
     
     switch (page) {
@@ -227,12 +227,37 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     if (searchBox) {
       try {
         const place = searchBox.getPlace();
-        if (place.formatted_address && onAddressSelect) {
-          onAddressSelect(place.formatted_address);
+        console.log("Place selected:", place);
+        
+        if (!place.geometry) {
+          console.warn("Place returned with no geometry");
+          toast({
+            variant: "destructive",
+            title: "Adresse non trouvée",
+            description: "Veuillez sélectionner une adresse dans la liste suggérée"
+          });
+          return;
         }
+        
+        if (place.formatted_address && onAddressSelect) {
+          console.log("Setting address:", place.formatted_address);
+          onAddressSelect(place.formatted_address);
+          toast({
+            title: "Adresse sélectionnée",
+            description: place.formatted_address
+          });
+        }
+        
         if (place.geometry?.location && map) {
           map.panTo(place.geometry.location);
           map.setZoom(15);
+          
+          // Ajouter un marqueur
+          new google.maps.Marker({
+            position: place.geometry.location,
+            map: map,
+            title: place.formatted_address
+          });
         }
       } catch (error) {
         console.error("Erreur lors de la sélection du lieu:", error);
@@ -242,6 +267,8 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
           description: "Impossible de récupérer les détails de l'adresse"
         });
       }
+    } else {
+      console.warn("SearchBox not initialized");
     }
   };
 
@@ -260,7 +287,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         onPlaceChanged={onPlaceChanged}
         options={{
           componentRestrictions: { country: 'fr' },
-          fields: ['formatted_address', 'geometry'],
+          fields: ['formatted_address', 'geometry', 'name'],
           types: ['address']
         }}
       >
@@ -281,6 +308,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: true,
+            zoomControl: true,
           }}
         />
       </div>
