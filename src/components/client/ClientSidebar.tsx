@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, FileText, Truck, Receipt, History, Settings } from 'lucide-react';
+import { Home, FileText, Truck, Receipt, History, Settings, ArrowLeft } from 'lucide-react';
 
 const ClientSidebar = () => {
   return (
@@ -12,6 +12,10 @@ const ClientSidebar = () => {
           className="w-36 h-auto mx-auto mb-2" 
           src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" 
         />
+        <Link to="/" className="flex items-center justify-center p-2 text-dk-navy hover:bg-gray-100 rounded-md mt-2">
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Retour à l'accueil
+        </Link>
       </div>
       
       <nav className="mt-4">
