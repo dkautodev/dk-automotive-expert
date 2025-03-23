@@ -1,9 +1,11 @@
 import { UseFormReturn } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { QuoteFormValues } from './quoteFormSchema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getCommunesByPostalCode, type Commune } from '@/utils/locationService';
 
 interface AddressFormProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -61,14 +63,57 @@ const AddressForm = ({
   onNext,
   onPrevious
 }: AddressFormProps) => {
+  const [pickupCommunes, setPickupCommunes] = useState<Commune[]>([]);
+  const [deliveryCommunes, setDeliveryCommunes] = useState<Commune[]>([]);
+  const [isLoadingPickupCommunes, setIsLoadingPickupCommunes] = useState(false);
+  const [isLoadingDeliveryCommunes, setIsLoadingDeliveryCommunes] = useState(false);
+
+  useEffect(() => {
+    const postalCode = form.watch('pickupPostalCode');
+    const fetchPickupCommunes = async () => {
+      if (postalCode && postalCode.length === 5) {
+        setIsLoadingPickupCommunes(true);
+        const communes = await getCommunesByPostalCode(postalCode);
+        setPickupCommunes(communes);
+        setIsLoadingPickupCommunes(false);
+        
+        if (communes.length === 1) {
+          form.setValue('pickupCity', communes[0].nom);
+        }
+      } else {
+        setPickupCommunes([]);
+      }
+    };
+    
+    fetchPickupCommunes();
+  }, [form.watch('pickupPostalCode')]);
+
+  useEffect(() => {
+    const postalCode = form.watch('deliveryPostalCode');
+    const fetchDeliveryCommunes = async () => {
+      if (postalCode && postalCode.length === 5) {
+        setIsLoadingDeliveryCommunes(true);
+        const communes = await getCommunesByPostalCode(postalCode);
+        setDeliveryCommunes(communes);
+        setIsLoadingDeliveryCommunes(false);
+        
+        if (communes.length === 1) {
+          form.setValue('deliveryCity', communes[0].nom);
+        }
+      } else {
+        setDeliveryCommunes([]);
+      }
+    };
+    
+    fetchDeliveryCommunes();
+  }, [form.watch('deliveryPostalCode')]);
+
   const handleNext = () => {
-    // Création des adresses complètes à partir des champs individuels
     const pickupComplement = form.getValues('pickupComplement') ? `, ${form.getValues('pickupComplement')}` : '';
     const deliveryComplement = form.getValues('deliveryComplement') ? `, ${form.getValues('deliveryComplement')}` : '';
     const pickupAddress = `${form.getValues('pickupStreetNumber')} ${form.getValues('pickupStreetType')} ${form.getValues('pickupStreetName')}${pickupComplement}, ${form.getValues('pickupPostalCode')} ${form.getValues('pickupCity')}, ${form.getValues('pickupCountry')}`;
     const deliveryAddress = `${form.getValues('deliveryStreetNumber')} ${form.getValues('deliveryStreetType')} ${form.getValues('deliveryStreetName')}${deliveryComplement}, ${form.getValues('deliveryPostalCode')} ${form.getValues('deliveryCity')}, ${form.getValues('deliveryCountry')}`;
 
-    // Mise à jour des champs d'adresse complète pour maintenir la compatibilité
     form.setValue('pickupAddress', pickupAddress);
     form.setValue('deliveryAddress', deliveryAddress);
     const addressData = {
@@ -193,6 +238,7 @@ const AddressForm = ({
                 <FormControl>
                   <Input placeholder="Ex: 75001" className="bg-[#EEF1FF]" {...field} />
                 </FormControl>
+                {isLoadingPickupCommunes && <div className="text-sm text-gray-500">Chargement des communes...</div>}
                 <FormMessage />
               </FormItem>} />
           
@@ -203,7 +249,25 @@ const AddressForm = ({
                   Ville <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Paris" className="bg-[#EEF1FF]" {...field} />
+                  {pickupCommunes.length > 1 ? (
+                    <Select 
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="bg-[#EEF1FF]">
+                        <SelectValue placeholder="Sélectionner une ville" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {pickupCommunes.map((commune) => (
+                          <SelectItem key={commune.code} value={commune.nom}>
+                            {commune.nom}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input placeholder="Ex: Paris" className="bg-[#EEF1FF]" {...field} />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>} />
@@ -312,6 +376,7 @@ const AddressForm = ({
                 <FormControl>
                   <Input placeholder="Ex: 75001" className="bg-[#EEF1FF]" {...field} />
                 </FormControl>
+                {isLoadingDeliveryCommunes && <div className="text-sm text-gray-500">Chargement des communes...</div>}
                 <FormMessage />
               </FormItem>} />
           
@@ -322,7 +387,25 @@ const AddressForm = ({
                   Ville <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Paris" className="bg-[#EEF1FF]" {...field} />
+                  {deliveryCommunes.length > 1 ? (
+                    <Select 
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="bg-[#EEF1FF]">
+                        <SelectValue placeholder="Sélectionner une ville" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {deliveryCommunes.map((commune) => (
+                          <SelectItem key={commune.code} value={commune.nom}>
+                            {commune.nom}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input placeholder="Ex: Paris" className="bg-[#EEF1FF]" {...field} />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>} />
