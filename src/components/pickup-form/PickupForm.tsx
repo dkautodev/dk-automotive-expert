@@ -29,11 +29,6 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
     }
   });
 
-  const handleAddressSelect = (address: string) => {
-    form.setValue('address', address);
-    console.log("Address set in form:", address);
-  };
-
   const onSubmit = async (data: PickupFormValues) => {
     console.log('Pickup details:', data);
     try {
@@ -84,7 +79,7 @@ const PickupForm = ({ onPrevious, onNext }: PickupFormProps) => {
         
         <ContactSection form={form} />
         <PickupDetailsSection form={form} addressInputRef={addressInputRef} />
-        <MapSection onAddressSelect={handleAddressSelect} />
+        <MapSection />
 
         <div className="flex justify-between mt-6">
           <Button 

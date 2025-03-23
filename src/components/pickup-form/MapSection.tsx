@@ -1,60 +1,29 @@
 
-import React, { useState } from 'react';
-import { toast } from '@/hooks/use-toast';
-import { useGoogleMapsLoader } from './hooks/useGoogleMapsLoader';
-import MapErrorDisplay from './components/MapErrorDisplay';
-import GoogleMapDisplay from './components/GoogleMapDisplay';
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { MapPin } from 'lucide-react';
 
 interface MapSectionProps {
   onAddressSelect?: (address: string) => void;
 }
 
 const MapSection = ({ onAddressSelect }: MapSectionProps) => {
-  const [manualAddress, setManualAddress] = useState<string>("");
-  const { isLoaded, loadError, projectId, parseGoogleMapsError, detailedError } = useGoogleMapsLoader();
-
-  const handleManualAddressSubmit = () => {
-    if (manualAddress && onAddressSelect) {
-      onAddressSelect(manualAddress);
-      toast({
-        title: "Adresse saisie",
-        description: "L'adresse a été enregistrée manuellement"
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Veuillez saisir une adresse complète"
-      });
-    }
-  };
-
-  // Show loading state
-  if (!isLoaded && !loadError) {
-    return (
-      <div className="w-full h-[300px] bg-gray-100 flex items-center justify-center rounded-lg">
-        Chargement de la carte...
+  return (
+    <Card className="p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <MapPin className="h-5 w-5 text-blue-500" />
+        <h3 className="font-medium">Emplacement</h3>
       </div>
-    );
-  }
-
-  // Show error state
-  if (loadError) {
-    return (
-      <MapErrorDisplay
-        error={loadError}
-        projectId={projectId}
-        parseGoogleMapsError={parseGoogleMapsError}
-        manualAddress={manualAddress}
-        setManualAddress={setManualAddress}
-        onManualAddressSubmit={handleManualAddressSubmit}
-        detailedError={detailedError}
-      />
-    );
-  }
-
-  // Show map
-  return <GoogleMapDisplay onAddressSelect={onAddressSelect} />;
+      
+      <div className="flex items-center justify-center h-[200px] bg-gray-100 rounded-md">
+        <p className="text-gray-500 text-center">
+          La fonctionnalité de carte a été désactivée.
+          <br />
+          Veuillez saisir l'adresse manuellement.
+        </p>
+      </div>
+    </Card>
+  );
 };
 
 export default MapSection;
