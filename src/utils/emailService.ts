@@ -8,6 +8,7 @@ export const sendQuoteEmail = async (formData: QuoteFormValues): Promise<void> =
       Numéro: ${formData.pickupStreetNumber}
       Type de voie: ${formData.pickupStreetType}
       Nom de voie: ${formData.pickupStreetName}
+      ${formData.pickupComplement ? `Complément: ${formData.pickupComplement}` : ''}
       Code postal: ${formData.pickupPostalCode}
       Ville: ${formData.pickupCity}
       Pays: ${formData.pickupCountry}
@@ -17,6 +18,7 @@ export const sendQuoteEmail = async (formData: QuoteFormValues): Promise<void> =
       Numéro: ${formData.deliveryStreetNumber}
       Type de voie: ${formData.deliveryStreetType}
       Nom de voie: ${formData.deliveryStreetName}
+      ${formData.deliveryComplement ? `Complément: ${formData.deliveryComplement}` : ''}
       Code postal: ${formData.deliveryPostalCode}
       Ville: ${formData.deliveryCity}
       Pays: ${formData.deliveryCountry}

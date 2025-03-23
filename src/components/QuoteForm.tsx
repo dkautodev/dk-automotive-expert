@@ -26,18 +26,20 @@ const QuoteForm = () => {
       licensePlate: '',
       fuelType: '',
       
-      // Nouveaux champs pour l'adresse de prise en charge
+      // Champs pour l'adresse de prise en charge
       pickupStreetNumber: '',
       pickupStreetType: '',
       pickupStreetName: '',
+      pickupComplement: '',
       pickupPostalCode: '',
       pickupCity: '',
       pickupCountry: 'France',
       
-      // Nouveaux champs pour l'adresse de livraison
+      // Champs pour l'adresse de livraison
       deliveryStreetNumber: '',
       deliveryStreetType: '',
       deliveryStreetName: '',
+      deliveryComplement: '',
       deliveryPostalCode: '',
       deliveryCity: '',
       deliveryCountry: 'France',
