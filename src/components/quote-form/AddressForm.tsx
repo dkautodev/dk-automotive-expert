@@ -11,6 +11,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { QuoteFormValues } from './quoteFormSchema';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface AddressFormProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -18,12 +25,33 @@ interface AddressFormProps {
   onPrevious: () => void;
 }
 
+const complementOptions = [
+  { value: "", label: "Aucun" },
+  { value: "Appartement", label: "Appartement" },
+  { value: "Étage", label: "Étage" },
+  { value: "Résidence", label: "Résidence" },
+  { value: "Bâtiment", label: "Bâtiment" },
+  { value: "Lieu-dit", label: "Lieu-dit" },
+  { value: "Zone Industrielle", label: "Zone Industrielle" },
+  { value: "Zone Commerciale", label: "Zone Commerciale" },
+  { value: "Centre Commercial", label: "Centre Commercial" },
+  { value: "Parking", label: "Parking" },
+];
+
 const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
   const handleNext = () => {
     // Création des adresses complètes à partir des champs individuels
-    const pickupAddress = `${form.getValues('pickupStreetNumber')} ${form.getValues('pickupStreetType')} ${form.getValues('pickupStreetName')}, ${form.getValues('pickupPostalCode')} ${form.getValues('pickupCity')}, ${form.getValues('pickupCountry')}`;
+    const pickupComplement = form.getValues('pickupComplement') 
+      ? `, ${form.getValues('pickupComplement')}` 
+      : '';
+      
+    const deliveryComplement = form.getValues('deliveryComplement') 
+      ? `, ${form.getValues('deliveryComplement')}` 
+      : '';
     
-    const deliveryAddress = `${form.getValues('deliveryStreetNumber')} ${form.getValues('deliveryStreetType')} ${form.getValues('deliveryStreetName')}, ${form.getValues('deliveryPostalCode')} ${form.getValues('deliveryCity')}, ${form.getValues('deliveryCountry')}`;
+    const pickupAddress = `${form.getValues('pickupStreetNumber')} ${form.getValues('pickupStreetType')} ${form.getValues('pickupStreetName')}${pickupComplement}, ${form.getValues('pickupPostalCode')} ${form.getValues('pickupCity')}, ${form.getValues('pickupCountry')}`;
+    
+    const deliveryAddress = `${form.getValues('deliveryStreetNumber')} ${form.getValues('deliveryStreetType')} ${form.getValues('deliveryStreetName')}${deliveryComplement}, ${form.getValues('deliveryPostalCode')} ${form.getValues('deliveryCity')}, ${form.getValues('deliveryCountry')}`;
 
     // Mise à jour des champs d'adresse complète pour maintenir la compatibilité
     form.setValue('pickupAddress', pickupAddress);
@@ -33,12 +61,14 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
       pickupStreetNumber: form.getValues('pickupStreetNumber'),
       pickupStreetType: form.getValues('pickupStreetType'),
       pickupStreetName: form.getValues('pickupStreetName'),
+      pickupComplement: form.getValues('pickupComplement'),
       pickupPostalCode: form.getValues('pickupPostalCode'),
       pickupCity: form.getValues('pickupCity'),
       pickupCountry: form.getValues('pickupCountry'),
       deliveryStreetNumber: form.getValues('deliveryStreetNumber'),
       deliveryStreetType: form.getValues('deliveryStreetType'),
       deliveryStreetName: form.getValues('deliveryStreetName'),
+      deliveryComplement: form.getValues('deliveryComplement'),
       deliveryPostalCode: form.getValues('deliveryPostalCode'),
       deliveryCity: form.getValues('deliveryCity'),
       deliveryCountry: form.getValues('deliveryCountry'),
@@ -132,6 +162,36 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
                   {...field} 
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="pickupComplement"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dk-navy font-semibold">
+                Complément
+              </FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger className="bg-[#EEF1FF]">
+                    <SelectValue placeholder="Sélectionnez un complément" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {complementOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -258,6 +318,36 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
                   {...field} 
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="deliveryComplement"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dk-navy font-semibold">
+                Complément
+              </FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger className="bg-[#EEF1FF]">
+                    <SelectValue placeholder="Sélectionnez un complément" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {complementOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
