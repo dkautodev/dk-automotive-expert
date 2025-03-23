@@ -15,7 +15,7 @@ export const MissionStatusBadge: React.FC<MissionStatusBadgeProps> = ({ status }
       case 'in_progress':
         return { label: 'En cours de prise en charge', variant: 'default' as const };
       case 'pickup_completed':
-        return { label: 'En cours de livraison', variant: 'primary' as const };
+        return { label: 'En cours de livraison', variant: 'default' as const }; // Changed from 'primary' to 'default'
       case 'incident':
         return { label: 'Incident', variant: 'destructive' as const };
       case 'completed':
