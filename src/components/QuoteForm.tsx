@@ -28,7 +28,7 @@ const QuoteForm = () => {
       
       // Champs pour l'adresse de prise en charge
       pickupStreetNumber: '',
-      pickupStreetType: '',
+      pickupStreetType: 'Rue',
       pickupStreetName: '',
       pickupComplement: 'aucun',
       pickupPostalCode: '',
@@ -37,7 +37,7 @@ const QuoteForm = () => {
       
       // Champs pour l'adresse de livraison
       deliveryStreetNumber: '',
-      deliveryStreetType: '',
+      deliveryStreetType: 'Rue',
       deliveryStreetName: '',
       deliveryComplement: 'aucun',
       deliveryPostalCode: '',

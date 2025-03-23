@@ -1,15 +1,16 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { QuoteFormValues } from './quoteFormSchema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 interface AddressFormProps {
   form: UseFormReturn<QuoteFormValues>;
   onNext: (data: Partial<QuoteFormValues>) => void;
   onPrevious: () => void;
 }
+
 const complementOptions = [{
   value: "aucun",
   label: "Aucun"
@@ -96,6 +97,7 @@ const AddressForm = ({
       form.trigger(['pickupStreetNumber', 'pickupStreetType', 'pickupStreetName', 'pickupPostalCode', 'pickupCity', 'deliveryStreetNumber', 'deliveryStreetType', 'deliveryStreetName', 'deliveryPostalCode', 'deliveryCity']);
     }
   };
+
   return <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy mb-4">Adresses de prise en charge et de livraison</h2>
       
@@ -125,9 +127,10 @@ const AddressForm = ({
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
+                    defaultValue="Rue"
                   >
                     <SelectTrigger className="bg-[#EEF1FF]">
-                      <SelectValue placeholder="Ex: Rue de l'église" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {streetTypeOptions.map((option) => (
@@ -243,9 +246,10 @@ const AddressForm = ({
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
+                    defaultValue="Rue"
                   >
                     <SelectTrigger className="bg-[#EEF1FF]">
-                      <SelectValue placeholder="Ex: Rue de l'église" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {streetTypeOptions.map((option) => (
