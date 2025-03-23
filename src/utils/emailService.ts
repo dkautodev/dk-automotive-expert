@@ -1,81 +1,93 @@
 
 import { toast } from "@/hooks/use-toast";
 import { QuoteFormValues } from "@/components/quote-form/quoteFormSchema";
+import { supabase } from "@/integrations/supabase/client";
 
-// Fonction pour formater l'adresse complète à partir des composants d'adresse
-const formatAddress = (
-  streetNumber: string, 
-  streetType: string, 
-  streetName: string, 
-  complement: string, 
-  postalCode: string, 
-  city: string, 
-  country: string
-): string => {
-  const formattedComplement = complement !== "aucun" ? `, ${complement}` : "";
-  return `${streetNumber} ${streetType} ${streetName}${formattedComplement}, ${postalCode} ${city}, ${country}`;
-};
-
-// Fonction principale pour envoyer l'email du devis
-export const sendQuoteEmail = async (data: QuoteFormValues): Promise<void> => {
+export const sendQuoteEmail = async (quoteData: QuoteFormValues) => {
   try {
-    // Formatage des adresses complètes
-    const pickupAddress = formatAddress(
-      data.pickupStreetNumber,
-      data.pickupStreetType,
-      data.pickupStreetName,
-      data.pickupComplement,
-      data.pickupPostalCode,
-      data.pickupCity,
-      data.pickupCountry
-    );
-
-    const deliveryAddress = formatAddress(
-      data.deliveryStreetNumber,
-      data.deliveryStreetType,
-      data.deliveryStreetName,
-      data.deliveryComplement,
-      data.deliveryPostalCode,
-      data.deliveryCity,
-      data.deliveryCountry
-    );
-
-    // Préparation des données pour l'API
-    const emailData = {
-      ...data,
-      pickupFullAddress: pickupAddress,
-      deliveryFullAddress: deliveryAddress,
-      formType: 'quote'
+    // Formatage des données pour l'affichage
+    const formattedData = {
+      // Informations du véhicule
+      vehicleInfo: {
+        type: quoteData.vehicleType,
+        brand: quoteData.brand,
+        model: quoteData.model,
+        year: quoteData.year,
+        licensePlate: quoteData.licensePlate,
+        fuelType: quoteData.fuelType
+      },
+      // Adresse de prise en charge
+      pickupAddress: quoteData.pickupAddress,
+      // Adresse de livraison
+      deliveryAddress: quoteData.deliveryAddress,
+      // Contact
+      contact: {
+        company: quoteData.company,
+        firstName: quoteData.firstName,
+        lastName: quoteData.lastName, 
+        email: quoteData.email,
+        phone: quoteData.phone
+      },
+      // Date de création
+      dateCreated: new Date().toLocaleString('fr-FR')
     };
 
-    // En mode développement, on simule l'envoi d'email
-    if (import.meta.env.DEV) {
-      console.log("Envoi d'email simulé en développement:", emailData);
-      // Attendre 1 seconde pour simuler une requête réseau
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return;
+    // Enregistrement dans la base de données si l'utilisateur est connecté
+    const { data: userData } = await supabase.auth.getUser();
+    
+    if (userData?.user) {
+      // Génération d'un numéro de devis simple
+      const quoteNumber = `QT-${Date.now().toString().substring(0, 10)}`;
+      
+      const { data, error } = await supabase
+        .from('quotes')
+        .insert({
+          quote_number: quoteNumber,
+          pickup_address: quoteData.pickupAddress,
+          delivery_address: quoteData.deliveryAddress,
+          vehicles: {
+            type: quoteData.vehicleType,
+            brand: quoteData.brand,
+            model: quoteData.model,
+            year: quoteData.year,
+            license_plate: quoteData.licensePlate,
+            fuel_type: quoteData.fuelType
+          },
+          total_price_ht: 0, // Sera calculé par l'admin
+          total_price_ttc: 0, // Sera calculé par l'admin
+          distance: "À déterminer",
+          status: 'pending',
+          date_created: new Date().toISOString(),
+          pickup_contact: {
+            company: quoteData.company,
+            first_name: quoteData.firstName,
+            last_name: quoteData.lastName,
+            email: quoteData.email,
+            phone: quoteData.phone
+          },
+          delivery_contact: {
+            company: quoteData.company,
+            first_name: quoteData.firstName,
+            last_name: quoteData.lastName,
+            email: quoteData.email,
+            phone: quoteData.phone
+          },
+          client_id: userData.user.id
+        });
+
+      if (error) {
+        console.error("Erreur lors de l'enregistrement du devis:", error);
+        throw new Error("Erreur lors de l'enregistrement du devis");
+      }
     }
 
-    // En production, faire un appel API réel
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/send-email`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(emailData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erreur lors de l\'envoi de l\'email');
-    }
+    // Simulation d'envoi d'email (à implémenter avec un service réel)
+    console.log("Envoi d'email avec les données:", formattedData);
+    
+    // On considère que l'email a été envoyé avec succès
+    return true;
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
-    toast({
-      variant: "destructive",
-      title: "Erreur d'envoi",
-      description: "Impossible d'envoyer votre demande de devis. Veuillez réessayer plus tard.",
-    });
-    throw error; // Relancer l'erreur pour la gestion dans le composant
+    throw error;
   }
 };

@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { LogOut, Receipt, FileText } from "lucide-react";
+import { LogOut, Receipt, FileText, PlusCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
@@ -39,10 +39,18 @@ const DashboardHome = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Tableau de bord Client</h1>
-        <Button variant="outline" onClick={handleLogout}>
-          <LogOut className="mr-2" />
-          Déconnexion
-        </Button>
+        <div className="flex gap-3">
+          <Link to="/dashboard/client/create-quote">
+            <Button className="bg-[#1a237e] hover:bg-[#3f51b5] gap-2">
+              <PlusCircle className="h-4 w-4" />
+              Nouveau devis
+            </Button>
+          </Link>
+          <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="mr-2" />
+            Déconnexion
+          </Button>
+        </div>
       </div>
       
       <div className="space-y-6">
