@@ -38,8 +38,10 @@ export const quoteFormSchema = z.object({
     required_error: "Le nom de la voie est requis",
   }).min(1, "Le nom de la voie est requis")
     .regex(/^[a-zA-ZÀ-ÿ0-9\s-']+$/, "Le nom de la voie ne doit contenir que des lettres, chiffres, espaces, apostrophes et tirets"),
-  pickupComplement: z.string().default("aucun")
-    .regex(/^[a-zA-Z0-9À-ÿ\s-',.]*$/, "Le complément ne doit contenir que des lettres, chiffres, espaces et caractères spéciaux basiques"),
+  // Fix 1: Apply regex first, then default
+  pickupComplement: z.string()
+    .regex(/^[a-zA-Z0-9À-ÿ\s-',.]*$/, "Le complément ne doit contenir que des lettres, chiffres, espaces et caractères spéciaux basiques")
+    .default("aucun"),
   pickupPostalCode: z.string({
     required_error: "Le code postal est requis",
   }).min(5, "Le code postal doit contenir au moins 5 caractères")
@@ -64,8 +66,10 @@ export const quoteFormSchema = z.object({
     required_error: "Le nom de la voie est requis",
   }).min(1, "Le nom de la voie est requis")
     .regex(/^[a-zA-ZÀ-ÿ0-9\s-']+$/, "Le nom de la voie ne doit contenir que des lettres, chiffres, espaces, apostrophes et tirets"),
-  deliveryComplement: z.string().default("aucun")
-    .regex(/^[a-zA-Z0-9À-ÿ\s-',.]*$/, "Le complément ne doit contenir que des lettres, chiffres, espaces et caractères spéciaux basiques"),
+  // Fix 2: Apply regex first, then default
+  deliveryComplement: z.string()
+    .regex(/^[a-zA-Z0-9À-ÿ\s-',.]*$/, "Le complément ne doit contenir que des lettres, chiffres, espaces et caractères spéciaux basiques")
+    .default("aucun"),
   deliveryPostalCode: z.string({
     required_error: "Le code postal est requis",
   }).min(5, "Le code postal doit contenir au moins 5 caractères")
