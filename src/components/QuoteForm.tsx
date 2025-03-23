@@ -72,6 +72,10 @@ const QuoteForm = () => {
       const completeData = { ...formData, ...data };
       setFormData(completeData);
       
+      // Mise à jour des champs d'adresse complète avant l'envoi
+      completeData.pickupAddress = `${completeData.pickupStreetNumber} ${completeData.pickupStreetType} ${completeData.pickupStreetName}, ${completeData.pickupPostalCode} ${completeData.pickupCity}, ${completeData.pickupCountry}`;
+      completeData.deliveryAddress = `${completeData.deliveryStreetNumber} ${completeData.deliveryStreetType} ${completeData.deliveryStreetName}, ${completeData.deliveryPostalCode} ${completeData.deliveryCity}, ${completeData.deliveryCountry}`;
+      
       // Envoi d'email
       await sendQuoteEmail(completeData);
       

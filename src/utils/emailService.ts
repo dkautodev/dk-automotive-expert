@@ -1,96 +1,81 @@
 
-import { QuoteFormValues } from '@/components/quote-form/quoteFormSchema';
+import { toast } from "@/hooks/use-toast";
+import { QuoteFormValues } from "@/components/quote-form/quoteFormSchema";
 
-export const sendQuoteEmail = async (formData: QuoteFormValues): Promise<void> => {
+// Fonction pour formater l'adresse complète à partir des composants d'adresse
+const formatAddress = (
+  streetNumber: string, 
+  streetType: string, 
+  streetName: string, 
+  complement: string, 
+  postalCode: string, 
+  city: string, 
+  country: string
+): string => {
+  const formattedComplement = complement !== "aucun" ? `, ${complement}` : "";
+  return `${streetNumber} ${streetType} ${streetName}${formattedComplement}, ${postalCode} ${city}, ${country}`;
+};
+
+// Fonction principale pour envoyer l'email du devis
+export const sendQuoteEmail = async (data: QuoteFormValues): Promise<void> => {
   try {
-    // Construction des adresses détaillées
-    const pickupAddressDetails = `
-      Numéro: ${formData.pickupStreetNumber}
-      Type de voie: ${formData.pickupStreetType}
-      Nom de voie: ${formData.pickupStreetName}
-      ${formData.pickupComplement ? `Complément: ${formData.pickupComplement}` : ''}
-      Code postal: ${formData.pickupPostalCode}
-      Ville: ${formData.pickupCity}
-      Pays: ${formData.pickupCountry}
-    `;
-    
-    const deliveryAddressDetails = `
-      Numéro: ${formData.deliveryStreetNumber}
-      Type de voie: ${formData.deliveryStreetType}
-      Nom de voie: ${formData.deliveryStreetName}
-      ${formData.deliveryComplement ? `Complément: ${formData.deliveryComplement}` : ''}
-      Code postal: ${formData.deliveryPostalCode}
-      Ville: ${formData.deliveryCity}
-      Pays: ${formData.deliveryCountry}
-    `;
+    // Formatage des adresses complètes
+    const pickupAddress = formatAddress(
+      data.pickupStreetNumber,
+      data.pickupStreetType,
+      data.pickupStreetName,
+      data.pickupComplement,
+      data.pickupPostalCode,
+      data.pickupCity,
+      data.pickupCountry
+    );
 
-    // Construction du corps de l'email
-    const emailBody = `
-      NOUVELLE DEMANDE DE DEVIS - COLD
-      
-      -- INFORMATIONS DU VÉHICULE --
-      Type de véhicule: ${formData.vehicleType}
-      Marque: ${formData.brand}
-      Modèle: ${formData.model}
-      Année: ${formData.year}
-      Immatriculation: ${formData.licensePlate}
-      Carburant: ${formData.fuelType}
-      
-      -- ADRESSE DE PRISE EN CHARGE --
-      ${pickupAddressDetails}
-      
-      -- ADRESSE DE LIVRAISON --
-      ${deliveryAddressDetails}
-      
-      -- CONTACT --
-      ${formData.company ? `Société: ${formData.company}` : ''}
-      Nom: ${formData.lastName}
-      Prénom: ${formData.firstName}
-      Email: ${formData.email}
-      Téléphone: ${formData.phone}
-      
-      Demande reçue le: ${new Date().toLocaleString('fr-FR')}
-    `;
+    const deliveryAddress = formatAddress(
+      data.deliveryStreetNumber,
+      data.deliveryStreetType,
+      data.deliveryStreetName,
+      data.deliveryComplement,
+      data.deliveryPostalCode,
+      data.deliveryCity,
+      data.deliveryCountry
+    );
 
-    // Configuration de la requête d'envoi d'email
-    // Utilisation d'un service de messagerie tiers (EmailJS)
-    const serviceID = 'default_service'; // Remplacer par votre service ID
-    const templateID = 'template_quote'; // Remplacer par votre template ID
-    const userID = 'user_id'; // Remplacer par votre user ID
+    // Préparation des données pour l'API
+    const emailData = {
+      ...data,
+      pickupFullAddress: pickupAddress,
+      deliveryFullAddress: deliveryAddress,
+      formType: 'quote'
+    };
 
-    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    // En mode développement, on simule l'envoi d'email
+    if (import.meta.env.DEV) {
+      console.log("Envoi d'email simulé en développement:", emailData);
+      // Attendre 1 seconde pour simuler une requête réseau
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return;
+    }
+
+    // En production, faire un appel API réel
+    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/send-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        service_id: serviceID,
-        template_id: templateID,
-        user_id: userID,
-        template_params: {
-          to_email: 'dkautomotive70@gmail.com',
-          subject: 'Nouvelle demande de devis - COLD',
-          message: emailBody,
-          from_name: `${formData.firstName} ${formData.lastName}`,
-          reply_to: formData.email,
-        },
-      }),
+      body: JSON.stringify(emailData),
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur lors de l'envoi de l'email: ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Erreur lors de l\'envoi de l\'email');
     }
-
-    // Utilisation de mailto comme solution de secours
-    // Cette partie sera exécutée si vous n'avez pas configuré EmailJS
-    const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=Nouvelle demande de devis - COLD&body=${encodeURIComponent(emailBody)}`;
-    
-    // Ouvrir le lien mailto (cela ouvrira le client de messagerie de l'utilisateur)
-    window.open(mailtoLink);
-
-    console.log('Email envoyé avec succès');
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
-    throw error;
+    toast({
+      variant: "destructive",
+      title: "Erreur d'envoi",
+      description: "Impossible d'envoyer votre demande de devis. Veuillez réessayer plus tard.",
+    });
+    throw error; // Relancer l'erreur pour la gestion dans le composant
   }
 };
