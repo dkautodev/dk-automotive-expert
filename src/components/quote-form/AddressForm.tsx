@@ -8,11 +8,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { QuoteFormValues } from './quoteFormSchema';
-import MapSection from '../pickup-form/MapSection';
 
 interface AddressFormProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -21,10 +19,6 @@ interface AddressFormProps {
 }
 
 const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
-  const handleAddressSelect = (address: string) => {
-    form.setValue('pickupAddress', address);
-  };
-
   const handleNext = () => {
     const addressData = {
       pickupAddress: form.getValues('pickupAddress'),
@@ -65,10 +59,6 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
             </FormItem>
           )}
         />
-
-        <div className="h-[300px] rounded-lg overflow-hidden mb-6">
-          <MapSection onAddressSelect={handleAddressSelect} />
-        </div>
 
         <FormField
           control={form.control}
