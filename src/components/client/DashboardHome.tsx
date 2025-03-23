@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt, FileText } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,7 +11,6 @@ import {
 import { useAuthContext } from "@/context/AuthContext";
 import { useDashboardCounts } from "@/hooks/useDashboardCounts";
 import { toast } from "@/components/ui/use-toast";
-import OrderForm from "./OrderForm";
 
 const DashboardHome = () => {
   const { signOut, user } = useAuthContext();
@@ -93,8 +93,6 @@ const DashboardHome = () => {
           </CardContent>
         </Card>
       </div>
-
-      <OrderForm />
     </div>
   );
 };
