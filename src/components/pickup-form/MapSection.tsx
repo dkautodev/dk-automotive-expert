@@ -11,7 +11,7 @@ interface MapSectionProps {
 
 const MapSection = ({ onAddressSelect }: MapSectionProps) => {
   const [manualAddress, setManualAddress] = useState<string>("");
-  const { isLoaded, loadError, projectId, parseGoogleMapsError } = useGoogleMapsLoader();
+  const { isLoaded, loadError, projectId, parseGoogleMapsError, detailedError } = useGoogleMapsLoader();
 
   const handleManualAddressSubmit = () => {
     if (manualAddress && onAddressSelect) {
@@ -48,6 +48,7 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         manualAddress={manualAddress}
         setManualAddress={setManualAddress}
         onManualAddressSubmit={handleManualAddressSubmit}
+        detailedError={detailedError}
       />
     );
   }

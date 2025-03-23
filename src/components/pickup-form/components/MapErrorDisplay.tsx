@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Info } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { HelpCircle } from 'lucide-react';
 import { 
@@ -12,6 +12,7 @@ import {
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 import { MapError } from '../hooks/useGoogleMapsLoader';
+import GoogleMapsHelper from './GoogleMapsHelper';
 
 interface MapErrorDisplayProps {
   error: Error | null;
@@ -20,6 +21,7 @@ interface MapErrorDisplayProps {
   manualAddress: string;
   setManualAddress: (address: string) => void;
   onManualAddressSubmit: () => void;
+  detailedError?: string | null;
 }
 
 const MapErrorDisplay = ({ 
@@ -28,11 +30,12 @@ const MapErrorDisplay = ({
   parseGoogleMapsError,
   manualAddress,
   setManualAddress,
-  onManualAddressSubmit
+  onManualAddressSubmit,
+  detailedError
 }: MapErrorDisplayProps) => {
   if (!error) return null;
   
-  const { message, solution, errorType } = parseGoogleMapsError(error);
+  const { message, solution, errorType, errorCode } = parseGoogleMapsError(error);
   
   const openGoogleCloudConsole = (page: string) => {
     let url = `https://console.cloud.google.com/apis`;
@@ -47,6 +50,9 @@ const MapErrorDisplay = ({
       case 'places':
         url = `https://console.cloud.google.com/apis/library/places-backend.googleapis.com?project=${projectId}`;
         break;
+      case 'maps-js':
+        url = `https://console.cloud.google.com/apis/library/maps-backend.googleapis.com?project=${projectId}`;
+        break;
       case 'credentials':
       default:
         url = `https://console.cloud.google.com/apis/credentials?project=${projectId}`;
@@ -57,6 +63,8 @@ const MapErrorDisplay = ({
 
   return (
     <div className="space-y-4">
+      <GoogleMapsHelper projectId={projectId} errorCode={errorCode} />
+      
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <div className="ml-2">
@@ -68,10 +76,11 @@ const MapErrorDisplay = ({
               {solution}
             </div>
             
-            {errorType === 'places' && (
+            {(errorType === 'places' || errorCode === 'ApiTargetBlockedMapError') && (
               <div className="mt-2 text-xs bg-destructive/10 p-2 rounded">
                 <span className="font-medium">Activation de l'API Places requise: </span>
-                <p>Vous devez activer l'API Places dans la console Google Cloud.</p>
+                <p>Vous devez activer l'API Places et Maps JavaScript dans la console Google Cloud.</p>
+                <p className="mt-1 text-xs font-bold">Code d'erreur: {errorCode || 'API Places non activée'}</p>
               </div>
             )}
             
@@ -92,19 +101,45 @@ const MapErrorDisplay = ({
               </Button>
               
               {errorType === 'places' && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs" 
-                  onClick={() => openGoogleCloudConsole('oauth')}
-                >
-                  Configurer les origines autorisées
-                </Button>
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs" 
+                    onClick={() => openGoogleCloudConsole('oauth')}
+                  >
+                    Configurer les origines autorisées
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs" 
+                    onClick={() => openGoogleCloudConsole('maps-js')}
+                  >
+                    Activer Maps JavaScript API
+                  </Button>
+                </>
               )}
             </div>
           </AlertDescription>
         </div>
       </Alert>
+      
+      {detailedError && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle className="font-medium">Détails techniques de l'erreur</AlertTitle>
+          <AlertDescription>
+            <div className="mt-2 p-2 bg-gray-100 rounded overflow-auto max-h-32 text-xs font-mono">
+              {detailedError}
+            </div>
+            <p className="text-xs mt-2">
+              Utilisez ces informations lors de la configuration dans la Google Cloud Console.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
       
       <div className="p-4 border rounded-lg bg-gray-50">
         <h3 className="text-sm font-medium mb-2">Saisie manuelle de l'adresse</h3>
