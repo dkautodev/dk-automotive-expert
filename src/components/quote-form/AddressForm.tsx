@@ -1,3 +1,4 @@
+
 import { UseFormReturn } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,20 @@ const complementOptions = [{
   value: "Parking",
   label: "Parking"
 }];
+
+const streetTypeOptions = [
+  { value: "Rue", label: "Rue" },
+  { value: "Avenue", label: "Avenue" },
+  { value: "Boulevard", label: "Boulevard" },
+  { value: "Chemin", label: "Chemin" },
+  { value: "Impasse", label: "Impasse" },
+  { value: "Allée", label: "Allée" },
+  { value: "Place", label: "Place" },
+  { value: "Route", label: "Route" },
+  { value: "Quai", label: "Quai" },
+  { value: "Passage", label: "Passage" }
+];
+
 const AddressForm = ({
   form,
   onNext,
@@ -102,7 +117,29 @@ const AddressForm = ({
           
           <FormField control={form.control} name="pickupStreetType" render={({
           field
-        }) => {}} />
+        }) => <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Type de voie <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger className="bg-[#EEF1FF]">
+                      <SelectValue placeholder="Ex: Rue de l'église" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {streetTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>} />
         </div>
         
         <FormField control={form.control} name="pickupStreetName" render={({
@@ -119,7 +156,29 @@ const AddressForm = ({
         
         <FormField control={form.control} name="pickupComplement" render={({
         field
-      }) => {}} />
+      }) => <FormItem>
+              <FormLabel className="text-dk-navy font-semibold">
+                Complément
+              </FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="bg-[#EEF1FF]">
+                    <SelectValue placeholder="Sélectionner un complément" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {complementOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>} />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField control={form.control} name="pickupPostalCode" render={({
@@ -176,7 +235,29 @@ const AddressForm = ({
           
           <FormField control={form.control} name="deliveryStreetType" render={({
           field
-        }) => {}} />
+        }) => <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Type de voie <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger className="bg-[#EEF1FF]">
+                      <SelectValue placeholder="Ex: Rue de l'église" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {streetTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>} />
         </div>
         
         <FormField control={form.control} name="deliveryStreetName" render={({
@@ -193,7 +274,29 @@ const AddressForm = ({
         
         <FormField control={form.control} name="deliveryComplement" render={({
         field
-      }) => {}} />
+      }) => <FormItem>
+              <FormLabel className="text-dk-navy font-semibold">
+                Complément
+              </FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="bg-[#EEF1FF]">
+                    <SelectValue placeholder="Sélectionner un complément" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {complementOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>} />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField control={form.control} name="deliveryPostalCode" render={({
