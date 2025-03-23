@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const AdminSidebar = () => {
   return (
-    <Sidebar className="bg-gray-100 border-r">
+    <Sidebar className="bg-gray-100 border-r fixed">
       <SidebarHeader className="p-4">
         <h2 className="text-xl font-bold">Admin Dashboard</h2>
       </SidebarHeader>

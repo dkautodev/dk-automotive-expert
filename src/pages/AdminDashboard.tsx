@@ -10,7 +10,7 @@ const AdminDashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
-        <main className="flex-1 pl-52">
+        <main className="flex-1">
           <Routes>
             <Route index element={<AdminHome />} />
             <Route path="pricing-grids" element={<PricingGrids />} />
