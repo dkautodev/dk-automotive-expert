@@ -1,28 +1,21 @@
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
-import PickupForm from './PickupForm';
+import { toast } from '@/hooks/use-toast';
 import { Form } from '@/components/ui/form';
-import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
 import { quoteFormSchema, type QuoteFormValues } from './quote-form/quoteFormSchema';
+import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
+import AddressForm from './quote-form/AddressForm';
+import ContactForm from './quote-form/ContactForm';
+import { sendQuoteEmail } from '@/utils/emailService';
 
 const QuoteForm = () => {
   const [step, setStep] = useState(1);
-  const [vehicleData, setVehicleData] = useState<{
-    pickupAddress: string;
-    deliveryAddress: string;
-    vehicles: any[];
-    priceHT: number;
-  }>({
-    pickupAddress: '',
-    deliveryAddress: '',
-    vehicles: [],
-    priceHT: 0
-  });
-
+  const [formData, setFormData] = useState<Partial<QuoteFormValues>>({});
+  const [loading, setLoading] = useState(false);
+  
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
@@ -32,50 +25,97 @@ const QuoteForm = () => {
       year: '',
       licensePlate: '',
       fuelType: '',
+      pickupAddress: '',
+      deliveryAddress: '',
+      company: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
     },
   });
 
-  const onSubmit = (data: QuoteFormValues) => {
-    const vehicle = {
-      brand: data.brand,
-      model: data.model,
-      year: data.year,
-      fuel: data.fuelType,
-      licensePlate: data.licensePlate
-    };
-
-    setVehicleData(prev => ({
-      ...prev,
-      vehicles: [vehicle],
-      priceHT: 150
-    }));
-
-    setStep(2);
-    toast({
-      title: "Première étape validée",
-      description: "Veuillez remplir les informations d'enlèvement",
-    });
+  const nextStep = (data: Partial<QuoteFormValues>) => {
+    setFormData({ ...formData, ...data });
+    setStep(step + 1);
   };
 
-  if (step === 2) {
-    return <PickupForm onPrevious={() => setStep(1)} onNext={() => setStep(3)} />;
-  }
+  const prevStep = () => {
+    setStep(step - 1);
+  };
+
+  const onSubmit = async (data: QuoteFormValues) => {
+    setLoading(true);
+    try {
+      const completeData = { ...formData, ...data };
+      setFormData(completeData);
+      
+      // Envoi d'email
+      await sendQuoteEmail(completeData);
+      
+      toast({
+        title: "Demande envoyée",
+        description: "Votre demande de devis a été envoyée avec succès.",
+      });
+      
+      // Réinitialiser le formulaire
+      form.reset();
+      setFormData({});
+      setStep(1);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du formulaire:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi de votre demande.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <VehicleDetailsForm 
+            form={form} 
+            onNext={(data) => nextStep(data)} 
+          />
+        );
+      case 2:
+        return (
+          <AddressForm 
+            form={form} 
+            onNext={(data) => nextStep(data)}
+            onPrevious={prevStep}
+          />
+        );
+      case 3:
+        return (
+          <ContactForm 
+            form={form} 
+            onSubmit={onSubmit}
+            onPrevious={prevStep}
+            loading={loading}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <VehicleDetailsForm form={form} />
-
-        <div className="text-sm text-gray-600 mt-6">
-          Nous tenons à vous informer que notre service de convoyage est exclusivement dédié aux véhicules en état de marche, car nos experts convoyeurs assurent le transport en conduisant personnellement chaque véhicule. Nous ne faisons pas appel à des plateaux ou des camions pour ce service.
+      <div className="space-y-6">
+        <div className="flex justify-between mb-4">
+          <div className={`h-2 bg-gray-200 rounded-full flex-1 mr-2 ${step >= 1 ? 'bg-[#1a237e]' : ''}`}></div>
+          <div className={`h-2 bg-gray-200 rounded-full flex-1 mr-2 ${step >= 2 ? 'bg-[#1a237e]' : ''}`}></div>
+          <div className={`h-2 bg-gray-200 rounded-full flex-1 ${step >= 3 ? 'bg-[#1a237e]' : ''}`}></div>
         </div>
-
-        <div className="flex justify-end mt-6">
-          <Button type="submit" className="bg-[#1a237e] hover:bg-[#3f51b5]">
-            SUIVANT
-          </Button>
-        </div>
-      </form>
+        
+        {renderStep()}
+      </div>
     </Form>
   );
 };
