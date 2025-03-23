@@ -18,6 +18,7 @@ export type QuoteRow = {
   delivery_time: string | null;
   pickup_contact: any;
   delivery_contact: any;
+  client_id?: string;
 };
 
 export type MissionRow = {
