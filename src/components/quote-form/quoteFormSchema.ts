@@ -22,13 +22,49 @@ export const quoteFormSchema = z.object({
     required_error: "Le type de carburant est requis",
   }),
   
-  // Adresses
-  pickupAddress: z.string({
-    required_error: "L'adresse de prise en charge est requise",
-  }).min(5, "L'adresse de prise en charge doit contenir au moins 5 caractères"),
-  deliveryAddress: z.string({
-    required_error: "L'adresse de livraison est requise",
-  }).min(5, "L'adresse de livraison doit contenir au moins 5 caractères"),
+  // Adresse de prise en charge
+  pickupStreetNumber: z.string({
+    required_error: "Le numéro de rue est requis",
+  }).min(1, "Le numéro de rue est requis"),
+  pickupStreetType: z.string({
+    required_error: "Le type de voie est requis", 
+  }).min(1, "Le type de voie est requis"),
+  pickupStreetName: z.string({
+    required_error: "Le nom de la voie est requis",
+  }).min(1, "Le nom de la voie est requis"),
+  pickupPostalCode: z.string({
+    required_error: "Le code postal est requis",
+  }).min(5, "Le code postal doit contenir au moins 5 caractères"),
+  pickupCity: z.string({
+    required_error: "La ville est requise",
+  }).min(1, "La ville est requise"),
+  pickupCountry: z.string({
+    required_error: "Le pays est requis",
+  }).default("France"),
+  
+  // Adresse de livraison
+  deliveryStreetNumber: z.string({
+    required_error: "Le numéro de rue est requis",
+  }).min(1, "Le numéro de rue est requis"),
+  deliveryStreetType: z.string({
+    required_error: "Le type de voie est requis",
+  }).min(1, "Le type de voie est requis"),
+  deliveryStreetName: z.string({
+    required_error: "Le nom de la voie est requis",
+  }).min(1, "Le nom de la voie est requis"),
+  deliveryPostalCode: z.string({
+    required_error: "Le code postal est requis",
+  }).min(5, "Le code postal doit contenir au moins 5 caractères"),
+  deliveryCity: z.string({
+    required_error: "La ville est requise", 
+  }).min(1, "La ville est requise"),
+  deliveryCountry: z.string({
+    required_error: "Le pays est requis",
+  }).default("France"),
+  
+  // Pour maintenir la compatibilité avec le reste du code
+  pickupAddress: z.string().optional(),
+  deliveryAddress: z.string().optional(),
   
   // Coordonnées de contact
   company: z.string().optional(),

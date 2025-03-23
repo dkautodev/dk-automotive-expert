@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { QuoteFormValues } from './quoteFormSchema';
 
 interface AddressFormProps {
@@ -20,18 +20,51 @@ interface AddressFormProps {
 
 const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
   const handleNext = () => {
+    // Création des adresses complètes à partir des champs individuels
+    const pickupAddress = `${form.getValues('pickupStreetNumber')} ${form.getValues('pickupStreetType')} ${form.getValues('pickupStreetName')}, ${form.getValues('pickupPostalCode')} ${form.getValues('pickupCity')}, ${form.getValues('pickupCountry')}`;
+    
+    const deliveryAddress = `${form.getValues('deliveryStreetNumber')} ${form.getValues('deliveryStreetType')} ${form.getValues('deliveryStreetName')}, ${form.getValues('deliveryPostalCode')} ${form.getValues('deliveryCity')}, ${form.getValues('deliveryCountry')}`;
+
+    // Mise à jour des champs d'adresse complète pour maintenir la compatibilité
+    form.setValue('pickupAddress', pickupAddress);
+    form.setValue('deliveryAddress', deliveryAddress);
+    
     const addressData = {
-      pickupAddress: form.getValues('pickupAddress'),
-      deliveryAddress: form.getValues('deliveryAddress'),
+      pickupStreetNumber: form.getValues('pickupStreetNumber'),
+      pickupStreetType: form.getValues('pickupStreetType'),
+      pickupStreetName: form.getValues('pickupStreetName'),
+      pickupPostalCode: form.getValues('pickupPostalCode'),
+      pickupCity: form.getValues('pickupCity'),
+      pickupCountry: form.getValues('pickupCountry'),
+      deliveryStreetNumber: form.getValues('deliveryStreetNumber'),
+      deliveryStreetType: form.getValues('deliveryStreetType'),
+      deliveryStreetName: form.getValues('deliveryStreetName'),
+      deliveryPostalCode: form.getValues('deliveryPostalCode'),
+      deliveryCity: form.getValues('deliveryCity'),
+      deliveryCountry: form.getValues('deliveryCountry'),
+      pickupAddress,
+      deliveryAddress
     };
     
-    const isValid = !form.formState.errors.pickupAddress && 
-                   !form.formState.errors.deliveryAddress;
-                   
-    if (isValid) {
+    const pickupFieldsValid = !form.formState.errors.pickupStreetNumber && 
+                           !form.formState.errors.pickupStreetType &&
+                           !form.formState.errors.pickupStreetName &&
+                           !form.formState.errors.pickupPostalCode &&
+                           !form.formState.errors.pickupCity;
+                           
+    const deliveryFieldsValid = !form.formState.errors.deliveryStreetNumber && 
+                             !form.formState.errors.deliveryStreetType &&
+                             !form.formState.errors.deliveryStreetName &&
+                             !form.formState.errors.deliveryPostalCode &&
+                             !form.formState.errors.deliveryCity;
+                             
+    if (pickupFieldsValid && deliveryFieldsValid) {
       onNext(addressData);
     } else {
-      form.trigger(['pickupAddress', 'deliveryAddress']);
+      form.trigger([
+        'pickupStreetNumber', 'pickupStreetType', 'pickupStreetName', 'pickupPostalCode', 'pickupCity',
+        'deliveryStreetNumber', 'deliveryStreetType', 'deliveryStreetName', 'deliveryPostalCode', 'deliveryCity'
+      ]);
     }
   };
 
@@ -40,18 +73,62 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
       <h2 className="text-2xl font-bold text-dk-navy mb-4">Adresses de prise en charge et de livraison</h2>
       
       <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-dk-navy">ADRESSE DE PRISE EN CHARGE</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="pickupStreetNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Numéro de rue <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: 123" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="pickupStreetType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Type de voie <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: Rue, Avenue, Boulevard" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
         <FormField
           control={form.control}
-          name="pickupAddress"
+          name="pickupStreetName"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                ADRESSE DE PRISE EN CHARGE <span className="text-red-500">*</span>
+                Nom de la voie <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Adresse complète de prise en charge" 
-                  className="bg-[#EEF1FF] min-h-[80px]"
+                <Input 
+                  placeholder="Ex: des Fleurs" 
+                  className="bg-[#EEF1FF]"
                   {...field} 
                 />
               </FormControl>
@@ -59,19 +136,187 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
             </FormItem>
           )}
         />
-
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="pickupPostalCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Code postal <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: 75001" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="pickupCity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Ville <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: Paris" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
         <FormField
           control={form.control}
-          name="deliveryAddress"
+          name="pickupCountry"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                ADRESSE DE LIVRAISON <span className="text-red-500">*</span>
+                Pays <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Adresse complète de livraison" 
-                  className="bg-[#EEF1FF] min-h-[80px]"
+                <Input 
+                  defaultValue="France"
+                  className="bg-[#EEF1FF]"
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <h3 className="text-lg font-semibold text-dk-navy mt-8">ADRESSE DE LIVRAISON</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="deliveryStreetNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Numéro de rue <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: 123" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="deliveryStreetType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Type de voie <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: Rue, Avenue, Boulevard" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <FormField
+          control={form.control}
+          name="deliveryStreetName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dk-navy font-semibold">
+                Nom de la voie <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Ex: des Fleurs" 
+                  className="bg-[#EEF1FF]"
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="deliveryPostalCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Code postal <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: 75001" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="deliveryCity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dk-navy font-semibold">
+                  Ville <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: Paris" 
+                    className="bg-[#EEF1FF]"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <FormField
+          control={form.control}
+          name="deliveryCountry"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dk-navy font-semibold">
+                Pays <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input 
+                  defaultValue="France"
+                  className="bg-[#EEF1FF]"
                   {...field} 
                 />
               </FormControl>

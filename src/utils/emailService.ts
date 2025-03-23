@@ -3,6 +3,25 @@ import { QuoteFormValues } from '@/components/quote-form/quoteFormSchema';
 
 export const sendQuoteEmail = async (formData: QuoteFormValues): Promise<void> => {
   try {
+    // Construction des adresses détaillées
+    const pickupAddressDetails = `
+      Numéro: ${formData.pickupStreetNumber}
+      Type de voie: ${formData.pickupStreetType}
+      Nom de voie: ${formData.pickupStreetName}
+      Code postal: ${formData.pickupPostalCode}
+      Ville: ${formData.pickupCity}
+      Pays: ${formData.pickupCountry}
+    `;
+    
+    const deliveryAddressDetails = `
+      Numéro: ${formData.deliveryStreetNumber}
+      Type de voie: ${formData.deliveryStreetType}
+      Nom de voie: ${formData.deliveryStreetName}
+      Code postal: ${formData.deliveryPostalCode}
+      Ville: ${formData.deliveryCity}
+      Pays: ${formData.deliveryCountry}
+    `;
+
     // Construction du corps de l'email
     const emailBody = `
       NOUVELLE DEMANDE DE DEVIS - COLD
@@ -15,9 +34,11 @@ export const sendQuoteEmail = async (formData: QuoteFormValues): Promise<void> =
       Immatriculation: ${formData.licensePlate}
       Carburant: ${formData.fuelType}
       
-      -- ADRESSES --
-      Adresse de prise en charge: ${formData.pickupAddress}
-      Adresse de livraison: ${formData.deliveryAddress}
+      -- ADRESSE DE PRISE EN CHARGE --
+      ${pickupAddressDetails}
+      
+      -- ADRESSE DE LIVRAISON --
+      ${deliveryAddressDetails}
       
       -- CONTACT --
       ${formData.company ? `Société: ${formData.company}` : ''}
