@@ -26,7 +26,7 @@ interface AddressFormProps {
 }
 
 const complementOptions = [
-  { value: "", label: "Aucun" },
+  { value: "aucun", label: "Aucun" },
   { value: "Appartement", label: "Appartement" },
   { value: "Étage", label: "Étage" },
   { value: "Résidence", label: "Résidence" },
@@ -177,7 +177,7 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
               </FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value || "aucun"}
               >
                 <FormControl>
                   <SelectTrigger className="bg-[#EEF1FF]">
@@ -333,7 +333,7 @@ const AddressForm = ({ form, onNext, onPrevious }: AddressFormProps) => {
               </FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value || "aucun"}
               >
                 <FormControl>
                   <SelectTrigger className="bg-[#EEF1FF]">

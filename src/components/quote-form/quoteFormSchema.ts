@@ -32,7 +32,7 @@ export const quoteFormSchema = z.object({
   pickupStreetName: z.string({
     required_error: "Le nom de la voie est requis",
   }).min(1, "Le nom de la voie est requis"),
-  pickupComplement: z.string().optional(),
+  pickupComplement: z.string().default("aucun"),
   pickupPostalCode: z.string({
     required_error: "Le code postal est requis",
   }).min(5, "Le code postal doit contenir au moins 5 caractères"),
@@ -53,7 +53,7 @@ export const quoteFormSchema = z.object({
   deliveryStreetName: z.string({
     required_error: "Le nom de la voie est requis",
   }).min(1, "Le nom de la voie est requis"),
-  deliveryComplement: z.string().optional(),
+  deliveryComplement: z.string().default("aucun"),
   deliveryPostalCode: z.string({
     required_error: "Le code postal est requis",
   }).min(5, "Le code postal doit contenir au moins 5 caractères"),
