@@ -1,0 +1,153 @@
+
+import React from 'react';
+import { useAuthContext } from '@/context/AuthContext';
+import { useTodayMissions, Mission } from '@/hooks/useTodayMissions';
+import { MissionStatusBadge } from './MissionStatusBadge';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Loader } from "@/components/ui/loader";
+import { MapPin, Truck, Calendar, Clock } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
+
+const getMissionProgress = (status: Mission['status']) => {
+  switch (status) {
+    case 'pending': return 10;
+    case 'in_progress': return 40;
+    case 'pickup_completed': return 70;
+    case 'incident': return 50;
+    case 'completed': return 100;
+    default: return 0;
+  }
+};
+
+const TodayMissions: React.FC = () => {
+  const { user } = useAuthContext();
+  const { data: missions, isLoading, error } = useTodayMissions(user?.id);
+  
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
+  if (isLoading) {
+    return <Loader className="my-8" />;
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Missions du jour</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-destructive">Erreur lors du chargement des missions</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!missions || missions.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Missions du jour</CardTitle>
+          <CardDescription>Aucune mission prévue aujourd'hui</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Truck className="h-5 w-5" />
+          Missions du jour
+        </CardTitle>
+        <CardDescription>
+          Suivez l'état d'avancement de vos missions en temps réel
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Heure</TableHead>
+              <TableHead>Adresses</TableHead>
+              <TableHead>Véhicule</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead>Progression</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {missions.map((mission) => {
+              const vehicle = mission.quote?.vehicles && 
+                Array.isArray(mission.quote.vehicles) ? 
+                mission.quote.vehicles[0] : 
+                (typeof mission.quote?.vehicles === 'object' ? mission.quote.vehicles : null);
+
+              return (
+                <TableRow key={mission.id}>
+                  <TableCell className="whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      {formatDate(mission.created_at)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-start gap-1">
+                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <span className="text-xs">{mission.quote?.pickup_address || 'Adresse inconnue'}</span>
+                      </div>
+                      <div className="flex items-start gap-1">
+                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <span className="text-xs">{mission.quote?.delivery_address || 'Adresse inconnue'}</span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {vehicle ? (
+                      <div className="text-xs">
+                        {vehicle.brand} {vehicle.model}
+                        <div className="text-muted-foreground">
+                          {vehicle.licensePlate}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">Non spécifié</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <MissionStatusBadge status={mission.status} />
+                  </TableCell>
+                  <TableCell className="w-[140px]">
+                    <Progress value={getMissionProgress(mission.status)} className="h-2" />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default TodayMissions;
