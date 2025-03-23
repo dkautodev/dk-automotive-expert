@@ -6,10 +6,10 @@ import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
-import { pickupFormSchema, type PickupFormValues } from './pickup-form/pickupFormSchema';
-import ContactSection from './pickup-form/ContactSection';
-import PickupDetailsSection from './pickup-form/PickupDetailsSection';
-import MapSection from './pickup-form/MapSection';
+import { pickupFormSchema, type PickupFormValues } from '@/components/pickup-form/pickupFormSchema';
+import ContactSection from '@/components/pickup-form/ContactSection';
+import PickupDetailsSection from '@/components/pickup-form/PickupDetailsSection';
+import MapSection from '@/components/pickup-form/MapSection';
 
 interface PickupFormProps {
   onPrevious: () => void;
