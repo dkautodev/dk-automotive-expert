@@ -35,11 +35,11 @@ const ContactForm = ({ form, onSubmit, onPrevious, loading }: ContactFormProps) 
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                SOCIÉTÉ
+                SOCIÉTÉ <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Nom de votre société (optionnel)" 
+                  placeholder="Nom de votre société" 
                   {...field} 
                   className="bg-[#EEF1FF]"
                 />
