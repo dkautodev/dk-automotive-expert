@@ -2,9 +2,9 @@
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { GoogleMap, useLoadScript, Autocomplete } from '@react-google-maps/api';
 import { Input } from "@/components/ui/input";
-import { useState } from 'react';
-import { toast } from '@/components/ui/use-toast';
-import { AlertCircle, HelpCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { toast } from '@/hooks/use-toast';
+import { AlertCircle, HelpCircle, MapPin } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   Tooltip, 
@@ -12,7 +12,7 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 
 interface MapSectionProps {
   onAddressSelect?: (address: string) => void;
@@ -23,12 +23,20 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
   const [searchBox, setSearchBox] = useState<google.maps.places.Autocomplete | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [manualAddress, setManualAddress] = useState<string>("");
+  const [currentMarker, setCurrentMarker] = useState<google.maps.Marker | null>(null);
   const projectId = "vigilant-shell-453812-d7";
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries: ['places'],
   });
+
+  useEffect(() => {
+    console.log("Map load status:", { isLoaded, loadError });
+    if (loadError) {
+      console.error("Google Maps load error:", loadError);
+    }
+  }, [isLoaded, loadError]);
 
   const handleManualAddressSubmit = () => {
     if (manualAddress && onAddressSelect) {
@@ -46,8 +54,8 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
     }
   };
 
-  // Fix the TypeScript error by properly typing the parameter
-  const openGoogleCloudConsole = (page: 'credentials' | 'api' | 'oauth' | 'places') => {
+  // Fix the TypeScript error by using type string instead of specific literals
+  const openGoogleCloudConsole = (page: string) => {
     let url = `https://console.cloud.google.com/apis`;
     
     switch (page) {
@@ -72,9 +80,9 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
   if (loadError) {
     let errorMsg = "Erreur de chargement de Google Maps";
     let solutionMsg = "Vérifiez votre connexion internet et réessayez.";
-    let errorType: 'credentials' | 'api' | 'oauth' | 'places' = 'credentials';
+    let errorType = 'credentials';
     
-    if (loadError.message?.includes('ApiNotActivatedMapError')) {
+    if (loadError.message?.includes('ApiNotActivatedMapError') || loadError.message?.includes('ApiTargetBlockedMapError')) {
       errorMsg = `L'API Google Maps Places n'est pas activée pour le projet '${projectId}'.`;
       solutionMsg = "Activez l'API Places et l'API JavaScript Maps dans la console Google Cloud.";
       errorType = 'places';
@@ -220,10 +228,12 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
   }
 
   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log("Autocomplete loaded");
     setSearchBox(autocomplete);
   };
 
   const onPlaceChanged = () => {
+    console.log("Place changed event triggered");
     if (searchBox) {
       try {
         const place = searchBox.getPlace();
@@ -252,12 +262,20 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
           map.panTo(place.geometry.location);
           map.setZoom(15);
           
-          // Ajouter un marqueur
-          new google.maps.Marker({
+          // Supprimer le marqueur précédent s'il existe
+          if (currentMarker) {
+            currentMarker.setMap(null);
+          }
+          
+          // Ajouter un nouveau marqueur
+          const marker = new google.maps.Marker({
             position: place.geometry.location,
             map: map,
-            title: place.formatted_address
+            title: place.formatted_address,
+            animation: google.maps.Animation.DROP
           });
+          
+          setCurrentMarker(marker);
         }
       } catch (error) {
         console.error("Erreur lors de la sélection du lieu:", error);
@@ -298,12 +316,15 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
         />
       </Autocomplete>
       
-      <div className="h-[300px] rounded-lg overflow-hidden">
+      <div className="h-[300px] rounded-lg overflow-hidden border border-gray-200">
         <GoogleMap
           zoom={5}
           center={{ lat: 46.603354, lng: 1.888334 }}
           mapContainerClassName="w-full h-full"
-          onLoad={(map) => setMap(map)}
+          onLoad={(map) => {
+            console.log("Map loaded");
+            setMap(map);
+          }}
           options={{
             streetViewControl: false,
             mapTypeControl: false,
@@ -311,6 +332,11 @@ const MapSection = ({ onAddressSelect }: MapSectionProps) => {
             zoomControl: true,
           }}
         />
+      </div>
+      
+      <div className="text-sm text-gray-500 flex items-center gap-1">
+        <MapPin className="h-4 w-4" />
+        <span>Sélectionnez une adresse dans le champ de recherche ou saisissez-la manuellement</span>
       </div>
     </div>
   );
