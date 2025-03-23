@@ -39,7 +39,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard/driver" element={<DriverDashboard />} />
             <Route path="/dashboard/client/*" element={<ClientDashboard />} />
-            <Route path="/dashboard/admin" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cookies" element={<Cookies />} />
