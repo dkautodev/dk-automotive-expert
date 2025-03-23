@@ -20,4 +20,14 @@ export type QuoteRow = {
   delivery_contact: any;
 };
 
+export type MissionRow = {
+  id: string;
+  client_id: string;
+  driver_id: string | null;
+  quote_id: string | null;
+  status: 'pending' | 'in_progress' | 'pickup_completed' | 'incident' | 'completed';
+  created_at: string;
+  updated_at: string | null;
+};
+
 export type Tables = Database['public']['Tables'];
