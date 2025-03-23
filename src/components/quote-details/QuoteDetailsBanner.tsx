@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { vehicleTypes } from "@/lib/vehicleTypes";
+import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
+import { PRICE_PER_KM } from "@/lib/constants";
 
 interface QuoteDetailsBannerProps {
   pickupAddress: string;
@@ -19,7 +20,6 @@ export const QuoteDetailsBanner = ({
 }: QuoteDetailsBannerProps) => {
   const [distance, setDistance] = useState("");
   const [priceHT, setPriceHT] = useState(0);
-  const PRICE_PER_KM = 2.5;
 
   useDistanceCalculation(pickupAddress, deliveryAddress, setDistance);
 
@@ -36,7 +36,8 @@ export const QuoteDetailsBanner = ({
     return vehicleType ? vehicleType.name : "Non spécifié";
   };
 
-  return <Card className="bg-secondary/50 p-6 mb-6">
+  return (
+    <Card className="bg-secondary/50 p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <p className="text-lg font-medium">Distance totale</p>
@@ -54,5 +55,6 @@ export const QuoteDetailsBanner = ({
           </div>
         </div>
       </div>
-    </Card>;
+    </Card>
+  );
 };
