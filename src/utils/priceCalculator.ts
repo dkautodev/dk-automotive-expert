@@ -9,9 +9,20 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
   try {
     const selectedPrice = await getPriceForVehicleAndDistance(vehicleTypeId, distance);
     
+    if (!selectedPrice) {
+      return {
+        priceHT: "0.00",
+        priceTTC: "0.00",
+        isPerKm: false,
+        error: "Prix non trouvé"
+      };
+    }
+    
+    const priceHTString = selectedPrice.priceHT.toString();
+    
     return {
-      priceHT: selectedPrice.priceHT.toFixed(2),
-      priceTTC: calculateTTC(selectedPrice.priceHT.toFixed(2)),
+      priceHT: priceHTString,
+      priceTTC: calculateTTC(priceHTString),
       isPerKm: selectedPrice.isPerKm
     };
   } catch (error: any) {

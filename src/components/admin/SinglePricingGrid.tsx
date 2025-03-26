@@ -12,6 +12,7 @@ interface SinglePricingGridProps {
   distanceRanges: PriceRange[];
   editingGrid: string | null;
   editedPrices: Record<string, { ht: string, ttc: string }>;
+  savingGrid?: boolean;
   onEditGrid: (vehicleTypeId: string) => void;
   onSaveGrid: (vehicleTypeId: string) => void;
   onPriceHTChange: (rangeId: string, value: string) => void;
@@ -23,6 +24,7 @@ const SinglePricingGrid: React.FC<SinglePricingGridProps> = ({
   distanceRanges,
   editingGrid,
   editedPrices,
+  savingGrid = false,
   onEditGrid,
   onSaveGrid,
   onPriceHTChange,
@@ -37,6 +39,7 @@ const SinglePricingGrid: React.FC<SinglePricingGridProps> = ({
           <CardTitle>{grid.vehicleTypeName}</CardTitle>
           <PricingActionButton 
             isEditing={isEditing}
+            isSaving={savingGrid}
             onEdit={() => onEditGrid(grid.vehicleTypeId)}
             onSave={() => onSaveGrid(grid.vehicleTypeId)}
           />
