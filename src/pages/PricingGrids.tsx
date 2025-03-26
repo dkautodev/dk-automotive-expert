@@ -1,8 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
+import PricingGrid from "@/components/admin/PricingGrid";
 
 const PricingGrids = () => {
   return (
@@ -15,51 +16,42 @@ const PricingGrids = () => {
         </Button>
       </div>
       
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Grilles tarifaires</CardTitle>
-          <CardDescription>Configurez les différentes grilles tarifaires pour les devis clients</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Type de véhicule</TableHead>
-                <TableHead>Prix de base (HT)</TableHead>
-                <TableHead>Prix par km (HT)</TableHead>
-                <TableHead>TVA (%)</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Voiture particulière</TableCell>
-                <TableCell>Citadine</TableCell>
-                <TableCell>100 €</TableCell>
-                <TableCell>0.50 €</TableCell>
-                <TableCell>20%</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm">Modifier</Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Utilitaire léger</TableCell>
-                <TableCell>Camionnette</TableCell>
-                <TableCell>150 €</TableCell>
-                <TableCell>0.75 €</TableCell>
-                <TableCell>20%</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm">Modifier</Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter className="text-sm text-gray-500">
-          Ces tarifs sont utilisés pour calculer automatiquement le prix des devis clients.
-        </CardFooter>
-      </Card>
+      <Tabs defaultValue="by-vehicle" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="by-vehicle">Par véhicule</TabsTrigger>
+          <TabsTrigger value="all-grids">Toutes les grilles</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="by-vehicle">
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Grilles tarifaires par type de véhicule</CardTitle>
+              <CardDescription>
+                Configurez les tarifs pour chaque type de véhicule en fonction des tranches kilométriques
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PricingGrid />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="all-grids">
+          <Card>
+            <CardHeader>
+              <CardTitle>Vue complète des grilles tarifaires</CardTitle>
+              <CardDescription>
+                Aperçu de toutes les grilles tarifaires en un seul tableau
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-500">
+                Cette vue est en cours de développement. Veuillez utiliser la vue par véhicule pour le moment.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
