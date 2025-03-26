@@ -50,7 +50,16 @@ const AdminHome = () => {
       
       setPendingQuotesCount(pendingCount || 0);
       setOngoingMissionsCount(ongoingCount || 0);
-      setCompletedMissions(completedData || []);
+      
+      // Convert the response to match our MissionRow type
+      if (completedData) {
+        const typedMissions = completedData.map(mission => ({
+          ...mission,
+          status: mission.status as MissionRow['status'], // Cast status to the expected type
+        })) as MissionRow[];
+        setCompletedMissions(typedMissions);
+      }
+      
       setPendingInvoices(invoicesData as QuoteRow[] || []);
     };
 

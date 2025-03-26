@@ -29,6 +29,10 @@ export type MissionRow = {
   status: 'pending' | 'in_progress' | 'pickup_completed' | 'incident' | 'completed';
   created_at: string;
   updated_at: string | null;
+  quote?: {
+    pickup_address: string;
+    delivery_address: string;
+  };
 };
 
 export type Tables = Database['public']['Tables'];
