@@ -1,9 +1,16 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
+import { Facebook, Instagram, UserRound, Menu, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const isMobile = useIsMobile();
@@ -32,9 +39,20 @@ const Navbar = () => {
           <p className="text-sm text-center hidden md:block font-light">
             Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.
           </p>
-          <div className="invisible flex gap-4 hidden md:flex">
-            <Facebook size={20} />
-            <Instagram size={20} />
+          <div className="flex gap-4 items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="text-white/70 hover:text-white/100 transition-colors text-xs flex items-center gap-1">
+                  <ShieldCheck size={14} />
+                  <span className="sr-only md:not-sr-only">Admin</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/admin-auth">Espace administrateur</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
