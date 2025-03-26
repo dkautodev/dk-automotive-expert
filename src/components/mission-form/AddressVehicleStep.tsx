@@ -23,6 +23,7 @@ import { MissionFormValues } from "./missionFormSchema";
 import { vehicleTypes } from "@/lib/vehicleTypes";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
+import ClientSelector from "./ClientSelector";
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -70,8 +71,10 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
     <div className="space-y-6">
       <div className="text-2xl font-semibold">Adresses et type de véhicule</div>
       <p className="text-muted-foreground">
-        Veuillez saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule
+        Veuillez sélectionner un client et saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule
       </p>
+
+      <ClientSelector form={form} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
