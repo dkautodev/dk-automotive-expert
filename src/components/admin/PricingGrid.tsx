@@ -174,7 +174,7 @@ const PricingGrid: React.FC = () => {
                       <TableRow key={price.rangeId}>
                         <TableCell>
                           {range?.label}
-                          {range?.perKm && " /km"}
+                          {range?.perKm && <span className="text-gray-500 italic font-light ml-1">(€/km)</span>}
                         </TableCell>
                         <TableCell>
                           {editingGrid === grid.vehicleTypeId ? (
