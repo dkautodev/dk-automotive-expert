@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
@@ -150,6 +150,15 @@ const SignInForm = () => {
           </form>
         </Form>
       </CardContent>
+      <CardFooter className="flex justify-end pt-0">
+        <Link 
+          to="/admin-auth" 
+          className="text-xs text-muted-foreground hover:text-dk-navy flex items-center gap-1 transition-colors"
+        >
+          <ShieldCheck size={14} />
+          Espace administrateur
+        </Link>
+      </CardFooter>
     </Card>
   );
 };
