@@ -1,30 +1,33 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-/**
- * A simplified distance calculation hook that doesn't use Google Maps API
- */
-export const useDistanceCalculation = (
-  originAddress: string,
-  destinationAddress: string,
-  setDistance: React.Dispatch<React.SetStateAction<string>>
-) => {
-  useEffect(() => {
-    // Simplified calculation logic
-    const calculateDistanceEstimate = () => {
-      if (!originAddress || !destinationAddress) {
-        setDistance("");
-        return;
-      }
+// Simule le calcul de distance en attendant l'intégration Google Maps
+export const useDistanceCalculation = () => {
+  const [isCalculating, setIsCalculating] = useState(false);
+  
+  const calculateDistance = async (originAddress: string, destinationAddress: string): Promise<number> => {
+    try {
+      setIsCalculating(true);
       
-      // Return a placeholder distance based on string lengths
-      // This is just a placeholder and not a real calculation
-      const randomDistance = Math.floor(Math.random() * 100) + 10;
-      setDistance(`${randomDistance} km`);
-    };
-
-    calculateDistanceEstimate();
-  }, [originAddress, destinationAddress, setDistance]);
-
-  return null;
+      // TODO: À remplacer par l'appel à l'API Google Maps quand elle sera installée
+      // Pour le moment, on simule un délai et on génère une distance aléatoire entre 5 et 500 km
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulation d'une distance
+      // Cette partie sera remplacée par le vrai calcul avec Google Maps
+      const randomDistance = Math.floor(Math.random() * 496) + 5; // Entre 5 et 500 km
+      
+      setIsCalculating(false);
+      return randomDistance;
+    } catch (error) {
+      setIsCalculating(false);
+      console.error('Erreur lors du calcul de la distance:', error);
+      throw error;
+    }
+  };
+  
+  return {
+    calculateDistance,
+    isCalculating
+  };
 };

@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import {
   Form,
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { QuoteFormValues } from './quoteFormSchema';
 import { carBrands, getModelsByBrand } from './vehicleData';
+import VehicleTypeSelector from './VehicleTypeSelector';
 
 interface VehicleDetailsFormProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -58,35 +58,7 @@ const VehicleDetailsForm = ({ form, onNext }: VehicleDetailsFormProps) => {
       <h2 className="text-2xl font-bold text-dk-navy mb-4">Informations du véhicule</h2>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <FormField
-          control={form.control}
-          name="vehicleType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-dk-navy font-semibold">
-                TYPE DE VÉHICULE <span className="text-red-500">*</span>
-              </FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="bg-[#EEF1FF]">
-                    <SelectValue placeholder="Choix du véhicule" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="citadine">Citadine</SelectItem>
-                  <SelectItem value="berline">Berline</SelectItem>
-                  <SelectItem value="suv">4x4 (ou SUV)</SelectItem>
-                  <SelectItem value="utilitaire-3-5">Utilitaire 3-5m3</SelectItem>
-                  <SelectItem value="utilitaire-6-12">Utilitaire 6-12m3</SelectItem>
-                  <SelectItem value="utilitaire-12-15">Utilitaire 12-15m3</SelectItem>
-                  <SelectItem value="utilitaire-15-20">Utilitaire 15-20m3</SelectItem>
-                  <SelectItem value="utilitaire-20plus">Utilitaire + de 20m3</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <VehicleTypeSelector form={form} />
 
         <FormField
           control={form.control}
