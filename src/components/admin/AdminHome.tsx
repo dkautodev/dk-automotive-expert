@@ -1,14 +1,13 @@
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteRow, MissionRow } from "@/types/database";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { Check, Receipt } from "lucide-react";
 import CreateMissionDialog from "@/components/mission-form/CreateMissionDialog";
+import DashboardCards from "./DashboardCards";
+import CompletedMissionsTable from "./CompletedMissionsTable";
+import PendingInvoicesTable from "./PendingInvoicesTable";
 
 const AdminHome = () => {
   const [pendingQuotesCount, setPendingQuotesCount] = useState(0);
@@ -67,14 +66,6 @@ const AdminHome = () => {
     fetchDashboardData();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
-    } catch (error) {
-      return "Date invalide";
-    }
-  };
-
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -82,25 +73,10 @@ const AdminHome = () => {
         <CreateMissionDialog onMissionCreated={fetchDashboardData} />
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Devis en attente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{pendingQuotesCount}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Missions en cours</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{ongoingMissionsCount}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardCards 
+        pendingQuotesCount={pendingQuotesCount} 
+        ongoingMissionsCount={ongoingMissionsCount} 
+      />
 
       <Tabs defaultValue="completed-missions" className="mt-8">
         <TabsList className="mb-4">
@@ -115,77 +91,11 @@ const AdminHome = () => {
         </TabsList>
         
         <TabsContent value="completed-missions">
-          <Card>
-            <CardHeader>
-              <CardTitle>Missions terminées récentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID Mission</TableHead>
-                    <TableHead>Adresse départ</TableHead>
-                    <TableHead>Adresse livraison</TableHead>
-                    <TableHead>Date de fin</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {completedMissions.length > 0 ? (
-                    completedMissions.map((mission) => (
-                      <TableRow key={mission.id}>
-                        <TableCell className="font-medium">{mission.id.substring(0, 8)}</TableCell>
-                        <TableCell>{mission.quote?.pickup_address || mission.pickup_address || "N/A"}</TableCell>
-                        <TableCell>{mission.quote?.delivery_address || mission.delivery_address || "N/A"}</TableCell>
-                        <TableCell>{mission.updated_at ? formatDate(mission.updated_at) : "N/A"}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-4">Aucune mission terminée</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <CompletedMissionsTable missions={completedMissions} />
         </TabsContent>
         
         <TabsContent value="pending-invoices">
-          <Card>
-            <CardHeader>
-              <CardTitle>Factures en attente de paiement</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>N° Devis</TableHead>
-                    <TableHead>Départ</TableHead>
-                    <TableHead>Arrivée</TableHead>
-                    <TableHead>Montant</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingInvoices.length > 0 ? (
-                    pendingInvoices.map((invoice) => (
-                      <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.quote_number}</TableCell>
-                        <TableCell>{invoice.pickup_address.split(',')[0]}</TableCell>
-                        <TableCell>{invoice.delivery_address.split(',')[0]}</TableCell>
-                        <TableCell>{invoice.total_price_ttc} €</TableCell>
-                        <TableCell>{formatDate(invoice.date_created || "")}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">Aucune facture en attente</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <PendingInvoicesTable invoices={pendingInvoices} />
         </TabsContent>
       </Tabs>
     </div>
