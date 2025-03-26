@@ -104,7 +104,7 @@ const PricingGrids = () => {
                     {distanceRanges.map((range) => (
                       <TableRow key={range.id}>
                         <TableCell className="font-medium sticky left-0 bg-background z-10 border-r">
-                          {range.label.replace(' km', '')}
+                          {range.label}
                           {range.perKm && <span className="text-gray-500 italic font-light ml-1">(€/km)</span>}
                         </TableCell>
                         {vehicleTypes.map((vehicleType, index) => {
