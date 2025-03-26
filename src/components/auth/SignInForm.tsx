@@ -36,27 +36,44 @@ const SignInForm = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
+      console.log("Tentative de connexion avec", data.email);
       
-      // Si c'est l'admin, vérifier le mot de passe spécial
+      // Si c'est l'admin
       if (data.email === 'dkautomotive70@gmail.com') {
-        if (data.password === 'adminadmin70') {
+        console.log("Tentative de connexion admin");
+        try {
           await signIn(data.email, data.password);
-          navigate('/dashboard/admin');
           toast.success("Connexion administrateur réussie");
+          navigate('/dashboard/admin');
+          return;
+        } catch (error: any) {
+          console.error("Erreur connexion admin:", error);
+          
+          // Si le mot de passe est correct mais qu'il y a un problème avec Supabase
+          if (data.password === 'adminadmin70') {
+            toast.error("Problème de connexion: " + error.message);
+          } else {
+            toast.error("Mot de passe incorrect pour l'administrateur");
+          }
+          setIsLoading(false);
           return;
         }
       }
       
       // Pour les autres utilisateurs, connexion normale
-      await signIn(data.email, data.password);
-      
-      // After successful login, redirect to client dashboard by default
-      navigate('/dashboard/client');
-      toast.success("Connexion réussie");
-      
+      try {
+        await signIn(data.email, data.password);
+        toast.success("Connexion réussie");
+        navigate('/dashboard/client');
+      } catch (error: any) {
+        console.error("Erreur connexion:", error);
+        toast.error(error.message || "Identifiants invalides. Veuillez vérifier votre email et mot de passe.");
+      } finally {
+        setIsLoading(false);
+      }
     } catch (error: any) {
+      console.error("Erreur générale:", error);
       toast.error(error.message || "Une erreur est survenue lors de la connexion");
-    } finally {
       setIsLoading(false);
     }
   };
