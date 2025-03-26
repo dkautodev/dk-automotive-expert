@@ -257,9 +257,6 @@ export const usePricingGridsDB = () => {
         const rangeId = row.distance_range_id;
         const isPerKm = row.is_per_km;
         
-        // Extraire les nombres de la tranche (ex: "1-10" => [1, 10])
-        const rangeParts = rangeId.split('-').map(Number);
-        
         // Gérer le cas spécial "701+"
         if (rangeId === '701+' && distance > 700) {
           selectedPrice = isPerKm ? 
@@ -267,6 +264,9 @@ export const usePricingGridsDB = () => {
             { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
           break;
         }
+        
+        // Extraire les nombres de la tranche (ex: "1-10" => [1, 10])
+        const rangeParts = rangeId.split('-').map(Number);
         
         // Pour les autres tranches
         if (rangeParts.length === 2) {
