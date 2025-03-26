@@ -1,28 +1,11 @@
 
 import React from 'react';
-import { Edit, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import PriceTableRow from './PriceTableRow';
-import { calculateTTC } from '@/utils/priceCalculations';
-
-interface PriceRange {
-  id: string;
-  label: string;
-  perKm?: boolean;
-}
-
-interface PriceData {
-  rangeId: string;
-  priceHT: string;
-}
-
-interface PriceGrid {
-  vehicleTypeId: string;
-  vehicleTypeName: string;
-  prices: PriceData[];
-}
+import { PriceGrid, PriceRange } from './pricingTypes';
+import PricingTableHeader from './PricingTableHeader';
+import PricingTableBody from './PricingTableBody';
+import PricingActionButton from './PricingActionButton';
 
 interface SinglePricingGridProps {
   grid: PriceGrid;
@@ -45,31 +28,18 @@ const SinglePricingGrid: React.FC<SinglePricingGridProps> = ({
   onPriceHTChange,
   onPriceTTCChange,
 }) => {
+  const isEditing = editingGrid === grid.vehicleTypeId;
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-gray-50">
         <div className="flex justify-between items-center">
           <CardTitle>{grid.vehicleTypeName}</CardTitle>
-          {editingGrid === grid.vehicleTypeId ? (
-            <Button 
-              onClick={() => onSaveGrid(grid.vehicleTypeId)}
-              size="sm"
-              className="gap-2"
-            >
-              <Save className="h-4 w-4" />
-              Enregistrer
-            </Button>
-          ) : (
-            <Button 
-              onClick={() => onEditGrid(grid.vehicleTypeId)}
-              variant="outline" 
-              size="sm"
-              className="gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Modifier
-            </Button>
-          )}
+          <PricingActionButton 
+            isEditing={isEditing}
+            onEdit={() => onEditGrid(grid.vehicleTypeId)}
+            onSave={() => onSaveGrid(grid.vehicleTypeId)}
+          />
         </div>
         <CardDescription>
           Grille tarifaire pour {grid.vehicleTypeName.toLowerCase()}
@@ -78,30 +48,15 @@ const SinglePricingGrid: React.FC<SinglePricingGridProps> = ({
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-bold">Distance</TableHead>
-                <TableHead className="font-bold">Prix HT</TableHead>
-                <TableHead className="font-bold">Prix TTC</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {grid.prices.map((price) => {
-                const range = distanceRanges.find(r => r.id === price.rangeId);
-                return range && (
-                  <PriceTableRow
-                    key={price.rangeId}
-                    priceData={price}
-                    range={range}
-                    isEditing={editingGrid === grid.vehicleTypeId}
-                    editedPrices={editedPrices}
-                    onPriceHTChange={onPriceHTChange}
-                    onPriceTTCChange={onPriceTTCChange}
-                    calculateTTC={calculateTTC}
-                  />
-                );
-              })}
-            </TableBody>
+            <PricingTableHeader />
+            <PricingTableBody 
+              prices={grid.prices}
+              distanceRanges={distanceRanges}
+              isEditing={isEditing}
+              editedPrices={editedPrices}
+              onPriceHTChange={onPriceHTChange}
+              onPriceTTCChange={onPriceTTCChange}
+            />
           </Table>
         </div>
       </CardContent>
