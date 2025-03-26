@@ -1,4 +1,5 @@
 
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,47 +14,8 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { vehicleTypes } from "@/lib/vehicleTypes";
-import { useState } from "react";
-
-// Define the distance ranges
-const distanceRanges = [
-  { id: '1-10', label: '1 - 10 km' },
-  { id: '11-20', label: '11 - 20 km' },
-  { id: '21-30', label: '21 - 30 km' },
-  { id: '31-40', label: '31 - 40 km' },
-  { id: '41-50', label: '41 - 50 km' },
-  { id: '51-60', label: '51 - 60 km' },
-  { id: '61-70', label: '61 - 70 km' },
-  { id: '71-80', label: '71 - 80 km' },
-  { id: '81-90', label: '81 - 90 km' },
-  { id: '91-100', label: '91 - 100 km' },
-  { id: '101-200', label: '101 - 200 km', perKm: true },
-  { id: '201-300', label: '201 - 300 km', perKm: true },
-  { id: '301-400', label: '301 - 400 km', perKm: true },
-  { id: '401-500', label: '401 - 500 km', perKm: true },
-  { id: '501-600', label: '501 - 600 km', perKm: true },
-  { id: '601-700', label: '601 - 700 km', perKm: true },
-  { id: '701+', label: '+ de 701 km', perKm: true },
-];
-
-// Sample price grid data - in a real app this would come from the database
-const initialPriceGrids = vehicleTypes.map((vehicleType) => ({
-  vehicleTypeId: vehicleType.id,
-  vehicleTypeName: vehicleType.name,
-  prices: distanceRanges.map((range) => ({
-    rangeId: range.id,
-    priceHT: ((Math.random() * 50) + 50).toFixed(2), // Random price between 50 and 100€
-  })),
-}));
-
-// VAT rate (20%)
-const VAT_RATE = 0.20;
-
-// Calculate TTC from HT
-const calculateTTC = (priceHT: string): string => {
-  const ht = parseFloat(priceHT);
-  return (ht + (ht * VAT_RATE)).toFixed(2);
-};
+import { distanceRanges, initialPriceGrids } from "@/hooks/usePricingGrids";
+import { calculateTTC } from "@/utils/priceCalculations";
 
 const PricingGrids = () => {
   const [activeTab, setActiveTab] = useState("by-vehicle");
