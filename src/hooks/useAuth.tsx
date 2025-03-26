@@ -152,6 +152,46 @@ export const useAuth = () => {
     return data;
   };
 
+  const registerAdmin = async (email: string, password: string) => {
+    try {
+      // Check if this is the designated admin email
+      if (email !== 'dkautomotive70@gmail.com') {
+        throw new Error("Seule l'adresse email administrative est autorisée");
+      }
+      
+      // Attempt to create an admin account
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { role: 'admin' }
+        }
+      });
+      
+      if (error) {
+        // Check if user already exists
+        if (error.message.includes("User already registered")) {
+          // Try to update the user's role instead
+          await signIn(email, password);
+          return { success: true, message: "Connexion administrateur réussie" };
+        }
+        throw error;
+      }
+      
+      return { 
+        success: true, 
+        message: "Compte administrateur créé avec succès",
+        data
+      };
+    } catch (error: any) {
+      console.error("Erreur lors de l'inscription admin:", error);
+      return {
+        success: false,
+        message: error.message || "Une erreur est survenue lors de la création du compte admin"
+      };
+    }
+  };
+
   const fetchUserProfile = async (userId: string) => {
     const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
@@ -180,6 +220,7 @@ export const useAuth = () => {
     ...authState,
     signIn,
     signUp,
+    registerAdmin,
     signOut: async () => {
       await supabase.auth.signOut();
       setAuthState({
