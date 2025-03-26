@@ -19,13 +19,13 @@ const distanceRanges = [
   { id: '71-80', label: '71 - 80 km' },
   { id: '81-90', label: '81 - 90 km' },
   { id: '91-100', label: '91 - 100 km' },
-  { id: '101-200', label: '101 - 200 km' },
-  { id: '201-300', label: '201 - 300 km' },
-  { id: '301-400', label: '301 - 400 km' },
-  { id: '401-500', label: '401 - 500 km' },
-  { id: '501-600', label: '501 - 600 km' },
-  { id: '601-700', label: '601 - 700 km' },
-  { id: '701+', label: '+ de 701 km' },
+  { id: '101-200', label: '101 - 200 km', perKm: true },
+  { id: '201-300', label: '201 - 300 km', perKm: true },
+  { id: '301-400', label: '301 - 400 km', perKm: true },
+  { id: '401-500', label: '401 - 500 km', perKm: true },
+  { id: '501-600', label: '501 - 600 km', perKm: true },
+  { id: '601-700', label: '601 - 700 km', perKm: true },
+  { id: '701+', label: '+ de 701 km', perKm: true },
 ];
 
 // Sample price grid data - in a real app this would come from the database
@@ -34,14 +34,34 @@ const initialPriceGrids = vehicleTypes.map((vehicleType) => ({
   vehicleTypeName: vehicleType.name,
   prices: distanceRanges.map((range) => ({
     rangeId: range.id,
-    price: ((Math.random() * 50) + 50).toFixed(2), // Random price between 50 and 100€
+    priceHT: ((Math.random() * 50) + 50).toFixed(2), // Random price between 50 and 100€
   })),
 }));
+
+// VAT rate (20%)
+const VAT_RATE = 0.20;
+
+// Calculate TTC from HT
+const calculateTTC = (priceHT: string): string => {
+  const ht = parseFloat(priceHT);
+  return (ht + (ht * VAT_RATE)).toFixed(2);
+};
+
+// Calculate HT from TTC
+const calculateHT = (priceTTC: string): string => {
+  const ttc = parseFloat(priceTTC);
+  return (ttc / (1 + VAT_RATE)).toFixed(2);
+};
+
+interface PriceData {
+  rangeId: string;
+  priceHT: string;
+}
 
 const PricingGrid: React.FC = () => {
   const [priceGrids, setPriceGrids] = useState(initialPriceGrids);
   const [editingGrid, setEditingGrid] = useState<string | null>(null);
-  const [editedPrices, setEditedPrices] = useState<Record<string, string>>({});
+  const [editedPrices, setEditedPrices] = useState<Record<string, { ht: string, ttc: string }>>({});
 
   const handleEditGrid = (vehicleTypeId: string) => {
     setEditingGrid(vehicleTypeId);
@@ -49,9 +69,12 @@ const PricingGrid: React.FC = () => {
     // Initialize edited prices with current values
     const grid = priceGrids.find(g => g.vehicleTypeId === vehicleTypeId);
     if (grid) {
-      const prices: Record<string, string> = {};
+      const prices: Record<string, { ht: string, ttc: string }> = {};
       grid.prices.forEach(p => {
-        prices[p.rangeId] = p.price.toString();
+        prices[p.rangeId] = { 
+          ht: p.priceHT, 
+          ttc: calculateTTC(p.priceHT) 
+        };
       });
       setEditedPrices(prices);
     }
@@ -65,7 +88,7 @@ const PricingGrid: React.FC = () => {
             ...grid,
             prices: grid.prices.map(price => ({
               ...price,
-              price: editedPrices[price.rangeId] || price.price,
+              priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
             })),
           };
         }
@@ -76,10 +99,29 @@ const PricingGrid: React.FC = () => {
     setEditedPrices({});
   };
 
-  const handlePriceChange = (rangeId: string, value: string) => {
+  const handlePriceHTChange = (rangeId: string, value: string) => {
+    const sanitizedValue = value.replace(/[^0-9.]/g, '');
+    const ttcValue = calculateTTC(sanitizedValue);
+    
     setEditedPrices(prev => ({
       ...prev,
-      [rangeId]: value,
+      [rangeId]: { 
+        ht: sanitizedValue,
+        ttc: ttcValue
+      },
+    }));
+  };
+
+  const handlePriceTTCChange = (rangeId: string, value: string) => {
+    const sanitizedValue = value.replace(/[^0-9.]/g, '');
+    const htValue = calculateHT(sanitizedValue);
+    
+    setEditedPrices(prev => ({
+      ...prev,
+      [rangeId]: { 
+        ht: htValue,
+        ttc: sanitizedValue
+      },
     }));
   };
 
@@ -121,7 +163,8 @@ const PricingGrid: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="font-bold">Distance</TableHead>
-                    <TableHead className="font-bold">Prix (HT)</TableHead>
+                    <TableHead className="font-bold">Prix HT</TableHead>
+                    <TableHead className="font-bold">Prix TTC</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -129,19 +172,36 @@ const PricingGrid: React.FC = () => {
                     const range = distanceRanges.find(r => r.id === price.rangeId);
                     return (
                       <TableRow key={price.rangeId}>
-                        <TableCell>{range?.label}</TableCell>
+                        <TableCell>
+                          {range?.label}
+                          {range?.perKm && " /km"}
+                        </TableCell>
                         <TableCell>
                           {editingGrid === grid.vehicleTypeId ? (
                             <Input
-                              type="number"
+                              type="text"
                               min="0"
                               step="0.01"
-                              value={editedPrices[price.rangeId] || price.price}
-                              onChange={(e) => handlePriceChange(price.rangeId, e.target.value)}
+                              value={editedPrices[price.rangeId]?.ht || price.priceHT}
+                              onChange={(e) => handlePriceHTChange(price.rangeId, e.target.value)}
                               className="w-32"
                             />
                           ) : (
-                            `${price.price} €`
+                            `${price.priceHT} €`
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingGrid === grid.vehicleTypeId ? (
+                            <Input
+                              type="text"
+                              min="0"
+                              step="0.01"
+                              value={editedPrices[price.rangeId]?.ttc || calculateTTC(price.priceHT)}
+                              onChange={(e) => handlePriceTTCChange(price.rangeId, e.target.value)}
+                              className="w-32"
+                            />
+                          ) : (
+                            `${calculateTTC(price.priceHT)} €`
                           )}
                         </TableCell>
                       </TableRow>
