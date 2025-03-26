@@ -31,6 +31,17 @@ interface Client {
   phone: string;
 }
 
+// Define a separate type for the database response to avoid recursive type issues
+interface ClientFromDB {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: {
+    email: string;
+  } | null;
+  phone: string;
+}
+
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;
 }
@@ -62,7 +73,8 @@ const ClientSelector = ({ form }: ClientSelectorProps) => {
       if (error) throw error;
 
       // Format client data with email from the joined user table
-      const formattedClients = data.map(client => ({
+      // Use the ClientFromDB type to type the response data correctly
+      const formattedClients = (data as ClientFromDB[]).map(client => ({
         ...client,
         email: client.email?.email || "",
       }));
