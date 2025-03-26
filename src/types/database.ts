@@ -41,6 +41,8 @@ export type MissionRow = {
   price_ttc: number | null;
   created_at: string;
   updated_at: string | null;
+  pickup_address?: string; // Added property
+  delivery_address?: string; // Added property
   quote?: {
     pickup_address: string;
     delivery_address: string;

@@ -13,6 +13,7 @@ import AddressVehicleStep from "./AddressVehicleStep";
 import VehicleInfoStep from "./VehicleInfoStep";
 import ContactScheduleStep from "./ContactScheduleStep";
 import { useAuthContext } from "@/context/AuthContext";
+import React from "react"; // Added React import
 
 interface CreateMissionFormProps {
   onSuccess: () => void;
