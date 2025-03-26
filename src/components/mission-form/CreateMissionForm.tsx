@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -13,7 +13,6 @@ import AddressVehicleStep from "./AddressVehicleStep";
 import VehicleInfoStep from "./VehicleInfoStep";
 import ContactScheduleStep from "./ContactScheduleStep";
 import { useAuthContext } from "@/context/AuthContext";
-import React from "react"; // Added React import
 
 interface CreateMissionFormProps {
   onSuccess: () => void;
@@ -28,6 +27,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
     resolver: zodResolver(missionFormSchema),
     defaultValues: {
       mission_type: "livraison",
+      client_id: "",
       pickup_address: "",
       delivery_address: "",
       vehicle_type: "",
@@ -84,8 +84,8 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       // Format data for database
       const missionData = {
         mission_type: values.mission_type,
-        status: "en_attente",
-        client_id: user?.id,
+        status: "confirmé", // Changé de "en_attente" à "confirmé" pour les missions créées par l'admin
+        client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
         pickup_address: values.pickup_address,
         delivery_address: values.delivery_address,
         distance: values.distance,

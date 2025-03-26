@@ -1,4 +1,5 @@
 
+import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { CalendarIcon, Upload, Loader } from "lucide-react";
+import { CalendarIcon, Upload, Loader, Clock } from "lucide-react";
 import { MissionFormValues } from "./missionFormSchema";
 import { useState } from "react";
 
@@ -215,6 +216,7 @@ const ContactScheduleStep = ({
                           date < new Date(new Date().setHours(0, 0, 0, 0))
                         }
                         initialFocus
+                        locale={fr}
                       />
                     </PopoverContent>
                   </Popover>
@@ -230,7 +232,10 @@ const ContactScheduleStep = ({
                 <FormItem>
                   <FormLabel>Heure de prise en charge</FormLabel>
                   <FormControl>
-                    <Input placeholder="14:00" {...field} />
+                    <div className="relative">
+                      <Clock className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Input type="time" className="pl-8" {...field} />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -275,6 +280,7 @@ const ContactScheduleStep = ({
                           );
                         }}
                         initialFocus
+                        locale={fr}
                       />
                     </PopoverContent>
                   </Popover>
@@ -290,7 +296,10 @@ const ContactScheduleStep = ({
                 <FormItem>
                   <FormLabel>Heure de livraison</FormLabel>
                   <FormControl>
-                    <Input placeholder="18:00" {...field} />
+                    <div className="relative">
+                      <Clock className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Input type="time" className="pl-8" {...field} />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -300,7 +309,7 @@ const ContactScheduleStep = ({
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-4">Documents</h3>
+          <h3 className="text-lg font-semibold mb-4">Documents (facultatif)</h3>
           <div className="space-y-4">
             <label className="flex items-center gap-2 cursor-pointer border rounded-md p-3 hover:bg-accent">
               <Upload className="h-5 w-5" />
