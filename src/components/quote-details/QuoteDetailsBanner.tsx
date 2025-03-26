@@ -20,8 +20,24 @@ export const QuoteDetailsBanner = ({
 }: QuoteDetailsBannerProps) => {
   const [distance, setDistance] = useState("");
   const [priceHT, setPriceHT] = useState(0);
-
-  useDistanceCalculation(pickupAddress, deliveryAddress, setDistance);
+  
+  // Fixed the hook usage to follow its proper implementation
+  const { calculateDistance, isCalculating } = useDistanceCalculation();
+  
+  useEffect(() => {
+    const fetchDistance = async () => {
+      try {
+        if (pickupAddress && deliveryAddress) {
+          const distanceInKm = await calculateDistance(pickupAddress, deliveryAddress);
+          setDistance(`${distanceInKm} km`);
+        }
+      } catch (error) {
+        console.error("Error calculating distance:", error);
+      }
+    };
+    
+    fetchDistance();
+  }, [pickupAddress, deliveryAddress, calculateDistance]);
 
   useEffect(() => {
     if (distance) {
@@ -41,7 +57,7 @@ export const QuoteDetailsBanner = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <p className="text-lg font-medium">Distance totale</p>
-          <p className="text-2xl font-bold">{distance || "Calcul en cours..."}</p>
+          <p className="text-2xl font-bold">{isCalculating ? "Calcul en cours..." : distance || "Non calculée"}</p>
         </div>
         <div className="space-y-2">
           <p className="text-lg font-medium">Type de véhicule</p>
