@@ -6,23 +6,23 @@ import { calculateHT, calculateTTC } from '@/utils/priceCalculations';
 
 // Define the distance ranges
 export const distanceRanges: PriceRange[] = [
-  { id: '1-10', label: '1 - 10 km' },
-  { id: '11-20', label: '11 - 20 km' },
-  { id: '21-30', label: '21 - 30 km' },
-  { id: '31-40', label: '31 - 40 km' },
-  { id: '41-50', label: '41 - 50 km' },
-  { id: '51-60', label: '51 - 60 km' },
-  { id: '61-70', label: '61 - 70 km' },
-  { id: '71-80', label: '71 - 80 km' },
-  { id: '81-90', label: '81 - 90 km' },
-  { id: '91-100', label: '91 - 100 km' },
-  { id: '101-200', label: '101 - 200 km', perKm: true },
-  { id: '201-300', label: '201 - 300 km', perKm: true },
-  { id: '301-400', label: '301 - 400 km', perKm: true },
-  { id: '401-500', label: '401 - 500 km', perKm: true },
-  { id: '501-600', label: '501 - 600 km', perKm: true },
-  { id: '601-700', label: '601 - 700 km', perKm: true },
-  { id: '701+', label: '+ de 701 km', perKm: true },
+  { id: '1-10', label: '1 - 10' },
+  { id: '11-20', label: '11 - 20' },
+  { id: '21-30', label: '21 - 30' },
+  { id: '31-40', label: '31 - 40' },
+  { id: '41-50', label: '41 - 50' },
+  { id: '51-60', label: '51 - 60' },
+  { id: '61-70', label: '61 - 70' },
+  { id: '71-80', label: '71 - 80' },
+  { id: '81-90', label: '81 - 90' },
+  { id: '91-100', label: '91 - 100' },
+  { id: '101-200', label: '101 - 200', perKm: true },
+  { id: '201-300', label: '201 - 300', perKm: true },
+  { id: '301-400', label: '301 - 400', perKm: true },
+  { id: '401-500', label: '401 - 500', perKm: true },
+  { id: '501-600', label: '501 - 600', perKm: true },
+  { id: '601-700', label: '601 - 700', perKm: true },
+  { id: '701+', label: '+ de 701', perKm: true },
 ];
 
 // Sample price grid data - in a real app this would come from the database
@@ -58,20 +58,41 @@ export const usePricingGrids = () => {
   };
 
   const handleSaveGrid = (vehicleTypeId: string) => {
-    setPriceGrids(prevGrids => 
-      prevGrids.map(grid => {
-        if (grid.vehicleTypeId === vehicleTypeId) {
-          return {
-            ...grid,
-            prices: grid.prices.map(price => ({
-              ...price,
-              priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
-            })),
-          };
+    setPriceGrids(prevGrids => {
+      // Create a new array to avoid mutating the previous state
+      const newGrids = [...prevGrids];
+      
+      // Find the grid that's being edited
+      const gridIndex = newGrids.findIndex(g => g.vehicleTypeId === vehicleTypeId);
+      
+      if (gridIndex !== -1) {
+        // Update the current grid with new prices
+        newGrids[gridIndex] = {
+          ...newGrids[gridIndex],
+          prices: newGrids[gridIndex].prices.map(price => ({
+            ...price,
+            priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
+          })),
+        };
+        
+        // If the current grid is either Citadine or Berline, update the other one too
+        if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
+          const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
+          const otherGridIndex = newGrids.findIndex(g => g.vehicleTypeId === otherGridId);
+          
+          if (otherGridIndex !== -1) {
+            // Copy the prices from the current grid to the other grid
+            newGrids[otherGridIndex] = {
+              ...newGrids[otherGridIndex],
+              prices: [...newGrids[gridIndex].prices],
+            };
+          }
         }
-        return grid;
-      })
-    );
+      }
+      
+      return newGrids;
+    });
+    
     setEditingGrid(null);
     setEditedPrices({});
   };
