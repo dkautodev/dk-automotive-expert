@@ -25,6 +25,12 @@ export const distanceRanges: PriceRange[] = [
   { id: '701+', label: '+701 km', perKm: true },
 ];
 
+// Ensure the distance ranges are properly mapped by their IDs for consistent retrieval
+export const distanceRangeMap = distanceRanges.reduce<Record<string, PriceRange>>((acc, range) => {
+  acc[range.id] = range;
+  return acc;
+}, {});
+
 // Sample price grid data - in a real app this would come from the database
 export const initialPriceGrids: PriceGrid[] = vehicleTypes.map((vehicleType) => ({
   vehicleTypeId: vehicleType.id,
@@ -69,10 +75,13 @@ export const usePricingGrids = () => {
         // Update the current grid with new prices
         newGrids[gridIndex] = {
           ...newGrids[gridIndex],
-          prices: newGrids[gridIndex].prices.map(price => ({
-            ...price,
-            priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
-          })),
+          prices: distanceRanges.map(range => {
+            const existingPrice = newGrids[gridIndex].prices.find(p => p.rangeId === range.id);
+            return {
+              rangeId: range.id,
+              priceHT: editedPrices[range.id]?.ht || (existingPrice ? existingPrice.priceHT : '0.00'),
+            };
+          }),
         };
         
         // If the current grid is either Citadine or Berline, update the other one too
