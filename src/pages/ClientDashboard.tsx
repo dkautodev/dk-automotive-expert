@@ -9,7 +9,6 @@ import OngoingShipments from "./OngoingShipments";
 import PendingInvoices from "./PendingInvoices";
 import CompletedShipments from "./CompletedShipments";
 import PendingQuotes from "./PendingQuotes";
-import CreateQuote from "./CreateQuote";
 
 const ClientDashboard = () => {
   const location = useLocation();
@@ -27,7 +26,6 @@ const ClientDashboard = () => {
             <Route path="completed-shipments" element={<CompletedShipments />} />
             <Route path="pending-invoices" element={<PendingInvoices />} />
             <Route path="pending-quotes" element={<PendingQuotes />} />
-            <Route path="create-quote" element={<CreateQuote />} />
             <Route path="*" element={<Navigate to="/dashboard/client" replace />} />
           </Routes>
         </main>
