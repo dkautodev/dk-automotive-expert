@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PriceGrid } from '@/components/admin/pricingTypes';
 import { toast } from 'sonner';
 import { calculateTTC } from '@/utils/priceCalculations';
@@ -46,6 +46,11 @@ export const usePriceGridState = () => {
       setLoading(false);
     }
   };
+
+  // Load price grids on component mount
+  useEffect(() => {
+    loadPriceGrids();
+  }, []);
 
   return {
     priceGrids,

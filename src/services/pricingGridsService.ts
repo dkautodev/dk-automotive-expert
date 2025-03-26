@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
 import { vehicleTypes } from '@/lib/vehicleTypes';
