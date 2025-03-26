@@ -1,3 +1,4 @@
+
 import { createContext, useContext, ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import type { User, Session } from '@supabase/supabase-js';
@@ -26,6 +27,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<any>;
   signUp: (email: string, password: string, metadata: Record<string, any>) => Promise<any>;
+  registerAdmin: (email: string, password: string) => Promise<any>;
   user: User | null;
   session: Session | null;
   error: string | null;
