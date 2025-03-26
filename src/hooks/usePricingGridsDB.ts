@@ -93,6 +93,23 @@ export const usePricingGridsDB = () => {
         });
         
         await Promise.all(updatePromises);
+        
+        // Si la grille actuelle est Citadine ou Berline, mettre à jour l'autre aussi
+        if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
+          const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
+          
+          // Mettre à jour également dans la base de données pour l'autre véhicule
+          const updateOtherPromises = grid.prices.map(async (price) => {
+            const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
+            return updatePriceInDB(
+              otherGridId, 
+              price.rangeId, 
+              parseFloat(newPriceHT)
+            );
+          });
+          
+          await Promise.all(updateOtherPromises);
+        }
       }
 
       // Mettre à jour l'état local
@@ -124,18 +141,6 @@ export const usePricingGridsDB = () => {
                 ...newGrids[otherGridIndex],
                 prices: [...newGrids[gridIndex].prices],
               };
-
-              // Mettre à jour également dans la base de données
-              const updateOtherPromises = newGrids[gridIndex].prices.map(async (price) => {
-                const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-                return updatePriceInDB(
-                  otherGridId, 
-                  price.rangeId, 
-                  parseFloat(newPriceHT)
-                );
-              });
-              
-              await Promise.all(updateOtherPromises);
             }
           }
         }
