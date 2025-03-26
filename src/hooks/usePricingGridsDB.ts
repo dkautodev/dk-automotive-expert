@@ -1,12 +1,16 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
+import { PriceGrid } from '@/components/admin/pricingTypes';
 import { calculateTTC } from '@/utils/priceCalculations';
 import { useAuthContext } from '@/context/AuthContext';
-import { distanceRanges } from './usePricingGrids';
-import { vehicleTypes } from '@/lib/vehicleTypes';
+import { 
+  fetchPriceGrids, 
+  initializeDefaultPriceGrids, 
+  updatePriceInDB,
+  getPriceForVehicleAndDistance as getPrice
+} from '@/services/pricingGridsService';
+import { formatDBRowsToGrids } from '@/utils/pricingFormatters';
 
 export const usePricingGridsDB = () => {
   const [priceGrids, setPriceGrids] = useState<PriceGrid[]>([]);
@@ -19,43 +23,19 @@ export const usePricingGridsDB = () => {
 
   // Charger les grilles de prix depuis la base de données
   useEffect(() => {
-    const fetchPriceGrids = async () => {
+    const loadPriceGrids = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('price_grids')
-          .select('*')
-          .order('vehicle_type_id', { ascending: true })
-          .order('distance_range_id', { ascending: true });
-
-        if (error) {
-          throw error;
-        }
-
+        const data = await fetchPriceGrids();
+        
         if (data && data.length > 0) {
           // Convertir les données de la BD en structure utilisée par l'application
-          const vehicleTypes = [...new Set(data.map(row => row.vehicle_type_id))];
-          
-          const formattedGrids: PriceGrid[] = vehicleTypes.map(vehicleTypeId => {
-            const vehicleRows = data.filter(row => row.vehicle_type_id === vehicleTypeId);
-            const vehicleTypeName = vehicleRows[0]?.vehicle_type_name || '';
-            
-            const prices = vehicleRows.map(row => ({
-              rangeId: row.distance_range_id,
-              priceHT: row.price_ht.toString(),
-            }));
-            
-            return {
-              vehicleTypeId,
-              vehicleTypeName,
-              prices,
-            };
-          });
-          
+          const formattedGrids = formatDBRowsToGrids(data);
           setPriceGrids(formattedGrids);
         } else {
           // Si aucune donnée n'est trouvée, initialiser avec des valeurs par défaut
-          await initializeDefaultPriceGrids();
+          const defaultGrids = await initializeDefaultPriceGrids();
+          setPriceGrids(defaultGrids);
         }
       } catch (error: any) {
         console.error('Erreur lors du chargement des grilles tarifaires:', error);
@@ -65,44 +45,8 @@ export const usePricingGridsDB = () => {
       }
     };
 
-    fetchPriceGrids();
+    loadPriceGrids();
   }, []);
-
-  // Initialiser les grilles tarifaires avec des valeurs par défaut si la table est vide
-  const initializeDefaultPriceGrids = async () => {
-    try {
-      // Au lieu d'interroger une table vehicle_types qui n'existe pas, 
-      // utilisons l'import depuis lib/vehicleTypes
-      const defaultGrids: PriceGrid[] = vehicleTypes.map((vehicleType) => ({
-        vehicleTypeId: vehicleType.id,
-        vehicleTypeName: vehicleType.name,
-        prices: distanceRanges.map((range) => ({
-          rangeId: range.id,
-          priceHT: ((Math.random() * 50) + 50).toFixed(2), // Prix aléatoire entre 50 et 100€
-        })),
-      }));
-
-      // Insérer les données par défaut dans la base de données
-      for (const grid of defaultGrids) {
-        for (const price of grid.prices) {
-          const range = distanceRanges.find(r => r.id === price.rangeId);
-          await supabase.from('price_grids').insert({
-            vehicle_type_id: grid.vehicleTypeId,
-            vehicle_type_name: grid.vehicleTypeName,
-            distance_range_id: price.rangeId,
-            distance_range_label: range?.label || '',
-            price_ht: parseFloat(price.priceHT), // Convertir en nombre
-            is_per_km: range?.perKm || false
-          });
-        }
-      }
-
-      setPriceGrids(defaultGrids);
-    } catch (error: any) {
-      console.error('Erreur lors de l\'initialisation des grilles tarifaires:', error);
-      toast.error('Erreur lors de l\'initialisation des grilles tarifaires');
-    }
-  };
 
   const handleEditGrid = (vehicleTypeId: string) => {
     if (!isAdmin) {
@@ -138,16 +82,11 @@ export const usePricingGridsDB = () => {
       if (grid) {
         for (const price of grid.prices) {
           const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-          
-          const { error } = await supabase
-            .from('price_grids')
-            .update({ price_ht: parseFloat(newPriceHT) }) // Convertir en nombre
-            .match({ 
-              vehicle_type_id: vehicleTypeId, 
-              distance_range_id: price.rangeId 
-            });
-          
-          if (error) throw error;
+          await updatePriceInDB(
+            vehicleTypeId, 
+            price.rangeId, 
+            parseFloat(newPriceHT)
+          );
         }
       }
 
@@ -184,14 +123,11 @@ export const usePricingGridsDB = () => {
               // Mettre à jour également dans la base de données
               newGrids[gridIndex].prices.forEach(async (price) => {
                 const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-                
-                await supabase
-                  .from('price_grids')
-                  .update({ price_ht: parseFloat(newPriceHT) }) // Convertir en nombre
-                  .match({ 
-                    vehicle_type_id: otherGridId, 
-                    distance_range_id: price.rangeId 
-                  });
+                await updatePriceInDB(
+                  otherGridId, 
+                  price.rangeId, 
+                  parseFloat(newPriceHT)
+                );
               });
             }
           }
@@ -238,52 +174,8 @@ export const usePricingGridsDB = () => {
   // Fonction pour récupérer les prix pour un type de véhicule et une distance donnée
   const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number) => {
     try {
-      const { data, error } = await supabase
-        .from('price_grids')
-        .select('*')
-        .eq('vehicle_type_id', vehicleTypeId)
-        .order('distance_range_id', { ascending: true });
-
-      if (error) throw error;
+      const selectedPrice = await getPrice(vehicleTypeId, distance);
       
-      if (!data || data.length === 0) {
-        throw new Error(`Aucune grille tarifaire trouvée pour ${vehicleTypeId}`);
-      }
-
-      // Déterminer la tranche de distance appropriée
-      let selectedPrice = null;
-      
-      for (const row of data) {
-        const rangeId = row.distance_range_id;
-        const isPerKm = row.is_per_km;
-        
-        // Gérer le cas spécial "701+"
-        if (rangeId === '701+' && distance > 700) {
-          selectedPrice = isPerKm ? 
-            { priceHT: parseFloat(row.price_ht.toString()) * distance, isPerKm } : 
-            { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
-          break;
-        }
-        
-        // Extraire les nombres de la tranche (ex: "1-10" => [1, 10])
-        const rangeParts = rangeId.split('-').map(Number);
-        
-        // Pour les autres tranches
-        if (rangeParts.length === 2) {
-          const [min, max] = rangeParts;
-          if (distance >= min && distance <= max) {
-            selectedPrice = isPerKm ? 
-              { priceHT: parseFloat(row.price_ht.toString()) * distance, isPerKm } : 
-              { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
-            break;
-          }
-        }
-      }
-
-      if (!selectedPrice) {
-        throw new Error(`Aucun prix trouvé pour la distance ${distance}km et le véhicule ${vehicleTypeId}`);
-      }
-
       return {
         priceHT: selectedPrice.priceHT.toString(),
         priceTTC: calculateTTC(selectedPrice.priceHT.toString()),
