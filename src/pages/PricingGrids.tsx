@@ -15,12 +15,14 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { vehicleTypes } from "@/lib/vehicleTypes";
-import { distanceRanges, initialPriceGrids } from "@/hooks/usePricingGrids";
+import { distanceRanges } from "@/hooks/usePricingGrids";
 import { calculateTTC } from "@/utils/priceCalculations";
+import { usePricingGridsDB } from "@/hooks/usePricingGridsDB";
+import { Loader } from "@/components/ui/loader";
 
 const PricingGrids = () => {
   const [activeTab, setActiveTab] = useState("by-vehicle");
-  const [priceGrids, setPriceGrids] = useState(initialPriceGrids);
+  const { priceGrids, loading } = usePricingGridsDB();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -61,77 +63,84 @@ const PricingGrids = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table className="border-collapse w-full">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="sticky left-0 bg-background z-10 border-r">Distance</TableHead>
-                      {vehicleTypes.map((vehicleType, index) => (
-                        <React.Fragment key={vehicleType.id}>
-                          {index > 0 && (
-                            <TableHead className="p-0 w-1 border-0">
-                              <div className="h-full flex justify-center">
-                                <Separator orientation="vertical" className="h-full absolute" />
-                              </div>
+              {loading ? (
+                <div className="flex justify-center items-center p-10">
+                  <Loader className="w-8 h-8" />
+                  <span className="ml-2 text-muted-foreground">Chargement des grilles tarifaires...</span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="border-collapse w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="sticky left-0 bg-background z-10 border-r">Distance</TableHead>
+                        {vehicleTypes.map((vehicleType, index) => (
+                          <React.Fragment key={vehicleType.id}>
+                            {index > 0 && (
+                              <TableHead className="p-0 w-1 border-0">
+                                <div className="h-full flex justify-center">
+                                  <Separator orientation="vertical" className="h-full absolute" />
+                                </div>
+                              </TableHead>
+                            )}
+                            <TableHead colSpan={2} className="text-center w-40">
+                              {vehicleType.name}
                             </TableHead>
-                          )}
-                          <TableHead colSpan={2} className="text-center w-40">
-                            {vehicleType.name}
-                          </TableHead>
-                        </React.Fragment>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableHead className="sticky left-0 bg-background z-10 border-r text-center">
-                        km
-                      </TableHead>
-                      {vehicleTypes.map((vehicleType, index) => (
-                        <React.Fragment key={`header-${vehicleType.id}`}>
-                          {index > 0 && (
-                            <TableHead className="p-0 w-1 border-0">
-                              <div className="h-full flex justify-center">
-                                <Separator orientation="vertical" className="h-full absolute" />
-                              </div>
-                            </TableHead>
-                          )}
-                          <TableHead className="text-center w-40">Prix HT</TableHead>
-                          <TableHead className="text-center w-40">Prix TTC</TableHead>
-                        </React.Fragment>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="divide-y">
-                    {distanceRanges.map((range) => (
-                      <TableRow key={range.id}>
-                        <TableCell className="font-medium sticky left-0 bg-background z-10 border-r">
-                          {range.label}
-                          {range.perKm && <span className="text-gray-500 italic font-light ml-1">(€/km)</span>}
-                        </TableCell>
-                        {vehicleTypes.map((vehicleType, index) => {
-                          const grid = priceGrids.find(g => g.vehicleTypeId === vehicleType.id);
-                          const price = grid?.prices.find(p => p.rangeId === range.id);
-                          const priceHT = price?.priceHT || "0.00";
-                          const priceTTC = calculateTTC(priceHT);
-                          
-                          return (
-                            <React.Fragment key={`${range.id}-${vehicleType.id}`}>
-                              {index > 0 && (
-                                <TableCell className="p-0 w-1 border-0 relative">
-                                  <div className="h-full flex justify-center">
-                                    <Separator orientation="vertical" className="h-full absolute inset-0" />
-                                  </div>
-                                </TableCell>
-                              )}
-                              <TableCell className="text-center w-40">{priceHT}</TableCell>
-                              <TableCell className="text-center w-40">{priceTTC}</TableCell>
-                            </React.Fragment>
-                          );
-                        })}
+                          </React.Fragment>
+                        ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                      <TableRow>
+                        <TableHead className="sticky left-0 bg-background z-10 border-r text-center">
+                          km
+                        </TableHead>
+                        {vehicleTypes.map((vehicleType, index) => (
+                          <React.Fragment key={`header-${vehicleType.id}`}>
+                            {index > 0 && (
+                              <TableHead className="p-0 w-1 border-0">
+                                <div className="h-full flex justify-center">
+                                  <Separator orientation="vertical" className="h-full absolute" />
+                                </div>
+                              </TableHead>
+                            )}
+                            <TableHead className="text-center w-40">Prix HT</TableHead>
+                            <TableHead className="text-center w-40">Prix TTC</TableHead>
+                          </React.Fragment>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="divide-y">
+                      {distanceRanges.map((range) => (
+                        <TableRow key={range.id}>
+                          <TableCell className="font-medium sticky left-0 bg-background z-10 border-r">
+                            {range.label}
+                            {range.perKm && <span className="text-gray-500 italic font-light ml-1">(€/km)</span>}
+                          </TableCell>
+                          {vehicleTypes.map((vehicleType, index) => {
+                            const grid = priceGrids.find(g => g.vehicleTypeId === vehicleType.id);
+                            const price = grid?.prices.find(p => p.rangeId === range.id);
+                            const priceHT = price?.priceHT || "0.00";
+                            const priceTTC = calculateTTC(priceHT);
+                            
+                            return (
+                              <React.Fragment key={`${range.id}-${vehicleType.id}`}>
+                                {index > 0 && (
+                                  <TableCell className="p-0 w-1 border-0 relative">
+                                    <div className="h-full flex justify-center">
+                                      <Separator orientation="vertical" className="h-full absolute inset-0" />
+                                    </div>
+                                  </TableCell>
+                                )}
+                                <TableCell className="text-center w-40">{priceHT} €</TableCell>
+                                <TableCell className="text-center w-40">{priceTTC} €</TableCell>
+                              </React.Fragment>
+                            );
+                          })}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
