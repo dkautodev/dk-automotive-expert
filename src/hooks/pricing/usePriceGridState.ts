@@ -24,20 +24,24 @@ export const usePriceGridState = () => {
   const loadPriceGrids = async () => {
     setLoading(true);
     try {
+      console.log('Loading price grids');
       const data = await fetchPriceGrids();
       
       if (data && data.length > 0) {
+        console.log('Formatting data from DB:', data);
         // Convert DB data to application structure
         const formattedGrids = formatDBRowsToGrids(data);
+        console.log('Formatted grids:', formattedGrids);
         setPriceGrids(formattedGrids);
       } else {
+        console.log('No data found, initializing defaults');
         // If no data found, initialize with default values
         const defaultGrids = await initializeDefaultPriceGrids();
         setPriceGrids(defaultGrids);
       }
     } catch (error: any) {
       console.error('Error loading price grids:', error);
-      toast.error('Error loading price grids');
+      toast.error('Error loading price grids: ' + (error.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }

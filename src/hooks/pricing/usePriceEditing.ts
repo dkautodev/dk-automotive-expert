@@ -44,78 +44,87 @@ export const usePriceEditing = (
     }
 
     setSavingGrid(true);
+    console.log("Saving grid for vehicle type:", vehicleTypeId);
+    console.log("Edited prices:", editedPrices);
 
     try {
-      // Update prices in database
-      const grid = priceGrids.find(g => g.vehicleTypeId === vehicleTypeId);
-      if (grid) {
-        const updatePromises = grid.prices.map(async (price) => {
-          const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-          return updatePriceInDB(
-            vehicleTypeId, 
-            price.rangeId, 
-            parseFloat(newPriceHT)
-          );
-        });
-        
-        await Promise.all(updatePromises);
-        
-        // If current grid is Citadine or Berline, update the other one too
-        if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
-          const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
-          
-          // Also update in database for other vehicle
-          const updateOtherPromises = grid.prices.map(async (price) => {
-            const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-            return updatePriceInDB(
-              otherGridId, 
-              price.rangeId, 
-              parseFloat(newPriceHT)
-            );
-          });
-          
-          await Promise.all(updateOtherPromises);
-        }
-      }
-
-      // Now that all DB operations are complete, update local state
-      const updatedGrids = [...priceGrids];
-      const gridIndex = updatedGrids.findIndex(g => g.vehicleTypeId === vehicleTypeId);
+      // Update prices in database first, before updating UI
+      const updatePromises = [];
       
-      if (gridIndex !== -1) {
-        // Update current grid with new prices
-        updatedGrids[gridIndex] = {
-          ...updatedGrids[gridIndex],
-          prices: updatedGrids[gridIndex].prices.map(price => ({
-            ...price,
-            priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
-          })),
-        };
-        
-        // If current grid is Citadine or Berline, update the other one too
-        if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
-          const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
-          const otherGridIndex = updatedGrids.findIndex(g => g.vehicleTypeId === otherGridId);
+      // Get all ranges we need to update
+      for (const rangeId in editedPrices) {
+        const newPriceHT = editedPrices[rangeId]?.ht;
+        if (newPriceHT) {
+          console.log(`Updating price for ${vehicleTypeId}, range ${rangeId}: ${newPriceHT}`);
+          updatePromises.push(
+            updatePriceInDB(
+              vehicleTypeId, 
+              rangeId, 
+              parseFloat(newPriceHT)
+            )
+          );
           
-          if (otherGridIndex !== -1) {
-            // Copy prices from current grid to other grid
-            updatedGrids[otherGridIndex] = {
-              ...updatedGrids[otherGridIndex],
-              prices: [...updatedGrids[gridIndex].prices],
-            };
+          // If current grid is Citadine or Berline, update the other one too
+          if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
+            const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
+            console.log(`Also updating price for ${otherGridId}, range ${rangeId}: ${newPriceHT}`);
+            updatePromises.push(
+              updatePriceInDB(
+                otherGridId, 
+                rangeId, 
+                parseFloat(newPriceHT)
+              )
+            );
           }
         }
       }
       
-      // Update state
-      setPriceGrids(updatedGrids);
+      // Wait for all database updates to complete
+      await Promise.all(updatePromises);
+      console.log("All database updates completed successfully");
+
+      // Now that all DB operations are complete, update local state
+      setPriceGrids(prevGrids => {
+        const updatedGrids = [...prevGrids];
+        const gridIndex = updatedGrids.findIndex(g => g.vehicleTypeId === vehicleTypeId);
+        
+        if (gridIndex !== -1) {
+          // Update current grid with new prices
+          updatedGrids[gridIndex] = {
+            ...updatedGrids[gridIndex],
+            prices: updatedGrids[gridIndex].prices.map(price => ({
+              ...price,
+              priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
+            })),
+          };
+          
+          // If current grid is Citadine or Berline, update the other one too
+          if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
+            const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
+            const otherGridIndex = updatedGrids.findIndex(g => g.vehicleTypeId === otherGridId);
+            
+            if (otherGridIndex !== -1) {
+              // Copy prices from current grid to other grid
+              updatedGrids[otherGridIndex] = {
+                ...updatedGrids[otherGridIndex],
+                prices: updatedGrids[otherGridIndex].prices.map(price => ({
+                  ...price,
+                  priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
+                })),
+              };
+            }
+          }
+        }
+        
+        return updatedGrids;
+      });
 
       toast.success('Price grid saved successfully');
       setEditingGrid(null);
       setEditedPrices({});
     } catch (error: any) {
       console.error('Error saving price grid:', error);
-      toast.error('Error saving price grid');
+      toast.error('Error saving price grid: ' + (error.message || 'Unknown error'));
     } finally {
       setSavingGrid(false);
     }
