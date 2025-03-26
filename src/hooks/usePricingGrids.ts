@@ -4,7 +4,7 @@ import { vehicleTypes } from '@/lib/vehicleTypes';
 import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
 import { calculateHT, calculateTTC } from '@/utils/priceCalculations';
 
-// Define the distance ranges
+// Define the distance ranges in the correct order
 export const distanceRanges: PriceRange[] = [
   { id: '1-10', label: '1 - 10' },
   { id: '11-20', label: '11 - 20' },
