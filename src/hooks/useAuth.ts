@@ -28,14 +28,11 @@ export const useAuth = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        // Déterminer le rôle de l'utilisateur
         let role: UserRole | null = null;
         
         if (session?.user) {
-          // Vérifier si le rôle est dans les métadonnées
           role = (session.user.user_metadata?.role as UserRole) || null;
           
-          // Si le rôle n'est pas dans les métadonnées, vérifier si l'email est celui de l'admin
           if (!role && session.user.email === 'dkautomotive70@gmail.com') {
             role = 'admin';
           }
@@ -64,14 +61,11 @@ export const useAuth = () => {
     getSession();
 
     supabase.auth.onAuthStateChange((_event, session) => {
-      // Déterminer le rôle de l'utilisateur
       let role: UserRole | null = null;
       
       if (session?.user) {
-        // Vérifier si le rôle est dans les métadonnées
         role = (session.user.user_metadata?.role as UserRole) || null;
         
-        // Si le rôle n'est pas dans les métadonnées, vérifier si l'email est celui de l'admin
         if (!role && session.user.email === 'dkautomotive70@gmail.com') {
           role = 'admin';
         }
@@ -89,20 +83,16 @@ export const useAuth = () => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // Vérifier si l'utilisateur est l'admin avec le mot de passe codé en dur
     if (email === 'dkautomotive70@gmail.com' && password === 'adminadmin70') {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      // Si la connexion échoue parce que le mot de passe dans Supabase est différent
-      // On continue quand même car on vérifie manuellement le mot de passe
       if (error) {
-        // Tenter de se connecter comme invité pour avoir une session
         const { data: guestData } = await supabase.auth.signInWithPassword({
           email: email,
-          password: 'adminadmin70',  // Utiliser le nouveau mot de passe
+          password: 'adminadmin70',
         });
         
         return guestData;
@@ -110,7 +100,6 @@ export const useAuth = () => {
       
       return data;
     } else {
-      // Connexion normale pour les autres utilisateurs
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -130,6 +119,42 @@ export const useAuth = () => {
     });
     if (error) throw error;
     return data;
+  };
+
+  const registerAdmin = async (email: string, password: string) => {
+    try {
+      if (email !== 'dkautomotive70@gmail.com') {
+        throw new Error("Seule l'adresse email administrative est autorisée");
+      }
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { role: 'admin' }
+        }
+      });
+      
+      if (error) {
+        if (error.message.includes("User already registered")) {
+          await signIn(email, password);
+          return { success: true, message: "Connexion administrateur réussie" };
+        }
+        throw error;
+      }
+      
+      return { 
+        success: true, 
+        message: "Compte administrateur créé avec succès",
+        data
+      };
+    } catch (error: any) {
+      console.error("Erreur lors de l'inscription admin:", error);
+      return {
+        success: false,
+        message: error.message || "Une erreur est survenue lors de la création du compte admin"
+      };
+    }
   };
 
   const fetchUserProfile = async (userId: string) => {
@@ -160,6 +185,7 @@ export const useAuth = () => {
     ...authState,
     signIn,
     signUp,
+    registerAdmin,
     signOut: async () => {
       await supabase.auth.signOut();
       setAuthState({
