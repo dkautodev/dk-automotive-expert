@@ -19,6 +19,7 @@ import { distanceRanges } from "@/hooks/usePricingGrids";
 import { calculateTTC } from "@/utils/priceCalculations";
 import { usePricingGridsDB } from "@/hooks/usePricingGridsDB";
 import { Loader } from "@/components/ui/loader";
+import UpdatePriceGridsButton from "@/components/admin/UpdatePriceGridsButton";
 
 const PricingGrids = () => {
   const [activeTab, setActiveTab] = useState("by-vehicle");
@@ -28,10 +29,13 @@ const PricingGrids = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Gestion des grilles tarifaires</h1>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nouvelle grille
-        </Button>
+        <div className="flex gap-2">
+          <UpdatePriceGridsButton />
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Nouvelle grille
+          </Button>
+        </div>
       </div>
       
       <Tabs defaultValue="by-vehicle" className="w-full" onValueChange={setActiveTab} value={activeTab}>

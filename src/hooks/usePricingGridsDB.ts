@@ -112,41 +112,37 @@ export const usePricingGridsDB = () => {
         }
       }
 
-      // Mettre à jour l'état local
-      setPriceGrids(prevGrids => {
-        // Créer un nouveau tableau pour éviter de modifier l'état précédent
-        const newGrids = [...prevGrids];
+      // Maintenant que toutes les opérations DB sont terminées, nous mettons à jour l'état local
+      const updatedGrids = [...priceGrids];
+      const gridIndex = updatedGrids.findIndex(g => g.vehicleTypeId === vehicleTypeId);
+      
+      if (gridIndex !== -1) {
+        // Mettre à jour la grille actuelle avec les nouveaux prix
+        updatedGrids[gridIndex] = {
+          ...updatedGrids[gridIndex],
+          prices: updatedGrids[gridIndex].prices.map(price => ({
+            ...price,
+            priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
+          })),
+        };
         
-        // Trouver la grille en cours d'édition
-        const gridIndex = newGrids.findIndex(g => g.vehicleTypeId === vehicleTypeId);
-        
-        if (gridIndex !== -1) {
-          // Mettre à jour la grille actuelle avec les nouveaux prix
-          newGrids[gridIndex] = {
-            ...newGrids[gridIndex],
-            prices: newGrids[gridIndex].prices.map(price => ({
-              ...price,
-              priceHT: editedPrices[price.rangeId]?.ht || price.priceHT,
-            })),
-          };
+        // Si la grille actuelle est Citadine ou Berline, mettre à jour l'autre aussi
+        if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
+          const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
+          const otherGridIndex = updatedGrids.findIndex(g => g.vehicleTypeId === otherGridId);
           
-          // Si la grille actuelle est Citadine ou Berline, mettre à jour l'autre aussi
-          if (vehicleTypeId === 'citadine' || vehicleTypeId === 'berline') {
-            const otherGridId = vehicleTypeId === 'citadine' ? 'berline' : 'citadine';
-            const otherGridIndex = newGrids.findIndex(g => g.vehicleTypeId === otherGridId);
-            
-            if (otherGridIndex !== -1) {
-              // Copier les prix de la grille actuelle vers l'autre grille
-              newGrids[otherGridIndex] = {
-                ...newGrids[otherGridIndex],
-                prices: [...newGrids[gridIndex].prices],
-              };
-            }
+          if (otherGridIndex !== -1) {
+            // Copier les prix de la grille actuelle vers l'autre grille
+            updatedGrids[otherGridIndex] = {
+              ...updatedGrids[otherGridIndex],
+              prices: [...updatedGrids[gridIndex].prices],
+            };
           }
         }
-        
-        return newGrids;
-      });
+      }
+      
+      // Mettre à jour l'état
+      setPriceGrids(updatedGrids);
 
       toast.success('Grille tarifaire enregistrée avec succès');
       setEditingGrid(null);
