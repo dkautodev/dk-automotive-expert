@@ -6,6 +6,7 @@ import { distanceRanges } from '@/hooks/usePricingGrids';
 
 // Fetch price grids from the database
 export const fetchPriceGrids = async () => {
+  console.log('Fetching price grids from database');
   const { data, error } = await supabase
     .from('price_grids')
     .select('*')
@@ -17,6 +18,7 @@ export const fetchPriceGrids = async () => {
     throw error;
   }
 
+  console.log('Fetched price grids:', data);
   return data;
 };
 
@@ -60,20 +62,21 @@ export const updatePriceInDB = async (
   rangeId: string,
   priceHT: number
 ) => {
+  console.log(`Updating price in DB for ${vehicleTypeId}, range ${rangeId}: ${priceHT}`);
+  
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('price_grids')
       .update({ price_ht: priceHT })
-      .match({
-        vehicle_type_id: vehicleTypeId,
-        distance_range_id: rangeId
-      });
+      .eq('vehicle_type_id', vehicleTypeId)
+      .eq('distance_range_id', rangeId);
 
     if (error) {
       console.error(`Error updating price for ${vehicleTypeId}, range ${rangeId}:`, error);
       throw error;
     }
     
+    console.log(`Successfully updated price for ${vehicleTypeId}, range ${rangeId}`, data);
     return true;
   } catch (err) {
     console.error(`Exception updating price for ${vehicleTypeId}, range ${rangeId}:`, err);
