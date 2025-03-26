@@ -5,7 +5,7 @@ export const quoteFormSchema = z.object({
   // Détails du véhicule
   vehicleType: z.string({
     required_error: "Le type de véhicule est requis",
-  }),
+  }).min(1, "Le type de véhicule est requis"),
   brand: z.string({
     required_error: "La marque est requise",
   }).min(1, "La marque est requise")

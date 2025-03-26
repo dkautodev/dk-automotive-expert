@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
 import { vehicleTypes } from '@/lib/vehicleTypes';
@@ -88,55 +87,25 @@ export const updatePriceInDB = async (
 export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number) => {
   try {
     const { data, error } = await supabase
-      .from('price_grids')
-      .select('*')
-      .eq('vehicle_type_id', vehicleTypeId)
-      .order('distance_range_id', { ascending: true });
+      .rpc('calculate_price_from_distance', { 
+        p_vehicle_type_id: vehicleTypeId, 
+        p_distance: distance 
+      });
 
     if (error) {
-      console.error(`Error getting price for ${vehicleTypeId}:`, error);
+      console.error(`Error calculating price for ${vehicleTypeId}, distance ${distance}:`, error);
       throw error;
     }
     
     if (!data || data.length === 0) {
-      throw new Error(`Aucune grille tarifaire trouvée pour ${vehicleTypeId}`);
-    }
-
-    // Déterminer la tranche de distance appropriée
-    let selectedPrice = null;
-    
-    for (const row of data) {
-      const rangeId = row.distance_range_id;
-      const isPerKm = row.is_per_km;
-      
-      // Gérer le cas spécial "701+"
-      if (rangeId === '701+' && distance > 700) {
-        selectedPrice = isPerKm ? 
-          { priceHT: row.price_ht * distance, isPerKm } : 
-          { priceHT: row.price_ht, isPerKm };
-        break;
-      }
-      
-      // Extraire les nombres de la tranche (ex: "1-10" => [1, 10])
-      const rangeParts = rangeId.split('-').map(Number);
-      
-      // Pour les autres tranches
-      if (rangeParts.length === 2) {
-        const [min, max] = rangeParts;
-        if (distance >= min && distance <= max) {
-          selectedPrice = isPerKm ? 
-            { priceHT: row.price_ht * distance, isPerKm } : 
-            { priceHT: row.price_ht, isPerKm };
-          break;
-        }
-      }
-    }
-
-    if (!selectedPrice) {
       throw new Error(`Aucun prix trouvé pour la distance ${distance}km et le véhicule ${vehicleTypeId}`);
     }
 
-    return selectedPrice;
+    // La fonction retourne un tableau avec un seul résultat
+    return {
+      priceHT: data[0].price_ht,
+      isPerKm: data[0].is_per_km
+    };
   } catch (err) {
     console.error(`Exception getting price for ${vehicleTypeId}, distance ${distance}:`, err);
     throw err;

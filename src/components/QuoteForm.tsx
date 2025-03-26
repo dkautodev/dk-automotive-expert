@@ -10,11 +10,19 @@ import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
 import AddressForm from './quote-form/AddressForm';
 import ContactForm from './quote-form/ContactForm';
 import { sendQuoteEmail } from '@/utils/emailService';
+import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
+import { calculateTTC } from '@/utils/priceCalculations';
+import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
 
 const QuoteForm = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Partial<QuoteFormValues>>({});
   const [loading, setLoading] = useState(false);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [priceHT, setPriceHT] = useState<string | null>(null);
+  const [priceTTC, setPriceTTC] = useState<string | null>(null);
+  
+  const { calculateDistance } = useDistanceCalculation();
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
@@ -57,8 +65,40 @@ const QuoteForm = () => {
     },
   });
 
-  const nextStep = (data: Partial<QuoteFormValues>) => {
+  const nextStep = async (data: Partial<QuoteFormValues>) => {
     setFormData({ ...formData, ...data });
+    
+    // Si nous passons de l'étape 2 (adresses) à l'étape 3 (contact), calculer la distance et le prix
+    if (step === 2) {
+      try {
+        // Construire les adresses complètes
+        const pickupAddress = `${data.pickupStreetNumber || formData.pickupStreetNumber} ${data.pickupStreetType || formData.pickupStreetType} ${data.pickupStreetName || formData.pickupStreetName}, ${data.pickupPostalCode || formData.pickupPostalCode} ${data.pickupCity || formData.pickupCity}, ${data.pickupCountry || formData.pickupCountry}`;
+        const deliveryAddress = `${data.deliveryStreetNumber || formData.deliveryStreetNumber} ${data.deliveryStreetType || formData.deliveryStreetType} ${data.deliveryStreetName || formData.deliveryStreetName}, ${data.deliveryPostalCode || formData.deliveryPostalCode} ${data.deliveryCity || formData.deliveryCity}, ${data.deliveryCountry || formData.deliveryCountry}`;
+        
+        // Calculer la distance
+        setLoading(true);
+        const distanceResult = await calculateDistance(pickupAddress, deliveryAddress);
+        setDistance(distanceResult);
+        
+        // Calculer le prix si le type de véhicule est défini
+        const vehicleType = formData.vehicleType;
+        if (vehicleType && distanceResult) {
+          const price = await getPriceForVehicleAndDistance(vehicleType, distanceResult);
+          setPriceHT(price.priceHT.toString());
+          setPriceTTC(calculateTTC(price.priceHT.toString()));
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Erreur lors du calcul de la distance ou du prix:", error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Une erreur est survenue lors du calcul de la distance ou du prix.",
+        });
+        setLoading(false);
+      }
+    }
+    
     setStep(step + 1);
   };
 
@@ -76,8 +116,17 @@ const QuoteForm = () => {
       completeData.pickupAddress = `${completeData.pickupStreetNumber} ${completeData.pickupStreetType} ${completeData.pickupStreetName}, ${completeData.pickupPostalCode} ${completeData.pickupCity}, ${completeData.pickupCountry}`;
       completeData.deliveryAddress = `${completeData.deliveryStreetNumber} ${completeData.deliveryStreetType} ${completeData.deliveryStreetName}, ${completeData.deliveryPostalCode} ${completeData.deliveryCity}, ${completeData.deliveryCountry}`;
       
+      // Ajouter les informations de prix et de distance
+      const quoteData = {
+        ...completeData,
+        distance: distance ? `${distance} km` : "Non calculée",
+        priceHT: priceHT || "0.00",
+        priceTTC: priceTTC || "0.00",
+        selectedVehicleType: completeData.vehicleType
+      };
+      
       // Envoi d'email
-      await sendQuoteEmail(completeData);
+      await sendQuoteEmail(quoteData);
       
       toast({
         title: "Demande envoyée",
@@ -88,6 +137,9 @@ const QuoteForm = () => {
       form.reset();
       setFormData({});
       setStep(1);
+      setDistance(null);
+      setPriceHT(null);
+      setPriceTTC(null);
     } catch (error) {
       console.error("Erreur lors de l'envoi du formulaire:", error);
       toast({
@@ -124,6 +176,11 @@ const QuoteForm = () => {
             onSubmit={onSubmit}
             onPrevious={prevStep}
             loading={loading}
+            priceInfo={{
+              distance: distance ? `${distance} km` : "En cours de calcul...",
+              priceHT: priceHT || "En cours de calcul...",
+              priceTTC: priceTTC || "En cours de calcul..."
+            }}
           />
         );
       default:

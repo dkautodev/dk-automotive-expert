@@ -150,6 +150,7 @@ export type Database = {
           pickup_date: string | null
           pickup_time: string | null
           quote_number: string
+          selected_vehicle_type: string | null
           status: string
           total_price_ht: number
           total_price_ttc: number
@@ -169,6 +170,7 @@ export type Database = {
           pickup_date?: string | null
           pickup_time?: string | null
           quote_number: string
+          selected_vehicle_type?: string | null
           status?: string
           total_price_ht: number
           total_price_ttc: number
@@ -188,6 +190,7 @@ export type Database = {
           pickup_date?: string | null
           pickup_time?: string | null
           quote_number?: string
+          selected_vehicle_type?: string | null
           status?: string
           total_price_ht?: number
           total_price_ttc?: number
@@ -283,6 +286,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_price_from_distance: {
+        Args: {
+          p_vehicle_type_id: string
+          p_distance: number
+        }
+        Returns: {
+          price_ht: number
+          is_per_km: boolean
+        }[]
+      }
       generate_quote_number: {
         Args: Record<PropertyKey, never>
         Returns: string
