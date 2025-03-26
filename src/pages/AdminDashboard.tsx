@@ -8,39 +8,31 @@ import AdminHome from "@/components/admin/AdminHome";
 import PricingGrids from "@/pages/PricingGrids";
 import { useAuthContext } from "@/context/AuthContext";
 import { Loader } from "@/components/ui/loader";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
-  const { isAuthenticated, role, isLoading } = useAuthContext();
+  const { isAuthenticated, user, isLoading } = useAuthContext();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        toast({
-          title: "Accès refusé",
-          description: "Vous devez être connecté pour accéder au tableau de bord administrateur.",
-          variant: "destructive",
-        });
+        toast.error("Vous devez être connecté pour accéder au tableau de bord administrateur");
         navigate("/auth");
         return;
       }
 
-      if (role !== 'admin') {
-        toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas les droits d'accès au tableau de bord administrateur.",
-          variant: "destructive",
-        });
+      // Check if the email matches the admin email
+      if (user?.email !== 'dkautomotive70@gmail.com') {
+        toast.error("Vous n'avez pas les droits d'accès au tableau de bord administrateur");
         navigate("/");
         return;
       }
 
       setIsChecking(false);
     }
-  }, [isAuthenticated, isLoading, navigate, role, toast]);
+  }, [isAuthenticated, isLoading, navigate, user]);
 
   if (isLoading || isChecking) {
     return (

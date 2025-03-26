@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -28,14 +29,14 @@ export const useAuth = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        // Déterminer le rôle de l'utilisateur
+        // Determine user role
         let role: UserRole | null = null;
         
         if (session?.user) {
-          // Vérifier si le rôle est dans les métadonnées
+          // Check if role is in metadata
           role = (session.user.user_metadata?.role as UserRole) || null;
           
-          // Si le rôle n'est pas dans les métadonnées, vérifier si l'email est celui de l'admin
+          // If role not in metadata, check if email is admin
           if (!role && session.user.email === 'dkautomotive70@gmail.com') {
             role = 'admin';
           }
@@ -64,14 +65,14 @@ export const useAuth = () => {
     getSession();
 
     supabase.auth.onAuthStateChange((_event, session) => {
-      // Déterminer le rôle de l'utilisateur
+      // Determine user role
       let role: UserRole | null = null;
       
       if (session?.user) {
-        // Vérifier si le rôle est dans les métadonnées
+        // Check if role is in metadata
         role = (session.user.user_metadata?.role as UserRole) || null;
         
-        // Si le rôle n'est pas dans les métadonnées, vérifier si l'email est celui de l'admin
+        // If role not in metadata, check if email is admin
         if (!role && session.user.email === 'dkautomotive70@gmail.com') {
           role = 'admin';
         }
@@ -89,10 +90,10 @@ export const useAuth = () => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // Pour l'administrateur avec le mot de passe spécial
-    if (email === 'dkautomotive70@gmail.com' && password === 'adminadmin70') {
-      try {
-        // Essayer d'abord de se connecter normalement
+    try {
+      // Special handling for admin
+      if (email === 'dkautomotive70@gmail.com' && password === 'adminadmin70') {
+        // Try to sign in normally first
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -102,41 +103,40 @@ export const useAuth = () => {
           return data;
         }
         
-        // Si la connexion échoue, créer un utilisateur s'il n'existe pas encore
-        const { data: userData, error: signUpError } = await supabase.auth.signUp({
+        // If sign-in fails with error, create account if it doesn't exist
+        console.log("Tentative de création d'un compte admin");
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: {
-              role: 'admin'
-            }
+            data: { role: 'admin' }
           }
         });
         
         if (!signUpError) {
-          // Si l'inscription réussit, se connecter avec les nouveaux identifiants
-          const { data: loginData } = await supabase.auth.signInWithPassword({
+          // Try to sign in again after signup
+          const { data: signInData } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
           
-          return loginData;
+          return signInData;
         }
         
-        // Si l'inscription échoue parce que l'utilisateur existe déjà mais avec un mot de passe différent
-        throw new Error("Impossible de se connecter ou de créer le compte administrateur");
-      } catch (error) {
-        console.error("Erreur lors de la connexion admin:", error);
         throw error;
+      } else {
+        // Regular sign in for other users
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        return data;
       }
-    } else {
-      // Connexion normale pour les autres utilisateurs
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      return data;
+    } catch (error) {
+      console.error("Erreur d'authentification:", error);
+      throw error;
     }
   };
 
