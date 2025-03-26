@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
 import { vehicleTypes } from "@/lib/vehicleTypes";
 import { distanceRanges, initialPriceGrids } from "@/hooks/usePricingGrids";
 import { calculateTTC } from "@/utils/priceCalculations";
@@ -65,16 +66,32 @@ const PricingGrids = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="sticky left-0 bg-background z-10">Distance</TableHead>
-                      {vehicleTypes.map((vehicleType) => (
-                        <TableHead key={vehicleType.id} colSpan={2} className="text-center">
-                          {vehicleType.name}
-                        </TableHead>
+                      {vehicleTypes.map((vehicleType, index) => (
+                        <React.Fragment key={vehicleType.id}>
+                          {index > 0 && (
+                            <TableHead className="p-0 w-1" key={`separator-${vehicleType.id}`}>
+                              <div className="h-full flex justify-center">
+                                <Separator orientation="vertical" className="mx-2" />
+                              </div>
+                            </TableHead>
+                          )}
+                          <TableHead colSpan={2} className="text-center">
+                            {vehicleType.name}
+                          </TableHead>
+                        </React.Fragment>
                       ))}
                     </TableRow>
                     <TableRow>
                       <TableHead className="sticky left-0 bg-background z-10"></TableHead>
-                      {vehicleTypes.map((vehicleType) => (
+                      {vehicleTypes.map((vehicleType, index) => (
                         <React.Fragment key={`header-${vehicleType.id}`}>
+                          {index > 0 && (
+                            <TableHead className="p-0 w-1">
+                              <div className="h-full flex justify-center">
+                                <Separator orientation="vertical" className="mx-2" />
+                              </div>
+                            </TableHead>
+                          )}
                           <TableHead className="text-center">Prix HT</TableHead>
                           <TableHead className="text-center">Prix TTC</TableHead>
                         </React.Fragment>
@@ -88,7 +105,7 @@ const PricingGrids = () => {
                           {range.label}
                           {range.perKm && <span className="text-gray-500 italic font-light ml-1">(€/km)</span>}
                         </TableCell>
-                        {vehicleTypes.map((vehicleType) => {
+                        {vehicleTypes.map((vehicleType, index) => {
                           const grid = priceGrids.find(g => g.vehicleTypeId === vehicleType.id);
                           const price = grid?.prices.find(p => p.rangeId === range.id);
                           const priceHT = price?.priceHT || "0.00";
@@ -96,8 +113,15 @@ const PricingGrids = () => {
                           
                           return (
                             <React.Fragment key={`${range.id}-${vehicleType.id}`}>
-                              <TableCell className="text-center">{priceHT} €</TableCell>
-                              <TableCell className="text-center">{priceTTC} €</TableCell>
+                              {index > 0 && (
+                                <TableCell className="p-0 w-1">
+                                  <div className="h-full flex justify-center">
+                                    <Separator orientation="vertical" className="mx-2" />
+                                  </div>
+                                </TableCell>
+                              )}
+                              <TableCell className="text-center">{priceHT}</TableCell>
+                              <TableCell className="text-center">{priceTTC}</TableCell>
                             </React.Fragment>
                           );
                         })}
