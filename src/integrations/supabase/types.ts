@@ -100,6 +100,42 @@ export type Database = {
           },
         ]
       }
+      price_grids: {
+        Row: {
+          created_at: string | null
+          distance_range_id: string
+          distance_range_label: string
+          id: string
+          is_per_km: boolean | null
+          price_ht: number
+          updated_at: string | null
+          vehicle_type_id: string
+          vehicle_type_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          distance_range_id: string
+          distance_range_label: string
+          id?: string
+          is_per_km?: boolean | null
+          price_ht: number
+          updated_at?: string | null
+          vehicle_type_id: string
+          vehicle_type_name: string
+        }
+        Update: {
+          created_at?: string | null
+          distance_range_id?: string
+          distance_range_label?: string
+          id?: string
+          is_per_km?: boolean | null
+          price_ht?: number
+          updated_at?: string | null
+          vehicle_type_id?: string
+          vehicle_type_name?: string
+        }
+        Relationships: []
+      }
       quotes: {
         Row: {
           date_created: string | null
