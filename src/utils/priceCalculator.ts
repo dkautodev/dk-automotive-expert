@@ -29,8 +29,8 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
       // Cas spécial pour "701+"
       if (rangeId === '701+' && distance > 700) {
         selectedPrice = isPerKm ? 
-          { priceHT: parseFloat(row.price_ht) * distance, isPerKm } : 
-          { priceHT: parseFloat(row.price_ht), isPerKm };
+          { priceHT: parseFloat(row.price_ht.toString()) * distance, isPerKm } : 
+          { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
         break;
       }
       
@@ -42,8 +42,8 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
         
         if (distance >= min && distance <= max) {
           selectedPrice = isPerKm ? 
-            { priceHT: parseFloat(row.price_ht) * distance, isPerKm } : 
-            { priceHT: parseFloat(row.price_ht), isPerKm };
+            { priceHT: parseFloat(row.price_ht.toString()) * distance, isPerKm } : 
+            { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
           break;
         }
       }
@@ -53,8 +53,8 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
       // Utiliser le prix par défaut de la tranche la plus élevée
       const lastPrice = data[data.length - 1];
       selectedPrice = lastPrice.is_per_km ? 
-        { priceHT: parseFloat(lastPrice.price_ht) * distance, isPerKm: true } : 
-        { priceHT: parseFloat(lastPrice.price_ht), isPerKm: false };
+        { priceHT: parseFloat(lastPrice.price_ht.toString()) * distance, isPerKm: true } : 
+        { priceHT: parseFloat(lastPrice.price_ht.toString()), isPerKm: false };
     }
 
     return {

@@ -6,6 +6,7 @@ import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
 import { calculateTTC } from '@/utils/priceCalculations';
 import { useAuthContext } from '@/context/AuthContext';
 import { distanceRanges } from './usePricingGrids';
+import { vehicleTypes } from '@/lib/vehicleTypes';
 
 export const usePricingGridsDB = () => {
   const [priceGrids, setPriceGrids] = useState<PriceGrid[]>([]);
@@ -70,20 +71,8 @@ export const usePricingGridsDB = () => {
   // Initialiser les grilles tarifaires avec des valeurs par défaut si la table est vide
   const initializeDefaultPriceGrids = async () => {
     try {
-      const { data: vehicleTypesData, error: vehicleTypesError } = await supabase
-        .from('vehicle_types')
-        .select('id, name');
-
-      if (vehicleTypesError) throw vehicleTypesError;
-
-      const vehicleTypes = vehicleTypesData || [
-        { id: 'citadine', name: 'Citadine' },
-        { id: 'berline', name: 'Berline' },
-        { id: 'monospace', name: 'Monospace' },
-        { id: 'suv', name: 'SUV' },
-        { id: 'utilitaire', name: 'Utilitaire' }
-      ];
-
+      // Au lieu d'interroger une table vehicle_types qui n'existe pas, 
+      // utilisons l'import depuis lib/vehicleTypes
       const defaultGrids: PriceGrid[] = vehicleTypes.map((vehicleType) => ({
         vehicleTypeId: vehicleType.id,
         vehicleTypeName: vehicleType.name,
@@ -102,7 +91,7 @@ export const usePricingGridsDB = () => {
             vehicle_type_name: grid.vehicleTypeName,
             distance_range_id: price.rangeId,
             distance_range_label: range?.label || '',
-            price_ht: price.priceHT,
+            price_ht: parseFloat(price.priceHT), // Convertir en nombre
             is_per_km: range?.perKm || false
           });
         }
@@ -152,7 +141,7 @@ export const usePricingGridsDB = () => {
           
           const { error } = await supabase
             .from('price_grids')
-            .update({ price_ht: newPriceHT })
+            .update({ price_ht: parseFloat(newPriceHT) }) // Convertir en nombre
             .match({ 
               vehicle_type_id: vehicleTypeId, 
               distance_range_id: price.rangeId 
@@ -198,7 +187,7 @@ export const usePricingGridsDB = () => {
                 
                 await supabase
                   .from('price_grids')
-                  .update({ price_ht: newPriceHT })
+                  .update({ price_ht: parseFloat(newPriceHT) }) // Convertir en nombre
                   .match({ 
                     vehicle_type_id: otherGridId, 
                     distance_range_id: price.rangeId 
@@ -274,8 +263,8 @@ export const usePricingGridsDB = () => {
         // Gérer le cas spécial "701+"
         if (rangeId === '701+' && distance > 700) {
           selectedPrice = isPerKm ? 
-            { priceHT: parseFloat(row.price_ht) * distance, isPerKm } : 
-            { priceHT: parseFloat(row.price_ht), isPerKm };
+            { priceHT: parseFloat(row.price_ht.toString()) * distance, isPerKm } : 
+            { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
           break;
         }
         
@@ -284,8 +273,8 @@ export const usePricingGridsDB = () => {
           const [min, max] = rangeParts;
           if (distance >= min && distance <= max) {
             selectedPrice = isPerKm ? 
-              { priceHT: parseFloat(row.price_ht) * distance, isPerKm } : 
-              { priceHT: parseFloat(row.price_ht), isPerKm };
+              { priceHT: parseFloat(row.price_ht.toString()) * distance, isPerKm } : 
+              { priceHT: parseFloat(row.price_ht.toString()), isPerKm };
             break;
           }
         }
