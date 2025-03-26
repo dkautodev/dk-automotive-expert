@@ -62,7 +62,7 @@ const PricingGrids = () => {
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <Table className="border-collapse">
+                <Table className="border-collapse w-full">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="sticky left-0 bg-background z-10 border-r">Distance</TableHead>
@@ -100,7 +100,7 @@ const PricingGrids = () => {
                       ))}
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="divide-y">
                     {distanceRanges.map((range) => (
                       <TableRow key={range.id}>
                         <TableCell className="font-medium sticky left-0 bg-background z-10 border-r">
@@ -118,7 +118,7 @@ const PricingGrids = () => {
                               {index > 0 && (
                                 <TableCell className="p-0 w-1 border-0 relative">
                                   <div className="h-full flex justify-center">
-                                    <Separator orientation="vertical" className="h-full absolute" />
+                                    <Separator orientation="vertical" className="h-full absolute inset-0" />
                                   </div>
                                 </TableCell>
                               )}
