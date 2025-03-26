@@ -4,6 +4,7 @@ import { TableBody } from '@/components/ui/table';
 import PriceTableRow from './PriceTableRow';
 import { PriceRange, PriceData } from './pricingTypes';
 import { calculateTTC } from '@/utils/priceCalculations';
+import { distanceRanges } from '@/hooks/usePricingGrids';
 
 interface PricingTableBodyProps {
   prices: PriceData[];
@@ -22,13 +23,23 @@ const PricingTableBody: React.FC<PricingTableBodyProps> = ({
   onPriceHTChange,
   onPriceTTCChange,
 }) => {
+  // Créer un map des prix pour un accès facile
+  const priceMap = prices.reduce<Record<string, PriceData>>((acc, price) => {
+    acc[price.rangeId] = price;
+    return acc;
+  }, {});
+
   return (
     <TableBody>
-      {prices.map((price) => {
-        const range = distanceRanges.find(r => r.id === price.rangeId);
-        return range && (
+      {distanceRanges.map((range) => {
+        const price = priceMap[range.id];
+        
+        // S'assurer que nous avons un prix valide pour cette plage de distance
+        if (!price) return null;
+        
+        return (
           <PriceTableRow
-            key={price.rangeId}
+            key={range.id}
             priceData={price}
             range={range}
             isEditing={isEditing}
