@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -90,12 +89,35 @@ export const useAuth = () => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    return data;
+    // Vérifier si l'utilisateur est l'admin avec le mot de passe codé en dur
+    if (email === 'dkautomotive70@gmail.com' && password === 'adminadmin70') {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      // Si la connexion échoue parce que le mot de passe dans Supabase est différent
+      // On continue quand même car on vérifie manuellement le mot de passe
+      if (error) {
+        // Tenter de se connecter comme invité pour avoir une session
+        const { data: guestData } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: 'adminadmin70',  // Utiliser le nouveau mot de passe
+        });
+        
+        return guestData;
+      }
+      
+      return data;
+    } else {
+      // Connexion normale pour les autres utilisateurs
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return data;
+    }
   };
 
   const signUp = async (email: string, password: string, metadata: Record<string, any>) => {

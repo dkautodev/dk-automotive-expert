@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -35,10 +36,21 @@ const SignInForm = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
+      
+      // Si c'est l'admin, vérifier le mot de passe spécial
+      if (data.email === 'dkautomotive70@gmail.com') {
+        if (data.password === 'adminadmin70') {
+          await signIn(data.email, data.password);
+          navigate('/dashboard/admin');
+          toast.success("Connexion administrateur réussie");
+          return;
+        }
+      }
+      
+      // Pour les autres utilisateurs, connexion normale
       await signIn(data.email, data.password);
       
       // After successful login, redirect to client dashboard by default
-      // The role-based redirect will happen in the layout component
       navigate('/dashboard/client');
       toast.success("Connexion réussie");
       
