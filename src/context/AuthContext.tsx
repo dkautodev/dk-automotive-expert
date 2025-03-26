@@ -37,7 +37,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signIn: auth.signIn,
       signUp: auth.signUp,
       registerAdmin: auth.registerAdmin,
-      signOut: auth.signOut,
+      signOut: async () => {
+        await auth.signOut();
+        return Promise.resolve();
+      },
       fetchUserProfile: auth.fetchUserProfile
     }}>
       {children}

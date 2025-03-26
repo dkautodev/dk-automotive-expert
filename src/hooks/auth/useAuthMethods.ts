@@ -66,7 +66,8 @@ export const useAuthMethods = () => {
   };
 
   const signOut = async () => {
-    return await supabase.auth.signOut();
+    await supabase.auth.signOut();
+    return Promise.resolve();
   };
 
   const registerAdmin = async (email: string, password: string) => {
