@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
 import { vehicleTypes } from '@/lib/vehicleTypes';
@@ -29,11 +28,11 @@ export const initializeDefaultPriceGrids = async () => {
     vehicleTypeName: vehicleType.name,
     prices: distanceRanges.map((range) => ({
       rangeId: range.id,
-      priceHT: ((Math.random() * 50) + 50).toFixed(2), // Prix aléatoire entre 50 et 100€
+      priceHT: "0.00", // Set default price to 0
     })),
   }));
 
-  // Insérer les données par défaut dans la base de données
+  // Insert default data into database
   for (const grid of defaultGrids) {
     for (const price of grid.prices) {
       const range = distanceRanges.find(r => r.id === price.rangeId);
@@ -43,7 +42,7 @@ export const initializeDefaultPriceGrids = async () => {
           vehicle_type_name: grid.vehicleTypeName,
           distance_range_id: price.rangeId,
           distance_range_label: range?.label || '',
-          price_ht: parseFloat(price.priceHT), // Convertir en nombre
+          price_ht: 0, // Set default price to 0
           is_per_km: range?.perKm || false
         });
       } catch (err) {
