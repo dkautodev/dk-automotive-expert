@@ -11,6 +11,7 @@ const PricingGrid: React.FC = () => {
     editingGrid,
     editedPrices,
     loading,
+    savingGrid,
     handleEditGrid,
     handleSaveGrid,
     handlePriceHTChange,
@@ -35,6 +36,7 @@ const PricingGrid: React.FC = () => {
           distanceRanges={distanceRanges}
           editingGrid={editingGrid}
           editedPrices={editedPrices}
+          savingGrid={savingGrid}
           onEditGrid={handleEditGrid}
           onSaveGrid={handleSaveGrid}
           onPriceHTChange={handlePriceHTChange}

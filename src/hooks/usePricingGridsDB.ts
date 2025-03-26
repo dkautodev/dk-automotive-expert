@@ -17,6 +17,7 @@ export const usePricingGridsDB = () => {
   const [editingGrid, setEditingGrid] = useState<string | null>(null);
   const [editedPrices, setEditedPrices] = useState<Record<string, { ht: string, ttc: string }>>({});
   const [loading, setLoading] = useState(true);
+  const [savingGrid, setSavingGrid] = useState(false);
   const { role } = useAuthContext();
 
   const isAdmin = role === 'admin';
@@ -76,18 +77,22 @@ export const usePricingGridsDB = () => {
       return;
     }
 
+    setSavingGrid(true);
+
     try {
       // Mettre à jour les prix dans la base de données
       const grid = priceGrids.find(g => g.vehicleTypeId === vehicleTypeId);
       if (grid) {
-        for (const price of grid.prices) {
+        const updatePromises = grid.prices.map(async (price) => {
           const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-          await updatePriceInDB(
+          return updatePriceInDB(
             vehicleTypeId, 
             price.rangeId, 
             parseFloat(newPriceHT)
           );
-        }
+        });
+        
+        await Promise.all(updatePromises);
       }
 
       // Mettre à jour l'état local
@@ -121,14 +126,16 @@ export const usePricingGridsDB = () => {
               };
 
               // Mettre à jour également dans la base de données
-              newGrids[gridIndex].prices.forEach(async (price) => {
+              const updateOtherPromises = newGrids[gridIndex].prices.map(async (price) => {
                 const newPriceHT = editedPrices[price.rangeId]?.ht || price.priceHT;
-                await updatePriceInDB(
+                return updatePriceInDB(
                   otherGridId, 
                   price.rangeId, 
                   parseFloat(newPriceHT)
                 );
               });
+              
+              await Promise.all(updateOtherPromises);
             }
           }
         }
@@ -142,6 +149,8 @@ export const usePricingGridsDB = () => {
     } catch (error: any) {
       console.error('Erreur lors de la sauvegarde de la grille tarifaire:', error);
       toast.error('Erreur lors de la sauvegarde de la grille tarifaire');
+    } finally {
+      setSavingGrid(false);
     }
   };
 
@@ -192,6 +201,7 @@ export const usePricingGridsDB = () => {
     editingGrid,
     editedPrices,
     loading,
+    savingGrid,
     handleEditGrid,
     handleSaveGrid,
     handlePriceHTChange,

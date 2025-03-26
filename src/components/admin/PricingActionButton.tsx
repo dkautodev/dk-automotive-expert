@@ -1,16 +1,18 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Save } from 'lucide-react';
+import { Edit, Save, Loader2 } from 'lucide-react';
 
 interface PricingActionButtonProps {
   isEditing: boolean;
+  isSaving?: boolean;
   onEdit: () => void;
   onSave: () => void;
 }
 
 const PricingActionButton: React.FC<PricingActionButtonProps> = ({
   isEditing,
+  isSaving = false,
   onEdit,
   onSave,
 }) => {
@@ -20,9 +22,19 @@ const PricingActionButton: React.FC<PricingActionButtonProps> = ({
         onClick={onSave}
         size="sm"
         className="gap-2"
+        disabled={isSaving}
       >
-        <Save className="h-4 w-4" />
-        Enregistrer
+        {isSaving ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Enregistrement...
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4" />
+            Enregistrer
+          </>
+        )}
       </Button>
     );
   }
