@@ -26,7 +26,19 @@ export type MissionRow = {
   client_id: string;
   driver_id: string | null;
   quote_id: string | null;
-  status: 'pending' | 'in_progress' | 'pickup_completed' | 'incident' | 'completed';
+  status: 'en_attente' | 'confirme' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'termine';
+  mission_type: 'livraison' | 'restitution';
+  mission_number: string | null;
+  vehicle_info: any | null;
+  pickup_date: string | null;
+  pickup_time: string | null;
+  delivery_date: string | null;
+  delivery_time: string | null;
+  pickup_contact: any | null;
+  delivery_contact: any | null;
+  distance: string | null;
+  price_ht: number | null;
+  price_ttc: number | null;
   created_at: string;
   updated_at: string | null;
   quote?: {
