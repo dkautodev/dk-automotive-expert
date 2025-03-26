@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -27,13 +28,27 @@ export const useAuth = () => {
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        
+        // Déterminer le rôle de l'utilisateur
+        let role: UserRole | null = null;
+        
+        if (session?.user) {
+          // Vérifier si le rôle est dans les métadonnées
+          role = (session.user.user_metadata?.role as UserRole) || null;
+          
+          // Si le rôle n'est pas dans les métadonnées, vérifier si l'email est celui de l'admin
+          if (!role && session.user.email === 'dkautomotive70@gmail.com') {
+            role = 'admin';
+          }
+        }
+        
         setAuthState({
           user: session?.user || null,
           session,
           loading: false,
           error: null,
           isAuthenticated: !!session,
-          role: (session?.user?.user_metadata?.role as UserRole) || null
+          role
         });
       } catch (error: any) {
         setAuthState({
@@ -50,13 +65,26 @@ export const useAuth = () => {
     getSession();
 
     supabase.auth.onAuthStateChange((_event, session) => {
+      // Déterminer le rôle de l'utilisateur
+      let role: UserRole | null = null;
+      
+      if (session?.user) {
+        // Vérifier si le rôle est dans les métadonnées
+        role = (session.user.user_metadata?.role as UserRole) || null;
+        
+        // Si le rôle n'est pas dans les métadonnées, vérifier si l'email est celui de l'admin
+        if (!role && session.user.email === 'dkautomotive70@gmail.com') {
+          role = 'admin';
+        }
+      }
+      
       setAuthState({
         user: session?.user || null,
         session,
         loading: false,
         error: null,
         isAuthenticated: !!session,
-        role: (session?.user?.user_metadata?.role as UserRole) || null
+        role
       });
     });
   }, []);
