@@ -66,29 +66,65 @@ export type Database = {
         Row: {
           client_id: string
           created_at: string | null
+          delivery_contact: Json | null
+          delivery_date: string | null
+          delivery_time: string | null
+          distance: string | null
           driver_id: string | null
           id: string
+          mission_number: string | null
+          mission_type: string
+          pickup_contact: Json | null
+          pickup_date: string | null
+          pickup_time: string | null
+          price_ht: number | null
+          price_ttc: number | null
           quote_id: string | null
           status: string
           updated_at: string | null
+          vehicle_info: Json | null
         }
         Insert: {
           client_id: string
           created_at?: string | null
+          delivery_contact?: Json | null
+          delivery_date?: string | null
+          delivery_time?: string | null
+          distance?: string | null
           driver_id?: string | null
           id?: string
+          mission_number?: string | null
+          mission_type?: string
+          pickup_contact?: Json | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          price_ht?: number | null
+          price_ttc?: number | null
           quote_id?: string | null
           status?: string
           updated_at?: string | null
+          vehicle_info?: Json | null
         }
         Update: {
           client_id?: string
           created_at?: string | null
+          delivery_contact?: Json | null
+          delivery_date?: string | null
+          delivery_time?: string | null
+          distance?: string | null
           driver_id?: string | null
           id?: string
+          mission_number?: string | null
+          mission_type?: string
+          pickup_contact?: Json | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          price_ht?: number | null
+          price_ttc?: number | null
           quote_id?: string | null
           status?: string
           updated_at?: string | null
+          vehicle_info?: Json | null
         }
         Relationships: [
           {
@@ -295,6 +331,12 @@ export type Database = {
           price_ht: number
           is_per_km: boolean
         }[]
+      }
+      generate_mission_number: {
+        Args: {
+          mission_type: string
+        }
+        Returns: string
       }
       generate_quote_number: {
         Args: Record<PropertyKey, never>
