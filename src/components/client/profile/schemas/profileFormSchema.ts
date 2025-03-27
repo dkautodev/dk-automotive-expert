@@ -16,5 +16,5 @@ export const profileFormSchema = z.object({
   billing_address_country: z.string().min(1, "Le pays est requis")
 });
 
-// Create a type from the schema
+// Créer un type à partir du schéma pour assurer la cohérence
 export type ProfileFormSchemaType = z.infer<typeof profileFormSchema>;
