@@ -5,7 +5,6 @@ import { Form, FormField, FormItem, FormControl, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { ProfileData, ProfileFormData } from "./types";
 import { useProfileContext } from "./ProfileContext";
 
@@ -23,7 +22,10 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
       phone: profile?.phone || "",
       siret: profile?.siret || "",
       vat_number: profile?.vat_number || "",
-      billing_address: profile?.billing_address || ""
+      billing_address_street: profile?.billing_address_street || "",
+      billing_address_city: profile?.billing_address_city || "",
+      billing_address_postal_code: profile?.billing_address_postal_code || "",
+      billing_address_country: profile?.billing_address_country || "France"
     }
   });
 
@@ -34,7 +36,10 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
         phone: profile.phone || "",
         siret: profile.siret || "",
         vat_number: profile.vat_number || "",
-        billing_address: profile.billing_address || ""
+        billing_address_street: profile?.billing_address_street || "",
+        billing_address_city: profile?.billing_address_city || "",
+        billing_address_postal_code: profile?.billing_address_postal_code || "",
+        billing_address_country: profile?.billing_address_country || "France"
       });
     }
   }, [profile, form]);
@@ -114,23 +119,67 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="billing_address"
-          render={({ field }) => (
-            <FormItem>
-              <Label>Adresse de facturation</Label>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  rows={3}
-                  placeholder="Adresse complète pour facturation"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Adresse de facturation</h3>
+          
+          <FormField
+            control={form.control}
+            name="billing_address_street"
+            render={({ field }) => (
+              <FormItem>
+                <Label>Rue et numéro</Label>
+                <FormControl>
+                  <Input {...field} placeholder="123 rue de Paris" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="billing_address_postal_code"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Code postal</Label>
+                  <FormControl>
+                    <Input {...field} placeholder="75001" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="billing_address_city"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Ville</Label>
+                  <FormControl>
+                    <Input {...field} placeholder="Paris" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <FormField
+            control={form.control}
+            name="billing_address_country"
+            render={({ field }) => (
+              <FormItem>
+                <Label>Pays</Label>
+                <FormControl>
+                  <Input {...field} placeholder="France" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Mise à jour..." : "Mettre à jour"}

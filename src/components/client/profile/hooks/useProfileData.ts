@@ -75,7 +75,10 @@ export const useProfileData = (userId: string | undefined) => {
             vat_number: '',
             siret_locked: false,
             vat_number_locked: false,
-            billing_address: ''
+            billing_address_street: '',
+            billing_address_city: '',
+            billing_address_postal_code: '',
+            billing_address_country: ''
           };
           
           setProfile(defaultProfile);
@@ -95,6 +98,27 @@ export const useProfileData = (userId: string | undefined) => {
           ? !!data.vat_number_locked 
           : false;
         
+        // Décomposer l'adresse de facturation si elle existe
+        let billingStreet = '';
+        let billingCity = '';
+        let billingPostalCode = '';
+        let billingCountry = 'France';
+        
+        if (data.billing_address) {
+          const addressParts = data.billing_address.split(',').map(part => part.trim());
+          if (addressParts.length >= 1) billingStreet = addressParts[0];
+          if (addressParts.length >= 3) {
+            const cityAndPostal = addressParts[1].split(' ');
+            if (cityAndPostal.length >= 2) {
+              billingPostalCode = cityAndPostal[0];
+              billingCity = cityAndPostal.slice(1).join(' ');
+            } else {
+              billingCity = addressParts[1];
+            }
+          }
+          if (addressParts.length >= 4) billingCountry = addressParts[3];
+        }
+        
         // Créer un profil en utilisant à la fois les données du profil et les métadonnées
         const formattedProfile: ProfileData = {
           id: data.id,
@@ -108,7 +132,10 @@ export const useProfileData = (userId: string | undefined) => {
           vat_number: data.vat_number || '',
           siret_locked: siretLocked,
           vat_number_locked: vatLocked,
-          billing_address: data.billing_address || ''
+          billing_address_street: billingStreet,
+          billing_address_city: billingCity,
+          billing_address_postal_code: billingPostalCode,
+          billing_address_country: billingCountry
         };
         
         setProfile(formattedProfile);

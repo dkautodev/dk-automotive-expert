@@ -13,10 +13,13 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
     try {
       setIsSubmitting(true);
       
+      // Construire l'adresse de facturation complète au format attendu par la base de données
+      const formattedBillingAddress = `${data.billing_address_street}, ${data.billing_address_postal_code} ${data.billing_address_city}, ${data.billing_address_country}`;
+      
       // Mapping from form fields to database columns
       const updateData: Record<string, any> = {
         phone: data.phone,
-        billing_address: data.billing_address
+        billing_address: formattedBillingAddress
       };
 
       if (!profile?.siret_locked) {
@@ -38,7 +41,10 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
         setProfile({
           ...profile,
           phone: data.phone,
-          billing_address: data.billing_address,
+          billing_address_street: data.billing_address_street,
+          billing_address_city: data.billing_address_city,
+          billing_address_postal_code: data.billing_address_postal_code,
+          billing_address_country: data.billing_address_country,
           siret: !profile.siret_locked ? data.siret : profile.siret,
           vat_number: !profile.vat_number_locked ? data.vat_number : profile.vat_number
         });
