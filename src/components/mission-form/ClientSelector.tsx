@@ -37,7 +37,13 @@ const ClientSelector = ({ form, clients, loading, onAddClient }: ClientSelectorP
         <Select
           disabled={loading}
           value={clientId}
-          onValueChange={(value) => form.setValue("client_id", value)}
+          onValueChange={(value) => {
+            if (value === "add-client") {
+              onAddClient();
+            } else {
+              form.setValue("client_id", value);
+            }
+          }}
         >
           <SelectTrigger>
             <SelectValue placeholder="Sélectionner un client" />

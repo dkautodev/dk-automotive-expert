@@ -4,15 +4,19 @@ import { UseFormReturn } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "../missionFormSchema";
-import { ClientDisplay } from "../types";
 
-// Define client data structure
-export type NewClientData = {
+// Define client data structures and export them
+export interface ClientDisplay {
+  id: string;
+  name: string;
+}
+
+export interface NewClientData {
   first_name: string;
   last_name: string;
   email: string;
   phone: string;
-};
+}
 
 export const useClients = (form: UseFormReturn<MissionFormValues>) => {
   const [clients, setClients] = useState<ClientDisplay[]>([]);
