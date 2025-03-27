@@ -8,6 +8,12 @@ export interface Client {
   phone: string;
 }
 
+// Interface for displaying clients in lists/selectors
+export interface ClientDisplay {
+  id: string;
+  name: string;
+}
+
 // Interface for the database response structure
 export interface ClientFromDB {
   id: string;

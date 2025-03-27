@@ -14,12 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Client } from "./types";
+import { ClientDisplay } from "./types";
 import { MissionFormValues } from "./missionFormSchema";
 
 interface ClientListProps {
   form: UseFormReturn<MissionFormValues>;
-  clients: Client[];
+  clients: ClientDisplay[];
   loading: boolean;
 }
 
@@ -43,7 +43,7 @@ const ClientList = ({ form, clients, loading }: ClientListProps) => {
               <SelectContent>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
-                    {client.first_name} {client.last_name} - {client.email}
+                    {client.name}
                   </SelectItem>
                 ))}
               </SelectContent>
