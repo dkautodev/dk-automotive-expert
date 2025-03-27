@@ -8,11 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SignUpFormFields } from "./components/SignUpFormFields";
 import { signUpSchema, type SignUpFormData } from "./schemas/signUpSchema";
 import { useSignUpSubmit } from "./hooks/useSignUpSubmit";
+import { Loader2 } from "lucide-react";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { handleSubmit } = useSignUpSubmit();
+  const { handleSubmit, isLoading } = useSignUpSubmit();
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -46,8 +47,19 @@ const SignUpForm = () => {
               setShowConfirmPassword={setShowConfirmPassword}
             />
             
-            <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue">
-              S'inscrire
+            <Button 
+              type="submit" 
+              className="w-full bg-dk-navy hover:bg-dk-blue"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Inscription en cours...
+                </>
+              ) : (
+                "S'inscrire"
+              )}
             </Button>
           </form>
         </Form>

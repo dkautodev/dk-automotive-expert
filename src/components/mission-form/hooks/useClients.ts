@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "../missionFormSchema";
 
-// Définir des interfaces simplifiées et séparées pour éviter les références circulaires
+// Simplified interfaces to avoid circular references
 export interface ClientDisplay {
   id: string;
   name: string;
