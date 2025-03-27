@@ -1,9 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "../missionFormSchema";
+import { ClientDisplay } from "../types";
 
 type NewClientData = {
   first_name: string;
@@ -13,7 +14,7 @@ type NewClientData = {
 };
 
 export const useClients = (form: UseFormReturn<MissionFormValues>) => {
-  const [clients, setClients] = useState<Array<{id: string, name: string}>>([]);
+  const [clients, setClients] = useState<ClientDisplay[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newClient, setNewClient] = useState<NewClientData>({
@@ -23,7 +24,6 @@ export const useClients = (form: UseFormReturn<MissionFormValues>) => {
     phone: '',
   });
 
-  // Simplified type structure to prevent infinite recursion
   const fetchClients = async () => {
     try {
       setLoading(true);
@@ -34,7 +34,7 @@ export const useClients = (form: UseFormReturn<MissionFormValues>) => {
 
       if (error) throw error;
 
-      const formattedClients = data.map(client => ({
+      const formattedClients: ClientDisplay[] = data.map(client => ({
         id: client.id,
         name: `${client.first_name} ${client.last_name}${client.company_name ? ` (${client.company_name})` : ''}`
       }));
@@ -47,6 +47,10 @@ export const useClients = (form: UseFormReturn<MissionFormValues>) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
 
   const createClient = async () => {
     try {
@@ -74,12 +78,12 @@ export const useClients = (form: UseFormReturn<MissionFormValues>) => {
       if (error) throw error;
 
       // Add new client to the list
-      const newClientData = {
+      const newClientDisplay: ClientDisplay = {
         id: data.id,
         name: `${data.first_name} ${data.last_name}`
       };
       
-      setClients([...clients, newClientData]);
+      setClients([...clients, newClientDisplay]);
       
       // Set the client in the form
       form.setValue('client_id', data.id);
