@@ -63,7 +63,12 @@ const ContactSection = ({
           <FormItem>
             <Label>Numéro de téléphone</Label>
             <FormControl>
-              <Input {...field} type="tel" disabled={!isEditing} />
+              <Input 
+                {...field} 
+                type="tel" 
+                disabled={!isEditing}
+                value={field.value || ''} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

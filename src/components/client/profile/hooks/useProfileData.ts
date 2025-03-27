@@ -101,13 +101,19 @@ export const useProfileData = (userId: string | undefined) => {
         const siretLocked = false; // We'll default to false since the column doesn't exist yet
         const vatNumberLocked = false; // We'll default to false since the column doesn't exist yet
         
+        // Récupérer le numéro de téléphone avec gestion des valeurs null
+        const phoneNumber = data.phone || userMetadata.phone || '';
+        console.log("Phone number from database:", data.phone);
+        console.log("Phone number from metadata:", userMetadata.phone);
+        console.log("Final phone number value:", phoneNumber);
+        
         // Créer un profil en utilisant à la fois les données du profil et les métadonnées
         const formattedProfile: ProfileData = {
           id: data.id,
           first_name: data.first_name || userMetadata.firstName || '',
           last_name: data.last_name || userMetadata.lastName || '',
           email: userEmail,
-          phone: data.phone || userMetadata.phone || '',
+          phone: phoneNumber,
           company: data.company_name || userMetadata.company || '',
           profile_picture: data.profile_picture || '',
           siret: data.siret_number || '',
