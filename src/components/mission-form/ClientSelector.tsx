@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "./missionFormSchema";
 
+// Define a clear interface for the client data we work with in the component
 interface Client {
   id: string;
   first_name: string;
@@ -31,7 +32,7 @@ interface Client {
   phone: string;
 }
 
-// Define a separate type for the database response to avoid recursive type issues
+// Define a separate interface for the database response structure
 interface ClientFromDB {
   id: string;
   first_name: string;
@@ -73,10 +74,12 @@ const ClientSelector = ({ form }: ClientSelectorProps) => {
       if (error) throw error;
 
       // Format client data with email from the joined user table
-      // Use the ClientFromDB type to type the response data correctly
-      const formattedClients = (data as ClientFromDB[]).map(client => ({
-        ...client,
+      const formattedClients: Client[] = (data as ClientFromDB[]).map(client => ({
+        id: client.id,
+        first_name: client.first_name,
+        last_name: client.last_name,
         email: client.email?.email || "",
+        phone: client.phone
       }));
 
       setClients(formattedClients);
