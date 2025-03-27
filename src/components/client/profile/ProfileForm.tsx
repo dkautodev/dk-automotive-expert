@@ -1,12 +1,14 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ProfileData, ProfileFormData } from "./types";
 import { useProfileContext } from "./ProfileContext";
+import { profileFormSchema } from "./schemas/profileFormSchema";
 
 interface ProfileFormProps {
   profile: ProfileData | null;
@@ -17,6 +19,7 @@ interface ProfileFormProps {
 const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
   const { isLoading } = useProfileContext();
   const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
       email: profile?.email || "",
       phone: profile?.phone || "",
@@ -85,6 +88,8 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
                 <Input
                   {...field}
                   disabled={profile?.siret_locked}
+                  placeholder="14 chiffres"
+                  maxLength={14}
                   onBlur={() => {
                     if (field.value && !profile?.siret_locked) {
                       onLockField('siret', field.value);
@@ -107,6 +112,7 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
                 <Input
                   {...field}
                   disabled={profile?.vat_number_locked}
+                  placeholder="FR12345678912"
                   onBlur={() => {
                     if (field.value && !profile?.vat_number_locked) {
                       onLockField('vat_number', field.value);
@@ -144,7 +150,7 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
                 <FormItem>
                   <Label>Code postal</Label>
                   <FormControl>
-                    <Input {...field} placeholder="75001" />
+                    <Input {...field} placeholder="75001" maxLength={5} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
