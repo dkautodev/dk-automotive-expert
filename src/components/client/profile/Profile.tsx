@@ -56,10 +56,13 @@ const Profile = () => {
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
+      // Format the billing address from the individual fields
+      const formattedBillingAddress = `${data.billing_address_street}, ${data.billing_address_postal_code} ${data.billing_address_city}, ${data.billing_address_country}`;
+      
       const updateData: any = {
         email: data.email,
         phone: data.phone,
-        billing_address: data.billing_address
+        billing_address: formattedBillingAddress
       };
 
       if (!profile?.siret_locked) {
