@@ -27,11 +27,13 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
 
       if (error) throw error;
 
-      // Convertir explicitement les données pour éviter les problèmes de typage
+      // Transformation explicite des données pour éviter les problèmes de typage
       const formattedClients: Client[] = [];
       
       if (data) {
-        (data as ClientFromDB[]).forEach((client) => {
+        // Utilisation d'une boucle simple pour éviter les problèmes de typage complexe
+        for (let i = 0; i < data.length; i++) {
+          const client = data[i] as unknown as ClientFromDB;
           formattedClients.push({
             id: client.id,
             first_name: client.first_name,
@@ -39,7 +41,7 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
             email: client.email?.email || "",
             phone: client.phone || ""
           });
-        });
+        }
       }
 
       setClients(formattedClients);

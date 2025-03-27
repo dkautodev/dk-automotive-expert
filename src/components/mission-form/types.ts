@@ -16,5 +16,5 @@ export interface ClientFromDB {
   email: {
     email: string;
   } | null;
-  phone: string;
+  phone: string | null;
 }
