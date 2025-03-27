@@ -96,6 +96,11 @@ export const useProfileData = (userId: string | undefined) => {
           if (addressParts.length >= 3) billingCountry = addressParts[2];
         }
         
+        // Check for locked fields in the database
+        // Note: These columns don't exist in the database yet, so we'll handle them safely
+        const siretLocked = false; // We'll assume false by default since the column doesn't exist
+        const vatNumberLocked = false; // We'll assume false by default since the column doesn't exist
+        
         // Créer un profil en utilisant à la fois les données du profil et les métadonnées
         const formattedProfile: ProfileData = {
           id: data.id,
@@ -107,8 +112,8 @@ export const useProfileData = (userId: string | undefined) => {
           profile_picture: data.profile_picture || '',
           siret: data.siret_number || '',
           vat_number: data.vat_number || '',
-          siret_locked: !!data.siret_number_locked,
-          vat_number_locked: !!data.vat_number_locked,
+          siret_locked: siretLocked,
+          vat_number_locked: vatNumberLocked,
           billing_address_street: billingStreet,
           billing_address_city: billingCity,
           billing_address_postal_code: billingPostalCode,
