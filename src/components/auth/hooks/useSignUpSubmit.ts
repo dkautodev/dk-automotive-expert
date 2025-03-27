@@ -1,54 +1,55 @@
 
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
 import { toast } from "sonner";
-import { useAuthContext } from "@/context/AuthContext";
-import type { SignUpFormData } from "../schemas/signUpSchema";
-import type { UserRole } from "@/hooks/useAuth";
+import { useNavigate } from 'react-router-dom';
+import { SignUpFormData } from "../schemas/signUpSchema";
 
 export const useSignUpSubmit = () => {
-  const { signUp } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (data: SignUpFormData) => {
+    if (data.password !== data.confirmPassword) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    setIsLoading(true);
+    
     try {
-      const { error: signUpError } = await signUp(data.email, data.password, {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        phone: data.phone,
-        company: data.company,
-        role: 'client' as UserRole
+      const response = await fetch(`${window.location.origin}/api/register-client`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          phone: data.phone,
+          company: data.company
+        }),
       });
-
-      if (signUpError) {
-        let errorMessage = "Une erreur est survenue lors de l'inscription.";
-        
-        if (signUpError.message?.includes("Email rate limit exceeded")) {
-          errorMessage = "Veuillez attendre quelques secondes avant de réessayer.";
-        } else if (signUpError.message?.includes("User already registered")) {
-          errorMessage = "Cette adresse email est déjà utilisée.";
-        }
-
-        console.error("Signup error details:", signUpError);
-        
-        toast.error(errorMessage, {
-          description: signUpError.message
-        });
-        return;
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Une erreur est survenue lors de l\'inscription');
       }
-
-      toast.success("Inscription réussie", {
-        description: "Votre compte a été créé avec succès."
-      });
       
-      navigate('/dashboard/client');
+      toast.success("Inscription réussie ! Vous allez être redirigé vers la page de connexion.");
+      
+      setTimeout(() => {
+        navigate('/auth', { state: { email: data.email } });
+      }, 2000);
     } catch (error: any) {
-      console.error("Unexpected error during signup:", error);
-      
-      toast.error("Erreur", {
-        description: "Une erreur inattendue est survenue. Veuillez réessayer."
-      });
+      console.error('Registration error:', error);
+      toast.error(error.message || "Une erreur est survenue lors de l'inscription");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return { handleSubmit };
+  return { handleSubmit, isLoading };
 };
