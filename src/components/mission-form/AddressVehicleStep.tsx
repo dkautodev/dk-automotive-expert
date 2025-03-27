@@ -1,32 +1,18 @@
 
 import { UseFormReturn } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Check, RotateCw } from "lucide-react";
 import { MissionFormValues } from "./missionFormSchema";
-import { vehicleTypes } from "@/lib/vehicleTypes";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import ClientSelector from "./ClientSelector";
 import { useClients } from "./hooks/useClients";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import NewClientForm from "./NewClientForm";
+import AddressFields from "./AddressFields";
+import VehicleTypeSelector from "./VehicleTypeSelector";
+import CalculateButton from "./CalculateButton";
+import DistancePriceCard from "./DistancePriceCard";
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -120,118 +106,24 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
       </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField
-          control={form.control}
-          name="pickup_address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Adresse de prise en charge</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    placeholder="123 rue de Paris, 75001 Paris" 
-                    {...field} 
-                    className="pl-8"
-                  />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="delivery_address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Adresse de livraison</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    placeholder="456 avenue des Champs-Élysées, 75008 Paris" 
-                    {...field} 
-                    className="pl-8"
-                  />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="vehicle_type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type de véhicule</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un type de véhicule" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {vehicleTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <AddressFields form={form} />
+        <VehicleTypeSelector form={form} />
 
         <div className="md:col-span-2">
-          <Button
-            type="button"
-            variant="outline"
+          <CalculateButton 
             onClick={calculateDistanceAndPrice}
-            disabled={!pickupAddress || !deliveryAddress || !vehicleType || isCalculating}
-            className="w-full"
-          >
-            {isCalculating ? (
-              <>
-                <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                Calcul en cours...
-              </>
-            ) : distance ? (
-              <>
-                <Check className="mr-2 h-4 w-4" />
-                Recalculer la distance et le prix
-              </>
-            ) : (
-              "Calculer la distance et le prix"
-            )}
-          </Button>
+            isCalculating={isCalculating}
+            distance={distance}
+            disabled={!pickupAddress || !deliveryAddress || !vehicleType}
+          />
         </div>
       </div>
 
-      {distance && priceHT && priceTTC && (
-        <Card className="mt-6">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <div className="text-sm font-medium text-gray-500">Distance</div>
-                <div className="text-lg font-semibold">{distance} km</div>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-gray-500">Prix HT</div>
-                <div className="text-lg font-semibold">{priceHT} €</div>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-gray-500">Prix TTC</div>
-                <div className="text-lg font-semibold">{priceTTC} €</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <DistancePriceCard 
+        distance={distance} 
+        priceHT={priceHT} 
+        priceTTC={priceTTC} 
+      />
 
       <div className="flex justify-between">
         <Button
