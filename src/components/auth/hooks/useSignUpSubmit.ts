@@ -30,14 +30,13 @@ export const useSignUpSubmit = () => {
 
         console.error("Signup error details:", signUpError);
         
-        toast(errorMessage, {
-          description: signUpError.message,
-          variant: "destructive"
+        toast.error(errorMessage, {
+          description: signUpError.message
         });
         return;
       }
 
-      toast("Inscription réussie", {
+      toast.success("Inscription réussie", {
         description: "Votre compte a été créé avec succès."
       });
       
@@ -45,9 +44,8 @@ export const useSignUpSubmit = () => {
     } catch (error: any) {
       console.error("Unexpected error during signup:", error);
       
-      toast("Erreur", {
-        description: "Une erreur inattendue est survenue. Veuillez réessayer.",
-        variant: "destructive"
+      toast.error("Erreur", {
+        description: "Une erreur inattendue est survenue. Veuillez réessayer."
       });
     }
   };

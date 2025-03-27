@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface LogoUploadProps {
   currentLogo?: string | null;
@@ -19,11 +18,7 @@ export const LogoUpload = ({ currentLogo, onUploadSuccess }: LogoUploadProps) =>
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner une image.",
-        variant: "destructive"
-      });
+      toast.error("Veuillez sélectionner une image.");
       return;
     }
 
@@ -42,17 +37,10 @@ export const LogoUpload = ({ currentLogo, onUploadSuccess }: LogoUploadProps) =>
 
       onUploadSuccess(publicUrl);
       
-      toast({
-        title: "Succès",
-        description: "Votre logo a été mis à jour.",
-      });
+      toast.success("Votre logo a été mis à jour.");
     } catch (error) {
       console.error('Upload error:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors du téléchargement.",
-        variant: "destructive"
-      });
+      toast.error("Une erreur est survenue lors du téléchargement.");
     } finally {
       setIsUploading(false);
     }
