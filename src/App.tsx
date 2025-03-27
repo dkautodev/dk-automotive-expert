@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import Auth from "./pages/Auth";
 import AdminAuth from "./pages/AdminAuth";
+import DriverAuth from "./pages/DriverAuth";
 import NotFound from "./pages/NotFound";
 import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin-auth" element={<AdminAuth />} />
+            <Route path="/driver-auth" element={<DriverAuth />} />
             <Route path="/dashboard/driver" element={<DriverDashboard />} />
             <Route path="/dashboard/client/*" element={<ClientDashboard />} />
             <Route path="/dashboard/admin/*" element={<AdminDashboard />} />

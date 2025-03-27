@@ -1,22 +1,22 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SignInForm from './SignInForm';
-import SignUpForm from './SignUpForm';
+import DriverSignUpForm from './DriverSignUpForm';
 import { Link } from "react-router-dom";
-import { UserCircle2 } from "lucide-react";
+import { Briefcase } from "lucide-react";
 
-const AuthTabs = () => {
+const DriverAuthTabs = () => {
   return (
     <div className="w-full max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center text-dk-navy">Espace Professionnel</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center text-dk-navy">Espace Chauffeur</h1>
       <p className="text-center text-gray-500 mb-6">
-        Connectez-vous ou inscrivez-vous pour accéder à votre espace client
+        Connectez-vous ou inscrivez-vous pour accéder à votre espace chauffeur
       </p>
       
       <div className="mb-6 text-center">
-        <Link to="/driver-auth" className="inline-flex items-center text-dk-navy hover:text-dk-blue transition-colors">
-          <UserCircle2 className="mr-2 h-5 w-5" />
-          Accès chauffeur
+        <Link to="/auth" className="inline-flex items-center text-dk-navy hover:text-dk-blue transition-colors">
+          <Briefcase className="mr-2 h-5 w-5" />
+          Accès client professionnel
         </Link>
       </div>
       
@@ -29,11 +29,11 @@ const AuthTabs = () => {
           <SignInForm />
         </TabsContent>
         <TabsContent value="signup">
-          <SignUpForm />
+          <DriverSignUpForm />
         </TabsContent>
       </Tabs>
     </div>
   );
 };
 
-export default AuthTabs;
+export default DriverAuthTabs;
