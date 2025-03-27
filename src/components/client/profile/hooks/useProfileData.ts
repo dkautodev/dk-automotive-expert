@@ -97,9 +97,9 @@ export const useProfileData = (userId: string | undefined) => {
         }
         
         // Check for locked fields in the database
-        // Note: These columns don't exist in the database yet, so we'll handle them safely
-        const siretLocked = false; // We'll assume false by default since the column doesn't exist
-        const vatNumberLocked = false; // We'll assume false by default since the column doesn't exist
+        // The columns might not exist yet in the database, so use default values
+        const siretLocked = false; // We'll default to false since the column doesn't exist yet
+        const vatNumberLocked = false; // We'll default to false since the column doesn't exist yet
         
         // Créer un profil en utilisant à la fois les données du profil et les métadonnées
         const formattedProfile: ProfileData = {

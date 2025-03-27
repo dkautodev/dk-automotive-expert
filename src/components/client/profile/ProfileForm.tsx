@@ -57,7 +57,7 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-        <ContactSection control={form.control} />
+        <ContactSection control={form.control} emailDisabled={!!profile?.email} />
         <BusinessSection control={form.control} profile={profile} onLockField={onLockField} />
         <AddressSection control={form.control} />
 
