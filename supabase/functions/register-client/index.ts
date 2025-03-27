@@ -18,16 +18,36 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Variables d'environnement manquantes:", { 
+        hasUrl: !!supabaseUrl, 
+        hasKey: !!supabaseServiceKey 
+      });
+      
+      throw new Error("Configuration serveur incomplète");
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Get the request data
-    const { email, password, first_name, last_name, phone, company } = await req.json()
+    const data = await req.json();
+    console.log("Données reçues:", data);
+    
+    const { email, password, first_name, last_name, phone, company } = data;
 
     // Check required fields
     if (!email || !password || !first_name || !last_name || !phone) {
+      console.error("Champs requis manquants:", { 
+        hasEmail: !!email,
+        hasPassword: !!password,
+        hasFirstName: !!first_name,
+        hasLastName: !!last_name,
+        hasPhone: !!phone
+      });
+      
       return new Response(
         JSON.stringify({ 
-          error: 'Missing required fields' 
+          error: 'Certains champs requis sont manquants' 
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
@@ -37,6 +57,7 @@ serve(async (req) => {
     }
 
     // Create the user in auth.users
+    console.log("Création du compte utilisateur...");
     const { data: userData, error: createUserError } = await supabase.auth.admin.createUser({
       email,
       password,
@@ -49,12 +70,15 @@ serve(async (req) => {
     })
 
     if (createUserError) {
+      console.error("Erreur lors de la création de l'utilisateur:", createUserError);
       throw createUserError
     }
 
     const userId = userData.user.id
+    console.log("Utilisateur créé avec succès, ID:", userId);
 
     // Create profile in user_profiles
+    console.log("Création du profil utilisateur...");
     const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
       .insert({
@@ -69,12 +93,14 @@ serve(async (req) => {
       .single()
 
     if (profileError) {
+      console.error("Erreur lors de la création du profil:", profileError);
       throw profileError
     }
 
+    console.log("Profil créé avec succès:", profileData);
     return new Response(
       JSON.stringify({ 
-        message: 'Client registered successfully', 
+        message: 'Client enregistré avec succès', 
         id: userId,
         profile: profileData
       }),
@@ -84,9 +110,10 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error("Erreur lors du traitement de la demande:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message 
+        error: error.message || "Une erreur inconnue s'est produite" 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
