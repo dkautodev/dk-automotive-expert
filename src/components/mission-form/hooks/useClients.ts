@@ -47,7 +47,9 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
       setClients(formattedClients);
     } catch (error: any) {
       console.error("Error fetching clients:", error);
-      toast.error(`Erreur lors du chargement des clients: ${error.message}`);
+      toast(`Erreur lors du chargement des clients: ${error.message}`, {
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -55,7 +57,9 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
 
   const createClient = async () => {
     if (!newClient.first_name || !newClient.last_name || !newClient.email || !newClient.phone) {
-      toast.error("Veuillez remplir tous les champs");
+      toast("Veuillez remplir tous les champs", {
+        variant: "destructive"
+      });
       return;
     }
 
@@ -78,7 +82,9 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
 
       if (userError) throw userError;
 
-      toast.success(`Client ${newClient.first_name} ${newClient.last_name} créé avec succès`);
+      toast(`Client ${newClient.first_name} ${newClient.last_name} créé avec succès`, {
+        description: "Un email avec les instructions de connexion a été envoyé."
+      });
       
       // Refresh the clients list
       fetchClients();
@@ -99,7 +105,9 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
       return userData?.id;
     } catch (error: any) {
       console.error("Error creating client:", error);
-      toast.error(`Erreur lors de la création du client: ${error.message}`);
+      toast(`Erreur lors de la création du client: ${error.message}`, {
+        variant: "destructive"
+      });
       return null;
     } finally {
       setIsSubmitting(false);

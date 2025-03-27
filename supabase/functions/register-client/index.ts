@@ -21,7 +21,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Get the request data
-    const { email, password, first_name, last_name, phone } = await req.json()
+    const { email, password, first_name, last_name, phone, company } = await req.json()
 
     // Check required fields
     if (!email || !password || !first_name || !last_name || !phone) {
@@ -44,6 +44,7 @@ serve(async (req) => {
       user_metadata: {
         first_name,
         last_name,
+        role: 'client'
       }
     })
 
@@ -61,6 +62,7 @@ serve(async (req) => {
         first_name,
         last_name,
         phone,
+        company_name: company,
         user_type: 'client'
       })
       .select()
