@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -10,6 +10,7 @@ import { profileFormSchema } from "./schemas/profileFormSchema";
 import ContactSection from "./form-sections/ContactSection";
 import BusinessSection from "./form-sections/BusinessSection";
 import AddressSection from "./form-sections/AddressSection";
+import { toast } from "sonner";
 
 interface ProfileFormProps {
   profile: ProfileData | null;
@@ -19,6 +20,16 @@ interface ProfileFormProps {
 
 const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
   const { isLoading } = useProfileContext();
+  const [editingSections, setEditingSections] = useState<{
+    contact: boolean;
+    business: boolean;
+    address: boolean;
+  }>({
+    contact: false,
+    business: false,
+    address: false
+  });
+  
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -49,21 +60,56 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
     }
   }, [profile, form]);
 
-  const handleFormSubmit = async (data: ProfileFormData) => {
-    console.log("Form submitted with data:", data);
-    await onSubmit(data);
+  const handleSubmitSection = async (section: 'contact' | 'business' | 'address') => {
+    try {
+      const values = form.getValues();
+      await onSubmit(values);
+      setEditingSections(prev => ({ ...prev, [section]: false }));
+      toast.success(`Section ${getSectionName(section)} mise à jour avec succès`);
+    } catch (error) {
+      console.error("Error updating section:", error);
+      toast.error("Erreur lors de la mise à jour");
+    }
+  };
+
+  const getSectionName = (section: 'contact' | 'business' | 'address'): string => {
+    switch (section) {
+      case 'contact': return 'Contact';
+      case 'business': return 'Informations fiscales';
+      case 'address': return 'Adresse';
+    }
+  };
+
+  const toggleEditSection = (section: 'contact' | 'business' | 'address') => {
+    setEditingSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-        <ContactSection control={form.control} emailDisabled={!!profile?.email} />
-        <BusinessSection control={form.control} profile={profile} onLockField={onLockField} />
-        <AddressSection control={form.control} />
-
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Mise à jour..." : "Mettre à jour"}
-        </Button>
+      <form className="space-y-6">
+        <ContactSection 
+          control={form.control} 
+          emailDisabled={!!profile?.email}
+          isEditing={editingSections.contact}
+          onToggleEdit={() => toggleEditSection('contact')}
+          onSave={() => handleSubmitSection('contact')}
+        />
+        
+        <BusinessSection 
+          control={form.control} 
+          profile={profile}
+          onLockField={onLockField} 
+          isEditing={editingSections.business}
+          onToggleEdit={() => toggleEditSection('business')}
+          onSave={() => handleSubmitSection('business')}
+        />
+        
+        <AddressSection 
+          control={form.control}
+          isEditing={editingSections.address}
+          onToggleEdit={() => toggleEditSection('address')}
+          onSave={() => handleSubmitSection('address')}
+        />
       </form>
     </Form>
   );
