@@ -25,7 +25,7 @@ import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import ClientSelector from "./ClientSelector";
 import { useClients } from "./hooks/useClients";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import NewClientForm from "./NewClientForm";
 
 interface AddressVehicleStepProps {
