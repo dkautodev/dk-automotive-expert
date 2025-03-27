@@ -36,11 +36,7 @@ export const useSignInForm = () => {
           return;
         } catch (error: any) {
           console.error("Erreur connexion admin:", error);
-          if (data.password === 'adminadmin70') {
-            toast.error("Problème de connexion au serveur. Veuillez réessayer.");
-          } else {
-            toast.error("Mot de passe administrateur incorrect");
-          }
+          toast.error("Identifiants administrateur incorrects");
           setIsLoading(false);
           return;
         }

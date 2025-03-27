@@ -11,9 +11,9 @@ const SignInCard = () => {
   const { form, isLoading, onSubmit } = useSignInForm();
 
   return (
-    <Card className="border-none shadow-none">
+    <Card className="border shadow-md">
       <CardHeader>
-        <CardTitle>Connexion Professionnel</CardTitle>
+        <CardTitle>Espace Client</CardTitle>
         <CardDescription>
           Connectez-vous à votre espace professionnel
         </CardDescription>
