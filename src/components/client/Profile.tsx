@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuthContext } from "@/context/AuthContext";
@@ -63,10 +62,7 @@ const Profile = () => {
       if (error) throw error;
     } catch (error) {
       console.error('Error updating logo:', error);
-      toast("Erreur", {
-        description: "Une erreur est survenue lors de la mise à jour du logo.",
-        variant: "destructive"
-      });
+      toast.error("Une erreur est survenue lors de la mise à jour du logo.");
     }
   };
 
@@ -87,16 +83,11 @@ const Profile = () => {
         })
         .eq('id', profile.id);
       if (error) throw error;
-      toast("Succès", {
-        description: "Le champ a été mis à jour et verrouillé."
-      });
+      toast.success("Le champ a été mis à jour et verrouillé.");
       setShowConfirmDialog(false);
     } catch (error) {
       console.error('Error locking field:', error);
-      toast("Erreur", {
-        description: "Une erreur est survenue lors de la mise à jour.",
-        variant: "destructive"
-      });
+      toast.error("Une erreur est survenue lors de la mise à jour.");
     }
   };
 
@@ -117,14 +108,9 @@ const Profile = () => {
 
       const { error } = await supabase.from('user_profiles').update(updateData).eq('id', profile?.id);
       if (error) throw error;
-      toast("Profil mis à jour", {
-        description: "Vos informations ont été mises à jour avec succès."
-      });
+      toast.success("Vos informations ont été mises à jour avec succès.");
     } catch (error: any) {
-      toast("Erreur", {
-        description: "Une erreur est survenue lors de la mise à jour du profil.",
-        variant: "destructive"
-      });
+      toast.error("Une erreur est survenue lors de la mise à jour du profil.");
     }
   };
 

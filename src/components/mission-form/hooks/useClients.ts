@@ -31,9 +31,9 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
       const formattedClients: Client[] = [];
       
       if (data) {
-        // Utilisation d'une boucle simple pour éviter les problèmes de typage complexe
+        // Use a simple for loop instead of forEach or map to avoid type issues
         for (let i = 0; i < data.length; i++) {
-          const client = data[i] as unknown as ClientFromDB;
+          const client = data[i] as any;
           formattedClients.push({
             id: client.id,
             first_name: client.first_name,
@@ -47,9 +47,7 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
       setClients(formattedClients);
     } catch (error: any) {
       console.error("Error fetching clients:", error);
-      toast(`Erreur lors du chargement des clients: ${error.message}`, {
-        variant: "destructive"
-      });
+      toast.error(`Erreur lors du chargement des clients: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -57,9 +55,7 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
 
   const createClient = async () => {
     if (!newClient.first_name || !newClient.last_name || !newClient.email || !newClient.phone) {
-      toast("Veuillez remplir tous les champs", {
-        variant: "destructive"
-      });
+      toast.error("Veuillez remplir tous les champs");
       return;
     }
 
@@ -82,7 +78,7 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
 
       if (userError) throw userError;
 
-      toast(`Client ${newClient.first_name} ${newClient.last_name} créé avec succès`, {
+      toast.success(`Client ${newClient.first_name} ${newClient.last_name} créé avec succès`, {
         description: "Un email avec les instructions de connexion a été envoyé."
       });
       
@@ -105,9 +101,7 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
       return userData?.id;
     } catch (error: any) {
       console.error("Error creating client:", error);
-      toast(`Erreur lors de la création du client: ${error.message}`, {
-        variant: "destructive"
-      });
+      toast.error(`Erreur lors de la création du client: ${error.message}`);
       return null;
     } finally {
       setIsSubmitting(false);
