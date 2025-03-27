@@ -15,3 +15,6 @@ export const profileFormSchema = z.object({
   billing_address_postal_code: z.string().regex(/^[0-9]{5}$/, "Le code postal doit contenir 5 chiffres"),
   billing_address_country: z.string().min(1, "Le pays est requis")
 });
+
+// Create a type from the schema
+export type ProfileFormSchemaType = z.infer<typeof profileFormSchema>;
