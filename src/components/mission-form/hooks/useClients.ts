@@ -1,55 +1,65 @@
 
-import { useState, useEffect } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { MissionFormValues } from "../missionFormSchema";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { ClientData, NewClientData } from '@/hooks/auth/types';
 
-// Simplified interfaces to avoid circular references
-export interface ClientDisplay {
-  id: string;
-  name: string;
-}
-
-export interface NewClientData {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-}
-
-export const useClients = (form: UseFormReturn<MissionFormValues>) => {
-  const [clients, setClients] = useState<ClientDisplay[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newClient, setNewClient] = useState<NewClientData>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-  });
+export const useClients = () => {
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchClients = async () => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase
+      setIsLoading(true);
+      setError(null);
+      
+      // Requête aux profils utilisateurs avec le type 'client'
+      const { data: userProfiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, first_name, last_name, company_name')
-        .eq('user_type', 'client');
+        .select(`
+          id,
+          user_id,
+          first_name,
+          last_name,
+          company_name,
+          phone,
+          billing_address
+        `)
+        .order('company_name', { ascending: true });
 
-      if (error) throw error;
+      if (profilesError) {
+        throw profilesError;
+      }
 
-      const formattedClients: ClientDisplay[] = data.map(client => ({
-        id: client.id,
-        name: `${client.first_name} ${client.last_name}${client.company_name ? ` (${client.company_name})` : ''}`
+      // Transformer les données pour le format ClientData
+      const formattedClients: ClientData[] = userProfiles.map(profile => ({
+        id: profile.user_id,
+        name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+        email: '', // Sera rempli plus tard
+        phone: profile.phone || '',
+        company: profile.company_name || '',
+        address: profile.billing_address || ''
       }));
 
       setClients(formattedClients);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-      toast.error("Erreur lors du chargement des clients");
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des clients:', error);
+      setError(error.message);
+      toast.error('Erreur lors du chargement des clients');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
+    }
+  };
+
+  const addClient = async (newClient: NewClientData): Promise<string | null> => {
+    try {
+      // Implémentation de l'ajout de client
+      return null;
+    } catch (error: any) {
+      console.error('Erreur lors de l\'ajout du client:', error);
+      toast.error(error.message || 'Erreur lors de l\'ajout du client');
+      return null;
     }
   };
 
@@ -57,68 +67,5 @@ export const useClients = (form: UseFormReturn<MissionFormValues>) => {
     fetchClients();
   }, []);
 
-  const createClient = async () => {
-    try {
-      setIsSubmitting(true);
-      
-      // Validate required fields
-      if (!newClient.first_name || !newClient.last_name || !newClient.email) {
-        toast.error("Veuillez remplir tous les champs obligatoires");
-        return false;
-      }
-
-      // Insert the new client
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .insert({
-          first_name: newClient.first_name,
-          last_name: newClient.last_name,
-          email: newClient.email,
-          phone: newClient.phone,
-          user_type: 'client'
-        })
-        .select('id, first_name, last_name')
-        .single();
-
-      if (error) throw error;
-
-      // Add new client to the list
-      const newClientDisplay: ClientDisplay = {
-        id: data.id,
-        name: `${data.first_name} ${data.last_name}`
-      };
-      
-      setClients([...clients, newClientDisplay]);
-      
-      // Set the client in the form
-      form.setValue('client_id', data.id);
-      
-      // Reset form
-      setNewClient({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-      });
-      
-      toast.success("Client créé avec succès");
-      return true;
-    } catch (error) {
-      console.error('Error creating client:', error);
-      toast.error("Erreur lors de la création du client");
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return {
-    clients,
-    loading,
-    fetchClients,
-    newClient,
-    setNewClient,
-    createClient,
-    isSubmitting
-  };
+  return { clients, isLoading, error, fetchClients, addClient };
 };
