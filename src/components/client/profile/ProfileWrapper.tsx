@@ -1,10 +1,11 @@
+
 import { useEffect } from "react";
 import ProfileHeader from "./ProfileHeader";
 import ProfileCard from "./ProfileCard";
 import ProfileConfirmDialog from "./ProfileConfirmDialog";
 import { useProfileContext } from "./ProfileContext";
 import { Button } from "@/components/ui/button";
-import { ArrowPathIcon, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import ChangePasswordSection from "./ChangePasswordSection";
 
 const ProfileWrapper = () => {
