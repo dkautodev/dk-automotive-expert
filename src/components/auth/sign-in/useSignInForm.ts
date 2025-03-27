@@ -26,9 +26,9 @@ export const useSignInForm = () => {
       setIsLoading(true);
       console.log("Tentative de connexion avec", data.email);
       
-      // Check if this is the admin account
+      // Vérification pour l'administrateur
       if (data.email === 'dkautomotive70@gmail.com') {
-        console.log("Connexion administrateur");
+        console.log("Tentative de connexion administrateur");
         try {
           await signIn(data.email, data.password);
           toast.success("Connexion administrateur réussie");
@@ -42,7 +42,7 @@ export const useSignInForm = () => {
         }
       }
       
-      // For regular users
+      // Pour les utilisateurs réguliers
       try {
         await signIn(data.email, data.password);
         toast.success("Connexion réussie");
