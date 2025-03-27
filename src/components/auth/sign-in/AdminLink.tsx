@@ -6,7 +6,7 @@ export const AdminLink = () => {
   return (
     <Link 
       to="/admin-auth" 
-      className="text-xs text-muted-foreground hover:text-dk-navy flex items-center gap-1 transition-colors"
+      className="text-white/80 hover:text-white transition-colors hover-scale inline-block flex items-center gap-1"
     >
       <ShieldCheck size={14} />
       Espace administrateur

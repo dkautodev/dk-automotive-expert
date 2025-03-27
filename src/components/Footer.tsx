@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Mail } from 'lucide-react';
+import { AdminLink } from './auth/sign-in/AdminLink';
+
 const Footer = () => {
   return <footer className="bg-[#18257D] text-white py-[50px] my-[35px]">
       <div className="container mx-auto px-4">
@@ -30,6 +32,9 @@ const Footer = () => {
                 <Link to="/faq" className="text-white/80 hover:text-white transition-colors hover-scale inline-block">
                   FAQ
                 </Link>
+              </li>
+              <li>
+                <AdminLink />
               </li>
             </ul>
           </div>

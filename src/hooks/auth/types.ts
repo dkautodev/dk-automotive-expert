@@ -26,3 +26,21 @@ export interface UserProfile {
   vat_number_locked: boolean;
   billing_address: string | null;
 }
+
+// Ajout de types pour les clients et formulaires
+export interface ClientData {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  address?: string;
+}
+
+export interface NewClientData {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  address?: string;
+}
