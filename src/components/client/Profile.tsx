@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuthContext } from "@/context/AuthContext";
@@ -9,22 +10,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { LogoUpload } from "./LogoUpload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ProfileFormData {
   email: string;
   phone: string;
   siret: string;
   vat_number: string;
+  billing_address: string;
 }
 
 const Profile = () => {
-  const {
-    profile
-  } = useAuthContext();
+  const { profile } = useAuthContext();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [fieldToLock, setFieldToLock] = useState<'siret' | 'vat_number' | null>(null);
   const [tempValue, setTempValue] = useState('');
@@ -34,7 +35,8 @@ const Profile = () => {
       email: profile?.email || "",
       phone: profile?.phone || "",
       siret: profile?.siret || "",
-      vat_number: profile?.vat_number || ""
+      vat_number: profile?.vat_number || "",
+      billing_address: profile?.billing_address || ""
     }
   });
 
@@ -44,7 +46,8 @@ const Profile = () => {
         email: profile.email,
         phone: profile.phone || "",
         siret: profile.siret || "",
-        vat_number: profile.vat_number || ""
+        vat_number: profile.vat_number || "",
+        billing_address: profile.billing_address || ""
       });
     }
   }, [profile, form]);
@@ -60,8 +63,7 @@ const Profile = () => {
       if (error) throw error;
     } catch (error) {
       console.error('Error updating logo:', error);
-      toast({
-        title: "Erreur",
+      toast("Erreur", {
         description: "Une erreur est survenue lors de la mise à jour du logo.",
         variant: "destructive"
       });
@@ -85,15 +87,13 @@ const Profile = () => {
         })
         .eq('id', profile.id);
       if (error) throw error;
-      toast({
-        title: "Succès",
+      toast("Succès", {
         description: "Le champ a été mis à jour et verrouillé."
       });
       setShowConfirmDialog(false);
     } catch (error) {
       console.error('Error locking field:', error);
-      toast({
-        title: "Erreur",
+      toast("Erreur", {
         description: "Une erreur est survenue lors de la mise à jour.",
         variant: "destructive"
       });
@@ -104,7 +104,8 @@ const Profile = () => {
     try {
       const updateData: any = {
         email: data.email,
-        phone: data.phone
+        phone: data.phone,
+        billing_address: data.billing_address
       };
 
       if (!profile?.siret_locked) {
@@ -116,22 +117,24 @@ const Profile = () => {
 
       const { error } = await supabase.from('user_profiles').update(updateData).eq('id', profile?.id);
       if (error) throw error;
-      toast({
-        title: "Profil mis à jour",
+      toast("Profil mis à jour", {
         description: "Vos informations ont été mises à jour avec succès."
       });
     } catch (error: any) {
-      toast({
-        title: "Erreur",
+      toast("Erreur", {
         description: "Une erreur est survenue lors de la mise à jour du profil.",
         variant: "destructive"
       });
     }
   };
 
-  return <div className="p-6">
+  return (
+    <div className="p-6">
       <Button variant="ghost" size="sm" asChild className="mb-4">
-        
+        <Link to="/dashboard/client">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour au tableau de bord
+        </Link>
       </Button>
 
       <Card>
@@ -158,53 +161,95 @@ const Profile = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField control={form.control} name="email" render={({
-              field
-            }) => <FormItem>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
                     <Label>Email</Label>
                     <FormControl>
                       <Input {...field} type="email" />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                )}
+              />
 
-              <FormField control={form.control} name="phone" render={({
-              field
-            }) => <FormItem>
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
                     <Label>Numéro de téléphone</Label>
                     <FormControl>
                       <Input {...field} type="tel" />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                )}
+              />
 
-              <FormField control={form.control} name="siret" render={({
-              field
-            }) => <FormItem>
+              <FormField
+                control={form.control}
+                name="siret"
+                render={({ field }) => (
+                  <FormItem>
                     <Label>Numéro SIRET</Label>
                     <FormControl>
-                      <Input {...field} disabled={profile?.siret_locked} onBlur={() => {
-                  if (field.value && !profile?.siret_locked) {
-                    confirmLockField('siret', field.value);
-                  }
-                }} />
+                      <Input
+                        {...field}
+                        disabled={profile?.siret_locked}
+                        onBlur={() => {
+                          if (field.value && !profile?.siret_locked) {
+                            confirmLockField('siret', field.value);
+                          }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                )}
+              />
 
-              <FormField control={form.control} name="vat_number" render={({
-              field
-            }) => <FormItem>
+              <FormField
+                control={form.control}
+                name="vat_number"
+                render={({ field }) => (
+                  <FormItem>
                     <Label>Numéro de TVA intracommunautaire</Label>
                     <FormControl>
-                      <Input {...field} disabled={profile?.vat_number_locked} onBlur={() => {
-                  if (field.value && !profile?.vat_number_locked) {
-                    confirmLockField('vat_number', field.value);
-                  }
-                }} />
+                      <Input
+                        {...field}
+                        disabled={profile?.vat_number_locked}
+                        onBlur={() => {
+                          if (field.value && !profile?.vat_number_locked) {
+                            confirmLockField('vat_number', field.value);
+                          }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="billing_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Adresse de facturation</Label>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        rows={3}
+                        placeholder="Adresse complète pour facturation"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <Button type="submit" className="w-full">
                 Mettre à jour
@@ -232,7 +277,8 @@ const Profile = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>;
+    </div>
+  );
 };
 
 export default Profile;

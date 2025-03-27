@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 import type { SignUpFormData } from "../schemas/signUpSchema";
 import type { UserRole } from "@/hooks/useAuth";
@@ -30,16 +30,14 @@ export const useSignUpSubmit = () => {
 
         console.error("Signup error details:", signUpError);
         
-        toast({
-          title: "Erreur",
-          description: errorMessage,
+        toast(errorMessage, {
+          description: signUpError.message,
           variant: "destructive"
         });
         return;
       }
 
-      toast({
-        title: "Inscription réussie",
+      toast("Inscription réussie", {
         description: "Votre compte a été créé avec succès."
       });
       
@@ -47,8 +45,7 @@ export const useSignUpSubmit = () => {
     } catch (error: any) {
       console.error("Unexpected error during signup:", error);
       
-      toast({
-        title: "Erreur",
+      toast("Erreur", {
         description: "Une erreur inattendue est survenue. Veuillez réessayer.",
         variant: "destructive"
       });
