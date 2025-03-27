@@ -1,30 +1,16 @@
 
-import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SignInForm from './SignInForm';
-import SignUpForm from './SignUpForm';
-import DriverSignUpForm from './DriverSignUpForm';
 
 const AuthTabs = () => {
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup' | 'driver'>('signin');
-
   return (
-    <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'signin' | 'signup' | 'driver')} className="w-full max-w-md mx-auto">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="signin">Connexion</TabsTrigger>
-        <TabsTrigger value="signup">Inscription Pro</TabsTrigger>
-        <TabsTrigger value="driver">Chauffeur</TabsTrigger>
-      </TabsList>
-      <TabsContent value="signin">
-        <SignInForm />
-      </TabsContent>
-      <TabsContent value="signup">
-        <SignUpForm />
-      </TabsContent>
-      <TabsContent value="driver">
-        <DriverSignUpForm />
-      </TabsContent>
-    </Tabs>
+    <div className="w-full max-w-md mx-auto">
+      <h1 className="text-2xl font-bold mb-4 text-center text-dk-navy">Espace Professionnel</h1>
+      <p className="text-center text-gray-500 mb-6">
+        Connectez-vous pour accéder à votre espace client
+      </p>
+      <SignInForm />
+    </div>
   );
 };
 
