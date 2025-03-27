@@ -24,7 +24,13 @@ serve(async (req) => {
         hasKey: !!supabaseServiceKey 
       });
       
-      throw new Error("Configuration serveur incomplète");
+      return new Response(
+        JSON.stringify({ error: "Configuration serveur incomplète" }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500
+        }
+      );
     }
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -53,7 +59,7 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
           status: 400 
         }
-      )
+      );
     }
 
     // Create the user in auth.users
@@ -67,14 +73,22 @@ serve(async (req) => {
         last_name,
         role: 'client'
       }
-    })
+    });
 
     if (createUserError) {
       console.error("Erreur lors de la création de l'utilisateur:", createUserError);
-      throw createUserError
+      return new Response(
+        JSON.stringify({ 
+          error: createUserError.message || "Erreur lors de la création de l'utilisateur" 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
+      );
     }
 
-    const userId = userData.user.id
+    const userId = userData.user.id;
     console.log("Utilisateur créé avec succès, ID:", userId);
 
     // Create profile in user_profiles
@@ -90,11 +104,19 @@ serve(async (req) => {
         user_type: 'client'
       })
       .select()
-      .single()
+      .single();
 
     if (profileError) {
       console.error("Erreur lors de la création du profil:", profileError);
-      throw profileError
+      return new Response(
+        JSON.stringify({ 
+          error: profileError.message || "Erreur lors de la création du profil" 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
+      );
     }
 
     console.log("Profil créé avec succès:", profileData);
@@ -108,7 +130,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
         status: 200 
       }
-    )
+    );
   } catch (error) {
     console.error("Erreur lors du traitement de la demande:", error);
     return new Response(
@@ -119,6 +141,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
         status: 400 
       }
-    )
+    );
   }
-})
+});
