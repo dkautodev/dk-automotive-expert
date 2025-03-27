@@ -1,5 +1,5 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
 import type { User, Session } from '@supabase/supabase-js';
 import type { UserRole } from "@/hooks/auth/types";
@@ -24,12 +24,35 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState<boolean>(false);
+
+  // Fetch user profile when user is authenticated
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (auth.user?.id) {
+        setProfileLoading(true);
+        try {
+          const userProfile = await auth.fetchUserProfile(auth.user.id);
+          setProfile(userProfile);
+        } catch (error) {
+          console.error("Error loading user profile:", error);
+        } finally {
+          setProfileLoading(false);
+        }
+      } else {
+        setProfile(null);
+      }
+    };
+
+    loadUserProfile();
+  }, [auth.user?.id]);
 
   return (
     <AuthContext.Provider value={{
       isAuthenticated: !!auth.user,
-      isLoading: auth.loading,
-      profile: null,
+      isLoading: auth.loading || profileLoading,
+      profile,
       role: auth.role,
       user: auth.user,
       session: auth.session,
@@ -39,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       registerAdmin: auth.registerAdmin,
       signOut: async () => {
         await auth.signOut();
+        setProfile(null);
         return Promise.resolve();
       },
       fetchUserProfile: auth.fetchUserProfile
