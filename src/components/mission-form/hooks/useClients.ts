@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Client, ClientFromDB } from "../types";
+import { Client } from "../types";
 import { UseFormReturn } from "react-hook-form";
 import { MissionFormValues } from "../missionFormSchema";
 
