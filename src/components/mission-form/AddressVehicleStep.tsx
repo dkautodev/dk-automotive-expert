@@ -24,6 +24,9 @@ import { vehicleTypes } from "@/lib/vehicleTypes";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import ClientSelector from "./ClientSelector";
+import { useClients } from "./hooks/useClients";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import NewClientForm from "./NewClientForm";
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -36,12 +39,33 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
   const { calculatePrice, isCalculating: isPriceCalculating, priceHT, priceTTC } = usePriceCalculation();
   const [distance, setDistance] = useState<number | null>(null);
   const [isCalculatingTotal, setIsCalculatingTotal] = useState<boolean>(false);
+  const [clientDialogOpen, setClientDialogOpen] = useState(false);
+
+  const { 
+    clients, 
+    loading: clientsLoading, 
+    newClient, 
+    setNewClient, 
+    createClient, 
+    isSubmitting: isClientSubmitting 
+  } = useClients(form);
 
   const pickupAddress = form.watch("pickup_address");
   const deliveryAddress = form.watch("delivery_address");
   const vehicleType = form.watch("vehicle_type");
 
   const isCalculating = isDistanceCalculating || isPriceCalculating || isCalculatingTotal;
+
+  const handleAddClient = () => {
+    setClientDialogOpen(true);
+  };
+
+  const handleCreateClient = async () => {
+    const success = await createClient();
+    if (success) {
+      setClientDialogOpen(false);
+    }
+  };
 
   const calculateDistanceAndPrice = async () => {
     if (!pickupAddress || !deliveryAddress || !vehicleType) {
@@ -74,7 +98,26 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
         Veuillez sélectionner un client et saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule
       </p>
 
-      <ClientSelector form={form} />
+      <ClientSelector 
+        form={form} 
+        clients={clients}
+        loading={clientsLoading}
+        onAddClient={handleAddClient}
+      />
+
+      <Dialog open={clientDialogOpen} onOpenChange={setClientDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Ajouter un nouveau client</DialogTitle>
+          </DialogHeader>
+          <NewClientForm 
+            newClient={newClient}
+            setNewClient={setNewClient}
+            onSubmit={handleCreateClient}
+            isSubmitting={isClientSubmitting}
+          />
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
