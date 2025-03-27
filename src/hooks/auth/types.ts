@@ -27,7 +27,7 @@ export interface UserProfile {
   billing_address: string | null;
 }
 
-// Ajout de types pour les clients et formulaires
+// Client data types
 export interface ClientData {
   id: string;
   name: string;

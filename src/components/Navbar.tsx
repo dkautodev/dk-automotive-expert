@@ -34,7 +34,9 @@ const Navbar = () => {
             Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.
           </p>
           <div className="flex gap-4 items-center">
-            {/* Admin link has been removed from here */}
+            <Link to="/driver-auth" className="text-white/80 hover:text-white transition-colors hover-scale inline-block">
+              Accès chauffeur
+            </Link>
           </div>
         </div>
       </div>
