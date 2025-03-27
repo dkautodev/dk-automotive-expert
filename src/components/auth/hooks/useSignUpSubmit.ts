@@ -36,7 +36,8 @@ export const useSignUpSubmit = () => {
             role: 'client',
             firstName: data.firstName,
             lastName: data.lastName,
-            company: data.company
+            company: data.company,
+            phone: data.phone
           }
         }
       });
