@@ -1,11 +1,9 @@
 
-import { User, Session } from '@supabase/supabase-js';
-
 export type UserRole = 'client' | 'admin' | 'chauffeur';
 
 export interface AuthState {
-  user: User | null;
-  session: Session | null;
+  user: any | null;
+  session: any | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -27,7 +25,7 @@ export interface UserProfile {
   billing_address: string | null;
 }
 
-// These client types will be used for display and new client creation without circular references
+// Ces types client seront utilisés pour l'affichage et la création de nouveaux clients sans références circulaires
 export interface ClientData {
   id: string;
   name: string;

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "../missionFormSchema";
 
-// Define client data structures with clear boundaries
+// Définir des interfaces simplifiées et séparées pour éviter les références circulaires
 export interface ClientDisplay {
   id: string;
   name: string;
