@@ -4,7 +4,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import ClientSidebar from "@/components/client/ClientSidebar";
 import DashboardHome from "@/components/client/DashboardHome";
-import Profile from "@/components/client/Profile";
 import OrderHistory from "@/components/client/OrderHistory";
 import OngoingShipments from "./OngoingShipments";
 import PendingInvoices from "./PendingInvoices";
@@ -59,7 +58,6 @@ const ClientDashboard = () => {
         <main className="flex-1 pl-52">
           <Routes>
             <Route index element={<DashboardHome />} />
-            <Route path="profile" element={<Profile />} />
             <Route path="orders" element={<OrderHistory />} />
             <Route path="ongoing-shipments" element={<OngoingShipments />} />
             <Route path="completed-shipments" element={<CompletedShipments />} />
