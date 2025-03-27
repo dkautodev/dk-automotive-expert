@@ -21,3 +21,16 @@ export interface ProfileData {
   billing_address?: string | null;
   profile_picture?: string | null;
 }
+
+export interface ProfileContextType {
+  profile: ProfileData | null;
+  isLoading: boolean;
+  error: string | null;
+  submitForm: (data: ProfileFormData) => Promise<void>;
+  handleLogoUpdate: (logoUrl: string) => Promise<void>;
+  confirmLockField: (field: 'siret' | 'vat_number', value: string) => void;
+  showConfirmDialog: boolean;
+  setShowConfirmDialog: (show: boolean) => void;
+  handleConfirmLock: () => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
+}
