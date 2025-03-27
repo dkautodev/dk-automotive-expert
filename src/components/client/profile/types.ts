@@ -4,7 +4,10 @@ export interface ProfileFormData {
   phone: string;
   siret: string;
   vat_number: string;
-  billing_address: string;
+  billing_address_street: string;
+  billing_address_city: string;
+  billing_address_postal_code: string;
+  billing_address_country: string;
 }
 
 export interface ProfileData {
@@ -18,7 +21,10 @@ export interface ProfileData {
   vat_number?: string | null;
   siret_locked?: boolean;
   vat_number_locked?: boolean;
-  billing_address?: string | null;
+  billing_address_street?: string | null;
+  billing_address_city?: string | null;
+  billing_address_postal_code?: string | null;
+  billing_address_country?: string | null;
   profile_picture?: string | null;
 }
 
