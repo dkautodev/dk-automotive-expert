@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ProfileData, ProfileFormData } from "./types";
+import { useProfileContext } from "./ProfileContext";
 
 interface ProfileFormProps {
   profile: ProfileData | null;
@@ -15,6 +16,7 @@ interface ProfileFormProps {
 }
 
 const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
+  const { isLoading } = useProfileContext();
   const form = useForm<ProfileFormData>({
     defaultValues: {
       email: profile?.email || "",
@@ -130,8 +132,8 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Mettre à jour
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Mise à jour..." : "Mettre à jour"}
         </Button>
       </form>
     </Form>

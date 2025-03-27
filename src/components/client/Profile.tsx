@@ -1,8 +1,13 @@
 
-import ProfileComponent from "./profile/Profile";
+import { ProfileProvider } from "./profile/ProfileContext";
+import ProfileWrapper from "./profile/ProfileWrapper";
 
 const Profile = () => {
-  return <ProfileComponent />;
+  return (
+    <ProfileProvider>
+      <ProfileWrapper />
+    </ProfileProvider>
+  );
 };
 
 export default Profile;
