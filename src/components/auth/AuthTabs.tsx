@@ -1,17 +1,12 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 import { Link } from "react-router-dom";
 import { UserCircle2 } from "lucide-react";
-
 const AuthTabs = () => {
-  return (
-    <div className="w-full max-w-md mx-auto">
+  return <div className="w-full max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center text-dk-navy">Espace Professionnel</h1>
-      <p className="text-center text-gray-500 mb-6 whitespace-nowrap overflow-hidden text-ellipsis">
-        Connectez-vous ou inscrivez-vous pour accéder à votre espace client
-      </p>
+      
       
       <div className="mb-6 text-center">
         <Link to="/driver-auth" className="inline-flex items-center text-dk-navy hover:text-dk-blue transition-colors">
@@ -32,8 +27,6 @@ const AuthTabs = () => {
           <SignUpForm />
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default AuthTabs;
