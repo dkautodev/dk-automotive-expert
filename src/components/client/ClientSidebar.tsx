@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, FileText, Truck, Receipt, History } from 'lucide-react';
+import { Home, FileText, Truck, Receipt, History, User } from 'lucide-react';
 
 const ClientSidebar = () => {
   return <div className="h-screen w-52 bg-white border-r border-gray-200 fixed left-0 top-0">
@@ -40,6 +40,12 @@ const ClientSidebar = () => {
             <Link to="/dashboard/client/pending-invoices" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
               <Receipt className="mr-2 h-4 w-4" />
               Factures en Attente
+            </Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/dashboard/client/profile" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
+              <User className="mr-2 h-4 w-4" />
+              Mon Profil
             </Link>
           </li>
         </ul>
