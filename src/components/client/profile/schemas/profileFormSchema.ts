@@ -12,3 +12,6 @@ export const profileFormSchema = z.object({
   billing_address_postal_code: z.string().min(1, "Le code postal est requis"),
   billing_address_country: z.string().min(1, "Le pays est requis")
 });
+
+// Export le type généré par le schéma
+export type ProfileFormSchemaType = z.infer<typeof profileFormSchema>;
