@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { AuthState, UserRole } from './types';
+import { AuthState } from './types';
+import { determineUserRole } from './helpers/roleHelper';
 
 export const useAuthSession = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -19,17 +20,7 @@ export const useAuthSession = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         // Determine user role
-        let role: UserRole | null = null;
-        
-        if (session?.user) {
-          // Check if role is in metadata
-          role = (session.user.user_metadata?.role as UserRole) || null;
-          
-          // If role not in metadata, check if email is admin
-          if (!role && session.user.email === 'dkautomotive70@gmail.com') {
-            role = 'admin';
-          }
-        }
+        const role = session?.user ? determineUserRole(session.user) : null;
         
         setAuthState({
           user: session?.user || null,
@@ -55,17 +46,7 @@ export const useAuthSession = () => {
 
     supabase.auth.onAuthStateChange((_event, session) => {
       // Determine user role
-      let role: UserRole | null = null;
-      
-      if (session?.user) {
-        // Check if role is in metadata
-        role = (session.user.user_metadata?.role as UserRole) || null;
-        
-        // If role not in metadata, check if email is admin
-        if (!role && session.user.email === 'dkautomotive70@gmail.com') {
-          role = 'admin';
-        }
-      }
+      const role = session?.user ? determineUserRole(session.user) : null;
       
       setAuthState({
         user: session?.user || null,
