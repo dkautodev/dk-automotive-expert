@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from './types';
+import { mapDatabaseProfileToUserProfile } from './helpers/profileMapper';
 
 export const useUserProfile = () => {
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
@@ -17,31 +18,10 @@ export const useUserProfile = () => {
         return null;
       }
 
-      // Extraire l'email de la relation users
-      const userEmail = profileData.users ? (profileData.users as any).email : '';
-
-      // Check if the database has the locked fields columns
-      // If not, we need to handle it gracefully
-      const siretLocked = 'siret_locked' in profileData ? !!profileData.siret_locked : false;
-      const vatNumberLocked = 'vat_number_locked' in profileData ? !!profileData.vat_number_locked : false;
-
       console.log("Profile data from DB:", profileData);
 
-      // Mapper les données au format UserProfile
-      return {
-        id: profileData.id,
-        first_name: profileData.first_name,
-        last_name: profileData.last_name,
-        email: userEmail,
-        phone: profileData.phone,
-        company: profileData.company_name,
-        profile_picture: profileData.profile_picture,
-        siret: profileData.siret_number,
-        vat_number: profileData.vat_number,
-        siret_locked: siretLocked,
-        vat_number_locked: vatNumberLocked,
-        billing_address: profileData.billing_address
-      };
+      // Map database profile to UserProfile format
+      return mapDatabaseProfileToUserProfile(profileData);
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
       return null;
