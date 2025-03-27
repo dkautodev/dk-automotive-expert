@@ -4,9 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 export const useAuthMethods = () => {
   const signIn = async (email: string, password: string) => {
     try {
-      // Special handling for admin
-      if (email === 'dkautomotive70@gmail.com' && password === 'adminadmin70') {
-        // Try to sign in normally first
+      // Cas spécial pour l'administrateur
+      if (email === 'dkautomotive70@gmail.com') {
+        // Essayez d'abord de se connecter normalement avec Supabase Auth
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -16,7 +16,7 @@ export const useAuthMethods = () => {
           return data;
         }
         
-        // If sign-in fails with error, create account if it doesn't exist
+        // Si la connexion échoue avec une erreur, créez un compte s'il n'existe pas
         console.log("Tentative de création d'un compte admin");
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -27,7 +27,7 @@ export const useAuthMethods = () => {
         });
         
         if (!signUpError) {
-          // Try to sign in again after signup
+          // Essayez de vous connecter à nouveau après l'inscription
           const { data: signInData } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -38,14 +38,56 @@ export const useAuthMethods = () => {
         
         throw error;
       } else {
-        // Regular sign in for other users
-        const { data, error } = await supabase.auth.signInWithPassword({
+        // Pour les utilisateurs réguliers, tentez d'abord de vous connecter via Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
-        if (error) throw error;
-        return data;
+        if (!authError) {
+          return authData;
+        }
+        
+        // Si l'authentification Supabase échoue, essayez de vérifier dans la table public.users
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .single();
+          
+        if (userError || !userData) {
+          throw new Error('Identifiant ou mot de passe incorrect');
+        }
+        
+        // Vérifier si le mot de passe correspond
+        if (userData.password !== password) {
+          throw new Error('Identifiant ou mot de passe incorrect');
+        }
+        
+        // Créer un utilisateur dans Supabase Auth pour maintenir la session
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { role: 'client' }
+          }
+        });
+        
+        if (signUpError) {
+          // Si l'utilisateur existe déjà, tentez de vous connecter
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (signInError) {
+            throw signInError;
+          }
+          
+          return signInData;
+        }
+        
+        return signUpData;
       }
     } catch (error) {
       console.error("Erreur d'authentification:", error);
@@ -72,12 +114,12 @@ export const useAuthMethods = () => {
 
   const registerAdmin = async (email: string, password: string) => {
     try {
-      // Check if this is the designated admin email
+      // Vérifiez si c'est l'email administrateur désigné
       if (email !== 'dkautomotive70@gmail.com') {
         throw new Error("Seule l'adresse email administrative est autorisée");
       }
       
-      // Attempt to create an admin account
+      // Tentative de création d'un compte administrateur
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -87,9 +129,9 @@ export const useAuthMethods = () => {
       });
       
       if (error) {
-        // Check if user already exists
+        // Vérifiez si l'utilisateur existe déjà
         if (error.message.includes("User already registered")) {
-          // Try to update the user's role instead
+          // Essayez de mettre à jour le rôle de l'utilisateur à la place
           await signIn(email, password);
           return { success: true, message: "Connexion administrateur réussie" };
         }
