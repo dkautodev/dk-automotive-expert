@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +33,7 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
 
   useEffect(() => {
     if (profile) {
+      console.log("Resetting form with profile data:", profile);
       form.reset({
         email: profile.email || "",
         phone: profile.phone || "",
@@ -47,9 +47,14 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
     }
   }, [profile, form]);
 
+  const handleFormSubmit = async (data: ProfileFormData) => {
+    console.log("Form submitted with data:", data);
+    await onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"

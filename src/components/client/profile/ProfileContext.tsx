@@ -15,6 +15,8 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   const userId = user?.id;
   const userEmail = user?.email;
   
+  console.log("Current user context:", userId, userEmail);
+  
   // Use our custom hooks
   const { profile, setProfile, isLoading, error } = useProfileData(userId);
   const { submitForm } = useProfileUpdate(userId, profile, setProfile);
@@ -27,6 +29,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   
   useEffect(() => {
     if (!profile && authProfile) {
+      console.log("Using authProfile as fallback:", authProfile);
       setProfile(authProfile);
     }
   }, [authProfile, profile, setProfile]);

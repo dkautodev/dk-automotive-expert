@@ -19,6 +19,8 @@ export const useProfileData = (userId: string | undefined) => {
         setIsLoading(true);
         setError(null);
         
+        console.log("Fetching profile for user ID:", userId);
+        
         // Récupérer d'abord les métadonnées de l'utilisateur
         const { data: userData, error: userError } = await supabase.auth.getUser();
         
@@ -28,25 +30,6 @@ export const useProfileData = (userId: string | undefined) => {
         
         const userMetadata = userData?.user?.user_metadata || {};
         console.log("User metadata from Auth:", userMetadata);
-        
-        // Vérifier si les colonnes de verrouillage existent
-        const { data: columnsData, error: columnsError } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .limit(1);
-        
-        if (columnsError) {
-          console.error('Error checking columns:', columnsError);
-          setError("Impossible de vérifier les colonnes de la table utilisateur.");
-          return;
-        }
-        
-        // Vérifier si les champs verrouillés existent
-        const hasLockedFields = columnsData && columnsData.length > 0 && 
-          ('siret_number_locked' in columnsData[0] || 'vat_number_locked' in columnsData[0]);
-        
-        console.log("Columns data sample:", columnsData);
-        console.log("Has locked fields:", hasLockedFields);
         
         // Récupérer le profil utilisateur
         const { data, error } = await supabase
@@ -60,6 +43,8 @@ export const useProfileData = (userId: string | undefined) => {
           setError("Impossible de charger les données du profil. Veuillez réessayer plus tard.");
           return;
         }
+
+        console.log("Profile data from database:", data);
         
         if (!data) {
           // Si aucun profil n'existe, créer un profil par défaut basé sur les métadonnées
@@ -89,15 +74,6 @@ export const useProfileData = (userId: string | undefined) => {
         // Extraire l'email de la relation users
         const userEmail = data.users ? (data.users as any).email : (userMetadata.email || '');
         
-        // Vérifier si les champs verrouillés existent ou utiliser des valeurs par défaut
-        const siretLocked = hasLockedFields && 'siret_number_locked' in data 
-          ? !!data.siret_number_locked 
-          : false;
-          
-        const vatLocked = hasLockedFields && 'vat_number_locked' in data 
-          ? !!data.vat_number_locked 
-          : false;
-        
         // Décomposer l'adresse de facturation si elle existe
         let billingStreet = '';
         let billingCity = '';
@@ -105,9 +81,10 @@ export const useProfileData = (userId: string | undefined) => {
         let billingCountry = 'France';
         
         if (data.billing_address) {
+          console.log("Parsing billing address:", data.billing_address);
           const addressParts = data.billing_address.split(',').map(part => part.trim());
           if (addressParts.length >= 1) billingStreet = addressParts[0];
-          if (addressParts.length >= 3) {
+          if (addressParts.length >= 2) {
             const cityAndPostal = addressParts[1].split(' ');
             if (cityAndPostal.length >= 2) {
               billingPostalCode = cityAndPostal[0];
@@ -116,7 +93,7 @@ export const useProfileData = (userId: string | undefined) => {
               billingCity = addressParts[1];
             }
           }
-          if (addressParts.length >= 4) billingCountry = addressParts[3];
+          if (addressParts.length >= 3) billingCountry = addressParts[2];
         }
         
         // Créer un profil en utilisant à la fois les données du profil et les métadonnées
@@ -130,14 +107,15 @@ export const useProfileData = (userId: string | undefined) => {
           profile_picture: data.profile_picture || '',
           siret: data.siret_number || '',
           vat_number: data.vat_number || '',
-          siret_locked: siretLocked,
-          vat_number_locked: vatLocked,
+          siret_locked: !!data.siret_number_locked,
+          vat_number_locked: !!data.vat_number_locked,
           billing_address_street: billingStreet,
           billing_address_city: billingCity,
           billing_address_postal_code: billingPostalCode,
           billing_address_country: billingCountry
         };
         
+        console.log("Formatted profile:", formattedProfile);
         setProfile(formattedProfile);
       } catch (err) {
         console.error('Error in fetchProfile:', err);
