@@ -19,7 +19,17 @@ export const useProfileData = (userId: string | undefined) => {
         setIsLoading(true);
         setError(null);
         
-        // First check if the locked fields columns exist in the user_profiles table
+        // Récupérer d'abord les métadonnées de l'utilisateur
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          console.error('Error fetching user metadata:', userError);
+        }
+        
+        const userMetadata = userData?.user?.user_metadata || {};
+        console.log("User metadata from Auth:", userMetadata);
+        
+        // Vérifier si les colonnes de verrouillage existent
         const { data: columnsData, error: columnsError } = await supabase
           .from('user_profiles')
           .select('*')
@@ -31,19 +41,19 @@ export const useProfileData = (userId: string | undefined) => {
           return;
         }
         
-        // Check if the locked fields exist in the schema
+        // Vérifier si les champs verrouillés existent
         const hasLockedFields = columnsData && columnsData.length > 0 && 
           ('siret_number_locked' in columnsData[0] || 'vat_number_locked' in columnsData[0]);
         
         console.log("Columns data sample:", columnsData);
         console.log("Has locked fields:", hasLockedFields);
         
-        // Now fetch the user profile
+        // Récupérer le profil utilisateur
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*, users(email)')
           .eq('id', userId)
-          .maybeSingle();  // Use maybeSingle instead of single to avoid errors when no profile is found
+          .maybeSingle();
           
         if (error) {
           console.error('Error fetching profile:', error);
@@ -52,14 +62,14 @@ export const useProfileData = (userId: string | undefined) => {
         }
         
         if (!data) {
-          // Create a default profile since none exists
+          // Si aucun profil n'existe, créer un profil par défaut basé sur les métadonnées
           const defaultProfile: ProfileData = {
             id: userId,
-            email: '',
-            first_name: '',
-            last_name: '',
-            phone: '',
-            company: '',
+            email: userMetadata.email || '',
+            first_name: userMetadata.firstName || '',
+            last_name: userMetadata.lastName || '',
+            phone: userMetadata.phone || '',
+            company: userMetadata.company || '',
             profile_picture: '',
             siret: '',
             vat_number: '',
@@ -74,9 +84,9 @@ export const useProfileData = (userId: string | undefined) => {
         }
         
         // Extraire l'email de la relation users
-        const userEmail = data.users ? (data.users as any).email : '';
+        const userEmail = data.users ? (data.users as any).email : (userMetadata.email || '');
         
-        // Check if the locked fields exist or use defaults
+        // Vérifier si les champs verrouillés existent ou utiliser des valeurs par défaut
         const siretLocked = hasLockedFields && 'siret_number_locked' in data 
           ? !!data.siret_number_locked 
           : false;
@@ -85,14 +95,14 @@ export const useProfileData = (userId: string | undefined) => {
           ? !!data.vat_number_locked 
           : false;
         
-        // Créer un objet de profil formaté
+        // Créer un profil en utilisant à la fois les données du profil et les métadonnées
         const formattedProfile: ProfileData = {
           id: data.id,
-          first_name: data.first_name,
-          last_name: data.last_name,
+          first_name: data.first_name || userMetadata.firstName || '',
+          last_name: data.last_name || userMetadata.lastName || '',
           email: userEmail,
-          phone: data.phone || '',
-          company: data.company_name || '',
+          phone: data.phone || userMetadata.phone || '',
+          company: data.company_name || userMetadata.company || '',
           profile_picture: data.profile_picture || '',
           siret: data.siret_number || '',
           vat_number: data.vat_number || '',
