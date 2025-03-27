@@ -20,6 +20,13 @@ export const useUserProfile = () => {
       // Extraire l'email de la relation users
       const userEmail = profileData.users ? (profileData.users as any).email : '';
 
+      // Check if the database has the locked fields columns
+      // If not, we need to handle it gracefully
+      const siretLocked = 'siret_locked' in profileData ? !!profileData.siret_locked : false;
+      const vatNumberLocked = 'vat_number_locked' in profileData ? !!profileData.vat_number_locked : false;
+
+      console.log("Profile data from DB:", profileData);
+
       // Mapper les données au format UserProfile
       return {
         id: profileData.id,
@@ -31,8 +38,8 @@ export const useUserProfile = () => {
         profile_picture: profileData.profile_picture,
         siret: profileData.siret_number,
         vat_number: profileData.vat_number,
-        siret_locked: !!profileData.siret_locked,
-        vat_number_locked: !!profileData.vat_number_locked,
+        siret_locked: siretLocked,
+        vat_number_locked: vatNumberLocked,
         billing_address: profileData.billing_address
       };
     } catch (error) {

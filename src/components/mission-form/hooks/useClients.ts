@@ -4,7 +4,12 @@ import { UseFormReturn } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "../missionFormSchema";
-import { ClientDisplay } from "../types";
+
+// Define clear types for the client display data
+export type ClientDisplay = {
+  id: string;
+  name: string;
+};
 
 type NewClientData = {
   first_name: string;

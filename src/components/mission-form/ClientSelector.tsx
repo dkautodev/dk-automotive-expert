@@ -1,66 +1,75 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectGroup, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MissionFormValues } from "./missionFormSchema";
-import ClientList from "./ClientList";
-import NewClientForm from "./NewClientForm";
-import { useClients } from "./hooks/useClients";
+import { ClientDisplay } from "./hooks/useClients";
 
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;
+  clients: ClientDisplay[];
+  loading: boolean;
+  onAddClient: () => void;
 }
 
-const ClientSelector = ({ form }: ClientSelectorProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { 
-    clients, 
-    loading, 
-    isSubmitting, 
-    newClient, 
-    setNewClient, 
-    createClient 
-  } = useClients(form);
+const ClientSelector = ({ form, clients, loading, onAddClient }: ClientSelectorProps) => {
+  const clientId = form.watch("client_id");
 
-  const handleCreateClient = async () => {
-    const result = await createClient();
-    if (result) {
-      setIsDialogOpen(false);
+  useEffect(() => {
+    // If there's only one client, auto-select it
+    if (clients.length === 1 && !clientId) {
+      form.setValue("client_id", clients[0].id);
     }
-  };
+  }, [clients, clientId, form]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
-        <ClientList 
-          form={form} 
-          clients={clients} 
-          loading={loading} 
-        />
-
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="flex gap-1">
-              <PlusCircle className="h-4 w-4" />
-              Nouveau client
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Créer un nouveau client</DialogTitle>
-            </DialogHeader>
-            <NewClientForm 
-              newClient={newClient}
-              setNewClient={setNewClient}
-              handleCreateClient={handleCreateClient}
-              isSubmitting={isSubmitting}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
-    </div>
+    <FormItem className="flex-1">
+      <FormLabel>Client</FormLabel>
+      <FormControl>
+        <Select
+          disabled={loading}
+          value={clientId}
+          onValueChange={(value) => form.setValue("client_id", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionner un client" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {loading ? (
+                <SelectItem value="loading" disabled>
+                  Chargement...
+                </SelectItem>
+              ) : clients.length === 0 ? (
+                <SelectItem value="empty" disabled>
+                  Aucun client trouvé
+                </SelectItem>
+              ) : (
+                <>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="add-client" className="text-primary font-medium">
+                    + Ajouter un nouveau client
+                  </SelectItem>
+                </>
+              )}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
   );
 };
 
