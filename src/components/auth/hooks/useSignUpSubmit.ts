@@ -27,32 +27,37 @@ export const useSignUpSubmit = () => {
         phone: data.phone
       });
       
-      // Étape 1: Créer l'utilisateur dans la table public.users
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .insert([
-          {
-            email: data.email,
-            password: data.password,
-            user_type: 'client'
+      // Étape 1: Créer uniquement l'utilisateur dans Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: { 
+            role: 'client',
+            firstName: data.firstName,
+            lastName: data.lastName,
+            company: data.company
           }
-        ])
-        .select()
-        .single();
-        
-      if (userError) {
-        console.error("Erreur lors de la création de l'utilisateur:", userError);
-        throw new Error("Erreur lors de la création de l'utilisateur. " + userError.message);
+        }
+      });
+      
+      if (authError) {
+        console.error("Erreur lors de la création dans Auth:", authError);
+        throw new Error("Erreur lors de la création du compte: " + authError.message);
       }
       
-      console.log("Utilisateur créé avec succès dans public.users:", userData);
+      console.log("Utilisateur créé avec succès dans Supabase Auth:", authData);
+      
+      if (!authData.user) {
+        throw new Error("Impossible de créer l'utilisateur");
+      }
       
       // Étape 2: Créer un profil pour cet utilisateur
       const { error: profileError } = await supabase
         .from('user_profiles')
         .insert([
           {
-            user_id: userData.id,
+            user_id: authData.user.id,
             first_name: data.firstName,
             last_name: data.lastName,
             company_name: data.company,
@@ -62,29 +67,12 @@ export const useSignUpSubmit = () => {
         
       if (profileError) {
         console.error("Erreur lors de la création du profil:", profileError);
-        throw new Error("Erreur lors de la création du profil. " + profileError.message);
+        // Ne pas bloquer l'inscription si le profil n'est pas créé
+        toast.warning("Votre compte a été créé mais votre profil n'a pas pu être enregistré complètement.");
+      } else {
+        console.log("Profil créé avec succès");
       }
-      
-      console.log("Profil créé avec succès");
-      
-      // Étape 3: Créer également un utilisateur dans Supabase Auth
-      const { error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: { 
-            role: 'client',
-            firstName: data.firstName,
-            lastName: data.lastName 
-          }
-        }
-      });
-      
-      if (authError) {
-        console.warn("Avertissement lors de la création dans Auth:", authError);
-        // On ne bloque pas le processus si cette étape échoue
-      }
-        
+          
       toast.success("Inscription réussie ! Vous allez être redirigé vers la page de connexion.");
       
       setTimeout(() => {
