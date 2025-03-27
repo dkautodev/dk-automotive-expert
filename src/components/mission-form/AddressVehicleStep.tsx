@@ -29,11 +29,11 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
 
   const { 
     clients, 
-    loading: clientsLoading, 
+    isLoading: clientsLoading, 
     newClient, 
     setNewClient, 
     createClient, 
-    isSubmitting: isClientSubmitting 
+    isSubmitting 
   } = useClients(form);
 
   const pickupAddress = form.watch("pickup_address");
@@ -100,7 +100,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
             newClient={newClient}
             setNewClient={setNewClient}
             onSubmit={handleCreateClient}
-            isSubmitting={isClientSubmitting}
+            isSubmitting={isSubmitting}
           />
         </DialogContent>
       </Dialog>

@@ -11,11 +11,11 @@ import {
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { MissionFormValues } from "./missionFormSchema";
-import { ClientDisplay } from "./hooks/useClients";
+import { ClientData } from "./hooks/useClients";
 
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;
-  clients: ClientDisplay[];
+  clients: ClientData[];
   loading: boolean;
   onAddClient: () => void;
 }
