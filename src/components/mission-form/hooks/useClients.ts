@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionFormValues } from "../missionFormSchema";
 
-// Define client data structures and export them
+// Define client data structures with clear boundaries
 export interface ClientDisplay {
   id: string;
   name: string;

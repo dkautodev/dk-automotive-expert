@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { EmailField } from "./EmailField";
 import { PasswordField } from "./PasswordField";
 import { SubmitButton } from "./SubmitButton";
-import { AdminLink } from "./AdminLink";
 import { useSignInForm } from "./useSignInForm";
 
 const SignInCard = () => {
@@ -28,7 +27,7 @@ const SignInCard = () => {
         </Form>
       </CardContent>
       <CardFooter className="flex justify-end pt-0">
-        <AdminLink />
+        {/* Footer content without AdminLink */}
       </CardFooter>
     </Card>
   );
