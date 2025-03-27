@@ -27,7 +27,7 @@ export interface UserProfile {
   billing_address: string | null;
 }
 
-// Client data types
+// These client types will be used for display and new client creation without circular references
 export interface ClientData {
   id: string;
   name: string;
