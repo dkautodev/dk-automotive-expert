@@ -2,9 +2,9 @@
 import { useAuthSession } from './useAuthSession';
 import { useAuthMethods } from './useAuthMethods';
 import { useUserProfile } from './useUserProfile';
-import { UserRole } from './types';
+import type { UserRole } from './types';
 
-export { UserRole };
+export type { UserRole };
 
 export const useAuth = () => {
   const authState = useAuthSession();
