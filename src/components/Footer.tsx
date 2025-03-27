@@ -1,9 +1,9 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Mail } from 'lucide-react';
-import { AdminLink } from './auth/sign-in/AdminLink';
+import { Mail, ShieldCheck } from 'lucide-react';
 
 const Footer = () => {
   return <footer className="bg-[#18257D] text-white py-[50px] my-[35px]">
@@ -11,10 +11,17 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="col-span-1 md:col-span-1 text-center md:text-left">
             <img src="/lovable-uploads/0569d88f-5ec1-4822-8cae-a5f0ba017d54.png" alt="DK AUTOMOTIVE" className="h-20 mb-4 mx-auto md:mx-0 brightness-0 invert hover-scale" />
-            <p className="text-sm text-white/80 leading-relaxed">
+            <p className="text-sm text-white/80 leading-relaxed mb-4">
               Notre entreprise spécialisée dans le convoyage de véhicules propose un service 
               sur mesure, écologique et économique pour les particuliers et les professionnels.
             </p>
+            <Link 
+              to="/admin-auth" 
+              className="text-white/80 hover:text-white transition-colors hover-scale inline-block flex items-center gap-1 mb-4"
+            >
+              <ShieldCheck size={14} />
+              Espace administrateur
+            </Link>
           </div>
 
           <div className="col-span-1 text-center md:text-left">
@@ -32,9 +39,6 @@ const Footer = () => {
                 <Link to="/faq" className="text-white/80 hover:text-white transition-colors hover-scale inline-block">
                   FAQ
                 </Link>
-              </li>
-              <li>
-                <AdminLink />
               </li>
             </ul>
           </div>
