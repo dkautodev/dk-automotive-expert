@@ -12,6 +12,7 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
     
     try {
       setIsSubmitting(true);
+      console.log("Updating profile with data:", data);
       
       // Construire l'adresse de facturation complète au format attendu par la base de données
       const formattedBillingAddress = `${data.billing_address_street}, ${data.billing_address_postal_code} ${data.billing_address_city}, ${data.billing_address_country}`;
@@ -29,12 +30,20 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
         updateData.vat_number = data.vat_number;
       }
 
+      console.log("Sending to database:", updateData);
+      console.log("User ID:", userId);
+
       const { error } = await supabase
         .from('user_profiles')
         .update(updateData)
         .eq('id', userId);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Database update error:", error);
+        throw error;
+      }
+      
+      console.log("Database update successful");
       
       // Update local profile
       if (profile) {
