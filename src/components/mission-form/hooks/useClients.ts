@@ -27,14 +27,20 @@ export const useClients = (form?: UseFormReturn<MissionFormValues>) => {
 
       if (error) throw error;
 
-      // Convert the database response to our Client interface
-      const formattedClients: Client[] = (data as ClientFromDB[]).map((client) => ({
-        id: client.id,
-        first_name: client.first_name,
-        last_name: client.last_name,
-        email: client.email?.email || "",
-        phone: client.phone
-      }));
+      // Convertir explicitement les données pour éviter les problèmes de typage
+      const formattedClients: Client[] = [];
+      
+      if (data) {
+        (data as ClientFromDB[]).forEach((client) => {
+          formattedClients.push({
+            id: client.id,
+            first_name: client.first_name,
+            last_name: client.last_name,
+            email: client.email?.email || "",
+            phone: client.phone || ""
+          });
+        });
+      }
 
       setClients(formattedClients);
     } catch (error: any) {

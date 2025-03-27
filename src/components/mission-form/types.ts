@@ -8,7 +8,7 @@ export interface Client {
   phone: string;
 }
 
-// Define a separate interface for the database response structure
+// Interface for the database response structure
 export interface ClientFromDB {
   id: string;
   first_name: string;
