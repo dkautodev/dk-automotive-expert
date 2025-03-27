@@ -66,7 +66,7 @@ export const useClients = (form?: any) => {
       // Transformer les données pour le format ClientData
       const formattedClients: ClientData[] = userProfiles.map(profile => ({
         id: profile.user_id,
-        name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+        name: `${profile.first_name || ''} ${profile.last_name || ''} - ${profile.company_name || ''}`.trim(),
         email: '', // Sera rempli plus tard
         phone: profile.phone || '',
         company: profile.company_name || '',
@@ -111,7 +111,7 @@ export const useClients = (form?: any) => {
         // Mise à jour de la liste des clients
         const newClientDisplay: ClientData = {
           id: clientId,
-          name: `${newClient.first_name} ${newClient.last_name}`,
+          name: `${newClient.first_name} ${newClient.last_name} - ${newClient.company || ''}`.trim(),
           email: newClient.email,
           phone: newClient.phone,
         };
