@@ -73,8 +73,8 @@ const ClientSelector = ({ form }: ClientSelectorProps) => {
 
       if (error) throw error;
 
-      // Format client data with email from the joined user table
-      const formattedClients: Client[] = (data as ClientFromDB[]).map(client => ({
+      // Convert the database response to our Client interface
+      const formattedClients: Client[] = (data as ClientFromDB[]).map((client) => ({
         id: client.id,
         first_name: client.first_name,
         last_name: client.last_name,
