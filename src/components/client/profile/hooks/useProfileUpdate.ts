@@ -23,6 +23,8 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
         billing_address: formattedBillingAddress
       };
 
+      // Since siret_locked and vat_number_locked don't exist in the database yet,
+      // we'll use the values from the profile object which default to false
       if (!profile?.siret_locked) {
         updateData.siret_number = data.siret;
       }
