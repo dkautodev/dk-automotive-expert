@@ -34,8 +34,8 @@ export const useProfileData = (userId: string | undefined) => {
         // Récupérer le profil utilisateur
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('*, users(email)')
-          .eq('id', userId)
+          .select('*')
+          .eq('user_id', userId)
           .maybeSingle();
           
         if (error) {
@@ -50,7 +50,7 @@ export const useProfileData = (userId: string | undefined) => {
           // Si aucun profil n'existe, créer un profil par défaut basé sur les métadonnées
           const defaultProfile: ProfileData = {
             id: userId,
-            email: userMetadata.email || '',
+            email: userData?.user?.email || '',
             first_name: userMetadata.firstName || '',
             last_name: userMetadata.lastName || '',
             phone: userMetadata.phone || '',
@@ -71,8 +71,8 @@ export const useProfileData = (userId: string | undefined) => {
           return;
         }
         
-        // Extraire l'email de la relation users
-        const userEmail = data.users ? (data.users as any).email : (userMetadata.email || '');
+        // Obtenir l'email de l'utilisateur depuis auth
+        const userEmail = userData?.user?.email || '';
         
         // Décomposer l'adresse de facturation si elle existe
         let billingStreet = '';
