@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { Form } from '@/components/ui/form';
 import { quoteFormSchema, type QuoteFormValues } from './quote-form/quoteFormSchema';
 import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
-import AddressForm from './quote-form/AddressForm';
+import AddressForm from './quote-form/address-form';
 import ContactForm from './quote-form/ContactForm';
 import { sendQuoteEmail } from '@/utils/emailService';
 import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
