@@ -4,8 +4,9 @@ import { Control } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Lock, Eye, EyeOff } from "lucide-react";
+import { Lock, Eye, EyeOff, Info } from "lucide-react";
 import { PasswordStepType } from "../schemas/signUpStepSchema";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PasswordStepProps {
   control: Control<PasswordStepType>;
@@ -24,7 +25,17 @@ const PasswordStep = ({ control }: PasswordStepProps) => {
         name="password"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Mot de passe*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Mot de passe*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Minimum 8 caractères, incluant une lettre majuscule, une minuscule, un chiffre et un caractère spécial</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -58,7 +69,17 @@ const PasswordStep = ({ control }: PasswordStepProps) => {
         name="confirmPassword"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Confirmer le mot de passe*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Confirmer le mot de passe*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Doit être identique au mot de passe saisi ci-dessus</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />

@@ -2,12 +2,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { 
   nameStepSchema, 
   contactStepSchema, 
   billingStepSchema, 
   passwordStepSchema,
-  completeSignUpSchema,
   NameStepType,
   ContactStepType,
   BillingStepType,
@@ -20,10 +20,10 @@ import FormActions from "./signup-components/FormActions";
 import StepContent from "./signup-components/StepContent";
 
 const steps = [
-  { id: 'name', title: 'Identité' },
-  { id: 'contact', title: 'Coordonnées' },
-  { id: 'billing', title: 'Facturation' },
-  { id: 'password', title: 'Sécurité' },
+  { id: 'name', title: 'Identité', description: 'Vos informations personnelles' },
+  { id: 'contact', title: 'Coordonnées', description: 'Comment vous contacter' },
+  { id: 'billing', title: 'Facturation', description: 'Informations de facturation' },
+  { id: 'password', title: 'Sécurité', description: 'Sécurisation de votre compte' },
 ];
 
 const MultiStepSignUpForm = () => {
@@ -89,37 +89,39 @@ const MultiStepSignUpForm = () => {
   });
 
   return (
-    <Card className="border-none shadow-none">
-      <CardHeader>
-        <CardTitle>Inscription Professionnel</CardTitle>
-        <CardDescription>
-          Créez votre compte professionnel pour commander vos convoyages
-        </CardDescription>
-      </CardHeader>
-      
-      <FormStepper steps={steps} currentStep={currentStep} />
-      
-      <CardContent>
-        <StepContent
-          currentStep={currentStep}
-          nameForm={nameForm}
-          contactForm={contactForm}
-          billingForm={billingForm}
-          passwordForm={passwordForm}
-        />
-      </CardContent>
-      
-      <CardFooter>
-        <FormActions
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          onPrevious={previous}
-          onNext={next}
-          onFinalSubmit={finalSubmit}
-          isLoading={isLoading}
-        />
-      </CardFooter>
-    </Card>
+    <TooltipProvider>
+      <Card className="border-none shadow-none">
+        <CardHeader>
+          <CardTitle>Inscription Professionnel</CardTitle>
+          <CardDescription>
+            Créez votre compte professionnel pour commander vos convoyages
+          </CardDescription>
+        </CardHeader>
+        
+        <FormStepper steps={steps} currentStep={currentStep} />
+        
+        <CardContent>
+          <StepContent
+            currentStep={currentStep}
+            nameForm={nameForm}
+            contactForm={contactForm}
+            billingForm={billingForm}
+            passwordForm={passwordForm}
+          />
+        </CardContent>
+        
+        <CardFooter>
+          <FormActions
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            onPrevious={previous}
+            onNext={next}
+            onFinalSubmit={finalSubmit}
+            isLoading={isLoading}
+          />
+        </CardFooter>
+      </Card>
+    </TooltipProvider>
   );
 };
 

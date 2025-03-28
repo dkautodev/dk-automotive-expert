@@ -2,8 +2,9 @@
 import { Control } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Briefcase, MapPin, FileDigit, CreditCard } from "lucide-react";
+import { Briefcase, MapPin, FileDigit, CreditCard, Info, Building } from "lucide-react";
 import { BillingStepType } from "../schemas/signUpStepSchema";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BillingStepProps {
   control: Control<BillingStepType>;
@@ -19,7 +20,17 @@ const BillingStep = ({ control }: BillingStepProps) => {
         name="company"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Société*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Société*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Nom de votre entreprise ou raison sociale</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <Briefcase className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -41,7 +52,17 @@ const BillingStep = ({ control }: BillingStepProps) => {
         name="street"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Adresse*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Adresse*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Adresse complète (numéro, rue, complément)</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -59,9 +80,19 @@ const BillingStep = ({ control }: BillingStepProps) => {
           name="postalCode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Code postal*</FormLabel>
+              <div className="flex items-center space-x-2">
+                <FormLabel>Code postal*</FormLabel>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Code postal à 5 chiffres</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <FormControl>
-                <Input placeholder="75001" {...field} />
+                <Input placeholder="75001" {...field} maxLength={5} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -73,9 +104,22 @@ const BillingStep = ({ control }: BillingStepProps) => {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ville*</FormLabel>
+              <div className="flex items-center space-x-2">
+                <FormLabel>Ville*</FormLabel>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Ville correspondant au code postal</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <FormControl>
-                <Input placeholder="Paris" {...field} />
+                <div className="relative">
+                  <Building className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input placeholder="Paris" className="pl-10" {...field} />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,7 +146,17 @@ const BillingStep = ({ control }: BillingStepProps) => {
         name="siret"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Numéro SIRET*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Numéro SIRET*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>14 chiffres sans espaces ni tirets</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <FileDigit className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -124,7 +178,17 @@ const BillingStep = ({ control }: BillingStepProps) => {
         name="vatNumber"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Numéro TVA Intracommunautaire*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Numéro TVA Intracommunautaire*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Format: FR12345678912 ou FR + 2 chiffres/lettres + 9 chiffres</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <CreditCard className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
