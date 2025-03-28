@@ -18,4 +18,3 @@ export const profileFormSchema = z.object({
 
 // Export le type généré par le schéma
 export type ProfileFormSchemaType = z.infer<typeof profileFormSchema>;
-
