@@ -1,7 +1,8 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
-import { ProfileContextType, ProfileData, ProfileFormData } from "./types";
+import { ProfileContextType, ProfileData } from "./types";
+import { ProfileFormSchemaType } from "./schemas/profileFormSchema";
 import { useProfileData } from "./hooks/useProfileData";
 import { useProfileUpdate } from "./hooks/useProfileUpdate";
 import { useLogoUpdate } from "./hooks/useLogoUpdate";

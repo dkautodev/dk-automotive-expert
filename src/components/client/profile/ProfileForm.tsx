@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { ProfileData, ProfileFormData } from "./types";
+import { ProfileData } from "./types";
 import { useProfileContext } from "./ProfileContext";
-import { profileFormSchema } from "./schemas/profileFormSchema";
+import { profileFormSchema, ProfileFormSchemaType } from "./schemas/profileFormSchema";
 import ContactSection from "./form-sections/ContactSection";
 import BusinessSection from "./form-sections/BusinessSection";
 import AddressSection from "./form-sections/AddressSection";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 interface ProfileFormProps {
   profile: ProfileData | null;
-  onSubmit: (data: ProfileFormData) => Promise<void>;
+  onSubmit: (data: ProfileFormSchemaType) => Promise<void>;
   onLockField: (field: 'siret' | 'vat_number', value: string) => void;
 }
 
@@ -30,7 +30,7 @@ const ProfileForm = ({ profile, onSubmit, onLockField }: ProfileFormProps) => {
     address: false
   });
   
-  const form = useForm<ProfileFormData>({
+  const form = useForm<ProfileFormSchemaType>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       email: profile?.email || "",
