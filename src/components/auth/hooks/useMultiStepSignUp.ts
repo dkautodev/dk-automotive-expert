@@ -22,7 +22,9 @@ export const useMultiStepSignUp = () => {
         lastName: data.lastName,
         company: data.company,
         phone: data.phone,
-        address: formattedAddress
+        address: formattedAddress,
+        siret: data.siret,
+        vatNumber: data.vatNumber
       });
       
       // Créer l'utilisateur dans Supabase Auth
@@ -61,7 +63,9 @@ export const useMultiStepSignUp = () => {
             last_name: data.lastName,
             company_name: data.company,
             phone: data.phone,
-            billing_address: formattedAddress
+            billing_address: formattedAddress,
+            siret_number: data.siret,
+            vat_number: data.vatNumber
           }
         ]);
         
@@ -72,11 +76,11 @@ export const useMultiStepSignUp = () => {
         console.log("Profil créé avec succès");
       }
           
-      toast.success("Inscription réussie ! Vous allez être redirigé vers la page de connexion.");
+      toast.success("Inscription réussie ! Veuillez vérifier votre boîte mail pour confirmer votre compte.");
       
-      setTimeout(() => {
-        navigate('/auth', { state: { email: data.email } });
-      }, 2000);
+      // Redirection immédiate vers la page d'authentification
+      navigate('/auth', { state: { email: data.email } });
+      
     } catch (error: any) {
       console.error('Erreur d\'inscription:', error);
       toast.error(error.message || "Une erreur est survenue lors de l'inscription");

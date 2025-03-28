@@ -2,7 +2,7 @@
 import { Control } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Briefcase, MapPin } from "lucide-react";
+import { Briefcase, MapPin, FileDigit, CreditCard } from "lucide-react";
 import { BillingStepType } from "../schemas/signUpStepSchema";
 
 interface BillingStepProps {
@@ -91,6 +91,49 @@ const BillingStep = ({ control }: BillingStepProps) => {
             <FormLabel>Pays*</FormLabel>
             <FormControl>
               <Input value="France" disabled {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="siret"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Numéro SIRET*</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <FileDigit className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <Input 
+                  placeholder="12345678901234" 
+                  className="pl-10" 
+                  maxLength={14}
+                  {...field} 
+                />
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="vatNumber"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Numéro TVA Intracommunautaire*</FormLabel>
+            <FormControl>
+              <div className="relative">
+                <CreditCard className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <Input 
+                  placeholder="FR12345678912" 
+                  className="pl-10" 
+                  {...field} 
+                />
+              </div>
             </FormControl>
             <FormMessage />
           </FormItem>

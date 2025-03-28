@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,7 +34,6 @@ const MultiStepSignUpForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { handleSubmit: onSubmitForm, isLoading } = useMultiStepSignUp();
   
-  // Formulaires pour chaque étape avec leurs types correspondants
   const nameForm = useForm<NameStepType>({
     resolver: zodResolver(nameStepSchema),
     defaultValues: {
@@ -59,7 +57,9 @@ const MultiStepSignUpForm = () => {
       street: "",
       postalCode: "",
       city: "",
-      country: "France"
+      country: "France",
+      siret: "",
+      vatNumber: ""
     }
   });
 
@@ -93,7 +93,6 @@ const MultiStepSignUpForm = () => {
     const isValid = await passwordForm.trigger();
     if (!isValid) return;
 
-    // Collecter toutes les données des formulaires
     const completeData: CompleteSignUpType = {
       ...nameForm.getValues(),
       ...contactForm.getValues(),
@@ -101,7 +100,6 @@ const MultiStepSignUpForm = () => {
       ...passwordForm.getValues()
     };
 
-    // Validation finale de toutes les données
     try {
       completeSignUpSchema.parse(completeData);
       onSubmitForm(completeData);
@@ -151,7 +149,6 @@ const MultiStepSignUpForm = () => {
       </div>
       
       <CardContent>
-        {/* Correction: Utiliser des conditions pour passer uniquement le formulaire approprié à chaque étape */}
         {currentStep === 0 && (
           <Form {...nameForm}>
             <form className="space-y-4">

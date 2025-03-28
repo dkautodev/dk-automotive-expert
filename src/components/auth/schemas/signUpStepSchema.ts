@@ -9,8 +9,12 @@ export const nameStepSchema = z.object({
 
 // Étape 2: Coordonnées
 export const contactStepSchema = z.object({
-  phone: z.string().min(1, "Le numéro de téléphone est requis"),
-  email: z.string().email("Email invalide").min(1, "L'email est requis"),
+  phone: z.string()
+    .min(1, "Le numéro de téléphone est requis")
+    .regex(/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/, "Format de téléphone invalide"),
+  email: z.string()
+    .email("Email invalide")
+    .min(1, "L'email est requis"),
 });
 
 // Étape 3: Coordonnées de facturation
@@ -20,6 +24,13 @@ export const billingStepSchema = z.object({
   postalCode: z.string().min(1, "Le code postal est requis"),
   city: z.string().min(1, "La ville est requise"),
   country: z.string().min(1, "Le pays est requis").default("France"),
+  siret: z.string()
+    .min(14, "Le SIRET doit contenir 14 chiffres")
+    .max(14, "Le SIRET doit contenir 14 chiffres")
+    .regex(/^\d{14}$/, "Format de SIRET invalide"),
+  vatNumber: z.string()
+    .min(1, "Le numéro de TVA est requis")
+    .regex(/^(FR){0,1}[0-9A-Z]{2}[0-9]{9}$/, "Format de TVA invalide (ex: FR12345678912)"),
 });
 
 // Étape 4: Mot de passe
