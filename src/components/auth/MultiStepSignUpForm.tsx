@@ -35,7 +35,7 @@ const MultiStepSignUpForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { handleSubmit: onSubmitForm, isLoading } = useMultiStepSignUp();
   
-  // Formulaires pour chaque étape
+  // Formulaires pour chaque étape avec leurs types correspondants
   const nameForm = useForm<NameStepType>({
     resolver: zodResolver(nameStepSchema),
     defaultValues: {
@@ -151,14 +151,38 @@ const MultiStepSignUpForm = () => {
       </div>
       
       <CardContent>
-        <Form {...currentForm}>
-          <form className="space-y-4">
-            {currentStep === 0 && <NameStep control={nameForm.control} />}
-            {currentStep === 1 && <ContactStep control={contactForm.control} />}
-            {currentStep === 2 && <BillingStep control={billingForm.control} />}
-            {currentStep === 3 && <PasswordStep control={passwordForm.control} />}
-          </form>
-        </Form>
+        {/* Correction: Utiliser des conditions pour passer uniquement le formulaire approprié à chaque étape */}
+        {currentStep === 0 && (
+          <Form {...nameForm}>
+            <form className="space-y-4">
+              <NameStep control={nameForm.control} />
+            </form>
+          </Form>
+        )}
+        
+        {currentStep === 1 && (
+          <Form {...contactForm}>
+            <form className="space-y-4">
+              <ContactStep control={contactForm.control} />
+            </form>
+          </Form>
+        )}
+        
+        {currentStep === 2 && (
+          <Form {...billingForm}>
+            <form className="space-y-4">
+              <BillingStep control={billingForm.control} />
+            </form>
+          </Form>
+        )}
+        
+        {currentStep === 3 && (
+          <Form {...passwordForm}>
+            <form className="space-y-4">
+              <PasswordStep control={passwordForm.control} />
+            </form>
+          </Form>
+        )}
       </CardContent>
       
       <CardFooter className="flex justify-between">

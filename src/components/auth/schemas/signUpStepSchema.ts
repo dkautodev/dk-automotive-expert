@@ -23,15 +23,19 @@ export const billingStepSchema = z.object({
 });
 
 // Étape 4: Mot de passe
+// Correction: transformer l'objet refine en un objet simple sans refine
 export const passwordStepSchema = z.object({
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
-  path: ["confirmPassword"],
-});
+  confirmPassword: z.string().min(1, "Veuillez confirmer votre mot de passe")
+}).refine(
+  (data) => data.password === data.confirmPassword, 
+  {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  }
+);
 
-// Schéma complet pour le formulaire final
+// Correction: fusionner les schémas sans utiliser de méthode refine supplémentaire
 export const completeSignUpSchema = nameStepSchema
   .merge(contactStepSchema)
   .merge(billingStepSchema)

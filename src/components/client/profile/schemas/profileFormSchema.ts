@@ -1,7 +1,7 @@
 
 import { z } from "zod";
 
-// Define the schema for profile form validation
+// Define the schema for profile form validation with all properties required
 export const profileFormSchema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
   phone: z.string().min(1, "Le numéro de téléphone est requis"),
