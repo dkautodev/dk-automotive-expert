@@ -80,9 +80,11 @@ export type Database = {
           price_ht: number | null
           price_ttc: number | null
           quote_id: string | null
+          quote_number: string | null
           status: string
           updated_at: string | null
           vehicle_info: Json | null
+          vehicles: Json | null
         }
         Insert: {
           client_id: string
@@ -101,9 +103,11 @@ export type Database = {
           price_ht?: number | null
           price_ttc?: number | null
           quote_id?: string | null
+          quote_number?: string | null
           status?: string
           updated_at?: string | null
           vehicle_info?: Json | null
+          vehicles?: Json | null
         }
         Update: {
           client_id?: string
@@ -122,19 +126,13 @@ export type Database = {
           price_ht?: number | null
           price_ttc?: number | null
           quote_id?: string | null
+          quote_number?: string | null
           status?: string
           updated_at?: string | null
           vehicle_info?: Json | null
+          vehicles?: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "missions_quote_id_fkey"
-            columns: ["quote_id"]
-            isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       price_grids: {
         Row: {
@@ -171,77 +169,6 @@ export type Database = {
           vehicle_type_name?: string
         }
         Relationships: []
-      }
-      quotes: {
-        Row: {
-          date_created: string | null
-          delivery_address: string
-          delivery_contact: Json | null
-          delivery_date: string | null
-          delivery_time: string | null
-          distance: string
-          id: string
-          pickup_address: string
-          pickup_contact: Json | null
-          pickup_date: string | null
-          pickup_time: string | null
-          quote_number: string
-          selected_vehicle_type: string | null
-          status: string
-          total_price_ht: number
-          total_price_ttc: number
-          user_id: string | null
-          vehicles: Json
-        }
-        Insert: {
-          date_created?: string | null
-          delivery_address: string
-          delivery_contact?: Json | null
-          delivery_date?: string | null
-          delivery_time?: string | null
-          distance: string
-          id?: string
-          pickup_address: string
-          pickup_contact?: Json | null
-          pickup_date?: string | null
-          pickup_time?: string | null
-          quote_number: string
-          selected_vehicle_type?: string | null
-          status?: string
-          total_price_ht: number
-          total_price_ttc: number
-          user_id?: string | null
-          vehicles: Json
-        }
-        Update: {
-          date_created?: string | null
-          delivery_address?: string
-          delivery_contact?: Json | null
-          delivery_date?: string | null
-          delivery_time?: string | null
-          distance?: string
-          id?: string
-          pickup_address?: string
-          pickup_contact?: Json | null
-          pickup_date?: string | null
-          pickup_time?: string | null
-          quote_number?: string
-          selected_vehicle_type?: string | null
-          status?: string
-          total_price_ht?: number
-          total_price_ttc?: number
-          user_id?: string | null
-          vehicles?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "quotes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       user_profiles: {
         Row: {
@@ -336,10 +263,6 @@ export type Database = {
         Args: {
           mission_type: string
         }
-        Returns: string
-      }
-      generate_quote_number: {
-        Args: Record<PropertyKey, never>
         Returns: string
       }
       register_user: {

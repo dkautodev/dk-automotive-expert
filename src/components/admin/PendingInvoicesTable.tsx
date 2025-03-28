@@ -1,15 +1,15 @@
 
-import { QuoteRow } from "@/types/database";
+import { MissionRow } from "@/types/database";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface PendingInvoicesTableProps {
-  invoices: QuoteRow[];
+  missions: MissionRow[];
 }
 
-const PendingInvoicesTable = ({ invoices }: PendingInvoicesTableProps) => {
+const PendingInvoicesTable = ({ missions }: PendingInvoicesTableProps) => {
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
@@ -27,7 +27,7 @@ const PendingInvoicesTable = ({ invoices }: PendingInvoicesTableProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>N° Devis</TableHead>
+              <TableHead>N° Mission</TableHead>
               <TableHead>Départ</TableHead>
               <TableHead>Arrivée</TableHead>
               <TableHead>Montant</TableHead>
@@ -35,14 +35,14 @@ const PendingInvoicesTable = ({ invoices }: PendingInvoicesTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.length > 0 ? (
-              invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">{invoice.quote_number}</TableCell>
-                  <TableCell>{invoice.pickup_address.split(',')[0]}</TableCell>
-                  <TableCell>{invoice.delivery_address.split(',')[0]}</TableCell>
-                  <TableCell>{invoice.total_price_ttc} €</TableCell>
-                  <TableCell>{formatDate(invoice.date_created || "")}</TableCell>
+            {missions.length > 0 ? (
+              missions.map((mission) => (
+                <TableRow key={mission.id}>
+                  <TableCell className="font-medium">{mission.mission_number}</TableCell>
+                  <TableCell>{mission.pickup_address?.split(',')[0] || 'N/A'}</TableCell>
+                  <TableCell>{mission.delivery_address?.split(',')[0] || 'N/A'}</TableCell>
+                  <TableCell>{mission.price_ttc} €</TableCell>
+                  <TableCell>{formatDate(mission.created_at || "")}</TableCell>
                 </TableRow>
               ))
             ) : (
