@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { MissionStatus } from '@/hooks/useTodayMissions';
@@ -29,7 +28,7 @@ export const MissionStatusBadge: React.FC<MissionStatusBadgeProps> = ({ status }
         return { label: 'Inconnu', variant: 'outline' as const };
     }
   };
-
+  
   const config = getStatusConfig(status);
   
   return (
