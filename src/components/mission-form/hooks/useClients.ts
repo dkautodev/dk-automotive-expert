@@ -63,17 +63,17 @@ export const useClients = (form?: any) => {
         return;
       }
 
-      // Transform the data to ClientData format
+      // Transform the data to ClientData format with better name formatting
       const formattedClients: ClientData[] = userProfiles.map(profile => {
-        const name = [
+        // Format the name part
+        const fullName = [
           profile.first_name || '',
-          profile.last_name || '',
-          profile.company_name ? `(${profile.company_name})` : ''
+          profile.last_name || ''
         ].filter(Boolean).join(' ');
 
         return {
           id: profile.user_id || profile.id,
-          name: name.trim() || 'Client sans nom',
+          name: fullName.trim() || 'Client sans nom',
           email: '', // Will be filled if needed later
           phone: profile.phone || '',
           company: profile.company_name || '',
