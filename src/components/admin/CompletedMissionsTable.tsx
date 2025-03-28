@@ -38,8 +38,8 @@ const CompletedMissionsTable = ({ missions }: CompletedMissionsTableProps) => {
               missions.map((mission) => (
                 <TableRow key={mission.id}>
                   <TableCell className="font-medium">{mission.id.substring(0, 8)}</TableCell>
-                  <TableCell>{mission.quote?.pickup_address || mission.pickup_address || "N/A"}</TableCell>
-                  <TableCell>{mission.quote?.delivery_address || mission.delivery_address || "N/A"}</TableCell>
+                  <TableCell>{mission.pickup_address || "N/A"}</TableCell>
+                  <TableCell>{mission.delivery_address || "N/A"}</TableCell>
                   <TableCell>{mission.updated_at ? formatDate(mission.updated_at) : "N/A"}</TableCell>
                 </TableRow>
               ))

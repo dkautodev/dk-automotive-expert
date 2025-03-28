@@ -36,13 +36,16 @@ export const sendQuoteEmail = async (quoteData: QuoteFormValues) => {
     const { data: userData } = await supabase.auth.getUser();
     
     if (userData?.user) {
-      // Génération d'un numéro de devis simple
-      const quoteNumber = `QT-${Date.now().toString().substring(0, 10)}`;
+      // Génération d'un numéro de mission simple
+      const missionNumber = `MISSION-${Date.now().toString().substring(0, 10)}`;
       
       const { data, error } = await supabase
-        .from('quotes')
+        .from('missions')
         .insert({
-          quote_number: quoteNumber,
+          client_id: userData.user.id,
+          mission_number: missionNumber,
+          status: 'en_attente',
+          mission_type: 'livraison',
           pickup_address: quoteData.pickupAddress,
           delivery_address: quoteData.deliveryAddress,
           vehicles: {
@@ -53,11 +56,9 @@ export const sendQuoteEmail = async (quoteData: QuoteFormValues) => {
             license_plate: quoteData.licensePlate,
             fuel_type: quoteData.fuelType
           },
-          total_price_ht: 0, // Sera calculé par l'admin
-          total_price_ttc: 0, // Sera calculé par l'admin
+          price_ht: 0, // Sera calculé par l'admin
+          price_ttc: 0, // Sera calculé par l'admin
           distance: "À déterminer",
-          status: 'pending',
-          date_created: new Date().toISOString(),
           pickup_contact: {
             company: quoteData.company,
             first_name: quoteData.firstName,
@@ -71,13 +72,12 @@ export const sendQuoteEmail = async (quoteData: QuoteFormValues) => {
             last_name: quoteData.lastName,
             email: quoteData.email,
             phone: quoteData.phone
-          },
-          client_id: userData.user.id
+          }
         });
 
       if (error) {
-        console.error("Erreur lors de l'enregistrement du devis:", error);
-        throw new Error("Erreur lors de l'enregistrement du devis");
+        console.error("Erreur lors de l'enregistrement de la mission:", error);
+        throw new Error("Erreur lors de l'enregistrement de la mission");
       }
     }
 

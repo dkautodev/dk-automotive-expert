@@ -27,32 +27,39 @@ export const useDashboardCounts = (userId: string | undefined) => {
         completedShipments: 0
       };
 
-      const { data: quotes, error: quotesError } = await supabase
-        .from('quotes')
+      // Récupérer les missions en attente au lieu des devis
+      const { data: pendingMissions, error: pendingError } = await supabase
+        .from('missions')
         .select('*')
-        .eq('user_id', userId)
-        .eq('status', 'pending');
+        .eq('client_id', userId)
+        .eq('status', 'en_attente');
 
       const { data: missions, error: missionsError } = await supabase
         .from('missions')
         .select('*')
         .eq('client_id', userId);
 
-      if (quotesError) {
-        console.error('Error fetching quotes:', quotesError);
+      if (pendingError) {
+        console.error('Error fetching pending missions:', pendingError);
       }
 
       if (missionsError) {
         console.error('Error fetching missions:', missionsError);
       }
 
-      const ongoingShipments = (missions as Mission[] || []).filter(m => m.status === 'in_progress').length;
-      const completedShipments = (missions as Mission[] || []).filter(m => m.status === 'completed').length;
+      const ongoingShipments = (missions as Mission[] || []).filter(m => 
+        m.status === 'in_progress' || m.status === 'prise_en_charge').length;
+        
+      const completedShipments = (missions as Mission[] || []).filter(m => 
+        m.status === 'completed' || m.status === 'termine').length;
+        
+      const pendingInvoices = (missions as Mission[] || []).filter(m => 
+        m.status === 'confirme' || m.status === 'confirmé').length;
 
       return {
-        pendingQuotes: quotes?.length || 0,
+        pendingQuotes: pendingMissions?.length || 0,
         ongoingShipments,
-        pendingInvoices: 0, // To be implemented
+        pendingInvoices,
         completedShipments
       };
     },

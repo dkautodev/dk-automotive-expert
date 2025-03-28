@@ -12,12 +12,9 @@ export interface Mission {
   updated_at: string | null;
   client_id: string;
   driver_id: string | null;
-  quote_id: string | null;
-  quote?: {
-    pickup_address: string;
-    delivery_address: string;
-    vehicles: any;
-  };
+  pickup_address: string;
+  delivery_address: string;
+  vehicles: any | null;
 }
 
 export const useTodayMissions = (userId: string | undefined) => {
@@ -32,10 +29,7 @@ export const useTodayMissions = (userId: string | undefined) => {
 
       const { data, error } = await supabase
         .from('missions')
-        .select(`
-          *,
-          quote:quotes(pickup_address, delivery_address, vehicles)
-        `)
+        .select('*')
         .eq('client_id', userId)
         .gte('created_at', startOfToday)
         .lte('created_at', endOfToday);
@@ -45,7 +39,7 @@ export const useTodayMissions = (userId: string | undefined) => {
         throw error;
       }
 
-      return data as Mission[];
+      return data as unknown as Mission[];
     },
     enabled: !!userId
   });
