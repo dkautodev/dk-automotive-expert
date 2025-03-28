@@ -45,15 +45,17 @@ export const useClients = (form?: any) => {
       setIsLoading(true);
       setError(null);
       
-      // Requête aux profils utilisateurs avec le type 'client'
+      // Get all profiles - we need to disable RLS for this query or make sure
+      // we have the proper policy in place
       const { data: userProfiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select(`*`)
-        .order('company_name', { ascending: true });
+        .select('*');
 
       if (profilesError) {
         throw profilesError;
       }
+
+      console.log("Raw user profiles from database:", userProfiles);
 
       if (!userProfiles || userProfiles.length === 0) {
         console.log("Aucun client trouvé dans la base de données");
@@ -61,17 +63,23 @@ export const useClients = (form?: any) => {
         return;
       }
 
-      console.log("Profils utilisateurs récupérés:", userProfiles);
+      // Transform the data to ClientData format
+      const formattedClients: ClientData[] = userProfiles.map(profile => {
+        const name = [
+          profile.first_name || '',
+          profile.last_name || '',
+          profile.company_name ? `(${profile.company_name})` : ''
+        ].filter(Boolean).join(' ');
 
-      // Transformer les données pour le format ClientData
-      const formattedClients: ClientData[] = userProfiles.map(profile => ({
-        id: profile.user_id || profile.id,
-        name: `${profile.first_name || ''} ${profile.last_name || ''}${profile.company_name ? ` - ${profile.company_name}` : ''}`.trim(),
-        email: '', // Sera rempli si nécessaire ultérieurement
-        phone: profile.phone || '',
-        company: profile.company_name || '',
-        address: profile.billing_address || ''
-      }));
+        return {
+          id: profile.user_id || profile.id,
+          name: name.trim() || 'Client sans nom',
+          email: '', // Will be filled if needed later
+          phone: profile.phone || '',
+          company: profile.company_name || '',
+          address: profile.billing_address || ''
+        };
+      });
 
       console.log("Clients formatés:", formattedClients);
       setClients(formattedClients);
