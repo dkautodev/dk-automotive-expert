@@ -1,3 +1,4 @@
+
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, Clock } from "lucide-react";
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 
 interface PickupDetailsSectionProps {
   form: UseFormReturn<PickupFormValues>;
@@ -26,6 +29,50 @@ interface PickupDetailsSectionProps {
 }
 
 const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionProps) => {
+  const [mapsLoaded, setMapsLoaded] = useState(false);
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+
+  // Load Google Maps API
+  useEffect(() => {
+    // Skip if already loaded or no API key
+    if (window.google?.maps?.places || !GOOGLE_MAPS_API_KEY || mapsLoaded) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setMapsLoaded(true);
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [mapsLoaded]);
+
+  // Initialize autocomplete when maps API is loaded
+  useEffect(() => {
+    if (!mapsLoaded || !window.google?.maps?.places || !addressInputRef.current || autocomplete) return;
+
+    const autocompleteInstance = new google.maps.places.Autocomplete(addressInputRef.current, {
+      types: ["address"],
+      componentRestrictions: { country: "fr" },
+      fields: ["formatted_address"],
+    });
+    
+    autocompleteInstance.addListener("place_changed", () => {
+      const place = autocompleteInstance.getPlace();
+      if (place.formatted_address) {
+        form.setValue("address", place.formatted_address, { shouldValidate: true });
+      }
+    });
+    
+    setAutocomplete(autocompleteInstance);
+  }, [mapsLoaded, addressInputRef, form, autocomplete]);
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <FormField
