@@ -22,13 +22,15 @@ interface ClientSelectorProps {
 
 const ClientSelector = ({ form, clients, loading, onAddClient }: ClientSelectorProps) => {
   const clientId = form.watch("client_id");
-
+  
   useEffect(() => {
-    // If there's only one client, auto-select it
+    // Si il y a des clients et aucun client sélectionné, auto-sélectionner le premier
     if (clients.length === 1 && !clientId) {
       form.setValue("client_id", clients[0].id);
     }
   }, [clients, clientId, form]);
+
+  console.log("Liste des clients dans ClientSelector:", clients);
 
   return (
     <FormItem className="flex-1">
