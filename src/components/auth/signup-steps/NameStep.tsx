@@ -2,8 +2,9 @@
 import { Control } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { User } from "lucide-react";
+import { User, Info } from "lucide-react";
 import { NameStepType } from "../schemas/signUpStepSchema";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface NameStepProps {
   control: Control<NameStepType>;
@@ -19,7 +20,17 @@ const NameStep = ({ control }: NameStepProps) => {
         name="lastName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nom*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Nom*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Votre nom de famille en majuscules</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -41,7 +52,17 @@ const NameStep = ({ control }: NameStepProps) => {
         name="firstName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Prénom*</FormLabel>
+            <div className="flex items-center space-x-2">
+              <FormLabel>Prénom*</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Première lettre en majuscule, reste en minuscules</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
