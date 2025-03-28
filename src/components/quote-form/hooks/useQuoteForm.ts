@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from '@/hooks/use-toast';
 import { quoteFormSchema, type QuoteFormValues } from '../quoteFormSchema';
-import { sendQuoteEmail } from '@/utils/emailService';
+import { supabase } from '@/integrations/supabase/client';
 import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
 import { calculateTTC } from '@/utils/priceCalculations';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
@@ -111,21 +111,50 @@ export const useQuoteForm = () => {
       completeData.pickupAddress = `${completeData.pickupStreetNumber} ${completeData.pickupStreetType} ${completeData.pickupStreetName}, ${completeData.pickupPostalCode} ${completeData.pickupCity}, ${completeData.pickupCountry}`;
       completeData.deliveryAddress = `${completeData.deliveryStreetNumber} ${completeData.deliveryStreetType} ${completeData.deliveryStreetName}, ${completeData.deliveryPostalCode} ${completeData.deliveryCity}, ${completeData.deliveryCountry}`;
       
-      // Ajouter les informations de prix et de distance
-      const quoteData = {
-        ...completeData,
-        distance: distance ? `${distance} km` : "Non calculée",
-        priceHT: priceHT || "0.00",
-        priceTTC: priceTTC || "0.00",
-        selectedVehicleType: completeData.vehicleType
+      // Créer une mission directement au lieu d'un devis
+      const missionData = {
+        status: 'en_attente',
+        mission_type: 'livraison',
+        pickup_address: completeData.pickupAddress,
+        delivery_address: completeData.deliveryAddress,
+        distance: distance ? `${distance} km` : null,
+        price_ht: priceHT ? parseFloat(priceHT) : null,
+        price_ttc: priceTTC ? parseFloat(priceTTC) : null,
+        vehicle_info: {
+          brand: completeData.brand,
+          model: completeData.model,
+          year: completeData.year,
+          fuel: completeData.fuelType,
+          licensePlate: completeData.licensePlate
+        },
+        pickup_contact: {
+          firstName: completeData.firstName,
+          lastName: completeData.lastName,
+          email: completeData.email,
+          phone: completeData.phone,
+          company: completeData.company
+        },
+        delivery_contact: {
+          firstName: completeData.firstName,
+          lastName: completeData.lastName,
+          email: completeData.email,
+          phone: completeData.phone,
+          company: completeData.company
+        }
       };
       
-      // Envoi d'email
-      await sendQuoteEmail(quoteData);
+      // Insérer la mission dans Supabase
+      const { data: missionResult, error } = await supabase
+        .from('missions')
+        .insert(missionData)
+        .select('mission_number')
+        .single();
+        
+      if (error) throw error;
       
       toast({
         title: "Demande envoyée",
-        description: "Votre demande de devis a été envoyée avec succès.",
+        description: `Votre demande de mission a été envoyée avec succès. Numéro de mission: ${missionResult.mission_number}`,
       });
       
       // Réinitialiser le formulaire

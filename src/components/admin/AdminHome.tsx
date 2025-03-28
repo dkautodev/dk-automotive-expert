@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { QuoteRow, MissionRow } from "@/types/database";
+import { MissionRow } from "@/types/database";
 import { Check, Receipt } from "lucide-react";
 import CreateMissionDialog from "@/components/mission-form/CreateMissionDialog";
 import DashboardCards from "./DashboardCards";
@@ -10,44 +10,41 @@ import CompletedMissionsTable from "./CompletedMissionsTable";
 import PendingInvoicesTable from "./PendingInvoicesTable";
 
 const AdminHome = () => {
-  const [pendingQuotesCount, setPendingQuotesCount] = useState(0);
+  const [pendingMissionsCount, setPendingMissionsCount] = useState(0);
   const [ongoingMissionsCount, setOngoingMissionsCount] = useState(0);
   const [completedMissions, setCompletedMissions] = useState<MissionRow[]>([]);
-  const [pendingInvoices, setPendingInvoices] = useState<QuoteRow[]>([]);
+  const [pendingInvoices, setPendingInvoices] = useState<MissionRow[]>([]);
 
   const fetchDashboardData = async () => {
-    // Fetch pending quotes count
+    // Fetch pending missions count
     const { count: pendingCount } = await supabase
-      .from('quotes')
+      .from('missions')
       .select('*', { count: 'exact', head: true })
-      .eq('status', 'pending');
+      .eq('status', 'en_attente');
     
     // Fetch ongoing missions count
     const { count: ongoingCount } = await supabase
       .from('missions')
       .select('*', { count: 'exact', head: true })
-      .in('status', ['en_attente', 'confirme', 'prise_en_charge']);
+      .in('status', ['confirme', 'prise_en_charge']);
     
-    // Fetch completed missions with quote details
+    // Fetch completed missions
     const { data: completedData } = await supabase
       .from('missions')
-      .select(`
-        *,
-        quote:quotes(pickup_address, delivery_address)
-      `)
+      .select('*')
       .eq('status', 'termine')
       .order('updated_at', { ascending: false })
       .limit(5);
     
-    // Fetch quotes with status 'accepted' for pending invoices
+    // Fetch missions with status 'confirmed' for pending invoices
     const { data: invoicesData } = await supabase
-      .from('quotes')
+      .from('missions')
       .select('*')
-      .eq('status', 'accepted')
-      .order('date_created', { ascending: false })
+      .eq('status', 'confirmé')
+      .order('created_at', { ascending: false })
       .limit(5);
     
-    setPendingQuotesCount(pendingCount || 0);
+    setPendingMissionsCount(pendingCount || 0);
     setOngoingMissionsCount(ongoingCount || 0);
     
     // Convert the response to match our MissionRow type
@@ -59,7 +56,7 @@ const AdminHome = () => {
       setCompletedMissions(typedMissions);
     }
     
-    setPendingInvoices(invoicesData as QuoteRow[] || []);
+    setPendingInvoices(invoicesData as MissionRow[] || []);
   };
 
   useEffect(() => {
@@ -74,7 +71,7 @@ const AdminHome = () => {
       </div>
       
       <DashboardCards 
-        pendingQuotesCount={pendingQuotesCount} 
+        pendingQuotesCount={pendingMissionsCount} 
         ongoingMissionsCount={ongoingMissionsCount} 
       />
 
@@ -86,7 +83,7 @@ const AdminHome = () => {
           </TabsTrigger>
           <TabsTrigger value="pending-invoices" className="flex items-center">
             <Receipt size={16} className="mr-2" />
-            Factures en attente
+            Missions confirmées
           </TabsTrigger>
         </TabsList>
         
@@ -95,7 +92,7 @@ const AdminHome = () => {
         </TabsContent>
         
         <TabsContent value="pending-invoices">
-          <PendingInvoicesTable invoices={pendingInvoices} />
+          <PendingInvoicesTable missions={pendingInvoices} />
         </TabsContent>
       </Tabs>
     </div>
