@@ -48,31 +48,32 @@ export const useClients = (form?: any) => {
       // Requête aux profils utilisateurs avec le type 'client'
       const { data: userProfiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select(`
-          id,
-          user_id,
-          first_name,
-          last_name,
-          company_name,
-          phone,
-          billing_address
-        `)
+        .select(`*`)
         .order('company_name', { ascending: true });
 
       if (profilesError) {
         throw profilesError;
       }
 
+      if (!userProfiles || userProfiles.length === 0) {
+        console.log("Aucun client trouvé dans la base de données");
+        setClients([]);
+        return;
+      }
+
+      console.log("Profils utilisateurs récupérés:", userProfiles);
+
       // Transformer les données pour le format ClientData
       const formattedClients: ClientData[] = userProfiles.map(profile => ({
-        id: profile.user_id,
-        name: `${profile.first_name || ''} ${profile.last_name || ''} - ${profile.company_name || ''}`.trim(),
-        email: '', // Sera rempli plus tard
+        id: profile.user_id || profile.id,
+        name: `${profile.first_name || ''} ${profile.last_name || ''}${profile.company_name ? ` - ${profile.company_name}` : ''}`.trim(),
+        email: '', // Sera rempli si nécessaire ultérieurement
         phone: profile.phone || '',
         company: profile.company_name || '',
         address: profile.billing_address || ''
       }));
 
+      console.log("Clients formatés:", formattedClients);
       setClients(formattedClients);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des clients:', error);
