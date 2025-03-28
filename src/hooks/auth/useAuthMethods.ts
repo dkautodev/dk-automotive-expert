@@ -4,91 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 export const useAuthMethods = () => {
   const signIn = async (email: string, password: string) => {
     try {
-      // Cas spécial pour l'administrateur
-      if (email === 'dkautomotive70@gmail.com') {
-        // Essayez d'abord de se connecter normalement avec Supabase Auth
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (!error) {
-          return data;
-        }
-        
-        // Si la connexion échoue avec une erreur, créez un compte s'il n'existe pas
-        console.log("Tentative de création d'un compte admin");
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { role: 'admin' }
-          }
-        });
-        
-        if (!signUpError) {
-          // Essayez de vous connecter à nouveau après l'inscription
-          const { data: signInData } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          
-          return signInData;
-        }
-        
+      // Tentative de connexion via Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error("Erreur d'authentification:", error);
         throw error;
-      } else {
-        // Pour les utilisateurs réguliers, tentez d'abord de vous connecter via Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (!authError) {
-          return authData;
-        }
-        
-        // Si l'authentification Supabase échoue, essayez de vérifier dans la table public.users
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', email)
-          .single();
-          
-        if (userError || !userData) {
-          throw new Error('Identifiant ou mot de passe incorrect');
-        }
-        
-        // Vérifier si le mot de passe correspond
-        if (userData.password !== password) {
-          throw new Error('Identifiant ou mot de passe incorrect');
-        }
-        
-        // Créer un utilisateur dans Supabase Auth pour maintenir la session
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { role: 'client' }
-          }
-        });
-        
-        if (signUpError) {
-          // Si l'utilisateur existe déjà, tentez de vous connecter
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          
-          if (signInError) {
-            throw signInError;
-          }
-          
-          return signInData;
-        }
-        
-        return signUpData;
       }
+      
+      return data;
     } catch (error) {
       console.error("Erreur d'authentification:", error);
       throw error;
@@ -128,15 +55,7 @@ export const useAuthMethods = () => {
         }
       });
       
-      if (error) {
-        // Vérifiez si l'utilisateur existe déjà
-        if (error.message.includes("User already registered")) {
-          // Essayez de mettre à jour le rôle de l'utilisateur à la place
-          await signIn(email, password);
-          return { success: true, message: "Connexion administrateur réussie" };
-        }
-        throw error;
-      }
+      if (error) throw error;
       
       return { 
         success: true, 
