@@ -27,7 +27,7 @@ export const useSignUpSubmit = () => {
         phone: data.phone
       });
       
-      // Étape 1: Créer uniquement l'utilisateur dans Supabase Auth
+      // Étape 1: Créer l'utilisateur dans Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
