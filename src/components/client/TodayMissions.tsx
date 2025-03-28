@@ -24,11 +24,14 @@ import { Progress } from "@/components/ui/progress";
 
 const getMissionProgress = (status: Mission['status']) => {
   switch (status) {
-    case 'pending': return 10;
-    case 'in_progress': return 40;
-    case 'pickup_completed': return 70;
+    case 'en_attente': return 10;
+    case 'confirme': 
+    case 'confirmé': return 30;
+    case 'prise_en_charge': return 70;
+    case 'livre': return 90;
     case 'incident': return 50;
-    case 'completed': return 100;
+    case 'termine': return 100;
+    case 'annule': return 0;
     default: return 0;
   }
 };
