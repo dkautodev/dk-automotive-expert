@@ -9,11 +9,14 @@ interface DashboardCounts {
   completedShipments: number;
 }
 
+// Update the Mission type to match actual database values
 interface Mission {
   id: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'en_attente' | 'confirme' | 'confirmé' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'termine';
   client_id: string;
   driver_id: string | null;
+  pickup_address: string;
+  delivery_address: string;
 }
 
 export const useDashboardCounts = (userId: string | undefined) => {
@@ -48,10 +51,10 @@ export const useDashboardCounts = (userId: string | undefined) => {
       }
 
       const ongoingShipments = (missions as Mission[] || []).filter(m => 
-        m.status === 'in_progress' || m.status === 'prise_en_charge').length;
+        m.status === 'prise_en_charge').length;
         
       const completedShipments = (missions as Mission[] || []).filter(m => 
-        m.status === 'completed' || m.status === 'termine').length;
+        m.status === 'termine').length;
         
       const pendingInvoices = (missions as Mission[] || []).filter(m => 
         m.status === 'confirme' || m.status === 'confirmé').length;

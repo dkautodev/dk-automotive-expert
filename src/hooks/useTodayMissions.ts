@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfDay, endOfDay } from 'date-fns';
 
-export type MissionStatus = 'pending' | 'in_progress' | 'pickup_completed' | 'incident' | 'completed';
+export type MissionStatus = 'en_attente' | 'confirme' | 'confirmé' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'termine';
 
 export interface Mission {
   id: string;
@@ -39,7 +39,7 @@ export const useTodayMissions = (userId: string | undefined) => {
         throw error;
       }
 
-      return data as unknown as Mission[];
+      return data as Mission[];
     },
     enabled: !!userId
   });
