@@ -63,7 +63,7 @@ export const useProfileData = (userId: string | undefined) => {
             billing_address_street: '',
             billing_address_city: '',
             billing_address_postal_code: '',
-            billing_address_country: ''
+            billing_address_country: 'France'
           };
           
           setProfile(defaultProfile);
@@ -82,18 +82,33 @@ export const useProfileData = (userId: string | undefined) => {
         
         if (data.billing_address) {
           console.log("Parsing billing address:", data.billing_address);
-          const addressParts = data.billing_address.split(',').map(part => part.trim());
-          if (addressParts.length >= 1) billingStreet = addressParts[0];
-          if (addressParts.length >= 2) {
-            const cityAndPostal = addressParts[1].split(' ');
-            if (cityAndPostal.length >= 2) {
-              billingPostalCode = cityAndPostal[0];
-              billingCity = cityAndPostal.slice(1).join(' ');
-            } else {
-              billingCity = addressParts[1];
+          try {
+            // Format attendu: "rue, code_postal ville, pays"
+            const addressParts = data.billing_address.split(',').map(part => part.trim());
+            
+            if (addressParts.length >= 1) {
+              billingStreet = addressParts[0];
             }
+            
+            if (addressParts.length >= 2) {
+              // Extraire code postal et ville
+              const cityPart = addressParts[1].trim();
+              const postalMatch = cityPart.match(/^(\d{5})\s+(.+)$/);
+              
+              if (postalMatch) {
+                billingPostalCode = postalMatch[1];
+                billingCity = postalMatch[2];
+              } else {
+                billingCity = cityPart;
+              }
+            }
+            
+            if (addressParts.length >= 3) {
+              billingCountry = addressParts[2];
+            }
+          } catch (err) {
+            console.error("Erreur lors du parsing de l'adresse:", err);
           }
-          if (addressParts.length >= 3) billingCountry = addressParts[2];
         }
         
         // Check for locked fields in the database

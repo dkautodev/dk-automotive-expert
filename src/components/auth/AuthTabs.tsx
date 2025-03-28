@@ -1,12 +1,14 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SignInForm from './SignInForm';
-import SignUpForm from './SignUpForm';
+import MultiStepSignUpForm from './MultiStepSignUpForm';
 import { Link } from "react-router-dom";
 import { UserCircle2 } from "lucide-react";
+
 const AuthTabs = () => {
-  return <div className="w-full max-w-md mx-auto">
+  return (
+    <div className="w-full max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center text-dk-navy">Espace Professionnel</h1>
-      
       
       <div className="mb-6 text-center">
         <Link to="/driver-auth" className="inline-flex items-center text-dk-navy hover:text-dk-blue transition-colors">
@@ -24,9 +26,11 @@ const AuthTabs = () => {
           <SignInForm />
         </TabsContent>
         <TabsContent value="signup">
-          <SignUpForm />
+          <MultiStepSignUpForm />
         </TabsContent>
       </Tabs>
-    </div>;
+    </div>
+  );
 };
+
 export default AuthTabs;
