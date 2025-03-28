@@ -25,7 +25,7 @@ const ClientSelector = ({ form, clients, loading, onAddClient }: ClientSelectorP
   
   useEffect(() => {
     // Si il y a des clients et aucun client sélectionné, auto-sélectionner le premier
-    if (clients.length === 1 && !clientId) {
+    if (clients.length > 0 && !clientId) {
       form.setValue("client_id", clients[0].id);
     }
   }, [clients, clientId, form]);
