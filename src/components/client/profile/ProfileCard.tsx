@@ -1,13 +1,14 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ProfileData, ProfileFormData } from "./types";
+import { ProfileData } from "./types";
+import { ProfileFormSchemaType } from "./schemas/profileFormSchema";
 import LogoSection from "./LogoSection";
 import ReadOnlyFields from "./ReadOnlyFields";
 import ProfileForm from "./ProfileForm";
 
 interface ProfileCardProps {
   profile: ProfileData | null;
-  onSubmit: (data: ProfileFormData) => Promise<void>;
+  onSubmit: (data: ProfileFormSchemaType) => Promise<void>;
   onLogoUpdate: (logoUrl: string) => Promise<void>;
   onLockField: (field: 'siret' | 'vat_number', value: string) => void;
 }

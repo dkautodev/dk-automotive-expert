@@ -1,13 +1,14 @@
 
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileData, ProfileFormData } from "../types";
+import { ProfileData } from "../types";
+import { ProfileFormSchemaType } from "../schemas/profileFormSchema";
 import { toast } from "sonner";
 
 export const useProfileUpdate = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submitForm = async (data: ProfileFormData) => {
+  const submitForm = async (data: ProfileFormSchemaType) => {
     if (!userId) return;
     
     try {
