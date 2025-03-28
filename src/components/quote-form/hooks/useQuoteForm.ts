@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
 import { calculateTTC } from '@/utils/priceCalculations';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
+import { useAuthContext } from '@/context/AuthContext';
 
 export const useQuoteForm = () => {
   const [step, setStep] = useState(1);
@@ -18,6 +19,7 @@ export const useQuoteForm = () => {
   const [priceTTC, setPriceTTC] = useState<string | null>(null);
   
   const { calculateDistance } = useDistanceCalculation();
+  const { user } = useAuthContext();
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
@@ -111,8 +113,13 @@ export const useQuoteForm = () => {
       completeData.pickupAddress = `${completeData.pickupStreetNumber} ${completeData.pickupStreetType} ${completeData.pickupStreetName}, ${completeData.pickupPostalCode} ${completeData.pickupCity}, ${completeData.pickupCountry}`;
       completeData.deliveryAddress = `${completeData.deliveryStreetNumber} ${completeData.deliveryStreetType} ${completeData.deliveryStreetName}, ${completeData.deliveryPostalCode} ${completeData.deliveryCity}, ${completeData.deliveryCountry}`;
       
+      if (!user) {
+        throw new Error("Vous devez être connecté pour créer une mission");
+      }
+      
       // Créer une mission directement au lieu d'un devis
       const missionData = {
+        client_id: user.id,
         status: 'en_attente',
         mission_type: 'livraison',
         pickup_address: completeData.pickupAddress,
@@ -169,7 +176,7 @@ export const useQuoteForm = () => {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi de votre demande.",
+        description: error instanceof Error ? error.message : "Une erreur est survenue lors de l'envoi de votre demande.",
       });
     } finally {
       setLoading(false);

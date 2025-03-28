@@ -97,10 +97,10 @@ const TodayMissions: React.FC = () => {
           </TableHeader>
           <TableBody>
             {missions.map((mission) => {
-              const vehicle = mission.quote?.vehicles && 
-                Array.isArray(mission.quote.vehicles) ? 
-                mission.quote.vehicles[0] : 
-                (typeof mission.quote?.vehicles === 'object' ? mission.quote.vehicles : null);
+              const vehicle = mission.vehicles && 
+                Array.isArray(mission.vehicles) ? 
+                mission.vehicles[0] : 
+                (typeof mission.vehicles === 'object' ? mission.vehicles : null);
 
               return (
                 <TableRow key={mission.id}>
@@ -114,11 +114,11 @@ const TodayMissions: React.FC = () => {
                     <div className="space-y-1">
                       <div className="flex items-start gap-1">
                         <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <span className="text-xs">{mission.quote?.pickup_address || 'Adresse inconnue'}</span>
+                        <span className="text-xs">{mission.pickup_address || 'Adresse inconnue'}</span>
                       </div>
                       <div className="flex items-start gap-1">
                         <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <span className="text-xs">{mission.quote?.delivery_address || 'Adresse inconnue'}</span>
+                        <span className="text-xs">{mission.delivery_address || 'Adresse inconnue'}</span>
                       </div>
                     </div>
                   </TableCell>
