@@ -23,7 +23,6 @@ export const billingStepSchema = z.object({
 });
 
 // Étape 4: Mot de passe
-// Correction: transformer l'objet refine en un objet simple sans refine
 export const passwordStepSchema = z.object({
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   confirmPassword: z.string().min(1, "Veuillez confirmer votre mot de passe")
@@ -35,11 +34,23 @@ export const passwordStepSchema = z.object({
   }
 );
 
-// Correction: fusionner les schémas sans utiliser de méthode refine supplémentaire
-export const completeSignUpSchema = nameStepSchema
+// Créons un objet de base sans la validation refine
+const baseCompleteSchema = nameStepSchema
   .merge(contactStepSchema)
   .merge(billingStepSchema)
-  .merge(passwordStepSchema);
+  .merge(z.object({
+    password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+    confirmPassword: z.string().min(1, "Veuillez confirmer votre mot de passe")
+  }));
+
+// Puis appliquons la validation refine séparément
+export const completeSignUpSchema = baseCompleteSchema.refine(
+  (data) => data.password === data.confirmPassword,
+  {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  }
+);
 
 export type NameStepType = z.infer<typeof nameStepSchema>;
 export type ContactStepType = z.infer<typeof contactStepSchema>;
