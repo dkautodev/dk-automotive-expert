@@ -3,12 +3,13 @@ import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Control } from "react-hook-form";
-import { ProfileData, ProfileFormData } from "../types";
+import { ProfileData } from "../types";
+import { ProfileFormSchemaType } from "../schemas/profileFormSchema";
 import { Button } from "@/components/ui/button";
 import { Pencil, Save, X } from "lucide-react";
 
 interface BusinessSectionProps {
-  control: Control<ProfileFormData>;
+  control: Control<ProfileFormSchemaType>;
   profile: ProfileData | null;
   onLockField: (field: 'siret' | 'vat_number', value: string) => void;
   isEditing: boolean;
