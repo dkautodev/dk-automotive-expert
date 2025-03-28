@@ -1,6 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { MissionRow } from '@/types/database';
 
 interface DashboardCounts {
   pendingQuotes: number;
@@ -9,16 +10,7 @@ interface DashboardCounts {
   completedShipments: number;
 }
 
-// Update the Mission type to match actual database values
-interface Mission {
-  id: string;
-  status: 'en_attente' | 'confirme' | 'confirmé' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'termine';
-  client_id: string;
-  driver_id: string | null;
-  pickup_address: string;
-  delivery_address: string;
-}
-
+// Use the MissionRow type from database.ts instead of defining a separate Mission interface
 export const useDashboardCounts = (userId: string | undefined) => {
   return useQuery({
     queryKey: ['dashboard-counts', userId],
@@ -50,13 +42,13 @@ export const useDashboardCounts = (userId: string | undefined) => {
         console.error('Error fetching missions:', missionsError);
       }
 
-      const ongoingShipments = (missions as Mission[] || []).filter(m => 
+      const ongoingShipments = (missions as MissionRow[] || []).filter(m => 
         m.status === 'prise_en_charge').length;
         
-      const completedShipments = (missions as Mission[] || []).filter(m => 
+      const completedShipments = (missions as MissionRow[] || []).filter(m => 
         m.status === 'termine').length;
         
-      const pendingInvoices = (missions as Mission[] || []).filter(m => 
+      const pendingInvoices = (missions as MissionRow[] || []).filter(m => 
         m.status === 'confirme' || m.status === 'confirmé').length;
 
       return {

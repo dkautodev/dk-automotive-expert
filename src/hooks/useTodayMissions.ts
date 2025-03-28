@@ -2,16 +2,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfDay, endOfDay } from 'date-fns';
+import { MissionRow } from '@/types/database';
 
 export type MissionStatus = 'en_attente' | 'confirme' | 'confirmé' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'termine';
 
-export interface Mission {
-  id: string;
+// We'll extend the MissionRow type to ensure we have all required fields
+export interface Mission extends MissionRow {
   status: MissionStatus;
-  created_at: string;
-  updated_at: string | null;
-  client_id: string;
-  driver_id: string | null;
   pickup_address: string;
   delivery_address: string;
   vehicles: any | null;
@@ -39,7 +36,12 @@ export const useTodayMissions = (userId: string | undefined) => {
         throw error;
       }
 
-      return data as Mission[];
+      // Cast the response data to our Mission type, ensuring pickup_address and delivery_address are present
+      return (data || []).map(mission => ({
+        ...mission,
+        pickup_address: mission.pickup_address || '',
+        delivery_address: mission.delivery_address || ''
+      })) as Mission[];
     },
     enabled: !!userId
   });
