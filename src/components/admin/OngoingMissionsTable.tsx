@@ -34,11 +34,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           .from('missions')
           .select(`
             *,
-            clientProfile:user_profiles!client_id(
-              first_name,
-              last_name,
-              company_name
-            )
+            clientProfile:user_profiles!client_id(*)
           `)
           .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
           .order('created_at', { ascending: false })
@@ -55,6 +51,8 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
               // Add missing properties required by MissionRow type
               pickup_address: vehicleInfo.pickup_address || 'N/A',
               delivery_address: vehicleInfo.delivery_address || 'N/A',
+              // Ensure clientProfile is properly typed
+              clientProfile: mission.clientProfile || null
             } as MissionRow;
           });
 
