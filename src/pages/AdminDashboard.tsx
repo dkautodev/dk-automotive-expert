@@ -6,6 +6,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminHome from "@/components/admin/AdminHome";
 import PricingGrids from "@/pages/PricingGrids";
+import PendingInvoices from "@/pages/PendingInvoices";
+import ProfileManagement from "@/pages/ProfileManagement";
 import { useAuthContext } from "@/context/AuthContext";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
@@ -50,6 +52,8 @@ const AdminDashboard = () => {
           <Routes>
             <Route index element={<AdminHome />} />
             <Route path="pricing-grids" element={<PricingGrids />} />
+            <Route path="pending-invoices" element={<PendingInvoices />} />
+            <Route path="profile-management" element={<ProfileManagement />} />
             <Route path="*" element={<Navigate to="/dashboard/admin" replace />} />
           </Routes>
         </main>
