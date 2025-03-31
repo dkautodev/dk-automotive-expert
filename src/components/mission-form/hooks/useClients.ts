@@ -1,10 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { ClientData, NewClientData } from './types/clientTypes';
+import { ClientData } from './types/clientTypes';
 import { clientService } from './services/clientService';
 
-export type { ClientData, NewClientData } from './types/clientTypes';
+export type { ClientData } from './types/clientTypes';
 
 /**
  * Hook for managing clients in the application
@@ -13,14 +13,7 @@ export const useClients = (form?: any) => {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [newClient, setNewClient] = useState<NewClientData>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-  });
 
   /**
    * Fetches clients from the backend
@@ -53,61 +46,6 @@ export const useClients = (form?: any) => {
     }
   }, []);
 
-  /**
-   * Creates a new client based on form data
-   */
-  const createClient = async (): Promise<boolean> => {
-    try {
-      setIsSubmitting(true);
-      
-      // Vérification des données minimales requises
-      if (!newClient.first_name || !newClient.last_name) {
-        toast.error('Veuillez saisir au moins un prénom et un nom');
-        return false;
-      }
-      
-      console.log("Tentative de création d'un client:", newClient);
-      const clientId = await clientService.addClientData(newClient);
-      
-      if (clientId) {
-        toast.success('Client créé avec succès');
-        
-        // Créer un nouvel objet client à partir des données du formulaire
-        const newClientDisplay: ClientData = {
-          id: clientId,
-          name: `${newClient.first_name} ${newClient.last_name}${newClient.company ? ` - ${newClient.company}` : ''}`.trim(),
-          email: newClient.email,
-          phone: newClient.phone,
-          company: newClient.company
-        };
-        
-        // Ajouter le client à la liste et mettre à jour le formulaire
-        setClients(prev => [...prev, newClientDisplay]);
-        if (form) {
-          form.setValue('client_id', clientId);
-        }
-        
-        // Réinitialiser le formulaire de création de client
-        setNewClient({
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
-        });
-        
-        return true;
-      }
-      
-      return false;
-    } catch (error: any) {
-      console.error('Erreur lors de la création du client:', error);
-      toast.error(error.message || 'Erreur lors de la création du client');
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   // Première récupération des clients
   useEffect(() => {
     fetchClients();
@@ -134,11 +72,6 @@ export const useClients = (form?: any) => {
     clients, 
     isLoading, 
     error, 
-    fetchClients, 
-    addClient: clientService.addClientData,
-    newClient,
-    setNewClient,
-    createClient,
-    isSubmitting
+    fetchClients
   };
 };

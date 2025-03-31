@@ -36,14 +36,21 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
   useEffect(() => {
     // Skip if already loaded or no API key
     if (window.google?.maps?.places || !GOOGLE_MAPS_API_KEY || mapsLoaded) {
+      if (window.google?.maps?.places) setMapsLoaded(true);
       return;
     }
 
+    console.log("Chargement de l'API Google Maps pour le formulaire d'enlèvement...");
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
     script.async = true;
     script.defer = true;
-    script.onload = () => setMapsLoaded(true);
+    script.onload = () => {
+      console.log("API Google Maps chargée avec succès pour le formulaire d'enlèvement");
+      setMapsLoaded(true);
+    };
+    script.onerror = () => console.error("Erreur lors du chargement de l'API Google Maps pour le formulaire d'enlèvement");
+
     document.head.appendChild(script);
 
     return () => {
@@ -55,23 +62,39 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
 
   // Initialize autocomplete when maps API is loaded
   useEffect(() => {
-    if (!mapsLoaded || !window.google?.maps?.places || !addressInputRef.current || autocomplete) return;
+    if (!mapsLoaded || !window.google?.maps?.places || !addressInputRef.current || autocomplete) {
+      return;
+    }
 
-    const autocompleteInstance = new google.maps.places.Autocomplete(addressInputRef.current, {
-      types: ["address"],
-      componentRestrictions: { country: "fr" },
-      fields: ["formatted_address"],
-    });
-    
-    autocompleteInstance.addListener("place_changed", () => {
-      const place = autocompleteInstance.getPlace();
-      if (place.formatted_address) {
-        form.setValue("address", place.formatted_address, { shouldValidate: true });
-      }
-    });
-    
-    setAutocomplete(autocompleteInstance);
+    try {
+      console.log("Initialisation de l'autocomplétion pour l'adresse d'enlèvement");
+      const autocompleteInstance = new google.maps.places.Autocomplete(addressInputRef.current, {
+        types: ["address"],
+        componentRestrictions: { country: "fr" },
+        fields: ["formatted_address"],
+      });
+      
+      autocompleteInstance.addListener("place_changed", () => {
+        const place = autocompleteInstance.getPlace();
+        if (place && place.formatted_address) {
+          console.log("Adresse d'enlèvement sélectionnée:", place.formatted_address);
+          form.setValue("address", place.formatted_address, { shouldValidate: true });
+        } else {
+          console.warn("Pas d'adresse formatée dans la réponse Google Maps");
+        }
+      });
+      
+      setAutocomplete(autocompleteInstance);
+      console.log("Autocomplétion pour l'adresse d'enlèvement initialisée");
+    } catch (error) {
+      console.error("Erreur lors de la création de l'autocomplétion pour l'adresse d'enlèvement:", error);
+    }
   }, [mapsLoaded, addressInputRef, form, autocomplete]);
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Valeur d'adresse d'enlèvement modifiée manuellement:", e.target.value);
+    form.setValue("address", e.target.value);
+  };
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -86,8 +109,9 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
             <FormControl>
               <Input
                 placeholder="Commencez à taper une adresse..."
-                {...field}
                 className="bg-[#EEF1FF]"
+                value={field.value || ''}
+                onChange={(e) => handleAddressChange(e)}
                 ref={(e) => {
                   addressInputRef.current = e;
                 }}
