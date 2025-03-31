@@ -130,10 +130,13 @@ export const useClients = (form?: any) => {
           
           const fullName = [firstName, lastName].filter(Boolean).join(' ');
           
+          // Make sure that user.email exists and is a string
+          const userEmail = typeof user.email === 'string' ? user.email : '';
+          
           return {
             id: user.id,
-            name: fullName.trim() || user.email || '',
-            email: user.email || '',
+            name: fullName.trim() || userEmail || '',
+            email: userEmail || '',
             phone: phone,
             company: company,
             address: profile?.billing_address || ''
