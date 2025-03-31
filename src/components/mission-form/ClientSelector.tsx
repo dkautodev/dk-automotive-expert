@@ -1,13 +1,9 @@
 
-import { useEffect, useState } from "react";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import { MissionFormValues } from "./missionFormSchema";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ClientData } from "./hooks/types/clientTypes";
-import { Button } from "@/components/ui/button";
-import { Search, Loader2 } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { MissionFormValues } from "./missionFormSchema";
 
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;
@@ -15,126 +11,36 @@ interface ClientSelectorProps {
   loading: boolean;
 }
 
-const ClientSelector = ({
-  form,
-  clients,
-  loading,
-}: ClientSelectorProps) => {
-  const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [filteredClients, setFilteredClients] = useState<ClientData[]>(clients);
-  const clientId = form.watch("client_id");
-
-  // Find the selected client name
-  const selectedClient = clients.find(client => client.id === clientId);
-
-  useEffect(() => {
-    // Debug logging
-    console.log("Clients disponibles:", clients);
-    console.log("Client sélectionné:", selectedClient);
-    console.log("ClientId actuel:", clientId);
-    
-    // Filter clients based on search value
-    const filtered = clients.filter(client => {
-      if (!searchValue.trim()) return true;
-      
-      const lowerSearchValue = searchValue.toLowerCase().trim();
-      const name = (client.name || '').toLowerCase();
-      const email = (client.email || '').toLowerCase();
-      const company = (client.company || '').toLowerCase();
-      
-      return name.includes(lowerSearchValue) || 
-             email.includes(lowerSearchValue) || 
-             company.includes(lowerSearchValue);
-    });
-    
-    console.log("Clients filtrés:", filtered);
-    setFilteredClients(filtered);
-  }, [searchValue, clients, selectedClient, clientId]);
-
-  const handleSelectClient = (value: string) => {
-    console.log("Client sélectionné avec ID:", value);
-    form.setValue("client_id", value);
-    setOpen(false);
-  };
-
+const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
   return (
-    <FormItem className="mb-4">
-      <FormLabel>Client</FormLabel>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+    <FormField
+      control={form.control}
+      name="client_id"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Sélectionner un client</FormLabel>
           <FormControl>
-            <Button
-              variant="outline"
-              role="combobox"
-              className={`w-full justify-between ${!selectedClient ? "text-muted-foreground" : ""}`}
+            <Select
               disabled={loading}
-              onClick={() => setOpen(true)}
-              type="button"
+              value={field.value}
+              onValueChange={field.onChange}
             >
-              {selectedClient ? selectedClient.name : "Rechercher un client..."}
-              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choisir un client" />
+              </SelectTrigger>
+              <SelectContent>
+                {clients.map((client) => (
+                  <SelectItem key={client.id} value={client.id}>
+                    {client.name} {client.company ? `(${client.company})` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormControl>
-        </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0" align="start">
-          <Command>
-            <CommandInput
-              placeholder="Rechercher un client..."
-              value={searchValue}
-              onValueChange={setSearchValue}
-              autoFocus
-            />
-            <CommandList>
-              {loading ? (
-                <div className="py-6 text-center text-sm flex items-center justify-center">
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Chargement des clients...
-                </div>
-              ) : (
-                <>
-                  <CommandEmpty>
-                    {searchValue.trim() 
-                      ? "Aucun client trouvé" 
-                      : clients.length === 0 
-                        ? "Aucun client disponible" 
-                        : "Saisissez un terme de recherche"
-                    }
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {filteredClients.length > 0 ? (
-                      filteredClients.map((client) => (
-                        <CommandItem
-                          key={client.id}
-                          value={client.id}
-                          onSelect={() => handleSelectClient(client.id)}
-                          className="cursor-pointer"
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-medium">{client.name}</span>
-                            {client.email && (
-                              <span className="text-xs text-muted-foreground">{client.email}</span>
-                            )}
-                            {client.company && (
-                              <span className="text-xs text-muted-foreground">{client.company}</span>
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))
-                    ) : !loading && (
-                      <div className="py-6 text-center text-sm">
-                        Aucun client à afficher
-                      </div>
-                    )}
-                  </CommandGroup>
-                </>
-              )}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      <FormMessage />
-    </FormItem>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 };
 

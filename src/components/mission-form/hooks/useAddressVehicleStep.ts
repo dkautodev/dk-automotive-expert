@@ -40,13 +40,6 @@ export const useAddressVehicleStep = (
     }
   }, [clientsError, fetchClients]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("État actuel des clients:", clients);
-    console.log("Chargement clients:", clientsLoading);
-    console.log("Erreur clients:", clientsError);
-  }, [clients, clientsLoading, clientsError]);
-
   const calculateDistanceAndPrice = async () => {
     if (!pickupAddress || !deliveryAddress || !vehicleType) {
       return;
@@ -55,13 +48,18 @@ export const useAddressVehicleStep = (
     setIsCalculatingTotal(true);
     
     try {
+      console.log("Calcul de distance entre:", pickupAddress, "et", deliveryAddress);
       // Calculate distance
       const calculatedDistance = await calculateDistance(pickupAddress, deliveryAddress);
+      console.log("Distance calculée:", calculatedDistance);
+      
       setDistance(calculatedDistance);
       form.setValue("distance", calculatedDistance);
 
       // Calculate price
       const priceResult = await calculatePrice(vehicleType, calculatedDistance);
+      console.log("Prix calculé:", priceResult);
+      
       form.setValue("price_ht", priceResult.priceHT);
       form.setValue("price_ttc", priceResult.priceTTC);
     } catch (error) {
