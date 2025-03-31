@@ -46,6 +46,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       delivery_phone: "",
       pickup_time: "",
       delivery_time: "",
+      additional_info: "",
     },
   });
 
@@ -114,6 +115,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
           email: values.delivery_email,
           phone: values.delivery_phone,
         },
+        additional_info: values.additional_info || null,
       };
 
       const { data, error } = await supabase
