@@ -1,52 +1,45 @@
-
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader } from "@/components/ui/loader";
-import { FileText, Download, ExternalLink } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
+import { InvoiceRow } from "@/types/database";
 import { extendedSupabase } from "@/integrations/supabase/extended-client";
-import { InvoiceRow } from '@/types/database';
 
-type Invoice = InvoiceRow;
-
-const InvoiceList = () => {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+export const InvoiceList: React.FC = () => {
+  const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
 
   useEffect(() => {
-    if (!user) return;
-    
     const fetchInvoices = async () => {
+      if (!user) return;
+      
+      setLoading(true);
       try {
-        setLoading(true);
-        
-        // Récupérer toutes les factures de l'utilisateur
         const { data, error } = await extendedSupabase
           .from('invoices')
           .select('*')
           .eq('client_id', user.id)
           .order('created_at', { ascending: false });
-          
-        if (error) throw error;
+
+        if (error) {
+          console.error('Error fetching invoices:', error);
+          return;
+        }
         
-        setInvoices(data as Invoice[] || []);
-      } catch (error) {
-        console.error('Erreur lors du chargement des factures:', error);
-        toast.error("Erreur lors du chargement des factures");
+        setInvoices(data as InvoiceRow[]);
+      } catch (err) {
+        console.error('Error in fetchInvoices:', err);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchInvoices();
   }, [user]);
 
-  const handleDownload = (invoice: Invoice) => {
+  const handleDownload = (invoice: InvoiceRow) => {
     // Dans une implémentation réelle, ceci génèrerait un PDF
     toast.info(`Téléchargement de la facture ${invoice.invoice_number}`);
   };
