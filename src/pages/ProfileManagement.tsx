@@ -7,6 +7,7 @@ import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { toast } from "sonner";
 import { UserTable } from "@/components/admin/clients/UserTable";
 
+// Define the basic profile data without nested relations
 type ProfileType = {
   id: string;
   user_id: string;
@@ -22,7 +23,18 @@ type ProfileType = {
   user_type?: string;
 };
 
-type UserWithProfile = ProfileType & {
+// Define a separate type for the raw Supabase response that includes nested users
+type ProfileWithUsersJoin = {
+  id: string;
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  company_name?: string | null;
+  phone?: string | null;
+  profile_picture?: string | null;
+  billing_address?: string | null;
+  siret_number?: string | null;
+  vat_number?: string | null;
   users?: {
     email?: string;
     user_type?: string;
@@ -55,20 +67,29 @@ const ProfileManagement = () => {
         if (driverError) throw driverError;
         
         // Map data to include email
-        const mapProfiles = (profiles: UserWithProfile[] | null): ProfileType[] => {
+        const mapProfiles = (profiles: ProfileWithUsersJoin[] | null): ProfileType[] => {
           if (!profiles) return [];
           
           return profiles.map(profile => {
             return {
-              ...profile,
+              id: profile.id,
+              user_id: profile.user_id,
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              company_name: profile.company_name,
+              phone: profile.phone,
+              profile_picture: profile.profile_picture,
+              billing_address: profile.billing_address,
+              siret_number: profile.siret_number,
+              vat_number: profile.vat_number,
               email: profile.users?.email || '',
-              user_type: profile.users?.user_type || profile.user_type || 'client'
+              user_type: profile.users?.user_type || 'client'
             };
           });
         };
         
-        setClientProfiles(mapProfiles(clientData));
-        setDriverProfiles(mapProfiles(driverData));
+        setClientProfiles(mapProfiles(clientData as ProfileWithUsersJoin[]));
+        setDriverProfiles(mapProfiles(driverData as ProfileWithUsersJoin[]));
       } catch (error: any) {
         console.error('Error fetching profiles:', error);
         toast.error(`Erreur lors du chargement des profils: ${error.message}`);
