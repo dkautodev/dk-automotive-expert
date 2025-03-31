@@ -5,14 +5,26 @@ import { UserData } from "../types";
 import { FetchUsersResponse } from "../types/clientManagementTypes";
 
 /**
- * Fetches users with their profiles from various sources
+ * Edge function module for user data fetching
  */
-export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
-  // Try with Edge Function first
-  try {
-    const { data: usersData, error: usersError } = await supabase.functions.invoke('get_users_with_profiles');
+const edgeFunctionService = {
+  /**
+   * Fetches users with profiles via edge function
+   */
+  fetchUsersViaEdgeFunction: async (): Promise<FetchUsersResponse | null> => {
+    try {
+      const { data: usersData, error: usersError } = await supabase.functions.invoke<any[]>('get_users_with_profiles');
 
-    if (!usersError && usersData && usersData.length > 0) {
+      if (usersError) {
+        console.warn("Erreur avec l'edge function:", usersError);
+        return null;
+      }
+      
+      if (!usersData || usersData.length === 0) {
+        console.warn("Pas de données de l'Edge Function");
+        return null;
+      }
+      
       console.log("Utilisateurs récupérés via Edge Function:", usersData);
       
       // Filter by user type
@@ -21,18 +33,29 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
       const adminsList = usersData.filter(user => user.user_type === 'admin');
       
       return { clients: clientsList, drivers: driversList, admins: adminsList };
-    } else {
-      console.warn("Pas de données de l'Edge Function ou erreur:", usersError);
+    } catch (edgeFnError) {
+      console.warn("Erreur lors de l'appel à l'Edge Function:", edgeFnError);
+      return null;
     }
-  } catch (edgeFnError) {
-    console.warn("Erreur lors de l'appel à l'Edge Function:", edgeFnError);
   }
+};
 
-  // Fallback: Auth API
-  try {
-    const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-    
-    if (!authError && authData && authData.users) {
+/**
+ * Auth API module for user data fetching
+ */
+const authApiService = {
+  /**
+   * Fetches users via Supabase Auth API
+   */
+  fetchUsersViaAuthApi: async (): Promise<FetchUsersResponse | null> => {
+    try {
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError || !authData?.users) {
+        console.warn("Erreur avec l'Auth API:", authError);
+        return null;
+      }
+      
       console.log("Utilisateurs récupérés via Auth API:", authData.users);
       
       // Fetch user profiles separately
@@ -61,7 +84,7 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
         };
       });
       
-      // Détecter l'administrateur par email si nécessaire
+      // Detect admin email if necessary
       const adminUsers = allUsers.map(user => {
         if (user.email === 'dkautomotive70@gmail.com' && user.user_type !== 'admin') {
           return { ...user, user_type: 'admin' };
@@ -75,128 +98,205 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
       const adminsList = adminUsers.filter(user => user.user_type === 'admin');
       
       return { clients: clientsList, drivers: driversList, admins: adminsList };
-    } else {
-      console.warn("Pas de données de l'Auth API ou erreur:", authError);
+    } catch (authApiError) {
+      console.warn("Erreur lors de l'appel à l'Auth API:", authApiError);
+      return null;
     }
-  } catch (authApiError) {
-    console.warn("Erreur lors de l'appel à l'Auth API:", authApiError);
-  }
-  
-  // Last resort: Fetch user profiles directly
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select(`
-        id, 
-        email, 
-        user_type, 
-        user_profiles:user_profiles(
-          first_name,
-          last_name,
-          company_name,
-          phone
-        )
-      `);
-
-    if (error) {
-      console.warn("Erreur lors de la récupération des utilisateurs:", error);
-      
-      // Try one last time with just profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('*');
-        
-      if (profilesError) {
-        throw profilesError;
-      }
-      
-      if (profiles && profiles.length > 0) {
-        const transformedUsers = profiles.map(profile => ({
-          id: profile.user_id || profile.id,
-          email: '',
-          user_type: 'client',
-          first_name: profile.first_name || '',
-          last_name: profile.last_name || '',
-          company_name: profile.company_name || '',
-          phone: profile.phone || ''
-        }));
-        
-        // Identify admins by email if available
-        const usersWithAdmins = transformedUsers.map(user => {
-          if (user.email === 'dkautomotive70@gmail.com') {
-            return { ...user, user_type: 'admin' };
-          }
-          return user;
-        });
-        
-        const clientsList = usersWithAdmins.filter(user => user.user_type === 'client');
-        const driversList = usersWithAdmins.filter(user => user.user_type === 'chauffeur');
-        const adminsList = usersWithAdmins.filter(user => user.user_type === 'admin');
-        
-        return { clients: clientsList, drivers: driversList, admins: adminsList };
-      }
-      
-      throw error;
-    }
-
-    // Transform the data
-    const transformedUsers = data.map(user => ({
-      id: user.id,
-      email: user.email,
-      user_type: user.user_type,
-      first_name: user.user_profiles?.[0]?.first_name || '',
-      last_name: user.user_profiles?.[0]?.last_name || '',
-      company_name: user.user_profiles?.[0]?.company_name,
-      phone: user.user_profiles?.[0]?.phone,
-      created_at: null
-    }));
-
-    // Identify admins by email if needed
-    const usersWithAdmins = transformedUsers.map(user => {
-      if (user.email === 'dkautomotive70@gmail.com' && user.user_type !== 'admin') {
-        return { ...user, user_type: 'admin' };
-      }
-      return user;
-    });
-
-    // Filter users by type
-    const clientsList = usersWithAdmins.filter(user => user.user_type === 'client');
-    const driversList = usersWithAdmins.filter(user => user.user_type === 'chauffeur');
-    const adminsList = usersWithAdmins.filter(user => user.user_type === 'admin');
-    
-    return { clients: clientsList, drivers: driversList, admins: adminsList };
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    throw error;
   }
 };
 
 /**
- * Deletes a user by ID
+ * Direct database module for user data fetching
  */
-export const deleteUser = async (userId: string): Promise<void> => {
-  // Try to use the edge function first
-  try {
-    const { data, error } = await supabase.functions.invoke('admin_delete_user', {
-      body: { userId }
-    });
-    
-    if (!error) {
-      return;
-    } else {
-      console.warn("Erreur avec l'edge function:", error);
-    }
-  } catch (edgeFnError) {
-    console.warn("Erreur lors de l'appel à l'edge function:", edgeFnError);
-  }
-  
-  // Fallback: Direct deletion
-  const { error } = await supabase
-    .from('users')
-    .delete()
-    .eq('id', userId);
+const databaseService = {
+  /**
+   * Fetches users directly from database tables
+   */
+  fetchUsersFromDatabase: async (): Promise<FetchUsersResponse | null> => {
+    try {
+      // Try to fetch users from the joint table first
+      const { data, error } = await supabase
+        .from('users')
+        .select(`
+          id, 
+          email, 
+          user_type, 
+          user_profiles:user_profiles(
+            first_name,
+            last_name,
+            company_name,
+            phone
+          )
+        `);
 
-  if (error) {
-    throw error;
+      if (error) {
+        console.warn("Erreur lors de la récupération des utilisateurs:", error);
+        
+        // Try one last time with just profiles
+        const { data: profiles, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('*');
+          
+        if (profilesError) {
+          return null;
+        }
+        
+        if (profiles && profiles.length > 0) {
+          const transformedUsers = profiles.map(profile => ({
+            id: profile.user_id || profile.id,
+            email: '',
+            user_type: profile.user_type || 'client',
+            first_name: profile.first_name || '',
+            last_name: profile.last_name || '',
+            company_name: profile.company_name || '',
+            phone: profile.phone || ''
+          }));
+          
+          // Identify admins by email if available
+          const usersWithAdmins = transformedUsers.map(user => {
+            if (user.email === 'dkautomotive70@gmail.com') {
+              return { ...user, user_type: 'admin' };
+            }
+            return user;
+          });
+          
+          const clientsList = usersWithAdmins.filter(user => user.user_type === 'client');
+          const driversList = usersWithAdmins.filter(user => user.user_type === 'chauffeur');
+          const adminsList = usersWithAdmins.filter(user => user.user_type === 'admin');
+          
+          return { clients: clientsList, drivers: driversList, admins: adminsList };
+        }
+        
+        return null;
+      }
+
+      // Transform the data
+      const transformedUsers = data.map(user => ({
+        id: user.id,
+        email: user.email,
+        user_type: user.user_type,
+        first_name: user.user_profiles?.[0]?.first_name || '',
+        last_name: user.user_profiles?.[0]?.last_name || '',
+        company_name: user.user_profiles?.[0]?.company_name,
+        phone: user.user_profiles?.[0]?.phone,
+        created_at: null
+      }));
+
+      // Identify admins by email if needed
+      const usersWithAdmins = transformedUsers.map(user => {
+        if (user.email === 'dkautomotive70@gmail.com' && user.user_type !== 'admin') {
+          return { ...user, user_type: 'admin' };
+        }
+        return user;
+      });
+
+      // Filter users by type
+      const clientsList = usersWithAdmins.filter(user => user.user_type === 'client');
+      const driversList = usersWithAdmins.filter(user => user.user_type === 'chauffeur');
+      const adminsList = usersWithAdmins.filter(user => user.user_type === 'admin');
+      
+      return { clients: clientsList, drivers: driversList, admins: adminsList };
+    } catch (error) {
+      console.error('Error fetching users from database:', error);
+      return null;
+    }
   }
-}
+};
+
+/**
+ * User deletion module
+ */
+const userDeletionService = {
+  /**
+   * Attempts to delete a user via edge function
+   */
+  deleteUserViaEdgeFunction: async (userId: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase.functions.invoke('admin_delete_user', {
+        body: { userId }
+      });
+      
+      if (error) {
+        console.warn("Erreur avec l'edge function pour la suppression:", error);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.warn("Erreur lors de l'appel à l'edge function de suppression:", error);
+      return false;
+    }
+  },
+
+  /**
+   * Attempts to delete a user directly from database
+   */
+  deleteUserFromDatabase: async (userId: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+
+      if (error) {
+        console.error("Erreur lors de la suppression directe de l'utilisateur:", error);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de la suppression directe de l'utilisateur:", error);
+      return false;
+    }
+  }
+};
+
+/**
+ * Main service module that orchestrates the user operations
+ */
+export const userService = {
+  /**
+   * Fetches users with profiles from various sources
+   * Tries edge function first, then Auth API, then direct database access
+   */
+  fetchUsersWithProfiles: async (): Promise<FetchUsersResponse> => {
+    // Try with Edge Function first
+    const edgeFunctionResult = await edgeFunctionService.fetchUsersViaEdgeFunction();
+    if (edgeFunctionResult) {
+      return edgeFunctionResult;
+    }
+    
+    // Fallback: Auth API
+    const authApiResult = await authApiService.fetchUsersViaAuthApi();
+    if (authApiResult) {
+      return authApiResult;
+    }
+    
+    // Last resort: Direct database access
+    const databaseResult = await databaseService.fetchUsersFromDatabase();
+    if (databaseResult) {
+      return databaseResult;
+    }
+    
+    // If all methods fail, return empty lists
+    return { clients: [], drivers: [], admins: [] };
+  },
+
+  /**
+   * Deletes a user by ID
+   * Tries edge function first, then direct database deletion
+   */
+  deleteUser: async (userId: string): Promise<void> => {
+    // Try edge function deletion first
+    const edgeFunctionSuccess = await userDeletionService.deleteUserViaEdgeFunction(userId);
+    if (edgeFunctionSuccess) {
+      return;
+    }
+    
+    // Fallback: Direct deletion from database
+    const databaseSuccess = await userDeletionService.deleteUserFromDatabase(userId);
+    if (!databaseSuccess) {
+      throw new Error("Failed to delete user");
+    }
+  }
+};
