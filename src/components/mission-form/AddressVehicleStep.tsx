@@ -9,6 +9,8 @@ import CalculateButton from "./CalculateButton";
 import DistancePriceCard from "./DistancePriceCard";
 import ClientStateDisplay from "./ClientStateDisplay";
 import { useAddressVehicleStep } from "./hooks/useAddressVehicleStep";
+import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea"; // Importer le composant Textarea
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -28,7 +30,8 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
-    vehicleType
+    vehicleType,
+    additionalInfo
   } = useAddressVehicleStep(form, onNext, onPrevious);
 
   return (
@@ -68,6 +71,25 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
         distance={distance} 
         priceHT={priceHT} 
         priceTTC={priceTTC} 
+      />
+      
+      {/* Ajout du champ compléments d'information */}
+      <FormField
+        control={form.control}
+        name="additional_info"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Compléments d'information</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Informations supplémentaires (max 250 caractères)" 
+                className="resize-none" 
+                maxLength={250}
+                {...field} 
+              />
+            </FormControl>
+          </FormItem>
+        )}
       />
 
       <div className="flex justify-between">

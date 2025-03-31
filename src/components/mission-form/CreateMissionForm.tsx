@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,13 +82,11 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
     try {
       const values = form.getValues();
       
-      // Format data for database
+      // Format data for database - Nous ne stockons pas directement les adresses de pickup et delivery
       const missionData = {
         mission_type: values.mission_type,
         status: "confirmé", // Changé de "en_attente" à "confirmé" pour les missions créées par l'admin
         client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
-        pickup_address: values.pickup_address,
-        delivery_address: values.delivery_address,
         distance: values.distance?.toString(), // Convert to string as required by the database
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
@@ -97,6 +96,9 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
           year: values.year,
           fuel: values.fuel,
           licensePlate: values.licensePlate,
+          // Stocker les adresses dans vehicle_info
+          pickup_address: values.pickup_address,
+          delivery_address: values.delivery_address
         },
         pickup_date: values.pickup_date.toISOString(),
         pickup_time: values.pickup_time,
@@ -117,12 +119,15 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
         additional_info: values.additional_info || null,
       };
 
+      console.log("Données de mission à envoyer:", missionData);
+
       const { data, error } = await supabase
         .from("missions")
         .insert(missionData)
         .select();
 
       if (error) {
+        console.error("Erreur détaillée:", error);
         throw error;
       }
 
