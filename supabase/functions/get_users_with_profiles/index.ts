@@ -46,14 +46,18 @@ serve(async (req) => {
         // Fusionner les données
         userData = authUsers.users.map(user => {
           const profile = profiles?.find(p => p.user_id === user.id);
+          const userType = user.user_metadata?.role || user.user_metadata?.user_type || 'client';
+          
+          // Détecter l'administrateur par email si nécessaire
+          const finalUserType = user.email === 'dkautomotive70@gmail.com' ? 'admin' : userType;
           
           return {
             id: user.id,
             email: user.email,
             created_at: user.created_at,
-            user_type: user.user_metadata?.user_type || 'client',
-            first_name: profile?.first_name || '',
-            last_name: profile?.last_name || '',
+            user_type: finalUserType,
+            first_name: profile?.first_name || user.user_metadata?.first_name || '',
+            last_name: profile?.last_name || user.user_metadata?.last_name || '',
             company_name: profile?.company_name || '',
             phone: profile?.phone || '',
           };
@@ -67,11 +71,13 @@ serve(async (req) => {
     if (userData.length === 0 && profiles && profiles.length > 0) {
       console.log("Utilisation des profils uniquement");
       userData = profiles.map(profile => {
+        let userType = profile.user_type || 'client';
+        
         return {
           id: profile.user_id || profile.id,
           email: '',
           created_at: null,
-          user_type: 'client',
+          user_type: userType,
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
           company_name: profile.company_name || '',
@@ -90,11 +96,14 @@ serve(async (req) => {
       if (!usersError && users && users.length > 0) {
         console.log(`${users.length} utilisateurs récupérés depuis la table users`);
         userData = users.map(user => {
+          // Vérifier si l'utilisateur est un administrateur par son email
+          const userType = user.email === 'dkautomotive70@gmail.com' ? 'admin' : (user.user_type || 'client');
+          
           return {
             id: user.id,
             email: user.email,
             created_at: user.created_at,
-            user_type: user.user_type || 'client',
+            user_type: userType,
             first_name: '',
             last_name: '',
             company_name: '',

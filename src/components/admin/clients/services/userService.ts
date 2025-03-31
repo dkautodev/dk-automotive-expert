@@ -18,8 +18,9 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
       // Filter by user type
       const clientsList = usersData.filter(user => user.user_type === 'client');
       const driversList = usersData.filter(user => user.user_type === 'chauffeur');
+      const adminsList = usersData.filter(user => user.user_type === 'admin');
       
-      return { clients: clientsList, drivers: driversList };
+      return { clients: clientsList, drivers: driversList, admins: adminsList };
     } else {
       console.warn("Pas de données de l'Edge Function ou erreur:", usersError);
     }
@@ -46,11 +47,12 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
       // Transform and combine data
       const allUsers = authData.users.map(user => {
         const profile = profilesData?.find(p => p.user_id === user.id);
+        const userType = user.user_metadata?.role || user.user_metadata?.user_type || 'client';
         
         return {
           id: user.id,
           email: user.email || '',
-          user_type: user.user_metadata?.role || user.user_metadata?.user_type || 'client',
+          user_type: userType,
           first_name: profile?.first_name || user.user_metadata?.first_name || user.user_metadata?.firstName || '',
           last_name: profile?.last_name || user.user_metadata?.last_name || user.user_metadata?.lastName || '',
           company_name: profile?.company_name || user.user_metadata?.company || '',
@@ -59,16 +61,20 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
         };
       });
       
+      // Détecter l'administrateur par email si nécessaire
+      const adminUsers = allUsers.map(user => {
+        if (user.email === 'dkautomotive70@gmail.com' && user.user_type !== 'admin') {
+          return { ...user, user_type: 'admin' };
+        }
+        return user;
+      });
+      
       // Filter by user type
-      const clientsList = allUsers.filter(user => 
-        user.user_type === 'client' || !user.user_type
-      );
+      const clientsList = adminUsers.filter(user => user.user_type === 'client');
+      const driversList = adminUsers.filter(user => user.user_type === 'chauffeur');
+      const adminsList = adminUsers.filter(user => user.user_type === 'admin');
       
-      const driversList = allUsers.filter(user => 
-        user.user_type === 'chauffeur'
-      );
-      
-      return { clients: clientsList, drivers: driversList };
+      return { clients: clientsList, drivers: driversList, admins: adminsList };
     } else {
       console.warn("Pas de données de l'Auth API ou erreur:", authError);
     }
@@ -115,10 +121,19 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
           phone: profile.phone || ''
         }));
         
-        const clientsList = transformedUsers.filter(user => user.user_type === 'client');
-        const driversList = transformedUsers.filter(user => user.user_type === 'chauffeur');
+        // Identify admins by email if available
+        const usersWithAdmins = transformedUsers.map(user => {
+          if (user.email === 'dkautomotive70@gmail.com') {
+            return { ...user, user_type: 'admin' };
+          }
+          return user;
+        });
         
-        return { clients: clientsList, drivers: driversList };
+        const clientsList = usersWithAdmins.filter(user => user.user_type === 'client');
+        const driversList = usersWithAdmins.filter(user => user.user_type === 'chauffeur');
+        const adminsList = usersWithAdmins.filter(user => user.user_type === 'admin');
+        
+        return { clients: clientsList, drivers: driversList, admins: adminsList };
       }
       
       throw error;
@@ -136,11 +151,20 @@ export const fetchUsersWithProfiles = async (): Promise<FetchUsersResponse> => {
       created_at: null
     }));
 
+    // Identify admins by email if needed
+    const usersWithAdmins = transformedUsers.map(user => {
+      if (user.email === 'dkautomotive70@gmail.com' && user.user_type !== 'admin') {
+        return { ...user, user_type: 'admin' };
+      }
+      return user;
+    });
+
     // Filter users by type
-    const clientsList = transformedUsers.filter(user => user.user_type === 'client');
-    const driversList = transformedUsers.filter(user => user.user_type === 'chauffeur');
+    const clientsList = usersWithAdmins.filter(user => user.user_type === 'client');
+    const driversList = usersWithAdmins.filter(user => user.user_type === 'chauffeur');
+    const adminsList = usersWithAdmins.filter(user => user.user_type === 'admin');
     
-    return { clients: clientsList, drivers: driversList };
+    return { clients: clientsList, drivers: driversList, admins: adminsList };
   } catch (error) {
     console.error('Error fetching users:', error);
     throw error;

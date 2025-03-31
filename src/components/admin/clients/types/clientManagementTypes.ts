@@ -4,6 +4,7 @@ import { UserData } from "../types";
 export interface UseClientManagementReturn {
   clients: UserData[];
   drivers: UserData[];
+  admins: UserData[];
   loading: boolean;
   deleteDialogOpen: boolean;
   setDeleteDialogOpen: (open: boolean) => void;
@@ -16,4 +17,5 @@ export interface UseClientManagementReturn {
 export interface FetchUsersResponse {
   clients: UserData[];
   drivers: UserData[];
+  admins: UserData[];
 }
