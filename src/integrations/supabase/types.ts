@@ -249,6 +249,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_vigilance_certificate_enum: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       calculate_price_from_distance: {
         Args: {
           p_vehicle_type_id: string
@@ -276,7 +280,11 @@ export type Database = {
       }
     }
     Enums: {
-      document_type: "kbis" | "driving_license" | "id_card"
+      document_type:
+        | "kbis"
+        | "driving_license"
+        | "id_card"
+        | "vigilance_certificate"
       mission_status:
         | "pending"
         | "assigned"

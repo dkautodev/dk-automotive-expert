@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,13 +13,13 @@ import { Input } from "@/components/ui/input";
 
 interface Document {
   id: string;
-  document_type: string;
+  document_type: DocumentType;
   document_url: string;
   uploaded_at: string;
 }
 
 interface DocumentTypeInfo {
-  id: string;
+  id: DocumentType;
   name: string;
   description: string;
 }
@@ -55,7 +54,7 @@ const DriverDocuments = () => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedDocType, setSelectedDocType] = useState<string | null>(null);
+  const [selectedDocType, setSelectedDocType] = useState<DocumentType | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
@@ -82,7 +81,7 @@ const DriverDocuments = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, documentType: DocumentType) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -133,8 +132,7 @@ const DriverDocuments = () => {
       
       setUploadProgress(80);
 
-      // For now use a query directly instead of a type check that might be invalid
-      // until the database is updated
+      // Insert the document record with proper type casting
       const { error: insertError } = await supabase
         .from("documents")
         .upsert({
