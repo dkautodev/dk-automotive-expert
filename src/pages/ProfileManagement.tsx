@@ -54,7 +54,7 @@ const ProfileManagement = () => {
         const { data: clientData, error: clientError } = await extendedSupabase
           .from('user_profiles')
           .select('*, users(email, user_type)')
-          .eq('user_type', 'client');
+          .eq('users.user_type', 'client');
         
         if (clientError) throw clientError;
         
@@ -62,12 +62,12 @@ const ProfileManagement = () => {
         const { data: driverData, error: driverError } = await extendedSupabase
           .from('user_profiles')
           .select('*, users(email, user_type)')
-          .eq('user_type', 'chauffeur');
+          .eq('users.user_type', 'chauffeur');
         
         if (driverError) throw driverError;
         
         // Map data to include email
-        const mapProfiles = (profiles: SupabaseProfileResponse[] | null): ProfileType[] => {
+        const mapProfiles = (profiles: any[] | null): ProfileType[] => {
           if (!profiles) return [];
           
           return profiles.map(profile => {
@@ -88,8 +88,8 @@ const ProfileManagement = () => {
           });
         };
         
-        setClientProfiles(mapProfiles(clientData as SupabaseProfileResponse[]));
-        setDriverProfiles(mapProfiles(driverData as SupabaseProfileResponse[]));
+        setClientProfiles(mapProfiles(clientData));
+        setDriverProfiles(mapProfiles(driverData));
       } catch (error: any) {
         console.error('Error fetching profiles:', error);
         toast.error(`Erreur lors du chargement des profils: ${error.message}`);
