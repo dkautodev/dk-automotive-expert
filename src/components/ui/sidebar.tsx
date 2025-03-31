@@ -1,6 +1,8 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
+import { Button } from "./button";
 
 type SidebarContextValue = {
   collapsed: boolean;
@@ -66,5 +68,28 @@ export const SidebarTrigger = () => {
     <button onClick={toggleCollapsed}>
       Toggle Sidebar
     </button>
+  );
+};
+
+// Add the missing MobileMenuToggle component
+export const MobileMenuToggle = ({ 
+  isOpen, 
+  onClick,
+  className
+}: { 
+  isOpen: boolean; 
+  onClick: () => void;
+  className?: string;
+}) => {
+  return (
+    <Button 
+      variant="ghost" 
+      size="icon" 
+      onClick={onClick}
+      className={cn("p-2", className)}
+    >
+      <Menu className="h-6 w-6" />
+      <span className="sr-only">Toggle menu</span>
+    </Button>
   );
 };

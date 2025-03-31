@@ -5,7 +5,8 @@ import {
   FileText,
   User,
   ClipboardList,
-  LogOut
+  LogOut,
+  X
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,12 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useAuthContext } from "@/context/AuthContext";
 import NotificationBell from "../notifications/NotificationBell";
 
-const ClientSidebar = () => {
+interface ClientSidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+const ClientSidebar = ({ isOpen, onClose }: ClientSidebarProps) => {
   const { collapsed, toggleCollapsed } = useSidebar();
   const { signOut } = useAuthContext();
   const navigate = useNavigate();
@@ -24,26 +30,44 @@ const ClientSidebar = () => {
     navigate("/auth");
   };
 
+  // Mobile and desktop sidebar styles
+  const sidebarClass = isOpen !== undefined
+    ? `fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-30 transform transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } lg:translate-x-0 lg:static lg:w-52 lg:z-10`
+    : "fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10";
+
   return (
-    <div className="fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10">
+    <div className={sidebarClass}>
       <div className="h-16 flex items-center justify-between px-4">
         <Link to="/dashboard/client" className="font-semibold">
           DK Automotive
         </Link>
         <div className="flex items-center space-x-1">
           <NotificationBell />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleCollapsed}
-            className="h-8 w-8"
-          >
-            <ChevronLeft
-              className={`h-5 w-5 transition-transform ${
-                collapsed ? "rotate-180" : ""
-              }`}
-            />
-          </Button>
+          {isOpen !== undefined && onClose ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8 lg:hidden"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCollapsed}
+              className="h-8 w-8"
+            >
+              <ChevronLeft
+                className={`h-5 w-5 transition-transform ${
+                  collapsed ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+          )}
         </div>
       </div>
       <Separator />
