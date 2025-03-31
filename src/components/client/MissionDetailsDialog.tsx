@@ -57,7 +57,6 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <h3 className="font-semibold">Statut</h3>
               <MissionStatusBadge status={mission.status} />
             </div>
             <div className="space-y-2">
@@ -105,9 +104,9 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             </div>
           )}
           
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <h3 className="font-semibold mb-2">Tarification</h3>
-            <p className="text-lg font-medium">
+          <div className="mt-8 pt-5 border-t border-gray-200">
+            <h3 className="font-semibold mb-3 border-b inline-block border-gray-400">Tarification</h3>
+            <p className="text-base">
               Prix total : {mission.price_ttc ? `${mission.price_ttc}€ TTC` : "Non spécifié"} 
               {mission.price_ht ? ` soit ${mission.price_ht}€ HT` : ""}
             </p>
