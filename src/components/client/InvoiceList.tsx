@@ -1,10 +1,15 @@
+
 import React, { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { format } from "date-fns";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuthContext } from "@/context/AuthContext";
 import { InvoiceRow } from "@/types/database";
 import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { FileText, Download, ExternalLink } from "lucide-react";
+import { Loader } from "@/components/ui/loader";
+import { toast } from "sonner";
 
 export const InvoiceList: React.FC = () => {
   const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
