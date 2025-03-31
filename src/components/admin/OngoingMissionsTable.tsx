@@ -27,7 +27,6 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
 }) => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [allMissions, setAllMissions] = useState<MissionRow[]>([]);
 
   useEffect(() => {
     const fetchMissions = async () => {
@@ -35,85 +34,93 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         setLoading(true);
         console.log("Fetching missions...");
         
-        // Fetch all mission data for debugging
+        // Recherche avec un orderBy pour obtenir les plus récentes en premier
         const { data: missionsData, error: missionsError } = await supabase
           .from('missions')
           .select('*')
-          .order('created_at', { ascending: false })
-          .limit(50);
+          .order('created_at', { ascending: false });
 
         if (missionsError) {
-          console.error("Error fetching missions:", missionsError);
+          console.error("Erreur lors de la récupération des missions:", missionsError);
           throw missionsError;
         }
         
-        console.log("All missions fetched:", missionsData);
+        console.log("Missions récupérées:", missionsData);
         
         if (!missionsData || missionsData.length === 0) {
-          console.log("No missions found");
-          setAllMissions([]);
+          console.log("Aucune mission trouvée dans la base de données");
           setMissions([]);
           setLoading(false);
           return;
         }
         
-        // Transform missions to include pickup_address and delivery_address as direct properties
+        // Transformer les missions pour inclure les adresses comme propriétés directes
         const transformedMissions = missionsData.map(mission => {
           const vehicleInfo = mission.vehicle_info as any || {};
           
           return {
             ...mission,
-            pickup_address: vehicleInfo.pickup_address || 'N/A',
-            delivery_address: vehicleInfo.delivery_address || 'N/A',
+            pickup_address: vehicleInfo.pickup_address || 'Non spécifié',
+            delivery_address: vehicleInfo.delivery_address || 'Non spécifié',
           } as MissionRow;
         });
         
-        setAllMissions(transformedMissions);
+        console.log(`Nombre de missions transformées: ${transformedMissions.length}`);
         
-        // Filter missions based on status if not showing all
-        const filteredMissions = showAllMissions ? 
-          transformedMissions : 
-          transformedMissions.filter(mission => 
-            mission.status === 'confirmé' || 
-            mission.status === 'confirme' || 
-            mission.status === 'prise_en_charge'
-          );
+        // Filtrer les missions en fonction des statuts uniquement si showAllMissions est false
+        const filteredMissions = showAllMissions 
+          ? transformedMissions 
+          : transformedMissions.filter(mission => 
+              mission.status === 'confirmé' || 
+              mission.status === 'confirme' || 
+              mission.status === 'prise_en_charge'
+            );
         
-        console.log("Filtered missions:", filteredMissions);
-        console.log("Mission statuses:", filteredMissions.map(m => m.status));
+        console.log(`Missions filtrées (${filteredMissions.length}):`, filteredMissions);
+        console.log("Statuts des missions:", filteredMissions.map(m => m.status).join(', '));
         
-        if (filteredMissions.length > 0) {
-          // Get the client profiles for these missions as a separate query
-          const clientIds = filteredMissions.map(mission => mission.client_id);
-          const { data: clientProfiles, error: clientsError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .in('user_id', clientIds);
+        // Récupérer les profils clients pour toutes les missions
+        try {
+          const clientIds = filteredMissions.map(mission => mission.client_id).filter(Boolean);
           
-          if (clientsError) {
-            console.error("Error fetching client profiles:", clientsError);
-            throw clientsError;
-          }
-
-          console.log("Client profiles fetched:", clientProfiles);
-          
-          // Map profiles to missions
-          const formattedMissions = filteredMissions.map(mission => {
-            const clientProfile = clientProfiles?.find(profile => profile.user_id === mission.client_id) || null;
+          if (clientIds.length > 0) {
+            const { data: clientProfiles, error: clientsError } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .in('user_id', clientIds);
             
-            return {
-              ...mission,
-              clientProfile
-            } as unknown as MissionRow;
-          });
+            if (clientsError) {
+              console.error("Erreur lors de la récupération des profils clients:", clientsError);
+              throw clientsError;
+            }
 
-          setMissions(formattedMissions);
-        } else {
-          setMissions([]);
+            console.log("Profils clients récupérés:", clientProfiles);
+            
+            // Associer les profils aux missions
+            const formattedMissions = filteredMissions.map(mission => {
+              const clientProfile = clientProfiles?.find(profile => profile.user_id === mission.client_id) || null;
+              
+              return {
+                ...mission,
+                clientProfile
+              } as unknown as MissionRow;
+            });
+
+            console.log("Missions avec profils clients:", formattedMissions);
+            setMissions(formattedMissions);
+          } else {
+            console.log("Aucun ID client trouvé pour les missions");
+            setMissions(filteredMissions as unknown as MissionRow[]);
+          }
+        } catch (profileError) {
+          console.error("Erreur lors de la récupération des profils:", profileError);
+          // Continuer avec les missions même sans profils clients
+          setMissions(filteredMissions as unknown as MissionRow[]);
         }
       } catch (err) {
-        console.error('Error fetching missions:', err);
+        console.error('Erreur globale lors de la récupération des missions:', err);
         toast.error("Erreur lors de la récupération des missions");
+        setMissions([]);
       } finally {
         setLoading(false);
       }
@@ -149,29 +156,39 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
                 <TableHead>Client</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Véhicule</TableHead>
+                <TableHead>Adresse départ</TableHead>
+                <TableHead>Adresse livraison</TableHead>
                 <TableHead>Statut</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {missions.map((mission) => {
                 const client = mission.clientProfile as any;
-                const vehicleInfo = mission.vehicle_info as any;
+                const vehicleInfo = mission.vehicle_info as any || {};
                 
                 return (
                   <TableRow key={mission.id}>
-                    <TableCell className="font-medium">{mission.mission_number || "N/A"}</TableCell>
+                    <TableCell className="font-medium">
+                      {mission.mission_number || "Non attribué"}
+                    </TableCell>
                     <TableCell>
-                      {client?.company_name || `${client?.first_name || ''} ${client?.last_name || ''}`}
+                      {client?.company_name || `${client?.first_name || ''} ${client?.last_name || ''}` || "Non spécifié"}
                     </TableCell>
                     <TableCell>{formatDate(mission.created_at)}</TableCell>
                     <TableCell>
                       {vehicleInfo ? (
                         <span>
-                          {vehicleInfo.brand} {vehicleInfo.model}
+                          {vehicleInfo.brand || ''} {vehicleInfo.model || ''}
                         </span>
                       ) : (
-                        "N/A"
+                        "Non spécifié"
                       )}
+                    </TableCell>
+                    <TableCell className="max-w-[150px] truncate" title={mission.pickup_address}>
+                      {mission.pickup_address}
+                    </TableCell>
+                    <TableCell className="max-w-[150px] truncate" title={mission.delivery_address}>
+                      {mission.delivery_address}
                     </TableCell>
                     <TableCell>
                       <MissionStatusBadge status={mission.status} />
@@ -182,19 +199,13 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
             </TableBody>
           </Table>
         ) : (
-          <div>
-            <p className="text-center text-muted-foreground py-4">
-              {showAllMissions ? "Aucune mission trouvée" : "Aucune mission en cours"}
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              {showAllMissions ? "Aucune mission trouvée dans la base de données" : "Aucune mission en cours"}
             </p>
-            {allMissions.length > 0 && !showAllMissions && (
-              <div className="mt-4 border-t pt-4">
-                <h3 className="font-medium mb-2">Statistiques des missions (déboguer):</h3>
-                <ul className="text-sm">
-                  <li>Total des missions: {allMissions.length}</li>
-                  <li>Statuts trouvés: {Array.from(new Set(allMissions.map(m => m.status))).join(', ')}</li>
-                </ul>
-              </div>
-            )}
+            <p className="text-sm text-muted-foreground mt-2">
+              {showAllMissions ? "Créez votre première mission en utilisant le bouton en haut de la page" : ""}
+            </p>
           </div>
         )}
       </CardContent>
