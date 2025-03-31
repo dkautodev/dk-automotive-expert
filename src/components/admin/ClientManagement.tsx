@@ -10,13 +10,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/context/AuthContext";
+import { AlertCircle } from "lucide-react";
 
 interface UserData {
   id: string;
   email: string;
-  user_type: string;
-  first_name: string;
-  last_name: string;
+  user_type?: string;
+  first_name?: string;
+  last_name?: string;
   company_name?: string;
   phone?: string;
   created_at?: string;
@@ -38,7 +39,80 @@ const ClientManagement = () => {
   const fetchUsersWithProfiles = async () => {
     try {
       setLoading(true);
+
+      // Essayer d'abord avec l'Edge Function
+      try {
+        const { data: usersData, error: usersError } = await supabase.functions.invoke('get_users_with_profiles');
+
+        if (!usersError && usersData && usersData.length > 0) {
+          console.log("Utilisateurs récupérés via Edge Function:", usersData);
+          
+          // Filtrer par type d'utilisateur
+          const clientsList = usersData.filter(user => user.user_type === 'client');
+          const driversList = usersData.filter(user => user.user_type === 'chauffeur');
+          
+          setClients(clientsList);
+          setDrivers(driversList);
+          return;
+        } else {
+          console.warn("Pas de données de l'Edge Function ou erreur:", usersError);
+        }
+      } catch (edgeFnError) {
+        console.warn("Erreur lors de l'appel à l'Edge Function:", edgeFnError);
+      }
+
+      // Fallback : Récupérer les utilisateurs via l'API Auth (nécessite des privilèges admin)
+      try {
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+        
+        if (!authError && authData && authData.users) {
+          console.log("Utilisateurs récupérés via Auth API:", authData.users);
+          
+          // Récupérer les profils utilisateurs séparément
+          const { data: profilesData, error: profilesError } = await supabase
+            .from('user_profiles')
+            .select('*');
+            
+          if (profilesError) {
+            console.warn("Erreur lors de la récupération des profils:", profilesError);
+          }
+          
+          // Transformer et combiner les données
+          const allUsers = authData.users.map(user => {
+            const profile = profilesData?.find(p => p.user_id === user.id);
+            
+            return {
+              id: user.id,
+              email: user.email || '',
+              user_type: user.user_metadata?.role || profile?.user_type || 'client',
+              first_name: profile?.first_name || user.user_metadata?.first_name || user.user_metadata?.firstName || '',
+              last_name: profile?.last_name || user.user_metadata?.last_name || user.user_metadata?.lastName || '',
+              company_name: profile?.company_name || user.user_metadata?.company || '',
+              phone: profile?.phone || user.user_metadata?.phone || '',
+              created_at: user.created_at
+            };
+          });
+          
+          // Filtrer par type d'utilisateur (basé sur les métadonnées)
+          const clientsList = allUsers.filter(user => 
+            user.user_type === 'client' || !user.user_type
+          );
+          
+          const driversList = allUsers.filter(user => 
+            user.user_type === 'chauffeur'
+          );
+          
+          setClients(clientsList);
+          setDrivers(driversList);
+          return;
+        } else {
+          console.warn("Pas de données de l'Auth API ou erreur:", authError);
+        }
+      } catch (authApiError) {
+        console.warn("Erreur lors de l'appel à l'Auth API:", authApiError);
+      }
       
+      // Dernier recours : Essayer de récupérer les profils utilisateurs directement
       const { data, error } = await supabase
         .from('users')
         .select(`
@@ -54,6 +128,36 @@ const ClientManagement = () => {
         `);
 
       if (error) {
+        console.warn("Erreur lors de la récupération des utilisateurs:", error);
+        
+        // Essayer une dernière fois avec juste les profils
+        const { data: profiles, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('*');
+          
+        if (profilesError) {
+          throw profilesError;
+        }
+        
+        if (profiles && profiles.length > 0) {
+          const transformedUsers = profiles.map(profile => ({
+            id: profile.user_id || profile.id,
+            email: '',
+            user_type: profile.user_type || 'client',
+            first_name: profile.first_name || '',
+            last_name: profile.last_name || '',
+            company_name: profile.company_name || '',
+            phone: profile.phone || ''
+          }));
+          
+          const clientsList = transformedUsers.filter(user => user.user_type === 'client');
+          const driversList = transformedUsers.filter(user => user.user_type === 'chauffeur');
+          
+          setClients(clientsList);
+          setDrivers(driversList);
+          return;
+        }
+        
         throw error;
       }
 
@@ -94,7 +198,32 @@ const ClientManagement = () => {
     try {
       setIsDeleting(true);
       
-      // Delete the user
+      // Try to use the edge function first
+      try {
+        const { data, error } = await supabase.functions.invoke('admin_delete_user', {
+          body: { userId: userToDelete.id }
+        });
+        
+        if (!error) {
+          toast.success("Utilisateur supprimé avec succès");
+          
+          // Remove user from local state
+          if (userToDelete.user_type === 'client' || !userToDelete.user_type) {
+            setClients(prev => prev.filter(client => client.id !== userToDelete.id));
+          } else if (userToDelete.user_type === 'chauffeur') {
+            setDrivers(prev => prev.filter(driver => driver.id !== userToDelete.id));
+          }
+          
+          setDeleteDialogOpen(false);
+          return;
+        } else {
+          console.warn("Erreur avec l'edge function:", error);
+        }
+      } catch (edgeFnError) {
+        console.warn("Erreur lors de l'appel à l'edge function:", edgeFnError);
+      }
+      
+      // Fallback: Try to delete user directly
       const { error } = await supabase
         .from('users')
         .delete()
@@ -107,7 +236,7 @@ const ClientManagement = () => {
       toast.success("Utilisateur supprimé avec succès");
       
       // Remove user from local state
-      if (userToDelete.user_type === 'client') {
+      if (userToDelete.user_type === 'client' || !userToDelete.user_type) {
         setClients(prev => prev.filter(client => client.id !== userToDelete.id));
       } else if (userToDelete.user_type === 'chauffeur') {
         setDrivers(prev => prev.filter(driver => driver.id !== userToDelete.id));
@@ -120,6 +249,10 @@ const ClientManagement = () => {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const getInitials = (firstName: string = '', lastName: string = '') => {
+    return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || '??';
   };
 
   return (
@@ -140,6 +273,11 @@ const ClientManagement = () => {
               <div className="flex justify-center">
                 <Loader className="w-6 h-6" />
               </div>
+            ) : clients.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground flex flex-col items-center gap-2">
+                <AlertCircle className="h-5 w-5" />
+                <p>Aucun client trouvé</p>
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
@@ -158,13 +296,16 @@ const ClientManagement = () => {
                           <div className="flex items-center space-x-2">
                             <Avatar>
                               <AvatarImage src={`https://avatar.vercel.sh/${client.email}.png`} alt={client.first_name} />
-                              <AvatarFallback>{client.first_name?.charAt(0)}{client.last_name?.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{getInitials(client.first_name, client.last_name)}</AvatarFallback>
                             </Avatar>
-                            <span>{client.first_name} {client.last_name}</span>
+                            <span>{client.first_name && client.last_name ? 
+                              `${client.first_name} ${client.last_name}` : 
+                              (client.email?.split('@')[0] || 'Client sans nom')}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>{client.email}</TableCell>
-                        <TableCell>{client.user_type}</TableCell>
+                        <TableCell>{client.user_type || 'client'}</TableCell>
                         <TableCell>
                           <Button 
                             variant="destructive"
@@ -196,6 +337,11 @@ const ClientManagement = () => {
               <div className="flex justify-center">
                 <Loader className="w-6 h-6" />
               </div>
+            ) : drivers.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground flex flex-col items-center gap-2">
+                <AlertCircle className="h-5 w-5" />
+                <p>Aucun chauffeur trouvé</p>
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
@@ -214,13 +360,16 @@ const ClientManagement = () => {
                           <div className="flex items-center space-x-2">
                             <Avatar>
                               <AvatarImage src={`https://avatar.vercel.sh/${driver.email}.png`} alt={driver.first_name} />
-                              <AvatarFallback>{driver.first_name?.charAt(0)}{driver.last_name?.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{getInitials(driver.first_name, driver.last_name)}</AvatarFallback>
                             </Avatar>
-                            <span>{driver.first_name} {driver.last_name}</span>
+                            <span>{driver.first_name && driver.last_name ? 
+                              `${driver.first_name} ${driver.last_name}` : 
+                              (driver.email?.split('@')[0] || 'Chauffeur sans nom')}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>{driver.email}</TableCell>
-                        <TableCell>{driver.user_type}</TableCell>
+                        <TableCell>{driver.user_type || 'chauffeur'}</TableCell>
                         <TableCell>
                           <Button 
                             variant="destructive"

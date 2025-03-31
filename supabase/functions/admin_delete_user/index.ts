@@ -8,55 +8,50 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Gérer les requêtes OPTIONS pour CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Get the request body
-    const { user_id } = await req.json();
+    // Créer un client Supabase avec la clé de service (role admin)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-    if (!user_id) {
-      return new Response(
-        JSON.stringify({ error: 'user_id is required' }),
-        { 
-          status: 400, 
-          headers: { 
-            'Content-Type': 'application/json',
-            ...corsHeaders 
-          } 
-        }
-      );
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Variables d\'environnement SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY manquantes');
     }
 
-    // Create a Supabase client with the service role key
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    );
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Extraire l'ID utilisateur du corps de la requête
+    const { userId } = await req.json();
+    
+    if (!userId) {
+      throw new Error('userId est requis');
+    }
 
-    // Delete the user's profile from user_profiles table
-    const { error: profileDeleteError } = await supabaseAdmin
+    console.log(`Tentative de suppression de l'utilisateur avec ID: ${userId}`);
+
+    // Supprimer l'utilisateur via l'API admin
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    
+    if (error) {
+      throw error;
+    }
+
+    // Supprimer également les profils utilisateur associés si nécessaire
+    console.log(`Suppression du profil utilisateur pour l'ID: ${userId}`);
+    await supabaseAdmin
       .from('user_profiles')
       .delete()
-      .eq('user_id', user_id);
-
-    if (profileDeleteError) {
-      throw profileDeleteError;
-    }
-
-    // Delete the user from auth.users
-    const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(
-      user_id
-    );
-
-    if (authDeleteError) {
-      throw authDeleteError;
-    }
+      .eq('user_id', userId);
 
     return new Response(
-      JSON.stringify({ success: true, message: 'User and profile deleted' }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'Utilisateur supprimé avec succès' 
+      }),
       { 
         headers: { 
           'Content-Type': 'application/json',
@@ -64,12 +59,17 @@ serve(async (req) => {
         } 
       }
     );
+    
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Erreur:', error);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      }),
       { 
-        status: 500, 
+        status: 400, 
         headers: { 
           'Content-Type': 'application/json',
           ...corsHeaders 
