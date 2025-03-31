@@ -18,26 +18,29 @@ import { toast } from "sonner";
 
 interface OngoingMissionsTableProps {
   refreshTrigger?: number;
+  showAllMissions?: boolean; // Nouvelle prop pour contrôler l'affichage de toutes les missions
 }
 
 const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({ 
-  refreshTrigger = 0 
+  refreshTrigger = 0,
+  showAllMissions = false
 }) => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allMissions, setAllMissions] = useState<MissionRow[]>([]); // Stocker toutes les missions pour déboguer
 
   useEffect(() => {
     const fetchMissions = async () => {
       try {
         setLoading(true);
-        console.log("Fetching ongoing missions...");
+        console.log("Fetching missions...");
         
-        // Fetch mission data with all statuses to debug
+        // Fetch all mission data for debugging
         const { data: missionsData, error: missionsError } = await supabase
           .from('missions')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(20);
+          .limit(50);
 
         if (missionsError) {
           console.error("Error fetching missions:", missionsError);
@@ -45,19 +48,23 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         }
         
         console.log("All missions fetched:", missionsData);
+        setAllMissions(missionsData || []);
         
-        // Filter missions for "confirmé", "confirme" or "prise_en_charge" status
-        const ongoingMissions = missionsData?.filter(mission => 
-          mission.status === 'confirmé' || 
-          mission.status === 'confirme' || 
-          mission.status === 'prise_en_charge'
-        ) || [];
+        // Filter missions based on status if not showing all
+        const filteredMissions = showAllMissions ? 
+          (missionsData || []) : 
+          (missionsData?.filter(mission => 
+            mission.status === 'confirmé' || 
+            mission.status === 'confirme' || 
+            mission.status === 'prise_en_charge'
+          ) || []);
         
-        console.log("Filtered ongoing missions:", ongoingMissions);
+        console.log("Filtered missions:", filteredMissions);
+        console.log("Mission statuses:", filteredMissions.map(m => m.status));
         
-        if (ongoingMissions.length > 0) {
+        if (filteredMissions.length > 0) {
           // Get the client profiles for these missions as a separate query
-          const clientIds = ongoingMissions.map(mission => mission.client_id);
+          const clientIds = filteredMissions.map(mission => mission.client_id);
           const { data: clientProfiles, error: clientsError } = await supabase
             .from('user_profiles')
             .select('*')
@@ -71,7 +78,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           console.log("Client profiles fetched:", clientProfiles);
           
           // Map profiles to missions
-          const formattedMissions = ongoingMissions.map(mission => {
+          const formattedMissions = filteredMissions.map(mission => {
             const vehicleInfo = mission.vehicle_info as any || {};
             const clientProfile = clientProfiles?.find(profile => profile.user_id === mission.client_id) || null;
             
@@ -88,21 +95,21 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           setMissions([]);
         }
       } catch (err) {
-        console.error('Error fetching ongoing missions:', err);
-        toast.error("Erreur lors de la récupération des missions en cours");
+        console.error('Error fetching missions:', err);
+        toast.error("Erreur lors de la récupération des missions");
       } finally {
         setLoading(false);
       }
     };
 
     fetchMissions();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, showAllMissions]);
 
   if (loading) {
     return (
       <Card className="col-span-1">
         <CardHeader>
-          <CardTitle>Missions en cours</CardTitle>
+          <CardTitle>{showAllMissions ? "Toutes les missions" : "Missions en cours"}</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center">
           <Loader className="h-8 w-8" />
@@ -114,7 +121,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
   return (
     <Card className="col-span-1">
       <CardHeader>
-        <CardTitle>Missions en cours</CardTitle>
+        <CardTitle>{showAllMissions ? "Toutes les missions" : "Missions en cours"}</CardTitle>
       </CardHeader>
       <CardContent>
         {missions.length > 0 ? (
@@ -158,7 +165,20 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
             </TableBody>
           </Table>
         ) : (
-          <p className="text-center text-muted-foreground py-4">Aucune mission en cours</p>
+          <div>
+            <p className="text-center text-muted-foreground py-4">
+              {showAllMissions ? "Aucune mission trouvée" : "Aucune mission en cours"}
+            </p>
+            {allMissions.length > 0 && !showAllMissions && (
+              <div className="mt-4 border-t pt-4">
+                <h3 className="font-medium mb-2">Statistiques des missions (déboguer):</h3>
+                <ul className="text-sm">
+                  <li>Total des missions: {allMissions.length}</li>
+                  <li>Statuts trouvés: {Array.from(new Set(allMissions.map(m => m.status))).join(', ')}</li>
+                </ul>
+              </div>
+            )}
+          </div>
         )}
       </CardContent>
     </Card>
