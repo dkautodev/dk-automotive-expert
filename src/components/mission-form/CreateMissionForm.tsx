@@ -13,6 +13,7 @@ import AddressVehicleStep from "./AddressVehicleStep";
 import VehicleInfoStep from "./VehicleInfoStep";
 import ContactScheduleStep from "./ContactScheduleStep";
 import { useAuthContext } from "@/context/AuthContext";
+import { MissionRow } from "@/types/database";
 
 interface CreateMissionFormProps {
   onSuccess: () => void;
@@ -83,10 +84,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       const values = form.getValues();
       
       // Format data for database - Specifions explicitement les colonnes dans notre objet
-      // Nous évitons de stocker "missions.mission_type" directement
       const missionData = {
-        // Précision du champ avec "missions." pour éviter l'ambiguïté
-        "missions_type": values.mission_type, // Renommer temporairement pour éviter l'ambiguïté
         status: "confirmé", // Changé de "en_attente" à "confirmé" pour les missions créées par l'admin
         client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
         distance: values.distance?.toString(), // Convert to string as required by the database
@@ -100,7 +98,8 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
           licensePlate: values.licensePlate,
           // Stocker les adresses dans vehicle_info
           pickup_address: values.pickup_address,
-          delivery_address: values.delivery_address
+          delivery_address: values.delivery_address,
+          vehicle_type: values.vehicle_type
         },
         pickup_date: values.pickup_date.toISOString(),
         pickup_time: values.pickup_time,
@@ -122,9 +121,10 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       };
 
       console.log("Données de mission à envoyer:", missionData);
+      console.log("Type de mission:", values.mission_type);
 
-      // Utiliser la requête SQL brute pour éviter l'ambiguïté de colonne
-      const { data, error } = await supabase.rpc('create_mission', {
+      // Utiliser la fonction RPC create_mission avec le bon typage
+      const { data, error } = await supabase.rpc<MissionRow[]>('create_mission', {
         mission_data: missionData,
         mission_type_value: values.mission_type // Passer le type de mission séparément
       });
@@ -134,7 +134,8 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
         throw error;
       }
 
-      toast.success(`Mission ${data ? data[0]?.mission_number : ''} créée avec succès`);
+      const createdMission = data && data.length > 0 ? data[0] : null;
+      toast.success(`Mission ${createdMission?.mission_number || ''} créée avec succès`);
       onSuccess();
     } catch (error: any) {
       console.error("Error creating mission:", error);
