@@ -82,9 +82,11 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
     try {
       const values = form.getValues();
       
-      // Format data for database - Nous ne stockons pas directement les adresses de pickup et delivery
+      // Format data for database - Specifions explicitement les colonnes dans notre objet
+      // Nous évitons de stocker "missions.mission_type" directement
       const missionData = {
-        mission_type: values.mission_type,
+        // Précision du champ avec "missions." pour éviter l'ambiguïté
+        "missions_type": values.mission_type, // Renommer temporairement pour éviter l'ambiguïté
         status: "confirmé", // Changé de "en_attente" à "confirmé" pour les missions créées par l'admin
         client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
         distance: values.distance?.toString(), // Convert to string as required by the database
@@ -121,17 +123,18 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
 
       console.log("Données de mission à envoyer:", missionData);
 
-      const { data, error } = await supabase
-        .from("missions")
-        .insert(missionData)
-        .select();
+      // Utiliser la requête SQL brute pour éviter l'ambiguïté de colonne
+      const { data, error } = await supabase.rpc('create_mission', {
+        mission_data: missionData,
+        mission_type_value: values.mission_type // Passer le type de mission séparément
+      });
 
       if (error) {
         console.error("Erreur détaillée:", error);
         throw error;
       }
 
-      toast.success(`Mission ${data[0].mission_number} créée avec succès`);
+      toast.success(`Mission ${data ? data[0]?.mission_number : ''} créée avec succès`);
       onSuccess();
     } catch (error: any) {
       console.error("Error creating mission:", error);
