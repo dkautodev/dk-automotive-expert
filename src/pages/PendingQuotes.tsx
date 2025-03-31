@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAuthContext } from "@/context/AuthContext";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
+import { extractPostalCodeAndCity } from "@/lib/utils";
 
 const PendingQuotes = () => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
@@ -20,33 +21,6 @@ const PendingQuotes = () => {
   const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
   const { user } = useAuthContext();
-
-  // Fonction pour extraire le code postal et la ville
-  const extractPostalCodeAndCity = (address: string) => {
-    if (!address) return "Non spécifié";
-    
-    // Recherche du code postal (5 chiffres en France)
-    const postalCodeMatch = address.match(/\b\d{5}\b/);
-    
-    if (!postalCodeMatch) return address.substring(0, 25) + "...";
-    
-    // Index du code postal
-    const postalCodeIndex = address.indexOf(postalCodeMatch[0]);
-    
-    // Extrait une partie de l'adresse à partir du code postal
-    const relevantPart = address.substring(postalCodeIndex);
-    
-    // Divise en mots pour trouver la ville après le code postal
-    const parts = relevantPart.split(' ');
-    
-    if (parts.length > 1) {
-      // Code postal + prochain mot (généralement la ville)
-      return `${postalCodeMatch[0]} ${parts.slice(1, 3).join(' ')}`;
-    }
-    
-    // Retourne uniquement le code postal si la ville ne peut pas être extraite
-    return postalCodeMatch[0];
-  };
 
   const fetchMissions = async () => {
     const { data, error } = await supabase
@@ -144,9 +118,9 @@ const PendingQuotes = () => {
                 <TableCell>{getVehicleInfo(mission)}</TableCell>
                 <TableCell>{formatPickupDate(mission.pickup_date)}</TableCell>
                 <TableCell>{formatDeliveryDate(mission.delivery_date)}</TableCell>
-                <TableCell>{extractPostalCodeAndCity(mission.pickup_address)}</TableCell>
-                <TableCell>{extractPostalCodeAndCity(mission.delivery_address)}</TableCell>
-                <TableCell className="text-right">{mission.price_ttc}€</TableCell>
+                <TableCell title={mission.pickup_address}>{extractPostalCodeAndCity(mission.pickup_address)}</TableCell>
+                <TableCell title={mission.delivery_address}>{extractPostalCodeAndCity(mission.delivery_address)}</TableCell>
+                <TableCell className="text-right">{mission.price_ttc ? `${mission.price_ttc}€` : "Non spécifié"}</TableCell>
                 <TableCell>
                   <div className="flex justify-center gap-2">
                     <Button
