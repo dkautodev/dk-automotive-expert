@@ -11,16 +11,74 @@ import { supabase } from "@/integrations/supabase/client";
 import { MissionRow } from "@/types/database";
 import { MissionStatusBadge } from "../client/MissionStatusBadge";
 import { toast } from "sonner";
+import { Bell } from "lucide-react";
+
+const markNotificationsRead = async (missionId: string) => {
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('mission_id', missionId)
+      .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+      
+    if (error) console.error("Erreur lors du marquage des notifications comme lues:", error);
+  } catch (error) {
+    console.error('Erreur:', error);
+  }
+};
 
 const DriverMissions = () => {
   const { user } = useAuthContext();
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [missionsWithNotifications, setMissionsWithNotifications] = useState<string[]>([]);
 
   useEffect(() => {
     if (user) {
       fetchMissions();
+      
+      const fetchNotifications = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('notifications')
+            .select('mission_id')
+            .eq('user_id', user.id)
+            .eq('read', false);
+            
+          if (error) throw error;
+          
+          if (data) {
+            setMissionsWithNotifications(data.map(n => n.mission_id).filter(Boolean));
+          }
+        } catch (error) {
+          console.error('Erreur lors du chargement des notifications:', error);
+        }
+      };
+      
+      fetchNotifications();
+      
+      const channel = supabase
+        .channel('public:notifications')
+        .on('postgres_changes', { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}` 
+        }, payload => {
+          if (payload.new && payload.new.mission_id) {
+            setMissionsWithNotifications(prev => 
+              prev.includes(payload.new.mission_id) 
+                ? prev 
+                : [...prev, payload.new.mission_id]
+            );
+          }
+        })
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 
@@ -35,7 +93,6 @@ const DriverMissions = () => {
 
       if (error) throw error;
       
-      // Ensure all required fields exist
       const typedData: MissionRow[] = (data || []).map(item => ({
         ...item as any,
         pickup_address: (item as any).pickup_address || "",
@@ -63,7 +120,6 @@ const DriverMissions = () => {
 
       if (error) throw error;
       
-      // Update the local state
       setMissions(prev => 
         prev.map(mission => 
           mission.id === missionId 
@@ -113,9 +169,14 @@ const DriverMissions = () => {
             {missions.filter(mission => mission.status !== 'termine' && mission.status !== 'livre' && mission.status !== 'incident').length > 0 ? (
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {missions.filter(mission => mission.status !== 'termine' && mission.status !== 'livre' && mission.status !== 'incident').map((mission) => (
-                  <Card key={mission.id}>
+                  <Card key={mission.id} className={missionsWithNotifications.includes(mission.id) ? "border-blue-500" : ""}>
                     <CardHeader>
-                      <CardTitle>Mission N°{mission.mission_number || 'N/A'}</CardTitle>
+                      <div className="flex justify-between items-center">
+                        <CardTitle>Mission N°{mission.mission_number || 'N/A'}</CardTitle>
+                        {missionsWithNotifications.includes(mission.id) && (
+                          <Bell className="h-4 w-4 text-blue-500" />
+                        )}
+                      </div>
                       <CardDescription>
                         {formatDate(mission.created_at)}
                       </CardDescription>
@@ -128,7 +189,7 @@ const DriverMissions = () => {
                         <strong>Arrivée:</strong> {mission.delivery_address}
                       </p>
                       <MissionStatusBadge status={mission.status} />
-                      <div className="flex justify-end gap-2 mt-4">
+                      <div className="flex justify-end gap-2 mt-4" onClick={() => markNotificationsRead(mission.id)}>
                         {mission.status === 'confirme' || mission.status === 'confirmé' ? (
                           <Button 
                             variant="outline" 

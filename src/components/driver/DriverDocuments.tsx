@@ -1,189 +1,149 @@
 
 import { useState, useEffect } from "react";
-import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Loader } from "@/components/ui/loader";
-import { UploadCloud, FileText, AlertTriangle, CheckCircle2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { DocumentType } from "@/types/database";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Upload, FileCheck, FileX, AlertTriangle } from "lucide-react";
 
-interface Document {
-  id: string;
-  document_type: DocumentType;
-  document_url: string;
-  uploaded_at: string;
-}
-
-interface DocumentTypeInfo {
-  id: DocumentType;
-  name: string;
-  description: string;
-}
-
-const documentTypes: DocumentTypeInfo[] = [
-  { 
-    id: "id_card", 
-    name: "Carte d'identité", 
-    description: "Pièce d'identité en cours de validité" 
-  },
-  { 
-    id: "driving_license", 
-    name: "Permis de conduire", 
-    description: "Permis de conduire en cours de validité" 
-  },
-  { 
-    id: "kbis", 
-    name: "Extrait Kbis", 
-    description: "Document officiel attestant de l'existence juridique de l'entreprise" 
-  },
-  { 
-    id: "vigilance_certificate", 
-    name: "Attestation de vigilance", 
-    description: "Document attestant que vous êtes à jour de vos cotisations sociales" 
-  }
+// Types de documents requis pour les chauffeurs
+const REQUIRED_DOCUMENTS = [
+  { id: "cni", name: "Carte Nationale d'Identité", type: "cni" },
+  { id: "permis", name: "Permis de conduire", type: "permis" },
+  { id: "kbis", name: "Extrait Kbis", type: "kbis" },
+  { id: "vigilance", name: "Attestation de vigilance", type: "vigilance" }
 ];
 
+type Document = {
+  id: string;
+  document_type: string;
+  document_url: string;
+  user_id: string;
+  uploaded_at: string;
+};
+
 const DriverDocuments = () => {
-  const { user } = useAuthContext();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<string | null>(null);
-  const [uploadingFile, setUploadingFile] = useState<File | null>(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedDocType, setSelectedDocType] = useState<DocumentType | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const { user } = useAuthContext();
 
   useEffect(() => {
-    if (user) {
-      fetchDriverDocuments();
-    }
+    if (!user) return;
+    
+    const fetchDocuments = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('user_id', user.id);
+          
+        if (error) throw error;
+        
+        setDocuments(data || []);
+      } catch (error) {
+        console.error('Erreur lors du chargement des documents:', error);
+        toast.error("Erreur lors du chargement des documents");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchDocuments();
   }, [user]);
 
-  const fetchDriverDocuments = async () => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+    
+    const file = event.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${documentType}-${user?.id}-${Date.now()}.${fileExt}`;
+    const filePath = `driver-documents/${fileName}`;
+    
     try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("documents")
-        .select("*")
-        .eq("user_id", user?.id);
-
-      if (error) throw error;
-      setDocuments(data || []);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      toast.error("Erreur lors du chargement des documents");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, documentType: DocumentType) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Le fichier est trop volumineux. Taille maximale: 5 Mo");
-      return;
-    }
-
-    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Format de fichier non supporté. Formats acceptés: PDF, JPEG, PNG");
-      return;
-    }
-
-    setUploadingFile(file);
-    setSelectedDocType(documentType);
-    setOpenDialog(true);
-  };
-
-  const uploadDocument = async () => {
-    if (!uploadingFile || !selectedDocType || !user) return;
-
-    try {
-      setUploading(selectedDocType);
-      setUploadProgress(10);
-
-      // Upload to storage
-      const fileName = `${user.id}-${selectedDocType}-${Date.now()}.${uploadingFile.name.split('.').pop()}`;
-      const filePath = `documents/${fileName}`;
+      setUploading(prev => ({ ...prev, [documentType]: true }));
       
-      setUploadProgress(30);
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from("documents")
-        .upload(filePath, uploadingFile, {
-          upsert: true,
-        });
-
+      // Upload du fichier dans le storage
+      const { error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file);
+        
       if (uploadError) throw uploadError;
       
-      setUploadProgress(60);
-      
-      // Get public URL
-      const { data: publicURLData } = supabase.storage
-        .from("documents")
+      // Récupération de l'URL publique
+      const { data: urlData } = await supabase.storage
+        .from('documents')
         .getPublicUrl(filePath);
-
-      const publicURL = publicURLData?.publicUrl;
+        
+      if (!urlData) throw new Error("Impossible de récupérer l'URL du document");
       
-      setUploadProgress(80);
-
-      // Using a workaround to handle the type incompatibility
-      // Cast the document_type to any to bypass TypeScript checking
-      // since we know the database has been updated to accept "vigilance_certificate"
-      const { error: insertError } = await supabase
-        .from("documents")
-        .upsert({
-          user_id: user.id,
-          document_type: selectedDocType as any,
-          document_url: publicURL
-        });
-
-      if (insertError) throw insertError;
+      // Vérifier si un document de ce type existe déjà
+      const existingDocIndex = documents.findIndex(doc => doc.document_type === documentType);
       
-      setUploadProgress(100);
+      if (existingDocIndex >= 0) {
+        // Mettre à jour le document existant
+        const { error: updateError } = await supabase
+          .from('documents')
+          .update({ 
+            document_url: urlData.publicUrl,
+            uploaded_at: new Date().toISOString()
+          })
+          .eq('id', documents[existingDocIndex].id);
+          
+        if (updateError) throw updateError;
+        
+        // Mettre à jour l'état local
+        const updatedDocuments = [...documents];
+        updatedDocuments[existingDocIndex] = {
+          ...updatedDocuments[existingDocIndex],
+          document_url: urlData.publicUrl,
+          uploaded_at: new Date().toISOString()
+        };
+        setDocuments(updatedDocuments);
+      } else {
+        // Créer une nouvelle entrée de document
+        const { data: newDoc, error: insertError } = await supabase
+          .from('documents')
+          .insert({
+            user_id: user?.id,
+            document_type: documentType,
+            document_url: urlData.publicUrl
+          })
+          .select()
+          .single();
+          
+        if (insertError) throw insertError;
+        
+        // Ajouter le nouveau document à l'état local
+        if (newDoc) {
+          setDocuments(prev => [...prev, newDoc]);
+        }
+      }
       
-      toast.success("Document uploadé avec succès");
-      fetchDriverDocuments();
-      setOpenDialog(false);
-      setUploadingFile(null);
-      setSelectedDocType(null);
+      toast.success(`Document ${documentType} téléchargé avec succès`);
     } catch (error) {
-      console.error("Error uploading document:", error);
-      toast.error("Erreur lors de l'upload du document");
+      console.error('Erreur lors du téléchargement du document:', error);
+      toast.error(`Erreur lors du téléchargement du document: ${error.message || 'Erreur inconnue'}`);
     } finally {
-      setUploading(null);
-      setUploadProgress(0);
+      setUploading(prev => ({ ...prev, [documentType]: false }));
     }
   };
 
-  const deleteDocument = async (documentId: string) => {
-    try {
-      const { error } = await supabase
-        .from("documents")
-        .delete()
-        .eq("id", documentId);
-
-      if (error) throw error;
-      
-      toast.success("Document supprimé avec succès");
-      setDocuments(documents.filter(doc => doc.id !== documentId));
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      toast.error("Erreur lors de la suppression du document");
-    }
+  const getDocumentStatus = (docType: string) => {
+    const doc = documents.find(d => d.document_type === docType);
+    return doc ? true : false;
   };
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Mes documents</h1>
-        <p className="text-muted-foreground">Gérez vos documents importants</p>
+        <h1 className="text-3xl font-bold">Mes Documents</h1>
+        <p className="text-muted-foreground">
+          Téléchargez vos documents obligatoires pour pouvoir accepter des missions
+        </p>
       </div>
 
       {loading ? (
@@ -191,98 +151,75 @@ const DriverDocuments = () => {
           <Loader className="h-8 w-8" />
         </div>
       ) : (
-        <div className="space-y-4">
-          {documentTypes.map((docType) => {
-            const uploadedDocument = documents.find(doc => doc.document_type === docType.id);
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {REQUIRED_DOCUMENTS.map((doc) => {
+            const isUploaded = getDocumentStatus(doc.type);
+            const isUploading = uploading[doc.type] || false;
             
             return (
-              <Card key={docType.id}>
-                <CardHeader className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <CardTitle className="text-lg font-semibold">{docType.name}</CardTitle>
-                    <CardDescription>{docType.description}</CardDescription>
+              <Card key={doc.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>{doc.name}</CardTitle>
+                    {isUploaded ? (
+                      <FileCheck className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    )}
                   </div>
-                  
-                  {uploadedDocument ? (
-                    <div className="flex items-center gap-2">
-                      <a href={uploadedDocument.document_url} target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="sm">
-                          <FileText className="h-4 w-4 mr-2" />
-                          Voir le document
-                        </Button>
-                      </a>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => deleteDocument(uploadedDocument.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <label htmlFor={`upload-${docType.id}`}>
-                      <input
-                        type="file"
-                        id={`upload-${docType.id}`}
-                        className="hidden"
-                        onChange={(e) => handleFileChange(e, docType.id)}
-                      />
-                      <Button variant="outline" asChild>
-                        <div className="flex items-center gap-2">
-                          <UploadCloud className="h-4 w-4" />
-                          Télécharger
-                        </div>
-                      </Button>
-                    </label>
-                  )}
+                  <CardDescription>
+                    {isUploaded ? "Document téléchargé" : "Document requis"}
+                  </CardDescription>
                 </CardHeader>
-                
-                {uploading === docType.id && (
-                  <CardContent>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader className="h-4 w-4" />
-                      Téléchargement en cours... {uploadProgress}%
+                <CardContent>
+                  <div className="flex justify-between items-center">
+                    {isUploaded && (
+                      <a 
+                        href={documents.find(d => d.document_type === doc.type)?.document_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-700 text-sm underline"
+                      >
+                        Voir le document
+                      </a>
+                    )}
+                    <div>
+                      <input
+                        id={`file-${doc.id}`}
+                        type="file"
+                        accept=".pdf,.png,.jpg,.jpeg"
+                        className="hidden"
+                        onChange={(e) => handleFileUpload(e, doc.type)}
+                        disabled={isUploading}
+                      />
+                      <label htmlFor={`file-${doc.id}`}>
+                        <Button
+                          variant={isUploaded ? "outline" : "default"}
+                          type="button"
+                          disabled={isUploading}
+                          className={`cursor-pointer ${isUploaded ? "ml-auto" : ""}`}
+                        >
+                          {isUploading ? (
+                            <>
+                              <Loader className="mr-2 h-4 w-4 animate-spin" />
+                              Téléchargement...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-2 h-4 w-4" />
+                              {isUploaded ? "Mettre à jour" : "Télécharger"}
+                            </>
+                          )}
+                        </Button>
+                      </label>
                     </div>
-                  </CardContent>
-                )}
+                  </div>
+                </CardContent>
               </Card>
             );
           })}
         </div>
       )}
-
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Confirmation de l'upload</DialogTitle>
-            <DialogDescription>
-              Êtes-vous sûr de vouloir uploader ce document ?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Type de document
-              </Label>
-              <Input id="name" value={selectedDocType ? documentTypes.find(dt => dt.id === selectedDocType)?.name : ''} className="col-span-3" disabled />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="filename" className="text-right">
-                Nom du fichier
-              </Label>
-              <Input id="filename" value={uploadingFile?.name || ''} className="col-span-3" disabled />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setOpenDialog(false)}>
-              Annuler
-            </Button>
-            <Button type="submit" onClick={uploadDocument} disabled={uploading !== null}>
-              Confirmer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

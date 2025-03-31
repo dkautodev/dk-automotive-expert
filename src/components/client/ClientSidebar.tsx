@@ -1,56 +1,94 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Home, FileText, Truck, Receipt, History, User } from 'lucide-react';
+import {
+  ChevronLeft,
+  LayoutDashboard,
+  FileText,
+  User,
+  ClipboardList,
+  LogOut
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useAuthContext } from "@/context/AuthContext";
+import NotificationBell from "../notifications/NotificationBell";
 
 const ClientSidebar = () => {
-  return <div className="h-screen w-52 bg-white border-r border-gray-200 fixed left-0 top-0">
-      <div className="p-2 my-[25px]">
-        <img alt="DK Automotive" className="w-36 h-auto mx-auto mb-2" src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" />
-        
+  const { collapsed, toggleCollapsed } = useSidebar();
+  const { logout } = useAuthContext();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
+
+  return (
+    <div className="fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10">
+      <div className="h-16 flex items-center justify-between px-4">
+        <Link to="/dashboard/client" className="font-semibold">
+          DK Automotive
+        </Link>
+        <div className="flex items-center space-x-1">
+          <NotificationBell />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleCollapsed}
+            className="h-8 w-8"
+          >
+            <ChevronLeft
+              className={`h-5 w-5 transition-transform ${
+                collapsed ? "rotate-180" : ""
+              }`}
+            />
+          </Button>
+        </div>
       </div>
-      
-      <nav className="mt-4">
-        <ul>
-          <li className="mb-2">
-            <Link to="/dashboard/client" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <Home className="mr-2 h-4 w-4" />
-              Dashboard
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/dashboard/client/pending-quotes" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <FileText className="mr-2 h-4 w-4" />
-              Devis en Attente
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/dashboard/client/ongoing-shipments" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <Truck className="mr-2 h-4 w-4" />
-              Convoyages en Cours
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/dashboard/client/completed-shipments" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <History className="mr-2 h-4 w-4" />
-              Historique
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/dashboard/client/pending-invoices" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <Receipt className="mr-2 h-4 w-4" />
-              Factures en Attente
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/dashboard/client/profile" className="flex items-center p-3 hover:bg-gray-100 rounded-md">
-              <User className="mr-2 h-4 w-4" />
-              Mon Profil
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </div>;
+      <Separator />
+      <div className="flex flex-col space-y-1 p-2">
+        <Link
+          to="/dashboard/client"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          <span>Tableau de bord</span>
+        </Link>
+        <Link
+          to="/dashboard/client/profile"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+        >
+          <User className="h-4 w-4" />
+          <span>Profil</span>
+        </Link>
+         <Link
+          to="/dashboard/client/missions"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+        >
+          <ClipboardList className="h-4 w-4" />
+          <span>Mes missions</span>
+        </Link>
+        <Link
+          to="/dashboard/client/quotes"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+        >
+          <FileText className="h-4 w-4" />
+          <span>Mes devis</span>
+        </Link>
+      </div>
+      <Separator />
+      <div className="p-2">
+        <Button
+          variant="ghost"
+          className="w-full justify-start font-normal"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Se déconnecter
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 export default ClientSidebar;

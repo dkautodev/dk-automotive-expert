@@ -1,100 +1,108 @@
-
-import { Link, useLocation } from "react-router-dom";
-import { Truck, User, FileText, DollarSign, LogOut, PlusCircle, LayoutDashboard, FileBox } from "lucide-react";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { 
+  ChevronLeft, 
+  LayoutDashboard, 
+  FileText, 
+  User,
+  Truck,
+  CreditCard,
+  LogOut,
+  FileCheck
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useAuthContext } from "@/context/AuthContext";
-import { toast } from "sonner";
+import NotificationBell from "../notifications/NotificationBell";
 
-const DriverSidebar = () => {
-  const location = useLocation();
-  const currentPath = location.pathname;
-  const { signOut } = useAuthContext();
-  
+interface DriverSidebarProps {}
+
+const DriverSidebar: React.FC<DriverSidebarProps> = () => {
+  const navigate = useNavigate();
+  const { collapsed, toggleCollapsed } = useSidebar();
+  const { logout } = useAuthContext();
+
   const handleLogout = async () => {
-    try {
-      await signOut();
-      toast.success("Vous avez été déconnecté avec succès");
-    } catch (error) {
-      toast.error("Une erreur est survenue lors de la déconnexion");
-    }
+    await logout();
+    navigate("/auth");
   };
 
   return (
-    <Sidebar>
-      <SidebarHeader className="h-14 items-center border-b px-6">
-        <div className="flex items-center gap-2 font-bold">
-          <Truck className="h-5 w-5 text-dk-navy" />
-          <span className="text-dk-navy">DK Automotive</span>
+    <div className="fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10">
+      <div className="h-16 flex items-center justify-between px-4">
+        <Link to="/dashboard/driver" className="font-semibold">
+          DK Automotive
+        </Link>
+        <div className="flex items-center space-x-1">
+          <NotificationBell />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleCollapsed}
+            className="h-8 w-8"
+          >
+            <ChevronLeft
+              className={`h-5 w-5 transition-transform ${
+                collapsed ? "rotate-180" : ""
+              }`}
+            />
+          </Button>
         </div>
-      </SidebarHeader>
+      </div>
       
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className={currentPath === "/dashboard/driver" ? "bg-accent" : ""}>
-                  <Link to="/dashboard/driver" className="flex items-center gap-3">
-                    <LayoutDashboard className="h-5 w-5" />
-                    <span>Tableau de bord</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className={currentPath.includes("/dashboard/driver/missions") ? "bg-accent" : ""}>
-                  <Link to="/dashboard/driver/missions" className="flex items-center gap-3">
-                    <Truck className="h-5 w-5" />
-                    <span>Mes missions</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className={currentPath.includes("/dashboard/driver/earnings") ? "bg-accent" : ""}>
-                  <Link to="/dashboard/driver/earnings" className="flex items-center gap-3">
-                    <DollarSign className="h-5 w-5" />
-                    <span>Mes revenus</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+      <Separator />
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className={currentPath.includes("/dashboard/driver/documents") ? "bg-accent" : ""}>
-                  <Link to="/dashboard/driver/documents" className="flex items-center gap-3">
-                    <FileBox className="h-5 w-5" />
-                    <span>Mes documents</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className={currentPath.includes("/dashboard/driver/profile") ? "bg-accent" : ""}>
-                  <Link to="/dashboard/driver/profile" className="flex items-center gap-3">
-                    <User className="h-5 w-5" />
-                    <span>Mon profil</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      
-      <SidebarFooter className="px-6 py-4">
-        <Button 
-          onClick={handleLogout} 
-          variant="outline" 
-          className="w-full flex items-center justify-center gap-2 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+      <div className="flex flex-col space-y-1 p-2">
+        <Link
+          to="/dashboard/driver"
+          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
         >
-          <LogOut className="h-4 w-4" />
-          Déconnexion
+          <LayoutDashboard className="h-4 w-4" />
+          <span>Tableau de bord</span>
+        </Link>
+        <Link
+          to="/dashboard/driver/missions"
+          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+        >
+          <Truck className="h-4 w-4" />
+          <span>Mes missions</span>
+        </Link>
+        <Link
+          to="/dashboard/driver/documents"
+          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+        >
+          <FileCheck className="h-4 w-4" />
+          <span>Mes documents</span>
+        </Link>
+        {/* <Link
+          to="/dashboard/driver/factures"
+          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+        >
+          <CreditCard className="h-4 w-4" />
+          <span>Mes factures</span>
+        </Link> */}
+        <Link
+          to="/dashboard/driver/profile"
+          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+        >
+          <User className="h-4 w-4" />
+          <span>Mon profil</span>
+        </Link>
+      </div>
+
+      <Separator />
+
+      <div className="flex flex-col space-y-1 p-2">
+        <Button
+          variant="ghost"
+          className="justify-start rounded-md p-2 hover:bg-gray-100"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          <span>Se déconnecter</span>
         </Button>
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+    </div>
   );
 };
 
