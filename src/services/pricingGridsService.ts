@@ -130,8 +130,13 @@ export const updatePriceInDB = async (
 
     // Déterminer si le prix est par km en fonction de la tranche
     const range = distanceRanges.find(r => r.id === rangeId);
+    if (!range) {
+      throw new Error(`Range not found: ${rangeId}`);
+    }
+    
     const isPerKm = range?.perKm || false;
-
+    const vehicleTypeName = getVehicleTypeName(vehicleTypeId);
+    
     if (existingPrice) {
       // Mettre à jour le prix existant
       const { error: updateError } = await supabase
@@ -154,7 +159,9 @@ export const updatePriceInDB = async (
         .from('price_grids')
         .insert({ 
           vehicle_type_id: vehicleTypeId,
+          vehicle_type_name: vehicleTypeName,
           distance_range_id: rangeId,
+          distance_range_label: range.label,
           price_ht: priceHT,
           is_per_km: isPerKm
         });
@@ -192,7 +199,9 @@ export const initializeDefaultPriceGrids = async (): Promise<PriceGrid[]> => {
           .from('price_grids')
           .insert({
             vehicle_type_id: vehicleTypeId,
+            vehicle_type_name: vehicleTypeName,
             distance_range_id: range.id,
+            distance_range_label: range.label,
             price_ht: basePrice,
             is_per_km: range.perKm || false
           });
@@ -230,7 +239,12 @@ const getVehicleTypeName = (vehicleTypeId: string): string => {
     case 'berline': return 'Berline';
     case 'camion': return 'Camion';
     case 'plateau': return 'Plateau';
-    default: return 'Inconnu';
+    case 'suv': return '4x4 (ou SUV)';
+    case 'utilitaire-6-12': return 'Utilitaire 6-12m3';
+    case 'utilitaire-12-15': return 'Utilitaire 12-15m3';
+    case 'utilitaire-15-20': return 'Utilitaire 15-20m3';
+    case 'utilitaire-20-plus': return 'Utilitaire + de 20m3';
+    default: return vehicleTypeId.charAt(0).toUpperCase() + vehicleTypeId.slice(1);
   }
 };
 
@@ -243,6 +257,11 @@ const getDefaultBasePrice = (vehicleTypeId: string, rangeId: string): number => 
     case 'berline': baseMultiplier = 1.2; break;
     case 'camion': baseMultiplier = 1.8; break;
     case 'plateau': baseMultiplier = 2.0; break;
+    case 'suv': baseMultiplier = 1.3; break;
+    case 'utilitaire-6-12': baseMultiplier = 1.4; break;
+    case 'utilitaire-12-15': baseMultiplier = 1.5; break;
+    case 'utilitaire-15-20': baseMultiplier = 1.7; break;
+    case 'utilitaire-20-plus': baseMultiplier = 1.9; break;
   }
   
   // Prix selon la distance
