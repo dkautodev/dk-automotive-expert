@@ -51,7 +51,7 @@ const ClientSelector = ({
     
     console.log("Clients filtrés:", filtered);
     setFilteredClients(filtered);
-  }, [searchValue, clients, clientId]);
+  }, [searchValue, clients, selectedClient, clientId]);
 
   const handleSelectClient = (value: string) => {
     console.log("Client sélectionné:", value);
@@ -95,26 +95,38 @@ const ClientSelector = ({
                 ) : (
                   <>
                     <CommandEmpty>
-                      {searchValue.trim() ? "Aucun client trouvé" : "Saisissez un terme de recherche"}
+                      {searchValue.trim() 
+                        ? "Aucun client trouvé" 
+                        : clients.length === 0 
+                          ? "Aucun client disponible, cliquez sur + pour en ajouter" 
+                          : "Saisissez un terme de recherche"
+                      }
                     </CommandEmpty>
                     <CommandGroup>
-                      {filteredClients.map((client) => (
-                        <CommandItem
-                          key={client.id}
-                          value={client.id}
-                          onSelect={handleSelectClient}
-                        >
-                          <div className="flex flex-col">
-                            <span>{client.name}</span>
-                            {client.email && (
-                              <span className="text-xs text-muted-foreground">{client.email}</span>
-                            )}
-                            {client.company && (
-                              <span className="text-xs text-muted-foreground">{client.company}</span>
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))}
+                      {filteredClients.length > 0 ? (
+                        filteredClients.map((client) => (
+                          <CommandItem
+                            key={client.id}
+                            value={client.id}
+                            onSelect={() => handleSelectClient(client.id)}
+                            className="cursor-pointer"
+                          >
+                            <div className="flex flex-col">
+                              <span>{client.name}</span>
+                              {client.email && (
+                                <span className="text-xs text-muted-foreground">{client.email}</span>
+                              )}
+                              {client.company && (
+                                <span className="text-xs text-muted-foreground">{client.company}</span>
+                              )}
+                            </div>
+                          </CommandItem>
+                        ))
+                      ) : !loading && (
+                        <div className="py-6 text-center text-sm">
+                          Aucun client à afficher
+                        </div>
+                      )}
                     </CommandGroup>
                   </>
                 )}

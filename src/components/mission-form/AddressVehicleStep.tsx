@@ -7,7 +7,9 @@ import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import ClientSelector from "./ClientSelector";
 import { useClients } from "./hooks/useClients";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import NewClientForm from "./NewClientForm";
 import AddressFields from "./AddressFields";
 import VehicleTypeSelector from "./VehicleTypeSelector";
@@ -58,7 +60,9 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
   // Debug logging
   useEffect(() => {
     console.log("État actuel des clients:", clients);
-  }, [clients]);
+    console.log("Chargement clients:", clientsLoading);
+    console.log("Erreur clients:", clientsError);
+  }, [clients, clientsLoading, clientsError]);
 
   const handleAddClient = () => {
     setClientDialogOpen(true);
@@ -102,6 +106,33 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
         Veuillez sélectionner un client et saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule
       </p>
 
+      {clientsLoading && (
+        <Alert variant="default" className="bg-blue-50 border-blue-200 text-blue-700">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Chargement des clients en cours...
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {clientsError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Erreur lors du chargement des clients. Veuillez réessayer ou ajouter un nouveau client.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {!clientsLoading && clients.length === 0 && !clientsError && (
+        <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-700">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Aucun client n'a été trouvé dans la base de données. Veuillez en ajouter un en utilisant le bouton +.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <ClientSelector 
         form={form} 
         clients={clients}
@@ -113,6 +144,9 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Ajouter un nouveau client</DialogTitle>
+            <DialogDescription>
+              Remplissez le formulaire ci-dessous pour créer un nouveau client
+            </DialogDescription>
           </DialogHeader>
           <NewClientForm 
             newClient={newClient}

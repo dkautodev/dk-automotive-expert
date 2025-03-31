@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { ClientData, NewClientData } from './types/clientTypes';
 import { fetchClientsData, addClientData } from './services/clientService';
@@ -11,6 +11,7 @@ export const useClients = (form?: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [newClient, setNewClient] = useState<NewClientData>({
     first_name: '',
     last_name: '',
@@ -18,7 +19,7 @@ export const useClients = (form?: any) => {
     phone: '',
   });
 
-  const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -44,7 +45,7 @@ export const useClients = (form?: any) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const addClient = async (newClientData: NewClientData): Promise<string | null> => {
     return await addClientData(newClientData);
@@ -54,22 +55,34 @@ export const useClients = (form?: any) => {
     try {
       setIsSubmitting(true);
       
-      // Simulate client creation (retained from original)
-      toast.success('Client créé avec succès');
+      // Vérification des données minimales requises
+      if (!newClient.first_name || !newClient.last_name) {
+        toast.error('Veuillez saisir au moins un prénom et un nom');
+        return false;
+      }
       
-      if (form && newClient.first_name && newClient.last_name) {
-        const clientId = `client-${Date.now()}`;
+      console.log("Tentative de création d'un client:", newClient);
+      const clientId = await addClient(newClient);
+      
+      if (clientId) {
+        toast.success('Client créé avec succès');
         
+        // Créer un nouvel objet client à partir des données du formulaire
         const newClientDisplay: ClientData = {
           id: clientId,
-          name: `${newClient.first_name} ${newClient.last_name} - ${newClient.company || ''}`.trim(),
+          name: `${newClient.first_name} ${newClient.last_name}${newClient.company ? ` - ${newClient.company}` : ''}`.trim(),
           email: newClient.email,
           phone: newClient.phone,
+          company: newClient.company
         };
         
+        // Ajouter le client à la liste et mettre à jour le formulaire
         setClients(prev => [...prev, newClientDisplay]);
-        form.setValue('client_id', clientId);
+        if (form) {
+          form.setValue('client_id', clientId);
+        }
         
+        // Réinitialiser le formulaire de création de client
         setNewClient({
           first_name: '',
           last_name: '',
@@ -90,9 +103,27 @@ export const useClients = (form?: any) => {
     }
   };
 
+  // Première récupération des clients
   useEffect(() => {
     fetchClients();
-  }, []);
+  }, [fetchClients]);
+
+  // Si erreur de chargement des clients ou aucun client, forcer une nouvelle tentative
+  useEffect(() => {
+    if ((error || (clients.length === 0 && !isLoading)) && retryCount < 3) {
+      console.log(`Nouvelle tentative de récupération des clients (${retryCount + 1}/3)...`);
+      const timer = setTimeout(() => {
+        setRetryCount(prevCount => prevCount + 1);
+        fetchClients();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clients.length, isLoading, retryCount, fetchClients]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("État actuel des clients:", clients);
+  }, [clients]);
 
   return { 
     clients, 
