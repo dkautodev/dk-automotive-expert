@@ -7,7 +7,7 @@ import { FetchUsersResponse } from "../types/clientManagementTypes";
 /**
  * Edge function module for user data fetching
  */
-const edgeFunctionService = {
+export const edgeFunctionService = {
   /**
    * Fetches users with profiles via edge function
    */
@@ -43,7 +43,7 @@ const edgeFunctionService = {
 /**
  * Auth API module for user data fetching
  */
-const authApiService = {
+export const authApiService = {
   /**
    * Fetches users via Supabase Auth API
    */
@@ -108,7 +108,7 @@ const authApiService = {
 /**
  * Direct database module for user data fetching
  */
-const databaseService = {
+export const databaseService = {
   /**
    * Fetches users directly from database tables
    */
@@ -206,7 +206,7 @@ const databaseService = {
 /**
  * User deletion module
  */
-const userDeletionService = {
+export const userDeletionService = {
   /**
    * Attempts to delete a user via edge function
    */
@@ -300,3 +300,6 @@ export const userService = {
     }
   }
 };
+
+// Export individually for direct importing
+export const { fetchUsersWithProfiles, deleteUser } = userService;
