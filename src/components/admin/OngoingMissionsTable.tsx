@@ -34,7 +34,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           .from('missions')
           .select(`
             *,
-            clientProfile:client_id(
+            clientProfile:user_profiles!client_id(
               first_name,
               last_name,
               company_name
@@ -46,7 +46,22 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
 
         if (error) throw error;
         
-        setMissions(data as MissionRow[] || []);
+        if (data) {
+          // Transform the data to match the MissionRow type
+          const formattedMissions = data.map(mission => {
+            const vehicleInfo = mission.vehicle_info as any || {};
+            return {
+              ...mission,
+              // Add missing properties required by MissionRow type
+              pickup_address: vehicleInfo.pickup_address || 'N/A',
+              delivery_address: vehicleInfo.delivery_address || 'N/A',
+            } as MissionRow;
+          });
+
+          setMissions(formattedMissions);
+        } else {
+          setMissions([]);
+        }
       } catch (err) {
         console.error('Error fetching ongoing missions:', err);
       } finally {
