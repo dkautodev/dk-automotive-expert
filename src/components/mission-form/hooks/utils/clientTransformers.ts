@@ -5,6 +5,16 @@ import { ClientData } from "../types/clientTypes";
  * Transforms user profile data into standardized client format
  */
 export const transformProfileToClient = (profile: any): ClientData => {
+  // Vérifier que le profil est valide
+  if (!profile || typeof profile !== 'object') {
+    console.warn("Profil invalide reçu dans transformProfileToClient", profile);
+    return {
+      id: 'invalid-profile',
+      name: 'Profil invalide',
+      email: '',
+    };
+  }
+
   const fullName = [
     profile.first_name || '',
     profile.last_name || ''
@@ -12,7 +22,7 @@ export const transformProfileToClient = (profile: any): ClientData => {
 
   return {
     id: profile.user_id || profile.id || '',
-    name: fullName.trim() || 'Client sans nom',
+    name: fullName.trim() || profile.company_name || 'Client sans nom',
     email: profile.email || '', // Profile might not have email
     phone: profile.phone || '',
     company: profile.company_name || '',
@@ -24,10 +34,10 @@ export const transformProfileToClient = (profile: any): ClientData => {
  * Transforms auth user data with optional profile into standardized client format
  */
 export const transformUserToClient = (user: any, profiles?: any[]): ClientData => {
-  if (!user) {
-    console.warn("Utilisateur invalide reçu dans transformUserToClient");
+  if (!user || typeof user !== 'object') {
+    console.warn("Utilisateur invalide reçu dans transformUserToClient", user);
     return {
-      id: '',
+      id: 'invalid-user',
       name: 'Client invalide',
       email: '',
     };
