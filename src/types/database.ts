@@ -26,6 +26,20 @@ export type MissionRow = {
   updated_at: string | null;
   vehicles: any | null;
   additional_info?: string | null;
+  clientProfile?: UserProfileRow | null;
+};
+
+export type UserProfileRow = {
+  id: string;
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  company_name?: string | null;
+  phone?: string | null;
+  profile_picture?: string | null;
+  billing_address?: string | null;
+  siret_number?: string | null;
+  vat_number?: string | null;
 };
 
 export type MissionStatus = "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule";
