@@ -1,23 +1,25 @@
-
 import { Button } from "@/components/ui/button";
 import { LogOut, Receipt, FileText } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useAuthContext } from "@/context/AuthContext";
 import { useDashboardCounts } from "@/hooks/useDashboardCounts";
 import { toast } from "@/components/ui/use-toast";
 import TodayMissions from "./TodayMissions";
-
 const DashboardHome = () => {
-  const { signOut, user } = useAuthContext();
+  const {
+    signOut,
+    user
+  } = useAuthContext();
   const navigate = useNavigate();
-  const { data: counts = { ongoingShipments: 0, pendingInvoices: 0, completedShipments: 0, pendingQuotes: 0 } } = useDashboardCounts(user?.id);
-
+  const {
+    data: counts = {
+      ongoingShipments: 0,
+      pendingInvoices: 0,
+      completedShipments: 0,
+      pendingQuotes: 0
+    }
+  } = useDashboardCounts(user?.id);
   const handleLogout = async () => {
     try {
       await signOut();
@@ -34,16 +36,11 @@ const DashboardHome = () => {
       });
     }
   };
-
-  return (
-    <div className="p-6">
+  return <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Tableau de bord Client</h1>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2" />
-            Déconnexion
-          </Button>
+          
         </div>
       </div>
       
@@ -100,8 +97,6 @@ const DashboardHome = () => {
         
         <TodayMissions />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default DashboardHome;
