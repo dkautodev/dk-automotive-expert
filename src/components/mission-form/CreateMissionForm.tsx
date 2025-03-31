@@ -83,7 +83,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       
       // Format data for database - Specifions explicitement les colonnes dans notre objet
       const missionData = {
-        status: "en_attente", // Utiliser un statut valide selon la contrainte missions_status_check
+        status: "confirmé", // Changé de "en_attente" à "confirmé" pour que la mission apparaisse dans "missions en cours"
         client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
         distance: values.distance?.toString(), // Convert to string as required by the database
         price_ht: parseFloat(values.price_ht || "0"),
