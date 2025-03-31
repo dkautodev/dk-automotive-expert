@@ -29,7 +29,7 @@ export const fetchClientsData = async (): Promise<{
       
       // Transform auth users to client format
       const formattedClients: ClientData[] = authData.users
-        .filter((user): user is { id: string; email?: string | null; user_metadata?: Record<string, any> } => 
+        .filter(user => 
           // Ensure user object has required properties
           user !== null && typeof user === 'object' && 'id' in user
         )
