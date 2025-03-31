@@ -11,6 +11,9 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
+import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
+import { generateMissionPDF } from "@/utils/missionPdfGenerator";
 
 interface MissionDetailsDialogProps {
   mission: MissionRow | null;
@@ -32,11 +35,28 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
     return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
   };
   
+  const handleGeneratePDF = () => {
+    if (mission) {
+      generateMissionPDF(mission);
+    }
+  };
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Détails de la mission {mission.mission_number}</DialogTitle>
+          <DialogTitle className="flex items-center justify-between">
+            <span>Détails de la mission {mission.mission_number}</span>
+            <Button 
+              onClick={handleGeneratePDF} 
+              variant="outline" 
+              size="sm" 
+              className="ml-2 flex items-center gap-1"
+            >
+              <FileText className="h-4 w-4" />
+              <span>PDF</span>
+            </Button>
+          </DialogTitle>
           <DialogDescription>
             Créée le {format(new Date(mission.created_at), "Pp", { locale: fr })}
           </DialogDescription>

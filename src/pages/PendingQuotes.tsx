@@ -6,13 +6,14 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { FileText, Eye, X } from "lucide-react";
+import { FileText, Eye, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAuthContext } from "@/context/AuthContext";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
 import { extractPostalCodeAndCity } from "@/lib/utils";
+import { generateMissionPDF } from "@/utils/missionPdfGenerator";
 
 const PendingQuotes = () => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
@@ -73,6 +74,10 @@ const PendingQuotes = () => {
     setIsDetailsDialogOpen(true);
   };
 
+  const handleGeneratePDF = (mission: MissionRow) => {
+    generateMissionPDF(mission);
+  };
+
   const formatPickupDate = (dateString: string | null) => {
     if (!dateString) return "Non spécifié";
     return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
@@ -130,6 +135,14 @@ const PendingQuotes = () => {
                       title="Voir les détails"
                     >
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleGeneratePDF(mission)}
+                      title="Télécharger le PDF"
+                    >
+                      <Download className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"

@@ -6,13 +6,14 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { FileText, Eye } from "lucide-react";
+import { FileText, Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
 import { extractPostalCodeAndCity } from "@/lib/utils";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
+import { generateMissionPDF } from "@/utils/missionPdfGenerator";
 
 const MissionHistory = () => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
@@ -47,6 +48,10 @@ const MissionHistory = () => {
   const handleViewDetails = (mission: MissionRow) => {
     setSelectedMission(mission);
     setIsDetailsDialogOpen(true);
+  };
+
+  const handleGeneratePDF = (mission: MissionRow) => {
+    generateMissionPDF(mission);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -108,7 +113,7 @@ const MissionHistory = () => {
                   <TableCell><MissionStatusBadge status={mission.status} /></TableCell>
                   <TableCell className="text-right">{mission.price_ttc ? `${mission.price_ttc}€` : "Non spécifié"}</TableCell>
                   <TableCell>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -116,6 +121,14 @@ const MissionHistory = () => {
                         title="Voir les détails"
                       >
                         <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleGeneratePDF(mission)}
+                        title="Télécharger le PDF"
+                      >
+                        <Download className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
