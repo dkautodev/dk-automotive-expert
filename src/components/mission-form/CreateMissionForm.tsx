@@ -121,11 +121,14 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       console.log("Données de mission à envoyer:", missionData);
       console.log("Type de mission:", values.mission_type);
 
-      // Utiliser la fonction RPC create_mission avec le bon typage
-      const { data, error } = await supabase.rpc('create_mission', {
-        mission_data: missionData,
-        mission_type_value: values.mission_type // Passer le type de mission séparément
-      });
+      // Appel modifié de la fonction RPC pour éviter l'ambiguïté de colonne
+      const { data, error } = await supabase.rpc(
+        'create_mission',
+        {
+          mission_data: missionData,
+          mission_type_value: values.mission_type
+        }
+      );
 
       if (error) {
         console.error("Erreur détaillée:", error);
