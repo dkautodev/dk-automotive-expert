@@ -28,7 +28,7 @@ export const useAddressVehicleStep = (
   const deliveryAddress = form.watch("delivery_address");
   const vehicleType = form.watch("vehicle_type");
   
-  // Ajouter surveillance du champ additional_info
+  // Surveillance du champ additional_info
   const additionalInfo = form.watch("additional_info");
 
   const isCalculating = isDistanceCalculating || isPriceCalculating || isCalculatingTotal;
