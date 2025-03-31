@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import CreateMissionForm from "./CreateMissionForm";
+import { toast } from "sonner";
 
 interface CreateMissionDialogProps {
   onMissionCreated?: () => void;
@@ -24,6 +25,7 @@ const CreateMissionDialog = ({ onMissionCreated }: CreateMissionDialogProps) => 
     if (onMissionCreated) {
       onMissionCreated();
     }
+    toast.success("Mission créée avec succès");
   };
 
   return (

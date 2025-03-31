@@ -1,19 +1,28 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardCards from "./DashboardCards";
 import ClientManagement from "./ClientManagement";
 import PendingInvoicesTable from "./PendingInvoicesTable";
 import CompletedMissionsTable from "./CompletedMissionsTable";
 import OngoingMissionsTable from "./OngoingMissionsTable";
 import CreateMissionDialog from "../mission-form/CreateMissionDialog";
+import { toast } from "sonner";
 
 const AdminHome = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Effet pour forcer l'actualisation lors du chargement initial
+  useEffect(() => {
+    console.log("AdminHome initial load, setting refresh trigger to 1");
+    setRefreshTrigger(1);
+  }, []);
+
   const handleMissionCreated = () => {
     // Incrémente le déclencheur de rafraîchissement pour forcer la mise à jour des tables
-    setRefreshTrigger(prev => prev + 1);
-    console.log("Mission créée, rafraîchissement du tableau de bord avec valeur:", refreshTrigger + 1);
+    const newValue = refreshTrigger + 1;
+    setRefreshTrigger(newValue);
+    console.log("Mission créée, rafraîchissement du tableau de bord avec valeur:", newValue);
+    toast.success("Mission créée avec succès! Le tableau de bord est mis à jour.");
   };
 
   return (
