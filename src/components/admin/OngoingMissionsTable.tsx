@@ -18,7 +18,7 @@ import { toast } from "sonner";
 
 interface OngoingMissionsTableProps {
   refreshTrigger?: number;
-  showAllMissions?: boolean; // Nouvelle prop pour contrôler l'affichage de toutes les missions
+  showAllMissions?: boolean;
 }
 
 const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({ 
@@ -27,7 +27,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
 }) => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [allMissions, setAllMissions] = useState<MissionRow[]>([]); // Stocker toutes les missions pour déboguer
+  const [allMissions, setAllMissions] = useState<MissionRow[]>([]);
 
   useEffect(() => {
     const fetchMissions = async () => {
@@ -48,16 +48,36 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         }
         
         console.log("All missions fetched:", missionsData);
-        setAllMissions(missionsData || []);
+        
+        if (!missionsData || missionsData.length === 0) {
+          console.log("No missions found");
+          setAllMissions([]);
+          setMissions([]);
+          setLoading(false);
+          return;
+        }
+        
+        // Transform missions to include pickup_address and delivery_address as direct properties
+        const transformedMissions = missionsData.map(mission => {
+          const vehicleInfo = mission.vehicle_info as any || {};
+          
+          return {
+            ...mission,
+            pickup_address: vehicleInfo.pickup_address || 'N/A',
+            delivery_address: vehicleInfo.delivery_address || 'N/A',
+          } as MissionRow;
+        });
+        
+        setAllMissions(transformedMissions);
         
         // Filter missions based on status if not showing all
         const filteredMissions = showAllMissions ? 
-          (missionsData || []) : 
-          (missionsData?.filter(mission => 
+          transformedMissions : 
+          transformedMissions.filter(mission => 
             mission.status === 'confirmé' || 
             mission.status === 'confirme' || 
             mission.status === 'prise_en_charge'
-          ) || []);
+          );
         
         console.log("Filtered missions:", filteredMissions);
         console.log("Mission statuses:", filteredMissions.map(m => m.status));
@@ -79,13 +99,10 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           
           // Map profiles to missions
           const formattedMissions = filteredMissions.map(mission => {
-            const vehicleInfo = mission.vehicle_info as any || {};
             const clientProfile = clientProfiles?.find(profile => profile.user_id === mission.client_id) || null;
             
             return {
               ...mission,
-              pickup_address: vehicleInfo.pickup_address || 'N/A',
-              delivery_address: vehicleInfo.delivery_address || 'N/A',
               clientProfile
             } as unknown as MissionRow;
           });
@@ -142,7 +159,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
                 
                 return (
                   <TableRow key={mission.id}>
-                    <TableCell className="font-medium">{mission.mission_number}</TableCell>
+                    <TableCell className="font-medium">{mission.mission_number || "N/A"}</TableCell>
                     <TableCell>
                       {client?.company_name || `${client?.first_name || ''} ${client?.last_name || ''}`}
                     </TableCell>
