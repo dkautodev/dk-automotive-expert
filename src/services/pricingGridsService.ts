@@ -4,6 +4,10 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { PriceGrid } from '@/components/admin/pricingTypes';
+import { toast } from 'sonner';
+import { formatDBRowsToGrids } from '@/utils/pricingFormatters';
+import { distanceRanges } from '@/hooks/usePricingGrids';
 
 interface PriceResult {
   priceHT: number;
@@ -78,4 +82,189 @@ export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, dista
       isPerKm: true
     };
   }
+};
+
+// Récupérer toutes les grilles de prix
+export const fetchPriceGrids = async (): Promise<any[]> => {
+  console.log('Fetching price grids from database');
+  try {
+    const { data, error } = await supabase
+      .from('price_grids')
+      .select('*')
+      .order('vehicle_type_id', { ascending: true })
+      .order('distance_range_id', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching price grids:', error);
+      throw new Error(`Error fetching price grids: ${error.message}`);
+    }
+
+    console.log(`Retrieved ${data?.length || 0} price grid entries`);
+    return data || [];
+  } catch (error: any) {
+    console.error('Error in fetchPriceGrids:', error);
+    throw error;
+  }
+};
+
+// Mettre à jour un prix dans la base de données
+export const updatePriceInDB = async (
+  vehicleTypeId: string, 
+  rangeId: string, 
+  priceHT: number
+): Promise<void> => {
+  console.log(`Updating price for ${vehicleTypeId}, range ${rangeId}: ${priceHT}`);
+  try {
+    // Vérifier si le prix existe déjà
+    const { data: existingPrice, error: checkError } = await supabase
+      .from('price_grids')
+      .select('*')
+      .eq('vehicle_type_id', vehicleTypeId)
+      .eq('distance_range_id', rangeId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error checking existing price:', checkError);
+      throw new Error(`Error checking existing price: ${checkError.message}`);
+    }
+
+    // Déterminer si le prix est par km en fonction de la tranche
+    const range = distanceRanges.find(r => r.id === rangeId);
+    const isPerKm = range?.perKm || false;
+
+    if (existingPrice) {
+      // Mettre à jour le prix existant
+      const { error: updateError } = await supabase
+        .from('price_grids')
+        .update({ 
+          price_ht: priceHT,
+          is_per_km: isPerKm,
+          updated_at: new Date().toISOString()
+        })
+        .eq('vehicle_type_id', vehicleTypeId)
+        .eq('distance_range_id', rangeId);
+
+      if (updateError) {
+        console.error('Error updating price:', updateError);
+        throw new Error(`Error updating price: ${updateError.message}`);
+      }
+    } else {
+      // Insérer un nouveau prix
+      const { error: insertError } = await supabase
+        .from('price_grids')
+        .insert({ 
+          vehicle_type_id: vehicleTypeId,
+          distance_range_id: rangeId,
+          price_ht: priceHT,
+          is_per_km: isPerKm
+        });
+
+      if (insertError) {
+        console.error('Error inserting price:', insertError);
+        throw new Error(`Error inserting price: ${insertError.message}`);
+      }
+    }
+    
+    console.log(`Successfully updated price for ${vehicleTypeId}, range ${rangeId}`);
+  } catch (error: any) {
+    console.error('Error updating price in DB:', error);
+    throw error;
+  }
+};
+
+// Initialiser les grilles de prix par défaut
+export const initializeDefaultPriceGrids = async (): Promise<PriceGrid[]> => {
+  console.log('Initializing default price grids');
+  try {
+    const vehicleTypes = ['citadine', 'berline', 'camion', 'plateau'];
+    const defaultGrids: PriceGrid[] = [];
+    
+    for (const vehicleTypeId of vehicleTypes) {
+      const vehicleTypeName = getVehicleTypeName(vehicleTypeId);
+      const prices = [];
+      
+      // Create default prices for each distance range
+      for (const range of distanceRanges) {
+        const basePrice = getDefaultBasePrice(vehicleTypeId, range.id);
+        
+        // Insert into database
+        const { error } = await supabase
+          .from('price_grids')
+          .insert({
+            vehicle_type_id: vehicleTypeId,
+            distance_range_id: range.id,
+            price_ht: basePrice,
+            is_per_km: range.perKm || false
+          });
+        
+        if (error) {
+          console.error(`Error initializing price for ${vehicleTypeId}, range ${range.id}:`, error);
+        }
+        
+        prices.push({
+          rangeId: range.id,
+          priceHT: basePrice.toString()
+        });
+      }
+      
+      defaultGrids.push({
+        vehicleTypeId,
+        vehicleTypeName,
+        prices
+      });
+    }
+    
+    console.log('Default price grids initialized successfully');
+    return defaultGrids;
+  } catch (error: any) {
+    console.error('Error initializing default price grids:', error);
+    toast.error('Erreur lors de l\'initialisation des grilles de prix');
+    throw error;
+  }
+};
+
+// Fonction utilitaire pour obtenir le nom du type de véhicule
+const getVehicleTypeName = (vehicleTypeId: string): string => {
+  switch (vehicleTypeId) {
+    case 'citadine': return 'Citadine';
+    case 'berline': return 'Berline';
+    case 'camion': return 'Camion';
+    case 'plateau': return 'Plateau';
+    default: return 'Inconnu';
+  }
+};
+
+// Fonction utilitaire pour déterminer un prix de base par défaut
+const getDefaultBasePrice = (vehicleTypeId: string, rangeId: string): number => {
+  // Prix de base selon le type de véhicule
+  let baseMultiplier = 1.0;
+  switch (vehicleTypeId) {
+    case 'citadine': baseMultiplier = 1.0; break;
+    case 'berline': baseMultiplier = 1.2; break;
+    case 'camion': baseMultiplier = 1.8; break;
+    case 'plateau': baseMultiplier = 2.0; break;
+  }
+  
+  // Prix selon la distance
+  if (rangeId === '1-10') return 20.0 * baseMultiplier;
+  if (rangeId === '11-20') return 25.0 * baseMultiplier;
+  if (rangeId === '21-30') return 30.0 * baseMultiplier;
+  if (rangeId === '31-40') return 35.0 * baseMultiplier;
+  if (rangeId === '41-50') return 40.0 * baseMultiplier;
+  if (rangeId === '51-60') return 45.0 * baseMultiplier;
+  if (rangeId === '61-70') return 50.0 * baseMultiplier;
+  if (rangeId === '71-80') return 55.0 * baseMultiplier;
+  if (rangeId === '81-90') return 60.0 * baseMultiplier;
+  if (rangeId === '91-100') return 65.0 * baseMultiplier;
+  
+  // Pour les tranches avec prix par km
+  if (rangeId === '101-200') return 0.95 * baseMultiplier;
+  if (rangeId === '201-300') return 0.90 * baseMultiplier;
+  if (rangeId === '301-400') return 0.85 * baseMultiplier;
+  if (rangeId === '401-500') return 0.80 * baseMultiplier;
+  if (rangeId === '501-600') return 0.75 * baseMultiplier;
+  if (rangeId === '601-700') return 0.70 * baseMultiplier;
+  if (rangeId === '701+') return 0.65 * baseMultiplier;
+  
+  return 1.0 * baseMultiplier; // Prix par défaut
 };
