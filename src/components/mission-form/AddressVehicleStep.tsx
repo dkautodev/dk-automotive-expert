@@ -2,9 +2,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { MissionFormValues } from "./missionFormSchema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ClientSelector from "./ClientSelector";
-import NewClientForm from "./NewClientForm";
 import AddressFields from "./AddressFields";
 import VehicleTypeSelector from "./VehicleTypeSelector";
 import CalculateButton from "./CalculateButton";
@@ -27,13 +25,6 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
     clients,
     clientsLoading,
     clientsError,
-    clientDialogOpen,
-    setClientDialogOpen,
-    newClient,
-    setNewClient,
-    isSubmitting,
-    handleAddClient,
-    handleCreateClient,
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
@@ -57,25 +48,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
         form={form} 
         clients={clients}
         loading={clientsLoading}
-        onAddClient={handleAddClient}
       />
-
-      <Dialog open={clientDialogOpen} onOpenChange={setClientDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Ajouter un nouveau client</DialogTitle>
-            <DialogDescription>
-              Remplissez le formulaire ci-dessous pour créer un nouveau client
-            </DialogDescription>
-          </DialogHeader>
-          <NewClientForm 
-            newClient={newClient}
-            setNewClient={setNewClient}
-            onSubmit={handleCreateClient}
-            isSubmitting={isSubmitting}
-          />
-        </DialogContent>
-      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AddressFields form={form} />

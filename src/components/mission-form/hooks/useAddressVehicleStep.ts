@@ -15,16 +15,11 @@ export const useAddressVehicleStep = (
   const { calculatePrice, isCalculating: isPriceCalculating, priceHT, priceTTC } = usePriceCalculation();
   const [distance, setDistance] = useState<number | null>(null);
   const [isCalculatingTotal, setIsCalculatingTotal] = useState<boolean>(false);
-  const [clientDialogOpen, setClientDialogOpen] = useState(false);
 
   const { 
     clients, 
     isLoading: clientsLoading, 
     fetchClients,
-    newClient, 
-    setNewClient, 
-    createClient, 
-    isSubmitting,
     error: clientsError
   } = useClients(form);
 
@@ -51,17 +46,6 @@ export const useAddressVehicleStep = (
     console.log("Chargement clients:", clientsLoading);
     console.log("Erreur clients:", clientsError);
   }, [clients, clientsLoading, clientsError]);
-
-  const handleAddClient = () => {
-    setClientDialogOpen(true);
-  };
-
-  const handleCreateClient = async () => {
-    const success = await createClient();
-    if (success) {
-      setClientDialogOpen(false);
-    }
-  };
 
   const calculateDistanceAndPrice = async () => {
     if (!pickupAddress || !deliveryAddress || !vehicleType) {
@@ -95,13 +79,6 @@ export const useAddressVehicleStep = (
     clients,
     clientsLoading,
     clientsError,
-    clientDialogOpen,
-    setClientDialogOpen,
-    newClient,
-    setNewClient,
-    isSubmitting,
-    handleAddClient,
-    handleCreateClient,
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
