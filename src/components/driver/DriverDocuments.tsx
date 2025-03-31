@@ -1,225 +1,199 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader } from "@/components/ui/loader";
-import { toast } from "sonner";
-import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, FileCheck, FileX, AlertTriangle } from "lucide-react";
-
-// Types de documents requis pour les chauffeurs
-const REQUIRED_DOCUMENTS = [
-  { id: "cni", name: "Carte Nationale d'Identité", type: "cni" },
-  { id: "permis", name: "Permis de conduire", type: "permis" },
-  { id: "kbis", name: "Extrait Kbis", type: "kbis" },
-  { id: "vigilance", name: "Attestation de vigilance", type: "vigilance" }
-];
-
-type Document = {
-  id: string;
-  document_type: string;
-  document_url: string;
-  user_id: string;
-  uploaded_at: string;
-};
+import { useAuthContext } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Upload, AlertCircle, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { DriverDocument, DriverDocumentType, DOCUMENT_TYPE_LABELS } from "@/types/documents";
 
 const DriverDocuments = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [documents, setDocuments] = useState<Record<DriverDocumentType, DriverDocument | null>>({
+    kbis: null,
+    driving_license: null,
+    id_card: null,
+    vigilance_certificate: null,
+  });
+  const [loading, setLoading] = useState<Record<DriverDocumentType, boolean>>({
+    kbis: false,
+    driving_license: false,
+    id_card: false,
+    vigilance_certificate: false,
+  });
   const { user } = useAuthContext();
 
   useEffect(() => {
-    if (!user) return;
-    
-    const fetchDocuments = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('documents')
-          .select('*')
-          .eq('user_id', user.id);
-          
-        if (error) throw error;
-        
-        setDocuments(data || []);
-      } catch (error) {
-        console.error('Erreur lors du chargement des documents:', error);
-        toast.error("Erreur lors du chargement des documents");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchDocuments();
+    if (user) {
+      fetchDocuments();
+    }
   }, [user]);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
-    if (!event.target.files || event.target.files.length === 0) return;
-    
-    const file = event.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${documentType}-${user?.id}-${Date.now()}.${fileExt}`;
-    const filePath = `driver-documents/${fileName}`;
-    
+  const fetchDocuments = async () => {
     try {
-      setUploading(prev => ({ ...prev, [documentType]: true }));
-      
-      // Upload du fichier dans le storage
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file);
-        
-      if (uploadError) throw uploadError;
-      
-      // Récupération de l'URL publique
-      const { data: urlData } = await supabase.storage
-        .from('documents')
-        .getPublicUrl(filePath);
-        
-      if (!urlData) throw new Error("Impossible de récupérer l'URL du document");
-      
-      // Vérifier si un document de ce type existe déjà
-      const existingDocIndex = documents.findIndex(doc => doc.document_type === documentType);
-      
-      if (existingDocIndex >= 0) {
-        // Mettre à jour le document existant
-        const { error: updateError } = await supabase
-          .from('documents')
-          .update({ 
-            document_url: urlData.publicUrl,
-            uploaded_at: new Date().toISOString()
-          })
-          .eq('id', documents[existingDocIndex].id);
-          
-        if (updateError) throw updateError;
-        
-        // Mettre à jour l'état local
-        const updatedDocuments = [...documents];
-        updatedDocuments[existingDocIndex] = {
-          ...updatedDocuments[existingDocIndex],
-          document_url: urlData.publicUrl,
-          uploaded_at: new Date().toISOString()
-        };
-        setDocuments(updatedDocuments);
-      } else {
-        // Créer une nouvelle entrée de document
-        const { data: newDoc, error: insertError } = await supabase
-          .from('documents')
-          .insert({
-            user_id: user?.id,
-            document_type: documentType,
-            document_url: urlData.publicUrl
-          })
-          .select()
-          .single();
-          
-        if (insertError) throw insertError;
-        
-        // Ajouter le nouveau document à l'état local
-        if (newDoc) {
-          setDocuments(prev => [...prev, newDoc]);
-        }
+      const { data, error } = await supabase
+        .from("documents")
+        .select("*")
+        .eq("user_id", user?.id);
+
+      if (error) throw error;
+
+      const documentMap: Record<DriverDocumentType, DriverDocument | null> = {
+        kbis: null,
+        driving_license: null,
+        id_card: null,
+        vigilance_certificate: null,
+      };
+
+      if (data) {
+        data.forEach((doc) => {
+          const documentType = doc.document_type as DriverDocumentType;
+          if (documentType) {
+            documentMap[documentType] = doc;
+          }
+        });
       }
-      
-      toast.success(`Document ${documentType} téléchargé avec succès`);
-    } catch (error) {
-      console.error('Erreur lors du téléchargement du document:', error);
-      toast.error(`Erreur lors du téléchargement du document: ${error.message || 'Erreur inconnue'}`);
-    } finally {
-      setUploading(prev => ({ ...prev, [documentType]: false }));
+
+      setDocuments(documentMap);
+    } catch (error: any) {
+      console.error("Erreur lors du chargement des documents:", error.message);
+      toast.error("Impossible de charger vos documents");
     }
   };
 
-  const getDocumentStatus = (docType: string) => {
-    const doc = documents.find(d => d.document_type === docType);
-    return doc ? true : false;
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    documentType: DriverDocumentType
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    try {
+      setLoading((prev) => ({ ...prev, [documentType]: true }));
+
+      // Upload file to storage
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}-${documentType}-${Date.now()}.${fileExt}`;
+      const filePath = `driver-documents/${fileName}`;
+
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from("documents")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("documents")
+        .getPublicUrl(filePath);
+
+      if (!urlData?.publicUrl) throw new Error("Failed to get public URL");
+
+      // Add or update document record in database
+      const documentData = {
+        user_id: user.id,
+        document_type: documentType,
+        document_url: urlData.publicUrl,
+      };
+
+      let dbOperation;
+      if (documents[documentType]) {
+        // Update existing document
+        dbOperation = supabase
+          .from("documents")
+          .update(documentData)
+          .eq("id", documents[documentType]?.id);
+      } else {
+        // Insert new document
+        dbOperation = supabase.from("documents").insert([documentData]);
+      }
+
+      const { error: dbError, data: dbData } = await dbOperation;
+      if (dbError) throw dbError;
+
+      // Refresh documents
+      await fetchDocuments();
+      toast.success(`${DOCUMENT_TYPE_LABELS[documentType]} mis à jour avec succès`);
+    } catch (error: any) {
+      console.error("Erreur d'envoi de fichier:", error.message);
+      toast.error(`Erreur lors du téléchargement: ${error.message}`);
+    } finally {
+      setLoading((prev) => ({ ...prev, [documentType]: false }));
+    }
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Mes Documents</h1>
-        <p className="text-muted-foreground">
-          Téléchargez vos documents obligatoires pour pouvoir accepter des missions
-        </p>
-      </div>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Mes Documents</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {Object.entries(DOCUMENT_TYPE_LABELS).map(([type, label]) => {
+          const documentType = type as DriverDocumentType;
+          const document = documents[documentType];
+          const isLoading = loading[documentType];
 
-      {loading ? (
-        <div className="flex justify-center p-8">
-          <Loader className="h-8 w-8" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {REQUIRED_DOCUMENTS.map((doc) => {
-            const isUploaded = getDocumentStatus(doc.type);
-            const isUploading = uploading[doc.type] || false;
-            
-            return (
-              <Card key={doc.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>{doc.name}</CardTitle>
-                    {isUploaded ? (
-                      <FileCheck className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <AlertTriangle className="h-5 w-5 text-amber-500" />
-                    )}
-                  </div>
-                  <CardDescription>
-                    {isUploaded ? "Document téléchargé" : "Document requis"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    {isUploaded && (
-                      <a 
-                        href={documents.find(d => d.document_type === doc.type)?.document_url}
+          return (
+            <Card key={type}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg font-medium">{label}</CardTitle>
+                {document && (
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {document ? (
+                    <div className="flex flex-col space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        Mis à jour le{" "}
+                        {new Date(document.uploaded_at).toLocaleDateString("fr-FR")}
+                      </p>
+                      <a
+                        href={document.document_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-700 text-sm underline"
+                        className="text-primary hover:underline"
                       >
                         Voir le document
                       </a>
-                    )}
-                    <div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-amber-600 flex items-center">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      Document requis
+                    </div>
+                  )}
+
+                  <div className="mt-4">
+                    <div className="relative">
+                      <Button
+                        type="button"
+                        variant={document ? "outline" : "default"}
+                        className="w-full"
+                        disabled={isLoading}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {document ? "Mettre à jour" : "Télécharger"}
+                        {isLoading && (
+                          <span className="ml-2">
+                            En cours...
+                          </span>
+                        )}
+                      </Button>
                       <input
-                        id={`file-${doc.id}`}
                         type="file"
                         accept=".pdf,.png,.jpg,.jpeg"
-                        className="hidden"
-                        onChange={(e) => handleFileUpload(e, doc.type)}
-                        disabled={isUploading}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        onChange={(e) => handleFileUpload(e, documentType)}
+                        disabled={isLoading}
                       />
-                      <label htmlFor={`file-${doc.id}`}>
-                        <Button
-                          variant={isUploaded ? "outline" : "default"}
-                          type="button"
-                          disabled={isUploading}
-                          className={`cursor-pointer ${isUploaded ? "ml-auto" : ""}`}
-                        >
-                          {isUploading ? (
-                            <>
-                              <Loader className="mr-2 h-4 w-4 animate-spin" />
-                              Téléchargement...
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="mr-2 h-4 w-4" />
-                              {isUploaded ? "Mettre à jour" : "Télécharger"}
-                            </>
-                          )}
-                        </Button>
-                      </label>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 };
