@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { MissionRow } from "@/types/database";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
@@ -11,7 +11,7 @@ const PendingInvoices = () => {
 
   useEffect(() => {
     const fetchMissions = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await extendedSupabase
         .from('missions')
         .select('*')
         .eq('status', 'confirmé')

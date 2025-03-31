@@ -1,83 +1,71 @@
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { MissionRow } from "@/types/database";
 import { useAuthContext } from "@/context/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Loader } from "@/components/ui/loader";
-import { format, parseISO } from "date-fns";
-import { fr } from "date-fns/locale";
 import { extendedSupabase } from "@/integrations/supabase/extended-client";
-import { MissionRow, NotificationRow } from "@/types/database";
-import { MissionStatusBadge } from "../client/MissionStatusBadge";
-import { toast } from "sonner";
-import { Bell } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Loader } from "@/components/ui/loader";
+import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 
-const markNotificationsRead = async (missionId: string) => {
-  try {
-    const { error } = await extendedSupabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('mission_id', missionId)
-      .eq('user_id', (await extendedSupabase.auth.getUser()).data.user?.id);
-      
-    if (error) console.error("Erreur lors du marquage des notifications comme lues:", error);
-  } catch (error) {
-    console.error('Erreur:', error);
-  }
-};
-
-const DriverMissions = () => {
-  const { user } = useAuthContext();
+export const DriverMissions = () => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [missionsWithNotifications, setMissionsWithNotifications] = useState<string[]>([]);
-
+  const { user } = useAuthContext();
+  
   useEffect(() => {
-    if (user) {
-      fetchMissions();
+    const fetchMissions = async () => {
+      if (!user) return;
       
-      const fetchNotifications = async () => {
-        try {
-          const { data, error } = await extendedSupabase
-            .from('notifications')
-            .select('mission_id')
-            .eq('user_id', user.id)
-            .eq('read', false);
-            
-          if (error) throw error;
+      setLoading(true);
+      try {
+        // Fetch missions assigned to this driver
+        const { data, error } = await extendedSupabase
+          .from('missions')
+          .select('*')
+          .eq('driver_id', user.id)
+          .order('created_at', { ascending: false });
           
-          if (data) {
-            const missionIds = data
-              .filter(n => n.mission_id) // Filter out notifications with null mission_id
-              .map(n => n.mission_id as string);
-            setMissionsWithNotifications(missionIds);
-          }
-        } catch (error) {
-          console.error('Erreur lors du chargement des notifications:', error);
+        if (error) {
+          console.error('Error fetching driver missions:', error);
+          return;
         }
-      };
-      
-      fetchNotifications();
-      
+        
+        console.log('Driver missions:', data);
+        setMissions(data as MissionRow[]);
+      } catch (err) {
+        console.error('Error in fetchMissions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchMissions();
+    
+    // Set up a real-time subscription for new missions
+    if (user) {
       const channel = extendedSupabase
-        .channel('public:notifications')
-        .on('postgres_changes', { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}` 
+        .channel('driver-missions')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'missions',
+          filter: `driver_id=eq.${user.id}`
         }, payload => {
-          const newNotification = payload.new as NotificationRow;
-          if (newNotification.mission_id) {
-            setMissionsWithNotifications(prev => 
-              prev.includes(newNotification.mission_id as string) 
-                ? prev 
-                : [...prev, newNotification.mission_id as string]
-            );
-          }
+          // Add the new mission to our list
+          const newMission = payload.new as MissionRow;
+          setMissions(prev => [newMission, ...prev]);
+          
+          // Create a new notification
+          extendedSupabase
+            .from('notifications')
+            .insert({
+              user_id: user.id,
+              message: `Nouvelle mission assignée: ${newMission.mission_number}`,
+              type: 'mission_status',
+              mission_id: newMission.id
+            });
         })
         .subscribe();
         
@@ -87,232 +75,103 @@ const DriverMissions = () => {
     }
   }, [user]);
 
-  const fetchMissions = async () => {
+  const handleAcceptMission = async (missionId: string) => {
     try {
       setLoading(true);
-      const { data, error } = await extendedSupabase
+      const { error } = await extendedSupabase
         .from('missions')
-        .select('*')
-        .eq('driver_id', user?.id)
-        .order('created_at', { ascending: false });
+        .update({ status: 'prise_en_charge' })
+        .eq('id', missionId);
 
-      if (error) throw error;
-      
-      const typedData: MissionRow[] = (data || []).map(item => ({
-        ...item as any,
-        pickup_address: (item as any).pickup_address || "",
-        delivery_address: (item as any).delivery_address || "",
-        status: (item as any).status || "en_attente"
-      }));
-      
-      setMissions(typedData);
-    } catch (error) {
-      console.error('Error fetching missions:', error);
-      toast.error("Erreur lors du chargement des missions");
+      if (error) {
+        console.error('Error updating mission status:', error);
+        return;
+      }
+
+      // Update the local state
+      setMissions(prev =>
+        prev.map(mission =>
+          mission.id === missionId ? { ...mission, status: 'prise_en_charge' } : mission
+        )
+      );
+    } catch (err) {
+      console.error('Error in handleAcceptMission:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateMissionStatus = async (missionId: string, newStatus: "prise_en_charge" | "livre" | "incident") => {
+  const handleRejectMission = async (missionId: string) => {
     try {
-      setUpdatingId(missionId);
-      
+      setLoading(true);
       const { error } = await extendedSupabase
         .from('missions')
-        .update({ status: newStatus })
+        .update({ status: 'annule' })
         .eq('id', missionId);
 
-      if (error) throw error;
-      
-      setMissions(prev => 
-        prev.map(mission => 
-          mission.id === missionId 
-            ? { ...mission, status: newStatus } as MissionRow
-            : mission
+      if (error) {
+        console.error('Error updating mission status:', error);
+        return;
+      }
+
+      // Update the local state
+      setMissions(prev =>
+        prev.map(mission =>
+          mission.id === missionId ? { ...mission, status: 'annule' } : mission
         )
       );
-      
-      toast.success(`Statut de la mission mis à jour : ${newStatus.replace('_', ' ')}`);
-    } catch (error) {
-      console.error('Error updating mission status:', error);
-      toast.error("Erreur lors de la mise à jour du statut");
+    } catch (err) {
+      console.error('Error in handleRejectMission:', err);
     } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return 'N/A';
-    try {
-      return format(parseISO(dateStr), 'dd MMM yyyy', { locale: fr });
-    } catch (e) {
-      return 'Date invalide';
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Mes missions</h1>
-        <p className="text-muted-foreground">Suivez l'état de vos missions</p>
-      </div>
-
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Mes missions</h1>
+      
       {loading ? (
-        <div className="flex justify-center p-8">
-          <Loader className="h-8 w-8" />
+        <div className="flex justify-center items-center h-40">
+          <Loader className="h-8 w-8 text-primary" />
         </div>
+      ) : missions.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-muted-foreground">Vous n'avez pas encore de missions assignées</p>
+          </CardContent>
+        </Card>
       ) : (
-        <Tabs defaultValue="en_cours" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="en_cours">Missions en cours</TabsTrigger>
-            <TabsTrigger value="terminees">Missions terminées</TabsTrigger>
-            <TabsTrigger value="problemes">Missions avec problèmes</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="en_cours" className="space-y-4">
-            {missions.filter(mission => mission.status !== 'termine' && mission.status !== 'livre' && mission.status !== 'incident').length > 0 ? (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {missions.filter(mission => mission.status !== 'termine' && mission.status !== 'livre' && mission.status !== 'incident').map((mission) => (
-                  <Card key={mission.id} className={missionsWithNotifications.includes(mission.id) ? "border-blue-500" : ""}>
-                    <CardHeader>
-                      <div className="flex justify-between items-center">
-                        <CardTitle>Mission N°{mission.mission_number || 'N/A'}</CardTitle>
-                        {missionsWithNotifications.includes(mission.id) && (
-                          <Bell className="h-4 w-4 text-blue-500" />
-                        )}
-                      </div>
-                      <CardDescription>
-                        {formatDate(mission.created_at)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <p>
-                        <strong>Départ:</strong> {mission.pickup_address}
-                      </p>
-                      <p>
-                        <strong>Arrivée:</strong> {mission.delivery_address}
-                      </p>
-                      <MissionStatusBadge status={mission.status} />
-                      <div className="flex justify-end gap-2 mt-4" onClick={() => markNotificationsRead(mission.id)}>
-                        {mission.status === 'confirme' || mission.status === 'confirmé' ? (
-                          <Button 
-                            variant="outline" 
-                            onClick={() => updateMissionStatus(mission.id, "prise_en_charge")}
-                            disabled={updatingId === mission.id}
-                          >
-                            {updatingId === mission.id ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
-                            Prise en charge
-                          </Button>
-                        ) : mission.status === 'prise_en_charge' ? (
-                          <Button 
-                            variant="outline"
-                            onClick={() => updateMissionStatus(mission.id, "livre")}
-                            disabled={updatingId === mission.id}
-                          >
-                            {updatingId === mission.id ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
-                            Livrer
-                          </Button>
-                        ) : null}
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive" disabled={updatingId === mission.id}>
-                              Signaler un problème
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Êtes-vous sûr(e) ?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Voulez-vous signaler un problème pour cette mission ? Cette action est irréversible.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuler</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => updateMissionStatus(mission.id, "incident")} disabled={updatingId === mission.id}>
-                                Confirmer
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Aucune mission en cours</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="terminees" className="space-y-4">
-            {missions.filter(mission => mission.status === 'termine' || mission.status === 'livre').length > 0 ? (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {missions.filter(mission => mission.status === 'termine' || mission.status === 'livre').map((mission) => (
-                  <Card key={mission.id}>
-                    <CardHeader>
-                      <CardTitle>Mission N°{mission.mission_number || 'N/A'}</CardTitle>
-                      <CardDescription>
-                        {formatDate(mission.created_at)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <p>
-                        <strong>Départ:</strong> {mission.pickup_address}
-                      </p>
-                      <p>
-                        <strong>Arrivée:</strong> {mission.delivery_address}
-                      </p>
-                      <MissionStatusBadge status={mission.status} />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Aucune mission terminée</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="problemes" className="space-y-4">
-            {missions.filter(mission => mission.status === 'incident').length > 0 ? (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {missions.filter(mission => mission.status === 'incident').map((mission) => (
-                  <Card key={mission.id}>
-                    <CardHeader>
-                      <CardTitle>Mission N°{mission.mission_number || 'N/A'}</CardTitle>
-                      <CardDescription>
-                        {formatDate(mission.created_at)}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <p>
-                        <strong>Départ:</strong> {mission.pickup_address}
-                      </p>
-                      <p>
-                        <strong>Arrivée:</strong> {mission.delivery_address}
-                      </p>
-                      <MissionStatusBadge status={mission.status} />
-                      <div className="flex justify-end">
-                        <Button variant="destructive" disabled>
-                          Résoudre le problème
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Aucune mission avec des problèmes</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-4">
+          {missions.map((mission) => (
+            <Card key={mission.id} className={mission.status === 'prise_en_charge' ? 'border-l-4 border-l-primary' : ''}>
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-lg">{mission.mission_number}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(mission.created_at || ''), "Pp", { locale: fr })}
+                    </p>
+                    <p className="mt-2">
+                      <span className="block">De: {mission.pickup_address}</span>
+                      <span className="block">À: {mission.delivery_address}</span>
+                    </p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => handleAcceptMission(mission.id)}>
+                      <Check className="h-4 w-4 mr-1" />
+                      Accepter
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleRejectMission(mission.id)}>
+                      <X className="h-4 w-4 mr-1" />
+                      Refuser
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
