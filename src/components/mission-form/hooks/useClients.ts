@@ -1,10 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { ClientData } from './types/clientTypes';
+import { ClientData, NewClientData } from './types/clientTypes';
 import { clientService } from './services/clientService';
 
-export type { ClientData } from './types/clientTypes';
+export type { ClientData, NewClientData } from './types/clientTypes';
 
 /**
  * Hook for managing clients in the application
