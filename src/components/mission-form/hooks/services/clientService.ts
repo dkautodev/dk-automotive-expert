@@ -81,6 +81,12 @@ const clientMappingService = {
   }
 };
 
+// Define interface for fetch result to avoid excessive type instantiation
+interface FetchClientResult {
+  clients: ClientData[];
+  success: boolean;
+}
+
 /**
  * Client data fetching strategies
  */
@@ -88,10 +94,7 @@ const clientFetchingService = {
   /**
    * Fetches clients via user profiles
    */
-  fetchClientsViaProfiles: async (): Promise<{
-    clients: ClientData[];
-    success: boolean;
-  }> => {
+  fetchClientsViaProfiles: async (): Promise<FetchClientResult> => {
     try {
       // Get user profiles
       const { data: profilesData, error: profilesError } = await supabase
@@ -131,10 +134,7 @@ const clientFetchingService = {
   /**
    * Fetches clients via Edge Function as fallback
    */
-  fetchClientsViaEdgeFunction: async (): Promise<{
-    clients: ClientData[];
-    success: boolean;
-  }> => {
+  fetchClientsViaEdgeFunction: async (): Promise<FetchClientResult> => {
     try {
       console.log("Essai avec l'Edge Function");
       
