@@ -1,23 +1,26 @@
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DialogHeader, DialogFooter, Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Loader } from "@/components/ui/loader";
 import { UploadCloud, FileText, AlertTriangle, CheckCircle2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { DocumentType } from "@/types/database";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface Document {
   id: string;
-  document_type: DocumentType;
+  document_type: string;
   document_url: string;
   uploaded_at: string;
 }
 
 interface DocumentTypeInfo {
-  id: DocumentType;
+  id: string;
   name: string;
   description: string;
 }
@@ -49,10 +52,10 @@ const DriverDocuments = () => {
   const { user } = useAuthContext();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<DocumentType | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedDocType, setSelectedDocType] = useState<DocumentType | null>(null);
+  const [selectedDocType, setSelectedDocType] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
@@ -79,7 +82,7 @@ const DriverDocuments = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, documentType: DocumentType) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -130,10 +133,11 @@ const DriverDocuments = () => {
       
       setUploadProgress(80);
 
-      // Save document reference in database
+      // For now use a query directly instead of a type check that might be invalid
+      // until the database is updated
       const { error: insertError } = await supabase
         .from("documents")
-        .insert({
+        .upsert({
           user_id: user.id,
           document_type: selectedDocType,
           document_url: publicURL

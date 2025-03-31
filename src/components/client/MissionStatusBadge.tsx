@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { MissionStatus } from '@/hooks/useTodayMissions';
+import { MissionStatus } from '@/types/database';
 
 interface MissionStatusBadgeProps {
   status: MissionStatus;

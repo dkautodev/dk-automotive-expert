@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,13 +38,14 @@ const DriverHome = () => {
 
       if (error) throw error;
 
-      const assigned = missions ? missions.length : 0;
-      const completed = missions ? missions.filter(m => m.status === 'termine').length : 0;
-      const inProgress = missions ? missions.filter(m => m.status === 'prise_en_charge').length : 0;
+      const missionsList = data || [];
+      const assigned = missionsList ? missionsList.length : 0;
+      const completed = missionsList ? missionsList.filter(m => m.status === 'termine').length : 0;
+      const inProgress = missionsList ? missionsList.filter(m => m.status === 'prise_en_charge').length : 0;
       
       // Calculate earnings from completed missions
-      const earnings = missions 
-        ? missions
+      const earnings = missionsList 
+        ? missionsList
             .filter(m => m.status === 'termine')
             .reduce((sum, mission) => sum + (mission.price_ht || 0), 0)
         : 0;
