@@ -108,7 +108,10 @@ export const useClients = (form?: any) => {
       
       // Transformer les données au format ClientData
       const formattedClients: ClientData[] = authData.users
-        .filter(user => user.email) // S'assurer que l'utilisateur a un email
+        .filter((user): user is { id: string; email?: string | null; user_metadata?: Record<string, any> } => 
+          // Ensure user object has required properties and is properly typed
+          user !== null && typeof user === 'object' && 'id' in user
+        )
         .map(user => {
           // Chercher le profil correspondant
           const profile = profiles?.find(p => p.user_id === user.id);
@@ -131,12 +134,12 @@ export const useClients = (form?: any) => {
           const fullName = [firstName, lastName].filter(Boolean).join(' ');
           
           // Make sure that user.email exists and is a string
-          const userEmail = typeof user.email === 'string' ? user.email : '';
+          const userEmail = user.email && typeof user.email === 'string' ? user.email : '';
           
           return {
             id: user.id,
             name: fullName.trim() || userEmail || '',
-            email: userEmail || '',
+            email: userEmail,
             phone: phone,
             company: company,
             address: profile?.billing_address || ''
