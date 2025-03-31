@@ -11,9 +11,9 @@ export const transformProfileToClient = (profile: any): ClientData => {
   ].filter(Boolean).join(' ');
 
   return {
-    id: profile.user_id || profile.id,
+    id: profile.user_id || profile.id || '',
     name: fullName.trim() || 'Client sans nom',
-    email: '', // No email available in user_profiles
+    email: profile.email || '', // Profile might not have email
     phone: profile.phone || '',
     company: profile.company_name || '',
     address: profile.billing_address || ''
@@ -24,8 +24,17 @@ export const transformProfileToClient = (profile: any): ClientData => {
  * Transforms auth user data with optional profile into standardized client format
  */
 export const transformUserToClient = (user: any, profiles?: any[]): ClientData => {
+  if (!user) {
+    console.warn("Utilisateur invalide reçu dans transformUserToClient");
+    return {
+      id: '',
+      name: 'Client invalide',
+      email: '',
+    };
+  }
+
   // Find matching profile if profiles are provided
-  const profile = profiles?.find(p => p.user_id === user.id);
+  const profile = profiles?.find(p => p?.user_id === user.id);
   
   // Extract name components from profile or user metadata
   let firstName = '', lastName = '', company = '', phone = '';
@@ -47,9 +56,12 @@ export const transformUserToClient = (user: any, profiles?: any[]): ClientData =
   // Ensure email is a string
   const userEmail = user.email && typeof user.email === 'string' ? user.email : '';
   
+  // Set a default name if none is available
+  const finalName = fullName.trim() || userEmail || 'Client sans nom';
+  
   return {
-    id: user.id,
-    name: fullName.trim() || userEmail || '',
+    id: user.id || '',
+    name: finalName,
     email: userEmail,
     phone: phone,
     company: company,

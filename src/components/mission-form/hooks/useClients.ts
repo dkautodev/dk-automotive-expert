@@ -23,12 +23,18 @@ export const useClients = (form?: any) => {
       setIsLoading(true);
       setError(null);
       
+      console.log("Début de la récupération des clients");
       const { clients: fetchedClients, error: fetchError } = await fetchClientsData();
+      console.log("Clients récupérés:", fetchedClients);
       
       if (fetchError) {
         setError(fetchError);
         toast.error('Erreur lors du chargement des clients');
+        console.error("Erreur de récupération:", fetchError);
       } else {
+        if (fetchedClients.length === 0) {
+          console.log("Aucun client récupéré");
+        }
         setClients(fetchedClients);
       }
     } catch (error: any) {

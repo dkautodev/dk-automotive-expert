@@ -31,7 +31,7 @@ export const fetchClientsData = async (): Promise<{
       const formattedClients: ClientData[] = authData.users
         .filter(user => 
           // Ensure user object has required properties
-          user !== null && typeof user === 'object' && 'id' in user
+          user && typeof user === 'object' && 'id' in user
         )
         .map(user => transformUserToClient(user, profiles));
       
