@@ -30,24 +30,47 @@ serve(async (req) => {
     }
 
     // Get user from auth.users table
-    const { data: userData, error: userError } = await supabaseClient
-      .from("users") // Using "users" table from public schema (not auth.users)
-      .select("email, user_type")
-      .eq("id", userId)
+    const { data: authUser, error: authError } = await supabaseClient
+      .from('auth.users')
+      .select('email')
+      .eq('id', userId)
       .single();
 
-    if (userError) {
+    if (authError) {
+      console.error("Error fetching auth user:", authError);
+    }
+
+    // Get user profile from user_profiles table
+    const { data: profileData, error: profileError } = await supabaseClient
+      .from("user_profiles")
+      .select("first_name, last_name, phone, company_name, user_type")
+      .eq("user_id", userId)
+      .single();
+
+    if (profileError && !authUser) {
       return new Response(
-        JSON.stringify({ error: "User not found", details: userError }),
+        JSON.stringify({ error: "User not found", details: profileError }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Combine data from both tables
+    const userData = {
+      id: userId,
+      email: authUser?.email || "",
+      first_name: profileData?.first_name || "",
+      last_name: profileData?.last_name || "",
+      phone: profileData?.phone || "",
+      company_name: profileData?.company_name || "",
+      user_type: profileData?.user_type || "client"
+    };
 
     return new Response(
       JSON.stringify(userData),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.error("Error in get_user_by_id function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

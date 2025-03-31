@@ -23,7 +23,14 @@ import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import { UserProfileDetail } from "./components/admin/clients/UserProfileDetail";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -42,7 +49,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin-auth" element={<AdminAuth />} />
             <Route path="/driver-auth" element={<DriverAuth />} />
-            <Route path="/dashboard/driver" element={<DriverDashboard />} />
+            <Route path="/dashboard/driver/*" element={<DriverDashboard />} />
             <Route path="/dashboard/client/*" element={<ClientDashboard />} />
             <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/profile/:userId" element={<UserProfileDetail />} />

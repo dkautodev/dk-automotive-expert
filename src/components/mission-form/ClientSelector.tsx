@@ -34,6 +34,7 @@ const ClientSelector = ({
     // Debug logging
     console.log("Clients disponibles:", clients);
     console.log("Client sélectionné:", selectedClient);
+    console.log("ClientId actuel:", clientId);
     
     // Filter clients based on search value
     const filtered = clients.filter(client => {
@@ -54,7 +55,7 @@ const ClientSelector = ({
   }, [searchValue, clients, selectedClient, clientId]);
 
   const handleSelectClient = (value: string) => {
-    console.log("Client sélectionné:", value);
+    console.log("Client sélectionné avec ID:", value);
     form.setValue("client_id", value);
     setOpen(false);
   };
@@ -72,13 +73,14 @@ const ClientSelector = ({
                 className={`w-full justify-between ${!selectedClient ? "text-muted-foreground" : ""}`}
                 disabled={loading}
                 onClick={() => setOpen(true)}
+                type="button"
               >
                 {selectedClient ? selectedClient.name : "Rechercher un client..."}
                 <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
           </PopoverTrigger>
-          <PopoverContent className="w-[400px] p-0">
+          <PopoverContent className="w-[400px] p-0" align="start">
             <Command>
               <CommandInput
                 placeholder="Rechercher un client..."
@@ -112,7 +114,7 @@ const ClientSelector = ({
                             className="cursor-pointer"
                           >
                             <div className="flex flex-col">
-                              <span>{client.name}</span>
+                              <span className="font-medium">{client.name}</span>
                               {client.email && (
                                 <span className="text-xs text-muted-foreground">{client.email}</span>
                               )}
