@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { Truck, User, FileText, DollarSign, LogOut, PlusCircle, LayoutDashboard, FileBox } from "lucide-react";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarHeaderTitle, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -23,10 +23,10 @@ const DriverSidebar = () => {
   return (
     <Sidebar>
       <SidebarHeader className="h-14 items-center border-b px-6">
-        <SidebarHeaderTitle className="flex items-center gap-2 font-bold">
+        <div className="flex items-center gap-2 font-bold">
           <Truck className="h-5 w-5 text-dk-navy" />
           <span className="text-dk-navy">DK Automotive</span>
-        </SidebarHeaderTitle>
+        </div>
       </SidebarHeader>
       
       <SidebarContent>

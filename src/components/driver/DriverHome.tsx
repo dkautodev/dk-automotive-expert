@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +29,8 @@ const DriverHome = () => {
 
   const fetchDriverStats = async () => {
     try {
-      const { data: missions, error } = await supabase
+      setLoading(true);
+      const { data, error } = await supabase
         .from('missions')
         .select('*')
         .eq('driver_id', user?.id);
@@ -71,7 +71,15 @@ const DriverHome = () => {
         .limit(5);
 
       if (error) throw error;
-      setRecentMissions(data || []);
+      
+      // Ensure all required fields exist
+      const typedData: MissionRow[] = (data || []).map(item => ({
+        ...item as any,
+        pickup_address: (item as any).pickup_address || "",
+        delivery_address: (item as any).delivery_address || "",
+      }));
+      
+      setRecentMissions(typedData);
     } catch (error) {
       console.error('Error fetching recent missions:', error);
     }
