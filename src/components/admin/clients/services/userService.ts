@@ -142,15 +142,20 @@ export const databaseService = {
         }
         
         if (profiles && profiles.length > 0) {
-          const transformedUsers = profiles.map(profile => ({
-            id: profile.user_id || profile.id,
-            email: '',
-            user_type: profile.user_type || 'client',
-            first_name: profile.first_name || '',
-            last_name: profile.last_name || '',
-            company_name: profile.company_name || '',
-            phone: profile.phone || ''
-          }));
+          const transformedUsers = profiles.map(profile => {
+            // Use default type if user_type doesn't exist in the profile
+            const userType = 'client'; // Default to client since user_type is not in the profile schema
+            
+            return {
+              id: profile.user_id || profile.id,
+              email: '',
+              user_type: userType,
+              first_name: profile.first_name || '',
+              last_name: profile.last_name || '',
+              company_name: profile.company_name || '',
+              phone: profile.phone || ''
+            };
+          });
           
           // Identify admins by email if available
           const usersWithAdmins = transformedUsers.map(user => {
