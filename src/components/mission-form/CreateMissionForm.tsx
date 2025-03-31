@@ -137,7 +137,14 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       // Vérifier si data est un tableau et contient au moins un élément
       const createdMission = Array.isArray(data) && data.length > 0 ? data[0] as MissionRow : null;
       
-      toast.success(`Mission ${createdMission?.mission_number || ''} créée avec succès`);
+      if (createdMission) {
+        console.log("Mission créée:", createdMission);
+        toast.success(`Mission ${createdMission.mission_number} créée avec succès`);
+      } else {
+        console.log("Données retournées:", data);
+        toast.success("Mission créée avec succès");
+      }
+      
       onSuccess();
     } catch (error: any) {
       console.error("Error creating mission:", error);

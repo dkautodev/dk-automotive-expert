@@ -32,24 +32,32 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         setLoading(true);
         console.log("Fetching ongoing missions...");
         
-        // Fetch mission data first
+        // Fetch mission data with all statuses to debug
         const { data: missionsData, error: missionsError } = await supabase
           .from('missions')
           .select('*')
-          .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(20);
 
         if (missionsError) {
           console.error("Error fetching missions:", missionsError);
           throw missionsError;
         }
         
-        console.log("Missions fetched:", missionsData);
+        console.log("All missions fetched:", missionsData);
         
-        if (missionsData && missionsData.length > 0) {
+        // Filter missions for "confirmé", "confirme" or "prise_en_charge" status
+        const ongoingMissions = missionsData?.filter(mission => 
+          mission.status === 'confirmé' || 
+          mission.status === 'confirme' || 
+          mission.status === 'prise_en_charge'
+        ) || [];
+        
+        console.log("Filtered ongoing missions:", ongoingMissions);
+        
+        if (ongoingMissions.length > 0) {
           // Get the client profiles for these missions as a separate query
-          const clientIds = missionsData.map(mission => mission.client_id);
+          const clientIds = ongoingMissions.map(mission => mission.client_id);
           const { data: clientProfiles, error: clientsError } = await supabase
             .from('user_profiles')
             .select('*')
@@ -63,7 +71,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           console.log("Client profiles fetched:", clientProfiles);
           
           // Map profiles to missions
-          const formattedMissions = missionsData.map(mission => {
+          const formattedMissions = ongoingMissions.map(mission => {
             const vehicleInfo = mission.vehicle_info as any || {};
             const clientProfile = clientProfiles?.find(profile => profile.user_id === mission.client_id) || null;
             
