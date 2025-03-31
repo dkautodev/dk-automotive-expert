@@ -21,6 +21,7 @@ import Cookies from "./pages/Cookies";
 import DriverDashboard from "./pages/DriverDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import { UserProfileDetail } from "./components/admin/clients/UserProfileDetail";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/dashboard/driver" element={<DriverDashboard />} />
             <Route path="/dashboard/client/*" element={<ClientDashboard />} />
             <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin/profile/:userId" element={<UserProfileDetail />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cookies" element={<Cookies />} />
