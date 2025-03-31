@@ -4,6 +4,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ClientData } from "./hooks/types/clientTypes";
 import { MissionFormValues } from "./missionFormSchema";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;
@@ -12,6 +13,13 @@ interface ClientSelectorProps {
 }
 
 const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
+  const { role } = useAuthContext();
+  
+  // Si l'utilisateur est un client, ne pas afficher le sélecteur
+  if (role === 'client') {
+    return null;
+  }
+  
   console.log("Liste des clients disponibles:", clients);
   
   return (
