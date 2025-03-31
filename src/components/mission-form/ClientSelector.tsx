@@ -5,8 +5,8 @@ import { UseFormReturn } from "react-hook-form";
 import { MissionFormValues } from "./missionFormSchema";
 import { ClientData } from "./hooks/types/clientTypes";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandLoading } from "@/components/ui/command";
+import { Search, UserPlus, Loader2 } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ClientSelectorProps {
@@ -88,7 +88,10 @@ const ClientSelector = ({
               />
               <CommandList>
                 {loading ? (
-                  <CommandLoading>Chargement des clients...</CommandLoading>
+                  <div className="py-6 text-center text-sm flex items-center justify-center">
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Chargement des clients...
+                  </div>
                 ) : (
                   <>
                     <CommandEmpty>
