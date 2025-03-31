@@ -81,11 +81,11 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
     try {
       const values = form.getValues();
       
-      // Format data for database - Specifions explicitement les colonnes dans notre objet
+      // Format data for database
       const missionData = {
-        status: "confirmé", // Changé de "en_attente" à "confirmé" pour que la mission apparaisse dans "missions en cours"
-        client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
-        distance: values.distance?.toString(), // Convert to string as required by the database
+        status: "confirmé", // S'assurer que les missions créées apparaissent dans "missions en cours"
+        client_id: values.client_id || user?.id,
+        distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
         vehicle_info: {
@@ -94,7 +94,6 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
           year: values.year,
           fuel: values.fuel,
           licensePlate: values.licensePlate,
-          // Stocker les adresses dans vehicle_info
           pickup_address: values.pickup_address,
           delivery_address: values.delivery_address,
           vehicle_type: values.vehicle_type
