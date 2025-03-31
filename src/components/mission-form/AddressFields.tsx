@@ -35,7 +35,10 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
       console.log("API Google Maps chargée avec succès");
       setMapsLoaded(true);
     };
-    script.onerror = (e) => console.error("Erreur lors du chargement de l'API Google Maps:", e);
+    script.onerror = (e) => {
+      console.error("Erreur lors du chargement de l'API Google Maps:", e);
+      // En cas d'erreur, on continue sans autocomplete
+    };
     
     document.head.appendChild(script);
 
@@ -52,9 +55,10 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
       return;
     }
     
-    // Initialize pickup autocomplete
-    if (pickupInputRef.current && !pickupAutocomplete) {
-      try {
+    try {
+      // Initialize pickup autocomplete
+      if (pickupInputRef.current && !pickupAutocomplete) {
+        console.log("Initialisation de l'autocomplétion pour l'adresse de prise en charge");
         const autocomplete = new google.maps.places.Autocomplete(pickupInputRef.current, {
           types: ["address"],
           fields: ["formatted_address"],
@@ -63,19 +67,17 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
         autocomplete.addListener("place_changed", () => {
           const place = autocomplete.getPlace();
           if (place && place.formatted_address) {
+            console.log("Adresse de prise en charge sélectionnée:", place.formatted_address);
             form.setValue("pickup_address", place.formatted_address, { shouldValidate: true });
           }
         });
         
         setPickupAutocomplete(autocomplete);
-      } catch (error) {
-        console.error("Erreur lors de la création de l'autocomplétion pour l'adresse de prise en charge:", error);
       }
-    }
 
-    // Initialize delivery autocomplete
-    if (deliveryInputRef.current && !deliveryAutocomplete) {
-      try {
+      // Initialize delivery autocomplete
+      if (deliveryInputRef.current && !deliveryAutocomplete) {
+        console.log("Initialisation de l'autocomplétion pour l'adresse de livraison");
         const autocomplete = new google.maps.places.Autocomplete(deliveryInputRef.current, {
           types: ["address"],
           fields: ["formatted_address"],
@@ -84,24 +86,29 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
         autocomplete.addListener("place_changed", () => {
           const place = autocomplete.getPlace();
           if (place && place.formatted_address) {
+            console.log("Adresse de livraison sélectionnée:", place.formatted_address);
             form.setValue("delivery_address", place.formatted_address, { shouldValidate: true });
           }
         });
         
         setDeliveryAutocomplete(autocomplete);
-      } catch (error) {
-        console.error("Erreur lors de la création de l'autocomplétion pour l'adresse de livraison:", error);
       }
+    } catch (error) {
+      console.error("Erreur lors de la création de l'autocomplétion:", error);
     }
   }, [mapsLoaded, form, pickupAutocomplete, deliveryAutocomplete]);
 
-  // Manual input handling for when autocomplete isn't used
+  // Manual input handling for when autocomplete isn't used or fails
   const handlePickupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    form.setValue("pickup_address", e.target.value);
+    const value = e.target.value;
+    console.log("Modification manuelle de l'adresse de prise en charge:", value);
+    form.setValue("pickup_address", value, { shouldValidate: true });
   };
 
   const handleDeliveryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    form.setValue("delivery_address", e.target.value);
+    const value = e.target.value;
+    console.log("Modification manuelle de l'adresse de livraison:", value);
+    form.setValue("delivery_address", value, { shouldValidate: true });
   };
 
   return (
