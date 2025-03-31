@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { ClientData, NewClientData } from './types/clientTypes';
 import { fetchClientsData, addClientData } from './services/clientService';
 
-export { ClientData, NewClientData } from './types/clientTypes';
+export type { ClientData, NewClientData } from './types/clientTypes';
 
 export const useClients = (form?: any) => {
   const [clients, setClients] = useState<ClientData[]>([]);
