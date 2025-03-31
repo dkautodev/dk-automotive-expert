@@ -1,113 +1,81 @@
+
+/**
+ * Service permettant d'obtenir les prix depuis la grille tarifaire
+ */
+
 import { supabase } from '@/integrations/supabase/client';
-import { PriceGrid, PriceRange } from '@/components/admin/pricingTypes';
-import { vehicleTypes } from '@/lib/vehicleTypes';
-import { distanceRanges } from '@/hooks/usePricingGrids';
 
-// Fetch price grids from the database
-export const fetchPriceGrids = async () => {
-  console.log('Fetching price grids from database');
-  const { data, error } = await supabase
-    .from('price_grids')
-    .select('*')
-    .order('vehicle_type_id', { ascending: true })
-    .order('distance_range_id', { ascending: true });
+interface PriceResult {
+  priceHT: number;
+  isPerKm: boolean;
+}
 
-  if (error) {
-    console.error('Error fetching price grids:', error);
-    throw error;
-  }
-
-  console.log('Fetched price grids:', data);
-  return data;
+// Fonction pour déterminer la tranche de distance appropriée
+const getDistanceRangeId = (distance: number): string => {
+  if (distance <= 10) return '1-10';
+  if (distance <= 20) return '11-20';
+  if (distance <= 30) return '21-30';
+  if (distance <= 40) return '31-40';
+  if (distance <= 50) return '41-50';
+  if (distance <= 60) return '51-60';
+  if (distance <= 70) return '61-70';
+  if (distance <= 80) return '71-80';
+  if (distance <= 90) return '81-90';
+  if (distance <= 100) return '91-100';
+  if (distance <= 200) return '101-200';
+  if (distance <= 300) return '201-300';
+  if (distance <= 400) return '301-400';
+  if (distance <= 500) return '401-500';
+  if (distance <= 600) return '501-600';
+  if (distance <= 700) return '601-700';
+  return '701+';
 };
 
-// Initialize default price grids in the database
-export const initializeDefaultPriceGrids = async () => {
-  const defaultGrids: PriceGrid[] = vehicleTypes.map((vehicleType) => ({
-    vehicleTypeId: vehicleType.id,
-    vehicleTypeName: vehicleType.name,
-    prices: distanceRanges.map((range) => ({
-      rangeId: range.id,
-      priceHT: "0.00", // Set default price to 0
-    })),
-  }));
-
-  // Insert default data into database
-  for (const grid of defaultGrids) {
-    for (const price of grid.prices) {
-      const range = distanceRanges.find(r => r.id === price.rangeId);
-      try {
-        await supabase.from('price_grids').insert({
-          vehicle_type_id: grid.vehicleTypeId,
-          vehicle_type_name: grid.vehicleTypeName,
-          distance_range_id: price.rangeId,
-          distance_range_label: range?.label || '',
-          price_ht: 0, // Set default price to 0
-          is_per_km: range?.perKm || false
-        });
-      } catch (err) {
-        console.error(`Error inserting default price for ${grid.vehicleTypeId}, range ${price.rangeId}:`, err);
-        throw err;
-      }
-    }
-  }
-
-  return defaultGrids;
-};
-
-// Update a single price in the database
-export const updatePriceInDB = async (
-  vehicleTypeId: string,
-  rangeId: string,
-  priceHT: number
-) => {
-  console.log(`Updating price in DB for ${vehicleTypeId}, range ${rangeId}: ${priceHT}`);
-  
+// Obtenir le prix pour un type de véhicule et une distance donnée
+export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number): Promise<PriceResult> => {
+  console.log(`Récupération du prix pour ${vehicleTypeId} et ${distance} km`);
   try {
+    // Déterminer la tranche de distance
+    const rangeId = getDistanceRangeId(distance);
+    console.log(`Tranche de distance identifiée: ${rangeId}`);
+    
+    // Récupérer le prix depuis la base de données
     const { data, error } = await supabase
       .from('price_grids')
-      .update({ price_ht: priceHT })
+      .select('price_ht, is_per_km')
       .eq('vehicle_type_id', vehicleTypeId)
-      .eq('distance_range_id', rangeId);
-
+      .eq('distance_range_id', rangeId)
+      .single();
+    
     if (error) {
-      console.error(`Error updating price for ${vehicleTypeId}, range ${rangeId}:`, error);
-      throw error;
+      console.error('Erreur lors de la récupération du prix:', error);
+      throw new Error(`Erreur lors de la récupération du prix: ${error.message}`);
     }
     
-    console.log(`Successfully updated price for ${vehicleTypeId}, range ${rangeId}`, data);
-    return true;
-  } catch (err) {
-    console.error(`Exception updating price for ${vehicleTypeId}, range ${rangeId}:`, err);
-    throw err;
-  }
-};
-
-// Get price for a specific vehicle type and distance
-export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number) => {
-  try {
-    const { data, error } = await supabase
-      .rpc('calculate_price_from_distance', { 
-        p_vehicle_type_id: vehicleTypeId, 
-        p_distance: distance 
-      });
-
-    if (error) {
-      console.error(`Error calculating price for ${vehicleTypeId}, distance ${distance}:`, error);
-      throw error;
+    if (!data) {
+      console.warn(`Aucun prix trouvé pour ${vehicleTypeId} dans la tranche ${rangeId}, utilisation du prix par défaut`);
+      // Prix par défaut
+      return {
+        priceHT: distance * 1.2,
+        isPerKm: true
+      };
     }
     
-    if (!data || data.length === 0) {
-      throw new Error(`Aucun prix trouvé pour la distance ${distance}km et le véhicule ${vehicleTypeId}`);
-    }
-
-    // La fonction retourne un tableau avec un seul résultat
+    // Si le prix est par km, multiplier par la distance
+    const finalPrice = data.is_per_km ? data.price_ht * distance : data.price_ht;
+    
+    console.log(`Prix HT calculé: ${finalPrice} (${data.is_per_km ? 'par km' : 'forfait'})`);
+    
     return {
-      priceHT: data[0].price_ht,
-      isPerKm: data[0].is_per_km
+      priceHT: finalPrice,
+      isPerKm: data.is_per_km
     };
-  } catch (err) {
-    console.error(`Exception getting price for ${vehicleTypeId}, distance ${distance}:`, err);
-    throw err;
+  } catch (error: any) {
+    console.error('Erreur dans le service de pricing:', error);
+    // En cas d'erreur, utiliser un prix par défaut
+    return {
+      priceHT: distance * 2.5,
+      isPerKm: true
+    };
   }
 };

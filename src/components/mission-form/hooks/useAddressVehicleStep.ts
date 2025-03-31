@@ -5,6 +5,7 @@ import { MissionFormValues } from "../missionFormSchema";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import { useClients } from "./useClients";
+import { toast } from "sonner";
 
 export const useAddressVehicleStep = (
   form: UseFormReturn<MissionFormValues>,
@@ -51,7 +52,7 @@ export const useAddressVehicleStep = (
 
   const calculateDistanceAndPrice = async () => {
     if (!pickupAddress || !deliveryAddress || !vehicleType) {
-      console.warn("Impossible de calculer: adresses ou type de véhicule manquants");
+      toast.error("Veuillez remplir tous les champs (adresses et type de véhicule)");
       return;
     }
 
@@ -72,8 +73,11 @@ export const useAddressVehicleStep = (
       
       form.setValue("price_ht", priceResult.priceHT);
       form.setValue("price_ttc", priceResult.priceTTC);
+      
+      toast.success("Calcul effectué avec succès");
     } catch (error) {
       console.error("Error calculating distance and price:", error);
+      toast.error("Erreur lors du calcul de la distance et du prix");
     } finally {
       setIsCalculatingTotal(false);
     }
