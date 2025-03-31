@@ -17,7 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MissionFormValues } from "./missionFormSchema";
-import { carBrands, getModelsByBrand } from "@/components/quote-form/vehicleData";
+import VehicleTypeSelector from "./VehicleTypeSelector";
+import { vehicleTypes, getVehiclesByCategory } from "@/lib/vehicleTypes";
+import { useEffect, useState } from "react";
 
 interface VehicleInfoStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -26,8 +28,29 @@ interface VehicleInfoStepProps {
 }
 
 const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => {
-  const selectedBrand = form.watch("brand");
-  const models = selectedBrand ? getModelsByBrand(selectedBrand) : [];
+  const selectedVehicleType = form.watch("vehicle_type");
+  const [suggestedVehicles, setSuggestedVehicles] = useState<string[]>([]);
+  
+  useEffect(() => {
+    if (selectedVehicleType) {
+      const vehicles = getVehiclesByCategory(selectedVehicleType);
+      setSuggestedVehicles(vehicles);
+      
+      // Reset brand and model when changing vehicle type
+      form.setValue("brand", "");
+      form.setValue("model", "");
+    }
+  }, [selectedVehicleType, form]);
+  
+  const handleVehicleSelection = (value: string) => {
+    if (value) {
+      const [brand, ...modelParts] = value.split(" ");
+      const model = modelParts.join(" ");
+      
+      form.setValue("brand", brand);
+      form.setValue("model", model);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -36,6 +59,43 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
         Veuillez fournir les informations détaillées du véhicule à convoyer
       </p>
 
+      <div className="space-y-4">
+        <VehicleTypeSelector form={form} />
+        
+        {selectedVehicleType && suggestedVehicles.length > 0 && (
+          <FormField
+            control={form.control}
+            name="suggested_vehicle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Véhicule suggéré</FormLabel>
+                <Select 
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    handleVehicleSelection(value);
+                  }} 
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un véhicule" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {suggestedVehicles.map((vehicle) => (
+                      <SelectItem key={vehicle} value={vehicle}>
+                        {vehicle}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
           control={form.control}
@@ -43,20 +103,9 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Marque</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une marque" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {carBrands.map((brand) => (
-                    <SelectItem key={brand} value={brand}>
-                      {brand}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <Input {...field} placeholder="Marque du véhicule" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -68,24 +117,9 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Modèle</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
-                value={field.value}
-                disabled={!selectedBrand}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={selectedBrand ? "Sélectionner un modèle" : "Sélectionner d'abord une marque"} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {models.map((model) => (
-                    <SelectItem key={model} value={model}>
-                      {model}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <Input {...field} placeholder="Modèle du véhicule" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

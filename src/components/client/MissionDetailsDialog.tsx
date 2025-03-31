@@ -12,8 +12,9 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { FileText, Car } from "lucide-react";
 import { generateMissionPDF } from "@/utils/missionPdfGenerator";
+import { vehicleTypes } from "@/lib/vehicleTypes";
 
 interface MissionDetailsDialogProps {
   mission: MissionRow | null;
@@ -39,6 +40,11 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
     if (mission) {
       generateMissionPDF(mission);
     }
+  };
+  
+  const getVehicleTypeName = (typeId: string) => {
+    const vehicleType = vehicleTypes.find(type => type.id === typeId);
+    return vehicleType ? vehicleType.name : typeId;
   };
   
   return (
@@ -76,10 +82,22 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
 
           <div className="space-y-2">
             <h3 className="font-semibold">Véhicule</h3>
-            <p>
-              {vehicleInfo.brand || "N/A"} {vehicleInfo.model || ""} {vehicleInfo.year || ""}
-              {vehicleInfo.fuel ? ` - ${vehicleInfo.fuel}` : ""}
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>
+                <p className="text-sm text-muted-foreground">Catégorie</p>
+                <div className="flex items-center gap-1">
+                  <Car className="h-4 w-4 text-blue-500" />
+                  <p>{vehicleInfo.vehicle_type ? getVehicleTypeName(vehicleInfo.vehicle_type) : "Non spécifié"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Détails</p>
+                <p>
+                  {vehicleInfo.brand || "N/A"} {vehicleInfo.model || ""} {vehicleInfo.year || ""}
+                  {vehicleInfo.fuel ? ` - ${vehicleInfo.fuel}` : ""}
+                </p>
+              </div>
+            </div>
             {vehicleInfo.licensePlate && (
               <p>Immatriculation: {vehicleInfo.licensePlate}</p>
             )}
