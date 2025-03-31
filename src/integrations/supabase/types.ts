@@ -383,7 +383,7 @@ export type Database = {
       }
       generate_mission_number: {
         Args: {
-          mission_type: string
+          mission_type_param: string
         }
         Returns: string
       }
