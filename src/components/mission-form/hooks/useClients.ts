@@ -45,42 +45,101 @@ export const useClients = (form?: any) => {
       setIsLoading(true);
       setError(null);
       
-      // Get all profiles - we need to disable RLS for this query or make sure
-      // we have the proper policy in place
-      const { data: userProfiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('*');
+      // Utilisation de l'API Auth pour récupérer les utilisateurs
+      // Cette opération nécessite des privilèges administratifs
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error("Erreur lors de la récupération des utilisateurs:", authError);
+        
+        // Fallback: essayer de récupérer les profiles directement
+        const { data: userProfiles, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('*');
 
-      if (profilesError) {
-        throw profilesError;
+        if (profilesError) {
+          throw profilesError;
+        }
+        
+        if (!userProfiles || userProfiles.length === 0) {
+          console.log("Aucun profil client trouvé dans la base de données");
+          setClients([]);
+          return;
+        }
+        
+        // Transformer les données au format ClientData
+        const formattedClients: ClientData[] = userProfiles.map(profile => {
+          const fullName = [
+            profile.first_name || '',
+            profile.last_name || ''
+          ].filter(Boolean).join(' ');
+
+          return {
+            id: profile.user_id || profile.id,
+            name: fullName.trim() || 'Client sans nom',
+            email: '', // Pas d'information d'email disponible dans user_profiles
+            phone: profile.phone || '',
+            company: profile.company_name || '',
+            address: profile.billing_address || ''
+          };
+        });
+        
+        console.log("Clients formatés depuis user_profiles:", formattedClients);
+        setClients(formattedClients);
+        return;
       }
-
-      console.log("Raw user profiles from database:", userProfiles);
-
-      if (!userProfiles || userProfiles.length === 0) {
-        console.log("Aucun client trouvé dans la base de données");
+      
+      if (!authData || !authData.users || authData.users.length === 0) {
+        console.log("Aucun utilisateur trouvé");
         setClients([]);
         return;
       }
-
-      // Transform the data to ClientData format with better name formatting
-      const formattedClients: ClientData[] = userProfiles.map(profile => {
-        // Format the name part
-        const fullName = [
-          profile.first_name || '',
-          profile.last_name || ''
-        ].filter(Boolean).join(' ');
-
-        return {
-          id: profile.user_id || profile.id,
-          name: fullName.trim() || 'Client sans nom',
-          email: '', // Will be filled if needed later
-          phone: profile.phone || '',
-          company: profile.company_name || '',
-          address: profile.billing_address || ''
-        };
-      });
-
+      
+      console.log("Utilisateurs récupérés via auth:", authData.users);
+      
+      // Récupérer les profils utilisateurs pour enrichir les données
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('*');
+      
+      if (profilesError) {
+        console.warn("Erreur lors de la récupération des profils:", profilesError);
+      }
+      
+      // Transformer les données au format ClientData
+      const formattedClients: ClientData[] = authData.users
+        .filter(user => user.email) // S'assurer que l'utilisateur a un email
+        .map(user => {
+          // Chercher le profil correspondant
+          const profile = profiles?.find(p => p.user_id === user.id);
+          
+          // Construire le nom à partir du profil ou des métadonnées
+          let firstName = '', lastName = '', company = '', phone = '';
+          
+          if (profile) {
+            firstName = profile.first_name || '';
+            lastName = profile.last_name || '';
+            company = profile.company_name || '';
+            phone = profile.phone || '';
+          } else if (user.user_metadata) {
+            firstName = user.user_metadata.firstName || user.user_metadata.first_name || '';
+            lastName = user.user_metadata.lastName || user.user_metadata.last_name || '';
+            company = user.user_metadata.company || '';
+            phone = user.user_metadata.phone || '';
+          }
+          
+          const fullName = [firstName, lastName].filter(Boolean).join(' ');
+          
+          return {
+            id: user.id,
+            name: fullName.trim() || user.email,
+            email: user.email || '',
+            phone: phone,
+            company: company,
+            address: profile?.billing_address || ''
+          };
+        });
+      
       console.log("Clients formatés:", formattedClients);
       setClients(formattedClients);
     } catch (error: any) {
