@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Loader } from "@/components/ui/loader";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AlertCircle, Edit, Trash2, ArrowDownAZ, ArrowUpAZ } from "lucide-react";
+import { AlertCircle, Eye, Trash2, ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { useState } from "react";
 import { UserData } from "./types";
 
@@ -121,10 +121,10 @@ export const UserTable = ({
                     variant="ghost"
                     size="sm"
                     className="p-2 h-8 w-8"
-                    onClick={() => window.location.href = `/dashboard/profile/${user.id}`}
-                    title="Modifier"
+                    onClick={() => window.location.href = `/dashboard/admin/profile/${user.id}`}
+                    title="Consulter"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="destructive"
