@@ -77,7 +77,7 @@ export const useClients = (form?: any) => {
           return {
             id: profile.user_id || profile.id,
             name: fullName.trim() || 'Client sans nom',
-            email: '', // Pas d'information d'email disponible dans user_profiles
+            email: '', // No email available in user_profiles
             phone: profile.phone || '',
             company: profile.company_name || '',
             address: profile.billing_address || ''
@@ -132,7 +132,7 @@ export const useClients = (form?: any) => {
           
           return {
             id: user.id,
-            name: fullName.trim() || user.email,
+            name: fullName.trim() || user.email || '',
             email: user.email || '',
             phone: phone,
             company: company,

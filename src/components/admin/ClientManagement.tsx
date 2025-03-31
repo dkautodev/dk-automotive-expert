@@ -84,7 +84,7 @@ const ClientManagement = () => {
             return {
               id: user.id,
               email: user.email || '',
-              user_type: user.user_metadata?.role || profile?.user_type || 'client',
+              user_type: user.user_metadata?.role || user.user_metadata?.user_type || 'client',
               first_name: profile?.first_name || user.user_metadata?.first_name || user.user_metadata?.firstName || '',
               last_name: profile?.last_name || user.user_metadata?.last_name || user.user_metadata?.lastName || '',
               company_name: profile?.company_name || user.user_metadata?.company || '',
@@ -143,7 +143,8 @@ const ClientManagement = () => {
           const transformedUsers = profiles.map(profile => ({
             id: profile.user_id || profile.id,
             email: '',
-            user_type: profile.user_type || 'client',
+            // Define default user_type since it doesn't exist in user_profiles
+            user_type: 'client',
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
             company_name: profile.company_name || '',
