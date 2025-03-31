@@ -1,13 +1,27 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, PieChart, LogOut } from 'lucide-react';
 import { useAuthContext } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { 
+  ChevronLeft, 
+  LayoutDashboard, 
+  Users, 
+  FileText, 
+  CreditCard,
+  Settings,
+  LogOut
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useSidebar } from "@/components/ui/sidebar";
+import NotificationBell from "../notifications/NotificationBell";
 
 const AdminSidebar = () => {
   const { signOut } = useAuthContext();
+  const { collapsed, toggleCollapsed } = useSidebar();
 
   const handleLogout = async () => {
     try {
@@ -20,9 +34,26 @@ const AdminSidebar = () => {
   };
 
   return (
-    <div className="h-screen w-52 bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
-      <div className="p-2 my-[25px]">
-        <img alt="DK Automotive" className="w-36 h-auto mx-auto mb-2" src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" />
+    <div className="fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10">
+      <div className="h-16 flex items-center justify-between px-4">
+        <Link to="/dashboard/admin" className="font-semibold">
+          DK Automotive
+        </Link>
+        <div className="flex items-center space-x-1">
+          <NotificationBell />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleCollapsed}
+            className="h-8 w-8"
+          >
+            <ChevronLeft
+              className={`h-5 w-5 transition-transform ${
+                collapsed ? "rotate-180" : ""
+              }`}
+            />
+          </Button>
+        </div>
       </div>
       
       <nav className="mt-4 flex-1">
