@@ -22,16 +22,45 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
     const fetchCompletedMissions = async () => {
       setLoading(true);
       try {
+        // First, fetch the basic mission data
         const { data, error } = await extendedSupabase
           .from('missions')
-          .select('*, user_profiles!missions_client_id_fkey(first_name, last_name, company_name)')
+          .select('*')
           .eq('status', 'livre')
           .order('delivery_date', { ascending: false })
           .limit(5);
         
         if (error) throw error;
         
-        setMissions(data || []);
+        // Check if we have data
+        if (!data || data.length === 0) {
+          setMissions([]);
+          setLoading(false);
+          return;
+        }
+
+        // Now fetch client profiles separately to avoid type mismatch
+        const missionData = data as unknown as MissionRow[];
+        
+        // Fetch client profiles for display
+        const clientIds = missionData.map(mission => mission.client_id);
+        const { data: clientProfiles, error: clientError } = await extendedSupabase
+          .from('user_profiles')
+          .select('*')
+          .in('user_id', clientIds);
+        
+        if (clientError) throw clientError;
+        
+        // Map client names to missions
+        const missionsWithClientInfo = missionData.map(mission => {
+          mission.clientProfile = clientProfiles?.find(profile => 
+            profile.user_id === mission.client_id
+          ) || null;
+          
+          return mission;
+        });
+        
+        setMissions(missionsWithClientInfo);
       } catch (error: any) {
         console.error('Error fetching completed missions:', error);
         toast.error(`Erreur: ${error.message}`);
@@ -43,8 +72,8 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
     fetchCompletedMissions();
   }, [refreshTrigger]);
 
-  const getClientName = (mission: any) => {
-    const profile = mission.user_profiles;
+  const getClientName = (mission: MissionRow) => {
+    const profile = mission.clientProfile;
     if (profile) {
       if (profile.company_name) return profile.company_name;
       if (profile.first_name || profile.last_name) 

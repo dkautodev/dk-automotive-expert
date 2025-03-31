@@ -12,14 +12,17 @@ type ProfileType = {
   user_id: string;
   first_name: string;
   last_name: string;
-  company_name?: string;
-  phone?: string;
-  profile_picture?: string;
-  billing_address?: string;
-  siret_number?: string;
-  vat_number?: string;
+  company_name?: string | null;
+  phone?: string | null;
+  profile_picture?: string | null;
+  billing_address?: string | null;
+  siret_number?: string | null;
+  vat_number?: string | null;
   email?: string;
   user_type?: string;
+};
+
+type UserWithProfile = ProfileType & {
   users?: {
     email?: string;
     user_type?: string;
@@ -52,16 +55,20 @@ const ProfileManagement = () => {
         if (driverError) throw driverError;
         
         // Map data to include email
-        const mapProfiles = (profiles: any[]) => profiles.map(profile => {
-          return {
-            ...profile,
-            email: profile.users?.email || '',
-            user_type: profile.users?.user_type || profile.user_type || 'client'
-          };
-        });
+        const mapProfiles = (profiles: UserWithProfile[] | null): ProfileType[] => {
+          if (!profiles) return [];
+          
+          return profiles.map(profile => {
+            return {
+              ...profile,
+              email: profile.users?.email || '',
+              user_type: profile.users?.user_type || profile.user_type || 'client'
+            };
+          });
+        };
         
-        setClientProfiles(mapProfiles(clientData || []));
-        setDriverProfiles(mapProfiles(driverData || []));
+        setClientProfiles(mapProfiles(clientData));
+        setDriverProfiles(mapProfiles(driverData));
       } catch (error: any) {
         console.error('Error fetching profiles:', error);
         toast.error(`Erreur lors du chargement des profils: ${error.message}`);
