@@ -6,7 +6,7 @@ import { MissionFormValues } from "./missionFormSchema";
 import { ClientData } from "./hooks/types/clientTypes";
 import { Button } from "@/components/ui/button";
 import { Search, UserPlus } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandLoading } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ClientSelectorProps {
@@ -31,17 +31,30 @@ const ClientSelector = ({
   const selectedClient = clients.find(client => client.id === clientId);
 
   useEffect(() => {
+    // Debug logging
+    console.log("Clients disponibles:", clients);
+    console.log("Client sélectionné:", selectedClient);
+    
     // Filter clients based on search value
     const filtered = clients.filter(client => {
-      const lowerSearchValue = searchValue.toLowerCase();
+      if (!searchValue.trim()) return true;
+      
+      const lowerSearchValue = searchValue.toLowerCase().trim();
       const name = (client.name || '').toLowerCase();
+      const email = (client.email || '').toLowerCase();
       const company = (client.company || '').toLowerCase();
-      return name.includes(lowerSearchValue) || company.includes(lowerSearchValue);
+      
+      return name.includes(lowerSearchValue) || 
+             email.includes(lowerSearchValue) || 
+             company.includes(lowerSearchValue);
     });
+    
+    console.log("Clients filtrés:", filtered);
     setFilteredClients(filtered);
-  }, [searchValue, clients]);
+  }, [searchValue, clients, clientId]);
 
   const handleSelectClient = (value: string) => {
+    console.log("Client sélectionné:", value);
     form.setValue("client_id", value);
     setOpen(false);
   };
@@ -58,6 +71,7 @@ const ClientSelector = ({
                 role="combobox"
                 className={`w-full justify-between ${!selectedClient ? "text-muted-foreground" : ""}`}
                 disabled={loading}
+                onClick={() => setOpen(true)}
               >
                 {selectedClient ? selectedClient.name : "Rechercher un client..."}
                 <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -70,27 +84,37 @@ const ClientSelector = ({
                 placeholder="Rechercher un client..."
                 value={searchValue}
                 onValueChange={setSearchValue}
+                autoFocus
               />
               <CommandList>
-                <CommandEmpty>
-                  {loading ? "Chargement des clients..." : "Aucun client trouvé"}
-                </CommandEmpty>
-                <CommandGroup>
-                  {filteredClients.map((client) => (
-                    <CommandItem
-                      key={client.id}
-                      value={client.id}
-                      onSelect={handleSelectClient}
-                    >
-                      <div className="flex flex-col">
-                        <span>{client.name}</span>
-                        {client.company && (
-                          <span className="text-xs text-muted-foreground">{client.company}</span>
-                        )}
-                      </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                {loading ? (
+                  <CommandLoading>Chargement des clients...</CommandLoading>
+                ) : (
+                  <>
+                    <CommandEmpty>
+                      {searchValue.trim() ? "Aucun client trouvé" : "Saisissez un terme de recherche"}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {filteredClients.map((client) => (
+                        <CommandItem
+                          key={client.id}
+                          value={client.id}
+                          onSelect={handleSelectClient}
+                        >
+                          <div className="flex flex-col">
+                            <span>{client.name}</span>
+                            {client.email && (
+                              <span className="text-xs text-muted-foreground">{client.email}</span>
+                            )}
+                            {client.company && (
+                              <span className="text-xs text-muted-foreground">{client.company}</span>
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </>
+                )}
               </CommandList>
             </Command>
           </PopoverContent>

@@ -1,5 +1,6 @@
+
 import { UseFormReturn } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MissionFormValues } from "./missionFormSchema";
 import { useDistanceCalculation } from "@/hooks/useDistanceCalculation";
@@ -29,10 +30,12 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
   const { 
     clients, 
     isLoading: clientsLoading, 
+    fetchClients,
     newClient, 
     setNewClient, 
     createClient, 
-    isSubmitting 
+    isSubmitting,
+    error: clientsError
   } = useClients(form);
 
   const pickupAddress = form.watch("pickup_address");
@@ -40,6 +43,22 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
   const vehicleType = form.watch("vehicle_type");
 
   const isCalculating = isDistanceCalculating || isPriceCalculating || isCalculatingTotal;
+
+  // Si erreur de chargement des clients, forcer une nouvelle tentative
+  useEffect(() => {
+    if (clientsError) {
+      console.warn("Erreur chargement clients, nouvelle tentative:", clientsError);
+      const timer = setTimeout(() => {
+        fetchClients();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [clientsError, fetchClients]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("État actuel des clients:", clients);
+  }, [clients]);
 
   const handleAddClient = () => {
     setClientDialogOpen(true);
