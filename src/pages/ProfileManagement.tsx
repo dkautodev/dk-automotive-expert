@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Loader } from "@/components/ui/loader";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { UserTable } from "@/components/admin/clients/UserTable";
+import { edgeFunctionService } from "@/components/admin/clients/services/api/edgeFunctionService";
 
 // Define the basic profile data without nested relations
 type ProfileType = {
@@ -35,17 +36,72 @@ const ProfileManagement = () => {
       setError(null);
       
       try {
-        console.log("Début de la récupération des profils...");
+        console.log("Début de la récupération des profils via Edge Function...");
         
-        // Approche alternative pour récupérer les profils
-        // D'abord, récupérer tous les profils utilisateurs
-        const { data: allProfiles, error: profilesError } = await extendedSupabase
+        // Utiliser l'Edge Function pour récupérer les utilisateurs avec profils
+        const response = await edgeFunctionService.fetchUsersViaEdgeFunction();
+        
+        if (!response) {
+          console.log("Pas de réponse de l'Edge Function, essayons les méthodes alternatives");
+          await fetchProfilesDirectly();
+          return;
+        }
+        
+        console.log("Réponse de l'Edge Function:", response);
+        
+        if (response.clients?.length > 0 || response.drivers?.length > 0) {
+          console.log(`Edge Function: ${response.clients?.length || 0} clients et ${response.drivers?.length || 0} chauffeurs trouvés`);
+          
+          // Transformer les données en format ProfileType
+          const formattedClients = response.clients?.map(client => ({
+            id: client.id,
+            user_id: client.id,
+            first_name: client.first_name || '',
+            last_name: client.last_name || '',
+            company_name: client.company_name || '',
+            phone: client.phone || '',
+            email: client.email || '',
+            user_type: 'client'
+          })) || [];
+          
+          const formattedDrivers = response.drivers?.map(driver => ({
+            id: driver.id,
+            user_id: driver.id,
+            first_name: driver.first_name || '',
+            last_name: driver.last_name || '',
+            company_name: driver.company_name || '',
+            phone: driver.phone || '',
+            email: driver.email || '',
+            user_type: 'chauffeur'
+          })) || [];
+          
+          setClientProfiles(formattedClients);
+          setDriverProfiles(formattedDrivers);
+          setLoading(false);
+        } else {
+          console.log("Aucun utilisateur trouvé via l'Edge Function, essayons les méthodes alternatives");
+          await fetchProfilesDirectly();
+        }
+      } catch (error: any) {
+        console.error("Erreur lors de la récupération via Edge Function:", error);
+        await fetchProfilesDirectly();
+      }
+    };
+
+    const fetchProfilesDirectly = async () => {
+      try {
+        console.log("Tentative de récupération directe des profils...");
+        
+        // 1. Récupérer tous les profils d'utilisateurs
+        const { data: allProfiles, error: profilesError } = await supabase
           .from('user_profiles')
           .select('*');
         
-        if (profilesError) throw profilesError;
+        if (profilesError) {
+          throw profilesError;
+        }
         
-        console.log("Profils récupérés:", allProfiles?.length || 0, "profils trouvés");
+        console.log("Profils récupérés directement:", allProfiles?.length || 0);
         
         if (!allProfiles || allProfiles.length === 0) {
           setError("Aucun profil trouvé dans la base de données");
@@ -54,33 +110,40 @@ const ProfileManagement = () => {
           setLoading(false);
           return;
         }
-        
-        // Ensuite, récupérer les informations utilisateurs pour avoir les emails et les types
-        const userIds = allProfiles.map(profile => profile.user_id);
-        
-        const { data: usersData, error: usersError } = await extendedSupabase
+
+        // 2. Récupérer les informations des utilisateurs (via auth.users n'est pas possible directement)
+        // Alternative: vérifier si nous avons la table 'users' dans la base de données
+        const { data: usersData, error: usersError } = await supabase
           .from('users')
-          .select('id, email, user_type')
-          .in('id', userIds);
+          .select('id, email, user_type');
         
-        if (usersError) throw usersError;
+        if (usersError) {
+          console.warn("Erreur lors de la récupération des utilisateurs:", usersError);
+          console.log("Utilisation des profils sans informations d'email");
+        }
         
-        console.log("Données utilisateurs récupérées:", usersData?.length || 0, "utilisateurs trouvés");
+        console.log("Données utilisateurs récupérées:", usersData?.length || 0);
         
-        // Combiner les données pour avoir des profils complets
+        // 3. Combiner les données
         const combinedProfiles = allProfiles.map(profile => {
           const userData = usersData?.find(user => user.id === profile.user_id);
+          
+          // Si nous n'avons pas de type d'utilisateur, utiliser 'client' par défaut
+          const userType = userData?.user_type || 'client';
+          
           return {
             ...profile,
+            id: profile.id,
+            user_id: profile.user_id || profile.id,
             email: userData?.email || '',
-            user_type: userData?.user_type || ''
+            user_type: userType
           };
         });
         
-        console.log("Profils combinés:", combinedProfiles);
+        console.log("Profils combinés:", combinedProfiles.length);
         
-        // Filtrer les clients et les chauffeurs
-        const clients = combinedProfiles.filter(profile => profile.user_type === 'client');
+        // 4. Filtrer les clients et chauffeurs
+        const clients = combinedProfiles.filter(profile => !profile.user_type || profile.user_type === 'client');
         const drivers = combinedProfiles.filter(profile => profile.user_type === 'chauffeur');
         
         console.log(`Filtrage terminé: ${clients.length} clients et ${drivers.length} chauffeurs trouvés`);
@@ -88,7 +151,7 @@ const ProfileManagement = () => {
         setClientProfiles(clients);
         setDriverProfiles(drivers);
       } catch (error: any) {
-        console.error('Erreur lors de la récupération des profils:', error);
+        console.error('Erreur lors de la récupération directe des profils:', error);
         setError(`Erreur: ${error.message}`);
         toast.error(`Erreur lors du chargement des profils: ${error.message}`);
       } finally {
