@@ -32,4 +32,29 @@ export type MissionStatus = "termine" | "prise_en_charge" | "en_attente" | "conf
 
 export type DocumentType = "kbis" | "driving_license" | "id_card" | "vigilance_certificate";
 
+export type NotificationType = "mission_status" | "document_update" | "invoice_generated" | "general";
+
+export type NotificationRow = {
+  id: string;
+  user_id: string;
+  message: string;
+  type: NotificationType;
+  mission_id?: string;
+  read: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type InvoiceRow = {
+  id: string;
+  mission_id: string;
+  client_id: string;
+  invoice_number: string;
+  price_ht: number;
+  price_ttc: number;
+  created_at: string;
+  paid: boolean;
+  issued_date: string;
+};
+
 export type Tables = Database['public']['Tables'];

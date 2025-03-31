@@ -9,14 +9,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { NotificationRow } from "@/types/database";
 
-export type Notification = {
-  id: string;
-  message: string;
-  created_at: string;
-  read: boolean;
-  type: 'mission_status' | 'document_update' | 'invoice_generated' | 'general';
-};
+export type Notification = NotificationRow;
 
 export const NotificationBell = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);

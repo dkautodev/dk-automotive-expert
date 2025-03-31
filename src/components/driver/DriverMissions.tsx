@@ -8,7 +8,7 @@ import { Loader } from "@/components/ui/loader";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
-import { MissionRow } from "@/types/database";
+import { MissionRow, NotificationRow } from "@/types/database";
 import { MissionStatusBadge } from "../client/MissionStatusBadge";
 import { toast } from "sonner";
 import { Bell } from "lucide-react";
@@ -49,7 +49,10 @@ const DriverMissions = () => {
           if (error) throw error;
           
           if (data) {
-            setMissionsWithNotifications(data.map(n => n.mission_id).filter(Boolean));
+            const missionIds = data
+              .filter(n => n.mission_id) // Filter out notifications with null mission_id
+              .map(n => n.mission_id as string);
+            setMissionsWithNotifications(missionIds);
           }
         } catch (error) {
           console.error('Erreur lors du chargement des notifications:', error);
@@ -66,11 +69,12 @@ const DriverMissions = () => {
           table: 'notifications',
           filter: `user_id=eq.${user.id}` 
         }, payload => {
-          if (payload.new && payload.new.mission_id) {
+          const newNotification = payload.new as NotificationRow;
+          if (newNotification.mission_id) {
             setMissionsWithNotifications(prev => 
-              prev.includes(payload.new.mission_id) 
+              prev.includes(newNotification.mission_id as string) 
                 ? prev 
-                : [...prev, payload.new.mission_id]
+                : [...prev, newNotification.mission_id as string]
             );
           }
         })

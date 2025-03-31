@@ -41,6 +41,50 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          invoice_number: string
+          issued_date: string | null
+          mission_id: string
+          paid: boolean | null
+          price_ht: number
+          price_ttc: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          invoice_number: string
+          issued_date?: string | null
+          mission_id: string
+          paid?: boolean | null
+          price_ht: number
+          price_ttc: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          invoice_number?: string
+          issued_date?: string | null
+          mission_id?: string
+          paid?: boolean | null
+          price_ht?: number
+          price_ttc?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mission_documents: {
         Row: {
           document_url: string
@@ -133,6 +177,47 @@ export type Database = {
           vehicles?: Json | null
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          mission_id: string | null
+          read: boolean | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          mission_id?: string | null
+          read?: boolean | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          mission_id?: string | null
+          read?: boolean | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_grids: {
         Row: {
