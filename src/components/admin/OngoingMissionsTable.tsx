@@ -34,11 +34,14 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         setLoading(true);
         console.log(`Fetching missions with refreshTrigger: ${refreshTrigger}, showAllMissions: ${showAllMissions}`);
         
-        // Recherche avec un orderBy pour obtenir les plus récentes en premier
+        // Query without any filters initially
         let query = supabase
           .from('missions')
           .select('*')
           .order('created_at', { ascending: false });
+        
+        // We don't apply any filters if showAllMissions is true
+        // This ensures we get ALL missions regardless of status
         
         const { data: missionsData, error: missionsError } = await query;
 
@@ -56,11 +59,10 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           return;
         }
         
-        // Transformer les missions pour inclure les adresses comme propriétés directes
+        // Transform missions to include addresses as direct properties
         const transformedMissions = missionsData.map(mission => {
           const vehicleInfo = mission.vehicle_info as any || {};
           
-          // Assurez-vous que ces propriétés sont toujours définies
           const missionWithAddresses = {
             ...mission,
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
@@ -72,7 +74,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         
         console.log(`Nombre de missions transformées: ${transformedMissions.length}`);
         
-        // Filtrer les missions en fonction des statuts uniquement si showAllMissions est false
+        // Filter missions by status only if showAllMissions is false
         const filteredMissions = showAllMissions 
           ? transformedMissions 
           : transformedMissions.filter(mission => 
@@ -84,7 +86,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         console.log(`Missions filtrées (${filteredMissions.length}):`, filteredMissions);
         console.log("Statuts des missions:", filteredMissions.map(m => m.status).join(', '));
         
-        // Récupérer les profils clients pour toutes les missions
+        // Get client profiles for all missions
         try {
           const clientIds = filteredMissions
             .map(mission => mission.client_id)
@@ -103,7 +105,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
 
             console.log("Profils clients récupérés:", clientProfiles);
             
-            // Associer les profils aux missions
+            // Associate profiles with missions
             const formattedMissions = filteredMissions.map(mission => {
               const clientProfile = clientProfiles?.find(profile => profile.user_id === mission.client_id) || null;
               
@@ -121,7 +123,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           }
         } catch (profileError) {
           console.error("Erreur lors de la récupération des profils:", profileError);
-          // Continuer avec les missions même sans profils clients
+          // Continue with missions even without client profiles
           setMissions(filteredMissions as MissionRow[]);
         }
       } catch (err) {
