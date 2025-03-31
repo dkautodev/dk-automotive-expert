@@ -9,18 +9,16 @@ export const useDistanceCalculation = () => {
     try {
       setIsCalculating(true);
       
+      // Si la clé API n'est pas configurée, utiliser une distance aléatoire
       if (!GOOGLE_MAPS_API_KEY) {
         console.warn("Clé API Google Maps non configurée, utilisation d'une distance aléatoire");
         await new Promise(resolve => setTimeout(resolve, 1000));
-        const randomDistance = Math.floor(Math.random() * 496) + 5; // Entre 5 et 500 km
-        setIsCalculating(false);
-        return randomDistance;
+        return generateRandomDistance();
       }
       
-      // Créer une instance du service Distance Matrix
+      // Utiliser le service Distance Matrix de Google Maps
       const service = new google.maps.DistanceMatrixService();
       
-      // Demander la distance entre l'origine et la destination
       const response = await new Promise<google.maps.DistanceMatrixResponse>((resolve, reject) => {
         service.getDistanceMatrix(
           {
@@ -30,37 +28,29 @@ export const useDistanceCalculation = () => {
             unitSystem: google.maps.UnitSystem.METRIC,
           },
           (response, status) => {
-            if (status === 'OK') {
-              resolve(response);
-            } else {
-              reject(new Error(`Erreur lors du calcul de la distance: ${status}`));
-            }
+            status === 'OK' ? resolve(response) : reject(new Error(`Erreur: ${status}`));
           }
         );
       });
       
-      // Extraire la distance du résultat
       const element = response.rows[0].elements[0];
       
       if (element.status === 'OK') {
-        // Convertir la distance en kilomètres (retirée en mètres)
-        const distanceInKm = Math.round(element.distance.value / 1000);
-        setIsCalculating(false);
-        return distanceInKm;
-      } else {
-        console.error('Impossible de calculer la distance:', element.status);
-        // Fallback vers une distance aléatoire en cas d'erreur
-        const randomDistance = Math.floor(Math.random() * 496) + 5;
-        setIsCalculating(false);
-        return randomDistance;
-      }
+        return Math.round(element.distance.value / 1000); // Convertir en km
+      } 
+      
+      throw new Error(`Impossible de calculer la distance: ${element.status}`);
     } catch (error) {
-      setIsCalculating(false);
       console.error('Erreur lors du calcul de la distance:', error);
-      // Fallback vers une distance aléatoire en cas d'erreur
-      const randomDistance = Math.floor(Math.random() * 496) + 5;
-      return randomDistance;
+      return generateRandomDistance();
+    } finally {
+      setIsCalculating(false);
     }
+  };
+  
+  // Fonction utilitaire pour générer une distance aléatoire
+  const generateRandomDistance = (): number => {
+    return Math.floor(Math.random() * 496) + 5; // Entre 5 et 500 km
   };
   
   return {
