@@ -23,8 +23,8 @@ type ProfileType = {
   user_type?: string;
 };
 
-// Define a separate type for the raw Supabase response that includes nested users
-type ProfileWithUsersJoin = {
+// Define a separate type for the raw Supabase response
+interface SupabaseProfileResponse {
   id: string;
   user_id: string;
   first_name: string;
@@ -38,8 +38,8 @@ type ProfileWithUsersJoin = {
   users?: {
     email?: string;
     user_type?: string;
-  };
-};
+  } | null;
+}
 
 const ProfileManagement = () => {
   const [clientProfiles, setClientProfiles] = useState<ProfileType[]>([]);
@@ -67,7 +67,7 @@ const ProfileManagement = () => {
         if (driverError) throw driverError;
         
         // Map data to include email
-        const mapProfiles = (profiles: ProfileWithUsersJoin[] | null): ProfileType[] => {
+        const mapProfiles = (profiles: SupabaseProfileResponse[] | null): ProfileType[] => {
           if (!profiles) return [];
           
           return profiles.map(profile => {
@@ -88,8 +88,8 @@ const ProfileManagement = () => {
           });
         };
         
-        setClientProfiles(mapProfiles(clientData as ProfileWithUsersJoin[]));
-        setDriverProfiles(mapProfiles(driverData as ProfileWithUsersJoin[]));
+        setClientProfiles(mapProfiles(clientData as SupabaseProfileResponse[]));
+        setDriverProfiles(mapProfiles(driverData as SupabaseProfileResponse[]));
       } catch (error: any) {
         console.error('Error fetching profiles:', error);
         toast.error(`Erreur lors du chargement des profils: ${error.message}`);
