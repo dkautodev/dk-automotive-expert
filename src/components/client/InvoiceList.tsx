@@ -9,17 +9,9 @@ import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { InvoiceRow } from "@/types/database";
 
-type Invoice = {
-  id: string;
-  mission_id: string;
-  mission_number: string;
-  invoice_number: string;
-  created_at: string;
-  price_ht: number;
-  price_ttc: number;
-  client_id: string;
-};
+type Invoice = InvoiceRow;
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -33,13 +25,11 @@ const InvoiceList = () => {
       try {
         setLoading(true);
         
-        // Récupérer toutes les missions livrées avec un numéro de facture
+        // Récupérer toutes les factures de l'utilisateur
         const { data, error } = await supabase
-          .from('missions')
-          .select('id, mission_number, invoice_number, created_at, price_ht, price_ttc, client_id')
+          .from('invoices')
+          .select('*')
           .eq('client_id', user.id)
-          .eq('status', 'livre')
-          .not('invoice_number', 'is', null)
           .order('created_at', { ascending: false });
           
         if (error) throw error;
@@ -82,9 +72,6 @@ const InvoiceList = () => {
               >
                 <div>
                   <p className="font-medium">{invoice.invoice_number}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Mission: {invoice.mission_number}
-                  </p>
                   <p className="text-sm text-muted-foreground">
                     Date: {format(parseISO(invoice.created_at), 'dd MMM yyyy', { locale: fr })}
                   </p>
