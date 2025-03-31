@@ -36,7 +36,10 @@ export const NotificationBell = () => {
           .order('created_at', { ascending: false })
           .limit(10);
           
-        if (error) throw error;
+        if (error) {
+          console.error("Erreur lors du chargement des notifications:", error);
+          return;
+        }
         
         if (data) {
           setNotifications(data as Notification[]);
@@ -51,14 +54,15 @@ export const NotificationBell = () => {
     
     // Abonnement aux nouvelles notifications en temps réel
     const channel = supabase
-      .channel('public:notifications')
+      .channel('notifications-channel')
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
         table: 'notifications',
         filter: `user_id=eq.${user.id}` 
       }, payload => {
-        setNotifications(prev => [payload.new as Notification, ...prev]);
+        const newNotification = payload.new as Notification;
+        setNotifications(prev => [newNotification, ...prev]);
         setUnreadCount(prev => prev + 1);
       })
       .subscribe();
@@ -83,7 +87,10 @@ export const NotificationBell = () => {
         .update({ read: true })
         .in('id', unreadIds);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur lors du marquage des notifications comme lues:", error);
+        return;
+      }
       
       // Mise à jour locale
       setNotifications(prev => 

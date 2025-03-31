@@ -1,10 +1,9 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Home, PieChart, LogOut } from 'lucide-react';
-import { useAuthContext } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
+  Home, 
+  PieChart, 
   ChevronLeft, 
   LayoutDashboard, 
   Users, 
@@ -13,8 +12,9 @@ import {
   Settings,
   LogOut
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useAuthContext } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
 import NotificationBell from "../notifications/NotificationBell";

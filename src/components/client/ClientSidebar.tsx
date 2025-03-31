@@ -1,3 +1,4 @@
+
 import {
   ChevronLeft,
   LayoutDashboard,
@@ -15,11 +16,11 @@ import NotificationBell from "../notifications/NotificationBell";
 
 const ClientSidebar = () => {
   const { collapsed, toggleCollapsed } = useSidebar();
-  const { logout } = useAuthContext();
+  const { signOut } = useAuthContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     navigate("/auth");
   };
 

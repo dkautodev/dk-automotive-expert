@@ -1,12 +1,11 @@
-import { 
-  ChevronLeft, 
-  LayoutDashboard, 
-  FileText, 
+
+import {
+  ChevronLeft,
+  LayoutDashboard,
   User,
-  Truck,
+  FileText,
   CreditCard,
-  LogOut,
-  FileCheck
+  LogOut
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,15 +14,13 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useAuthContext } from "@/context/AuthContext";
 import NotificationBell from "../notifications/NotificationBell";
 
-interface DriverSidebarProps {}
-
-const DriverSidebar: React.FC<DriverSidebarProps> = () => {
-  const navigate = useNavigate();
+const DriverSidebar = () => {
   const { collapsed, toggleCollapsed } = useSidebar();
-  const { logout } = useAuthContext();
+  const { signOut } = useAuthContext();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     navigate("/auth");
   };
 
@@ -49,57 +46,46 @@ const DriverSidebar: React.FC<DriverSidebarProps> = () => {
           </Button>
         </div>
       </div>
-      
       <Separator />
-
       <div className="flex flex-col space-y-1 p-2">
         <Link
           to="/dashboard/driver"
-          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
         >
           <LayoutDashboard className="h-4 w-4" />
           <span>Tableau de bord</span>
         </Link>
         <Link
-          to="/dashboard/driver/missions"
-          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+          to="/dashboard/driver/profile"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
         >
-          <Truck className="h-4 w-4" />
+          <User className="h-4 w-4" />
+          <span>Profil</span>
+        </Link>
+        <Link
+          to="/dashboard/driver/missions"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+        >
+          <FileText className="h-4 w-4" />
           <span>Mes missions</span>
         </Link>
         <Link
-          to="/dashboard/driver/documents"
-          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
-        >
-          <FileCheck className="h-4 w-4" />
-          <span>Mes documents</span>
-        </Link>
-        {/* <Link
-          to="/dashboard/driver/factures"
-          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
+          to="/dashboard/driver/earnings"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
         >
           <CreditCard className="h-4 w-4" />
-          <span>Mes factures</span>
-        </Link> */}
-        <Link
-          to="/dashboard/driver/profile"
-          className="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-100"
-        >
-          <User className="h-4 w-4" />
-          <span>Mon profil</span>
+          <span>Mes gains</span>
         </Link>
       </div>
-
       <Separator />
-
-      <div className="flex flex-col space-y-1 p-2">
+      <div className="p-2">
         <Button
           variant="ghost"
-          className="justify-start rounded-md p-2 hover:bg-gray-100"
+          className="w-full justify-start font-normal"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 mr-2" />
-          <span>Se déconnecter</span>
+          Se déconnecter
         </Button>
       </div>
     </div>
