@@ -45,6 +45,15 @@ export interface ExtendedDatabase extends Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_mission_id_fkey";
+            columns: ["mission_id"];
+            isOneToOne: false;
+            referencedRelation: "missions";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       
       invoices: {
@@ -81,6 +90,15 @@ export interface ExtendedDatabase extends Database {
           paid?: boolean;
           issued_date?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "invoices_mission_id_fkey";
+            columns: ["mission_id"];
+            isOneToOne: false;
+            referencedRelation: "missions";
+            referencedColumns: ["id"];
+          }
+        ];
       };
     };
     Views: Database['public']['Views'];
