@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -43,19 +44,10 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Détails de la mission {mission.mission_number}</span>
-            <Button 
-              onClick={handleGeneratePDF} 
-              variant="outline" 
-              size="sm" 
-              className="ml-2 flex items-center gap-1"
-            >
-              <FileText className="h-4 w-4" />
-              <span>PDF</span>
-            </Button>
+          <DialogTitle>
+            Détails de la mission {mission.mission_number}
           </DialogTitle>
           <DialogDescription>
             Créée le {format(new Date(mission.created_at), "Pp", { locale: fr })}
@@ -63,7 +55,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <h3 className="font-semibold">Statut</h3>
               <MissionStatusBadge status={mission.status} />
@@ -85,49 +77,33 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             )}
           </div>
 
-          <div className="space-y-2">
-            <h3 className="font-semibold">Prix</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <p className="text-sm text-muted-foreground">Prix HT</p>
-                <p>{mission.price_ht ? `${mission.price_ht}€` : "Non spécifié"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Prix TTC</p>
-                <p className="font-medium">
-                  {mission.price_ttc ? `${mission.price_ttc}€` : "Non spécifié"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-semibold">Dates</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <p className="text-sm text-muted-foreground">Prise en charge</p>
-                <p>{formatDate(mission.pickup_date)}</p>
-                <p className="text-sm">{mission.pickup_time || ""}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Livraison</p>
-                <p>{formatDate(mission.delivery_date)}</p>
-                <p className="text-sm">{mission.delivery_time || ""}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-semibold">Adresses</h3>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <div>
-                <p className="text-sm text-muted-foreground">Adresse de départ</p>
-                <p>{mission.pickup_address || "Non spécifié"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Adresse de livraison</p>
-                <p>{mission.delivery_address || "Non spécifié"}</p>
-              </div>
+              <h3 className="font-semibold">Prix HT</h3>
+              <p>{mission.price_ht ? `${mission.price_ht}€` : "Non spécifié"}</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold">Prix TTC</h3>
+              <p className="font-medium">
+                {mission.price_ttc ? `${mission.price_ttc}€` : "Non spécifié"}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h3 className="font-semibold">Prise en charge</h3>
+              <p>{formatDate(mission.pickup_date)}</p>
+              <p className="text-sm">{mission.pickup_time || ""}</p>
+              <p className="text-sm text-muted-foreground mt-2">Adresse de départ</p>
+              <p>{mission.pickup_address || "Non spécifié"}</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold">Livraison</h3>
+              <p>{formatDate(mission.delivery_date)}</p>
+              <p className="text-sm">{mission.delivery_time || ""}</p>
+              <p className="text-sm text-muted-foreground mt-2">Adresse de livraison</p>
+              <p>{mission.delivery_address || "Non spécifié"}</p>
             </div>
           </div>
 
@@ -145,6 +121,17 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             </div>
           )}
         </div>
+
+        <DialogFooter>
+          <Button 
+            onClick={handleGeneratePDF} 
+            variant="outline" 
+            className="ml-auto flex items-center gap-1"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Générer PDF</span>
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
