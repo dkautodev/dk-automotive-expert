@@ -4,7 +4,7 @@ import DashboardCards from "./DashboardCards";
 import CompletedMissionsTable from "./CompletedMissionsTable";
 import PendingInvoicesTable from "./PendingInvoicesTable";
 import RevenueStatistics from "./RevenueStatistics";
-import { supabase } from "@/integrations/supabase/client";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 
 const AdminHome = () => {
   const [completedMissions, setCompletedMissions] = useState([]);
@@ -15,7 +15,7 @@ const AdminHome = () => {
   useEffect(() => {
     // Fetch completed missions
     const fetchCompletedMissions = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await extendedSupabase
         .from('missions')
         .select('*')
         .eq('status', 'livre')
@@ -29,7 +29,7 @@ const AdminHome = () => {
     
     // Fetch pending invoices (unpaid invoices)
     const fetchPendingInvoices = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await extendedSupabase
         .from('invoices')
         .select('*')
         .eq('paid', false)
@@ -43,7 +43,7 @@ const AdminHome = () => {
     // Fetch counts for dashboard cards
     const fetchCounts = async () => {
       // Count pending missions (en_attente)
-      const { count: pendingCount, error: pendingError } = await supabase
+      const { count: pendingCount, error: pendingError } = await extendedSupabase
         .from('missions')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'en_attente');
@@ -53,7 +53,7 @@ const AdminHome = () => {
       }
       
       // Count ongoing missions (prise_en_charge)
-      const { count: ongoingCount, error: ongoingError } = await supabase
+      const { count: ongoingCount, error: ongoingError } = await extendedSupabase
         .from('missions')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'prise_en_charge');

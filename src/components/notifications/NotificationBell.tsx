@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { NotificationRow } from "@/types/database";
 
 export type Notification = NotificationRow;
@@ -24,7 +24,7 @@ export const NotificationBell = () => {
     // Charger les notifications
     const loadNotifications = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await extendedSupabase
           .from('notifications')
           .select('*')
           .eq('user_id', user.id)
@@ -48,7 +48,7 @@ export const NotificationBell = () => {
     loadNotifications();
     
     // Abonnement aux nouvelles notifications en temps réel
-    const channel = supabase
+    const channel = extendedSupabase
       .channel('notifications-channel')
       .on('postgres_changes', { 
         event: 'INSERT', 
@@ -63,7 +63,7 @@ export const NotificationBell = () => {
       .subscribe();
       
     return () => {
-      supabase.removeChannel(channel);
+      extendedSupabase.removeChannel(channel);
     };
   }, [user]);
   
@@ -77,7 +77,7 @@ export const NotificationBell = () => {
         
       if (unreadIds.length === 0) return;
       
-      const { error } = await supabase
+      const { error } = await extendedSupabase
         .from('notifications')
         .update({ read: true })
         .in('id', unreadIds);

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { InvoiceRow } from '@/types/database';
 
 export interface PendingInvoicesTableProps {
@@ -17,7 +17,7 @@ export interface PendingInvoicesTableProps {
 const PendingInvoicesTable = ({ missions = [] }: PendingInvoicesTableProps) => {
   const markAsPaid = async (invoiceId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await extendedSupabase
         .from('invoices')
         .update({ paid: true })
         .eq('id', invoiceId);
