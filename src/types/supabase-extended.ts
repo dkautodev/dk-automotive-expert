@@ -13,17 +13,17 @@ export interface ExtendedDatabase extends Database {
       price_grids: Database['public']['Tables']['price_grids'];
       user_profiles: Database['public']['Tables']['user_profiles'];
       
-      // Add our new tables
+      // Add our new tables with the correct types that match the generated types
       notifications: {
         Row: {
           id: string;
           user_id: string;
           message: string;
           type: string;
-          mission_id?: string | null;
-          read: boolean;
-          created_at: string;
-          updated_at: string;
+          mission_id: string | null;  // Changed to match Database structure (non-optional but nullable)
+          read: boolean | null;       // Changed to match Database structure
+          created_at: string | null;  // Changed to match Database structure
+          updated_at: string | null;  // Changed to match Database structure
         };
         Insert: {
           id?: string;
@@ -31,9 +31,9 @@ export interface ExtendedDatabase extends Database {
           message: string;
           type: string;
           mission_id?: string | null;
-          read?: boolean;
-          created_at?: string;
-          updated_at?: string;
+          read?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
@@ -41,9 +41,9 @@ export interface ExtendedDatabase extends Database {
           message?: string;
           type?: string;
           mission_id?: string | null;
-          read?: boolean;
-          created_at?: string;
-          updated_at?: string;
+          read?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
@@ -64,9 +64,9 @@ export interface ExtendedDatabase extends Database {
           invoice_number: string;
           price_ht: number;
           price_ttc: number;
-          created_at: string;
-          paid: boolean;
-          issued_date: string;
+          created_at: string | null;  // Changed to match Database structure
+          paid: boolean | null;       // Changed to match Database structure
+          issued_date: string | null; // Changed to match Database structure
         };
         Insert: {
           id?: string;
@@ -75,9 +75,9 @@ export interface ExtendedDatabase extends Database {
           invoice_number: string;
           price_ht: number;
           price_ttc: number;
-          created_at?: string;
-          paid?: boolean;
-          issued_date?: string;
+          created_at?: string | null;
+          paid?: boolean | null;
+          issued_date?: string | null;
         };
         Update: {
           id?: string;
@@ -86,9 +86,9 @@ export interface ExtendedDatabase extends Database {
           invoice_number?: string;
           price_ht?: number;
           price_ttc?: number;
-          created_at?: string;
-          paid?: boolean;
-          issued_date?: string;
+          created_at?: string | null;
+          paid?: boolean | null;
+          issued_date?: string | null;
         };
         Relationships: [
           {
