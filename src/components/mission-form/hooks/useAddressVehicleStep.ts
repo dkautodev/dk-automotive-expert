@@ -12,11 +12,10 @@ export const useAddressVehicleStep = (
   onNext: () => void,
   onPrevious: () => void
 ) => {
-  const { calculateDistanceWithAvoidTolls, isCalculating: isDistanceCalculating } = useDistanceCalculation();
+  const { calculateDistance, isCalculating: isDistanceCalculating } = useDistanceCalculation();
   const { calculatePrice, isCalculating: isPriceCalculating, priceHT, priceTTC } = usePriceCalculation();
   const [distance, setDistance] = useState<number | null>(null);
   const [isCalculatingTotal, setIsCalculatingTotal] = useState<boolean>(false);
-  const [avoidTolls, setAvoidTolls] = useState<boolean>(false);
 
   const { 
     clients, 
@@ -61,10 +60,9 @@ export const useAddressVehicleStep = (
     
     try {
       console.log("Calcul de distance entre:", pickupAddress, "et", deliveryAddress);
-      console.log("Option éviter péages:", avoidTolls);
       
-      // Calculate distance with toll preference
-      const calculatedDistance = await calculateDistanceWithAvoidTolls(pickupAddress, deliveryAddress, avoidTolls);
+      // Calculate distance
+      const calculatedDistance = await calculateDistance(pickupAddress, deliveryAddress);
       console.log("Distance calculée:", calculatedDistance, "km");
       
       setDistance(calculatedDistance);
@@ -91,10 +89,6 @@ export const useAddressVehicleStep = (
     }
   };
 
-  const toggleAvoidTolls = () => {
-    setAvoidTolls(!avoidTolls);
-  };
-
   return {
     distance,
     priceHT,
@@ -106,8 +100,6 @@ export const useAddressVehicleStep = (
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
-    vehicleType,
-    avoidTolls,
-    toggleAvoidTolls
+    vehicleType
   };
 };
