@@ -6,7 +6,12 @@ export interface ExtendedDatabase extends Database {
   public: {
     Tables: {
       // Include all existing tables from Database type
-      ...Database['public']['Tables'],
+      documents: Database['public']['Tables']['documents'];
+      users: Database['public']['Tables']['users'];
+      mission_documents: Database['public']['Tables']['mission_documents'];
+      missions: Database['public']['Tables']['missions'];
+      price_grids: Database['public']['Tables']['price_grids'];
+      user_profiles: Database['public']['Tables']['user_profiles'];
       
       // Add our new tables
       notifications: {

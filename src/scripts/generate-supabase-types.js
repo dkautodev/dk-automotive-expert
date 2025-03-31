@@ -18,7 +18,7 @@ const path = require('path');
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://lqjwvaqqhqgmkjsriijw.supabase.co";
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxand2YXFxaHFnbWtqc3JpaWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwOTAyOTYsImV4cCI6MjA1NzY2NjI5Nn0.GyKs7HY6WxdDo7Hf4XZoTQEknNy2pkcZN0ByHq38qMI";
 
-const outputPath = path.resolve(__dirname, '../src/integrations/supabase/types.ts');
+const outputPath = path.resolve(__dirname, '../integrations/supabase/types.ts');
 
 console.log('Generating TypeScript types from Supabase schema...');
 
