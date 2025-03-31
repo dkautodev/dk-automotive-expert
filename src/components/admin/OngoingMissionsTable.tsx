@@ -14,6 +14,7 @@ import { MissionRow } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader } from "@/components/ui/loader";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface OngoingMissionsTableProps {
   refreshTrigger?: number;
@@ -29,6 +30,8 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
     const fetchMissions = async () => {
       try {
         setLoading(true);
+        console.log("Fetching ongoing missions...");
+        
         // Fetch mission data first
         const { data: missionsData, error: missionsError } = await supabase
           .from('missions')
@@ -37,7 +40,12 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
           .order('created_at', { ascending: false })
           .limit(10);
 
-        if (missionsError) throw missionsError;
+        if (missionsError) {
+          console.error("Error fetching missions:", missionsError);
+          throw missionsError;
+        }
+        
+        console.log("Missions fetched:", missionsData);
         
         if (missionsData && missionsData.length > 0) {
           // Get the client profiles for these missions as a separate query
@@ -47,8 +55,13 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
             .select('*')
             .in('user_id', clientIds);
           
-          if (clientsError) throw clientsError;
+          if (clientsError) {
+            console.error("Error fetching client profiles:", clientsError);
+            throw clientsError;
+          }
 
+          console.log("Client profiles fetched:", clientProfiles);
+          
           // Map profiles to missions
           const formattedMissions = missionsData.map(mission => {
             const vehicleInfo = mission.vehicle_info as any || {};
@@ -59,7 +72,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
               pickup_address: vehicleInfo.pickup_address || 'N/A',
               delivery_address: vehicleInfo.delivery_address || 'N/A',
               clientProfile
-            } as MissionRow;
+            } as unknown as MissionRow;
           });
 
           setMissions(formattedMissions);
@@ -68,6 +81,7 @@ const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({
         }
       } catch (err) {
         console.error('Error fetching ongoing missions:', err);
+        toast.error("Erreur lors de la récupération des missions en cours");
       } finally {
         setLoading(false);
       }
