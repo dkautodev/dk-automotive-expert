@@ -37,7 +37,7 @@ export const fetchClientsData = async (): Promise<{
       for (const profile of profilesData) {
         try {
           // Get user data from Edge Function
-          const { data: userData, error: userError } = await supabase.functions.invoke(
+          const { data: userData, error: userError } = await supabase.functions.invoke<any>(
             'get_user_by_id',
             {
               body: { userId: profile.user_id }
@@ -76,7 +76,9 @@ export const fetchClientsData = async (): Promise<{
     // Fallback: Try to get users directly (without profiles)
     console.log("Aucun profil trouvé, essai avec l'Edge Function");
     try {
-      const { data: usersData, error: edgeFunctionError } = await supabase.functions.invoke('get_users_with_profiles');
+      const { data: usersData, error: edgeFunctionError } = await supabase.functions.invoke<any>(
+        'get_users_with_profiles'
+      );
       
       if (edgeFunctionError) {
         console.error("Erreur Edge Function:", edgeFunctionError);
