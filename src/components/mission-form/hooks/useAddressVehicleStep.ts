@@ -27,6 +27,9 @@ export const useAddressVehicleStep = (
   const pickupAddress = form.watch("pickup_address");
   const deliveryAddress = form.watch("delivery_address");
   const vehicleType = form.watch("vehicle_type");
+  
+  // Ajouter surveillance du champ additional_info
+  const additionalInfo = form.watch("additional_info");
 
   const isCalculating = isDistanceCalculating || isPriceCalculating || isCalculatingTotal;
 
@@ -100,6 +103,7 @@ export const useAddressVehicleStep = (
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
-    vehicleType
+    vehicleType,
+    additionalInfo
   };
 };

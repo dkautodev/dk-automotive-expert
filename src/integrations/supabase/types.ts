@@ -108,6 +108,7 @@ export type Database = {
       }
       missions: {
         Row: {
+          additional_info: string | null
           client_id: string
           created_at: string | null
           delivery_contact: Json | null
@@ -131,6 +132,7 @@ export type Database = {
           vehicles: Json | null
         }
         Insert: {
+          additional_info?: string | null
           client_id: string
           created_at?: string | null
           delivery_contact?: Json | null
@@ -154,6 +156,7 @@ export type Database = {
           vehicles?: Json | null
         }
         Update: {
+          additional_info?: string | null
           client_id?: string
           created_at?: string | null
           delivery_contact?: Json | null

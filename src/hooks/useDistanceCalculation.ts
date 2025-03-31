@@ -28,8 +28,6 @@ export const useDistanceCalculation = () => {
             destinations: [destinationAddress],
             travelMode: google.maps.TravelMode.DRIVING,
             unitSystem: google.maps.UnitSystem.METRIC,
-            avoidHighways: false,
-            avoidTolls: false,
             region: 'fr',       // Se concentrer sur la France/Europe
           },
           (response, status) => {
