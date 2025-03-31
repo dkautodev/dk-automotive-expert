@@ -21,21 +21,33 @@ const DashboardCards = ({
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        // Fetch pending quotes count
+        console.log("DashboardCards: Fetching counts with refreshTrigger:", refreshTrigger);
+        
+        // Fetch pending quotes count - status 'devis'
         const { count: pendingCount, error: pendingError } = await extendedSupabase
           .from('missions')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'devis');
         
-        if (pendingError) throw pendingError;
+        if (pendingError) {
+          console.error("Error fetching pending quotes:", pendingError);
+          throw pendingError;
+        }
         
-        // Fetch ongoing missions count - Include both 'confirmé' and 'confirme' statuses
+        console.log("Pending quotes count:", pendingCount);
+        
+        // Fetch ongoing missions count - statuses 'confirmé', 'confirme' or 'prise_en_charge'
         const { count: ongoingCount, error: ongoingError } = await extendedSupabase
           .from('missions')
           .select('*', { count: 'exact', head: true })
           .in('status', ['confirmé', 'confirme', 'prise_en_charge']);
         
-        if (ongoingError) throw ongoingError;
+        if (ongoingError) {
+          console.error("Error fetching ongoing missions:", ongoingError);
+          throw ongoingError;
+        }
+        
+        console.log("Ongoing missions count:", ongoingCount);
         
         setPendingQuotesCount(pendingCount || 0);
         setOngoingMissionsCount(ongoingCount || 0);
