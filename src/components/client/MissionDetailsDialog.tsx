@@ -55,7 +55,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <h3 className="font-semibold">Statut</h3>
               <MissionStatusBadge status={mission.status} />
@@ -63,6 +63,10 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             <div className="space-y-2">
               <h3 className="font-semibold">Type de mission</h3>
               <p>{mission.mission_type === "livraison" ? "Livraison" : "Restitution"}</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold">Distance</h3>
+              <p>{mission.distance ? `${mission.distance} km` : "Non spécifiée"}</p>
             </div>
           </div>
 
@@ -75,19 +79,6 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             {vehicleInfo.licensePlate && (
               <p>Immatriculation: {vehicleInfo.licensePlate}</p>
             )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h3 className="font-semibold">Prix HT</h3>
-              <p>{mission.price_ht ? `${mission.price_ht}€` : "Non spécifié"}</p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold">Prix TTC</h3>
-              <p className="font-medium">
-                {mission.price_ttc ? `${mission.price_ttc}€` : "Non spécifié"}
-              </p>
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -107,19 +98,20 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             </div>
           </div>
 
-          {mission.distance && (
-            <div className="space-y-2">
-              <h3 className="font-semibold">Distance</h3>
-              <p>{mission.distance} km</p>
-            </div>
-          )}
-
           {mission.additional_info && (
             <div className="space-y-2">
               <h3 className="font-semibold">Informations supplémentaires</h3>
               <p>{mission.additional_info}</p>
             </div>
           )}
+          
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <h3 className="font-semibold mb-2">Tarification</h3>
+            <p className="text-lg font-medium">
+              Prix total : {mission.price_ttc ? `${mission.price_ttc}€ TTC` : "Non spécifié"} 
+              {mission.price_ht ? ` soit ${mission.price_ht}€ HT` : ""}
+            </p>
+          </div>
         </div>
 
         <DialogFooter>
