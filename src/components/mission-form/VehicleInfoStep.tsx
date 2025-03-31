@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MissionFormValues } from "./missionFormSchema";
+import { MissionFormValues } from "../../mission-form/missionFormSchema";
 import VehicleTypeSelector from "./VehicleTypeSelector";
 import { vehicleTypes, getVehiclesByCategory } from "@/lib/vehicleTypes";
 import { useEffect, useState } from "react";
@@ -39,6 +39,7 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
       // Reset brand and model when changing vehicle type
       form.setValue("brand", "");
       form.setValue("model", "");
+      form.setValue("suggested_vehicle", "");
     }
   }, [selectedVehicleType, form]);
   
@@ -74,7 +75,7 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
                     field.onChange(value);
                     handleVehicleSelection(value);
                   }} 
-                  value={field.value}
+                  value={field.value || ""}
                 >
                   <FormControl>
                     <SelectTrigger>

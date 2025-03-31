@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { MissionFormValues, missionFormSchema } from "./missionFormSchema";
+import { MissionFormValues, missionFormSchema } from "../../mission-form/missionFormSchema";
 import MissionTypeStep from "./MissionTypeStep";
 import AddressVehicleStep from "./AddressVehicleStep";
 import VehicleInfoStep from "./VehicleInfoStep";
@@ -30,6 +31,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
       pickup_address: "",
       delivery_address: "",
       vehicle_type: "",
+      suggested_vehicle: "",
       brand: "",
       model: "",
       year: "",
@@ -101,7 +103,8 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
           licensePlate: values.licensePlate,
           pickup_address: values.pickup_address,
           delivery_address: values.delivery_address,
-          vehicle_type: values.vehicle_type
+          vehicle_type: values.vehicle_type,
+          suggested_vehicle: values.suggested_vehicle
         },
         pickup_date: values.pickup_date.toISOString(),
         pickup_time: values.pickup_time,
