@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
+import { toast } from "@/hooks/use-toast";
 
 interface PickupDetailsSectionProps {
   form: UseFormReturn<PickupFormValues>;
@@ -32,42 +33,44 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
   const [mapsLoaded, setMapsLoaded] = useState(false);
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
-  // Load Google Maps API
+  // Charger l'API Google Maps
   useEffect(() => {
-    // Skip if already loaded or no API key
+    // Ne pas charger si déjà chargée ou pas de clé API
     if (window.google?.maps?.places || !GOOGLE_MAPS_API_KEY || mapsLoaded) {
       if (window.google?.maps?.places) setMapsLoaded(true);
       return;
     }
 
-    console.log("Chargement de l'API Google Maps pour le formulaire d'enlèvement...");
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
     script.async = true;
     script.defer = true;
+    
     script.onload = () => {
-      console.log("API Google Maps chargée avec succès pour le formulaire d'enlèvement");
       setMapsLoaded(true);
     };
-    script.onerror = () => console.error("Erreur lors du chargement de l'API Google Maps pour le formulaire d'enlèvement");
-
+    
+    script.onerror = () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la fonctionnalité d'autocomplétion d'adresse",
+        variant: "destructive"
+      });
+    };
+    
     document.head.appendChild(script);
-
     return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+      if (script.parentNode) document.head.removeChild(script);
     };
   }, [mapsLoaded]);
 
-  // Initialize autocomplete when maps API is loaded
+  // Initialiser l'autocomplétion
   useEffect(() => {
     if (!mapsLoaded || !window.google?.maps?.places || !addressInputRef.current || autocomplete) {
       return;
     }
 
     try {
-      console.log("Initialisation de l'autocomplétion pour l'adresse d'enlèvement");
       const autocompleteInstance = new google.maps.places.Autocomplete(addressInputRef.current, {
         types: ["address"],
         componentRestrictions: { country: "fr" },
@@ -76,25 +79,16 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
       
       autocompleteInstance.addListener("place_changed", () => {
         const place = autocompleteInstance.getPlace();
-        if (place && place.formatted_address) {
-          console.log("Adresse d'enlèvement sélectionnée:", place.formatted_address);
+        if (place?.formatted_address) {
           form.setValue("address", place.formatted_address, { shouldValidate: true });
-        } else {
-          console.warn("Pas d'adresse formatée dans la réponse Google Maps");
         }
       });
       
       setAutocomplete(autocompleteInstance);
-      console.log("Autocomplétion pour l'adresse d'enlèvement initialisée");
     } catch (error) {
-      console.error("Erreur lors de la création de l'autocomplétion pour l'adresse d'enlèvement:", error);
+      console.error("Erreur d'initialisation de l'autocomplétion:", error);
     }
   }, [mapsLoaded, addressInputRef, form, autocomplete]);
-
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Valeur d'adresse d'enlèvement modifiée manuellement:", e.target.value);
-    form.setValue("address", e.target.value);
-  };
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -111,7 +105,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
                 placeholder="Commencez à taper une adresse..."
                 className="bg-[#EEF1FF]"
                 value={field.value || ''}
-                onChange={(e) => handleAddressChange(e)}
+                onChange={(e) => form.setValue("address", e.target.value)}
                 ref={(e) => {
                   addressInputRef.current = e;
                 }}
@@ -122,6 +116,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
         )}
       />
 
+      {/* Champ de date d'enlèvement */}
       <FormField
         control={form.control}
         name="pickupDate"
@@ -154,9 +149,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
                   mode="single"
                   selected={field.value}
                   onSelect={field.onChange}
-                  disabled={(date) =>
-                    date < new Date()
-                  }
+                  disabled={(date) => date < new Date()}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
@@ -167,6 +160,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
         )}
       />
 
+      {/* Champ d'heure d'enlèvement */}
       <FormField
         control={form.control}
         name="pickupTime"
@@ -191,6 +185,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
         )}
       />
 
+      {/* Champ de message complémentaire */}
       <FormField
         control={form.control}
         name="additionalMessage"

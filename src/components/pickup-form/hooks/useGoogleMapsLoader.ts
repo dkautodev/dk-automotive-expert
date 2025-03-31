@@ -10,26 +10,26 @@ export interface MapError {
 }
 
 /**
- * A simplified Google Maps loader hook that doesn't actually load Google Maps
+ * Hook simplifié pour gérer le chargement de Google Maps
  */
 export const useGoogleMapsLoader = () => {
   const [errorMessage] = useState<string | null>(null);
-  const projectId = "project-id-placeholder";
   const [detailedError] = useState<string | null>(null);
-
+  
+  // Configuration de base
   const isLoaded = false;
+  const projectId = "project-id-placeholder";
   const loadError = new Error("Maps functionality has been disabled");
 
   console.log("Map functionality has been disabled");
 
-  const parseGoogleMapsError = (error: Error): MapError => {
-    return {
-      message: "La fonctionnalité de carte a été désactivée",
-      solution: "La fonctionnalité de carte a été désactivée intentionnellement",
-      errorType: 'unknown',
-      errorCode: 'DISABLED'
-    };
-  };
+  // Fonction utilitaire pour analyser les erreurs
+  const parseGoogleMapsError = (): MapError => ({
+    message: "La fonctionnalité de carte a été désactivée",
+    solution: "La fonctionnalité de carte a été désactivée intentionnellement",
+    errorType: 'unknown',
+    errorCode: 'DISABLED'
+  });
 
   return {
     isLoaded,
