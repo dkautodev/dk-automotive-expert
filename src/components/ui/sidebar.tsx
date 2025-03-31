@@ -1,5 +1,6 @@
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 type SidebarContextValue = {
   collapsed: boolean;
@@ -34,6 +35,28 @@ export function SidebarProvider({
     <SidebarContext.Provider value={{ collapsed, toggleCollapsed }}>
       {children}
     </SidebarContext.Provider>
+  );
+}
+
+// Added Sidebar component export
+export function Sidebar({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  const { collapsed } = useSidebar();
+  
+  return (
+    <aside
+      className={cn(
+        "h-screen bg-background border-r transition-all duration-300",
+        collapsed ? "w-16" : "w-64",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </aside>
   );
 }
 

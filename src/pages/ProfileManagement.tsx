@@ -20,6 +20,10 @@ type ProfileType = {
   vat_number?: string;
   email?: string;
   user_type?: string;
+  users?: {
+    email?: string;
+    user_type?: string;
+  };
 };
 
 const ProfileManagement = () => {
@@ -48,11 +52,13 @@ const ProfileManagement = () => {
         if (driverError) throw driverError;
         
         // Map data to include email
-        const mapProfiles = (profiles: any[]) => profiles.map(profile => ({
-          ...profile,
-          email: profile.users?.email || '',
-          user_type: profile.users?.user_type || profile.user_type || 'client'
-        }));
+        const mapProfiles = (profiles: any[]) => profiles.map(profile => {
+          return {
+            ...profile,
+            email: profile.users?.email || '',
+            user_type: profile.users?.user_type || profile.user_type || 'client'
+          };
+        });
         
         setClientProfiles(mapProfiles(clientData || []));
         setDriverProfiles(mapProfiles(driverData || []));
@@ -77,6 +83,12 @@ const ProfileManagement = () => {
       company_name: profile.company_name || '',
       phone: profile.phone || '',
     }));
+  };
+
+  const handleDeleteUser = (user: any) => {
+    console.log("Delete user:", user);
+    // Implementation can be added later
+    toast.info("Fonctionnalité de suppression à implémenter");
   };
 
   return (
@@ -104,7 +116,7 @@ const ProfileManagement = () => {
                 <UserTable 
                   users={formatProfilesForUserTable(clientProfiles)} 
                   loading={false} 
-                  handleDeleteUser={() => {}} 
+                  handleDeleteUser={handleDeleteUser} 
                   isDeleting={false}
                   userType="client"
                 />
@@ -128,7 +140,7 @@ const ProfileManagement = () => {
                 <UserTable 
                   users={formatProfilesForUserTable(driverProfiles)} 
                   loading={false} 
-                  handleDeleteUser={() => {}} 
+                  handleDeleteUser={handleDeleteUser} 
                   isDeleting={false}
                   userType="chauffeur"
                 />
