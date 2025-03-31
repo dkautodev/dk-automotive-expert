@@ -6,7 +6,8 @@ import {
   User,
   ClipboardList,
   LogOut,
-  X
+  X,
+  History
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,17 @@ const ClientSidebar = () => {
             >
               <User className="h-4 w-4" />
               <span>Profil</span>
+            </Link>
+            <Link
+              to="/dashboard/client/mission-history"
+              className={cn(
+                "flex items-center space-x-2 px-3 py-2 rounded-md transition-colors",
+                isActive("/dashboard/client/mission-history") ? "bg-gray-100 font-medium" : "hover:bg-gray-100"
+              )}
+              onClick={() => isMobile && toggleCollapsed()}
+            >
+              <History className="h-4 w-4" />
+              <span>Historique des missions</span>
             </Link>
             <Link
               to="/dashboard/client/pending-quotes"
@@ -163,6 +175,16 @@ const ClientSidebar = () => {
         >
           <User className="h-4 w-4" />
           <span>Profil</span>
+        </Link>
+        <Link
+          to="/dashboard/client/mission-history"
+          className={cn(
+            "flex items-center space-x-2 px-3 py-2 rounded-md transition-colors",
+            isActive("/dashboard/client/mission-history") ? "bg-gray-100 font-medium" : "hover:bg-gray-100"
+          )}
+        >
+          <History className="h-4 w-4" />
+          <span>Historique des missions</span>
         </Link>
         <Link
           to="/dashboard/client/pending-quotes"
