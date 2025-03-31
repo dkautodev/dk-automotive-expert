@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -21,7 +20,7 @@ interface CreateMissionFormProps {
 const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: CreateMissionFormProps) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuthContext();
+  const { user, role } = useAuthContext();
 
   const form = useForm<MissionFormValues>({
     resolver: zodResolver(missionFormSchema),
@@ -49,6 +48,12 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
       additional_info: "",
     },
   });
+
+  useEffect(() => {
+    if (role === 'client' && user?.id) {
+      form.setValue('client_id', user.id);
+    }
+  }, [role, user, form]);
 
   const nextStep = () => {
     if (step === 1) {
@@ -82,9 +87,8 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
     try {
       const values = form.getValues();
       
-      // Format data for database
       const missionData = {
-        status: clientDefaultStatus, // Utiliser le statut par défaut basé sur le type d'utilisateur
+        status: clientDefaultStatus,
         client_id: values.client_id || user?.id,
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
@@ -122,7 +126,6 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
       console.log("Type de mission:", values.mission_type);
       console.log("Statut de la mission:", clientDefaultStatus);
 
-      // Appel de la fonction RPC avec la nouvelle structure
       const { data, error } = await supabase.rpc(
         'create_mission',
         {
@@ -136,7 +139,6 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
         throw error;
       }
 
-      // Vérifier si data est un tableau et contient au moins un élément
       const createdMission = Array.isArray(data) && data.length > 0 ? data[0] as MissionRow : null;
       
       if (createdMission) {
