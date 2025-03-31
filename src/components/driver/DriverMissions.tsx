@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Loader } from "@/components/ui/loader";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
-import { supabase } from "@/integrations/supabase/client";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { MissionRow, NotificationRow } from "@/types/database";
 import { MissionStatusBadge } from "../client/MissionStatusBadge";
 import { toast } from "sonner";
@@ -15,11 +16,11 @@ import { Bell } from "lucide-react";
 
 const markNotificationsRead = async (missionId: string) => {
   try {
-    const { error } = await supabase
+    const { error } = await extendedSupabase
       .from('notifications')
       .update({ read: true })
       .eq('mission_id', missionId)
-      .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+      .eq('user_id', (await extendedSupabase.auth.getUser()).data.user?.id);
       
     if (error) console.error("Erreur lors du marquage des notifications comme lues:", error);
   } catch (error) {
@@ -40,7 +41,7 @@ const DriverMissions = () => {
       
       const fetchNotifications = async () => {
         try {
-          const { data, error } = await supabase
+          const { data, error } = await extendedSupabase
             .from('notifications')
             .select('mission_id')
             .eq('user_id', user.id)
@@ -61,7 +62,7 @@ const DriverMissions = () => {
       
       fetchNotifications();
       
-      const channel = supabase
+      const channel = extendedSupabase
         .channel('public:notifications')
         .on('postgres_changes', { 
           event: 'INSERT', 
@@ -81,7 +82,7 @@ const DriverMissions = () => {
         .subscribe();
         
       return () => {
-        supabase.removeChannel(channel);
+        extendedSupabase.removeChannel(channel);
       };
     }
   }, [user]);
@@ -89,7 +90,7 @@ const DriverMissions = () => {
   const fetchMissions = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await extendedSupabase
         .from('missions')
         .select('*')
         .eq('driver_id', user?.id)
@@ -117,7 +118,7 @@ const DriverMissions = () => {
     try {
       setUpdatingId(missionId);
       
-      const { error } = await supabase
+      const { error } = await extendedSupabase
         .from('missions')
         .update({ status: newStatus })
         .eq('id', missionId);

@@ -8,8 +8,8 @@ import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { InvoiceRow } from "@/types/database";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { InvoiceRow } from '@/types/database';
 
 type Invoice = InvoiceRow;
 
@@ -26,7 +26,7 @@ const InvoiceList = () => {
         setLoading(true);
         
         // Récupérer toutes les factures de l'utilisateur
-        const { data, error } = await supabase
+        const { data, error } = await extendedSupabase
           .from('invoices')
           .select('*')
           .eq('client_id', user.id)
