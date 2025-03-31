@@ -20,7 +20,7 @@ export const clientFetchingService = {
   fetchClientsViaProfiles: async (): Promise<FetchResult> => {
     try {
       const { data: profiles, error } = await supabase
-        .from("profiles")
+        .from("user_profiles")
         .select("*");
 
       if (error) {
