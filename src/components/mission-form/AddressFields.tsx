@@ -65,12 +65,20 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
         const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
           types: ["address"],
           fields: ["formatted_address"],
+          componentRestrictions: { country: "fr" } // Restreindre à la France
         });
         
         autocomplete.addListener("place_changed", () => {
           const place = autocomplete.getPlace();
           if (place?.formatted_address) {
             form.setValue(fieldName, place.formatted_address, { shouldValidate: true });
+          }
+        });
+        
+        // Désactiver la soumission du formulaire quand l'utilisateur appuie sur Entrée
+        inputRef.current.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
           }
         });
         
@@ -82,14 +90,14 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
     };
     
     // Initialiser les deux champs si nécessaire
-    if (!autocompletes.pickup) {
+    if (!autocompletes.pickup && pickupInputRef.current) {
       const pickupAutocomplete = setupAutocomplete(pickupInputRef, 'pickup_address');
       if (pickupAutocomplete) {
         setAutocompletes(prev => ({ ...prev, pickup: pickupAutocomplete }));
       }
     }
     
-    if (!autocompletes.delivery) {
+    if (!autocompletes.delivery && deliveryInputRef.current) {
       const deliveryAutocomplete = setupAutocomplete(deliveryInputRef, 'delivery_address');
       if (deliveryAutocomplete) {
         setAutocompletes(prev => ({ ...prev, delivery: deliveryAutocomplete }));
@@ -111,9 +119,10 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
                 <Input 
                   placeholder="Saisissez l'adresse complète" 
                   className="pl-8"
-                  value={field.value || ''}
-                  onChange={(e) => form.setValue("pickup_address", e.target.value, { shouldValidate: true })}
+                  {...field}
                   ref={pickupInputRef}
+                  role="presentation"
+                  autoComplete="off"
                 />
               </div>
             </FormControl>
@@ -134,9 +143,10 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
                 <Input 
                   placeholder="Saisissez l'adresse complète" 
                   className="pl-8"
-                  value={field.value || ''}
-                  onChange={(e) => form.setValue("delivery_address", e.target.value, { shouldValidate: true })}
+                  {...field}
                   ref={deliveryInputRef}
+                  role="presentation"
+                  autoComplete="off"
                 />
               </div>
             </FormControl>
