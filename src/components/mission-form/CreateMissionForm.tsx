@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -89,7 +88,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
         client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
         pickup_address: values.pickup_address,
         delivery_address: values.delivery_address,
-        distance: values.distance,
+        distance: values.distance?.toString(), // Convert to string as required by the database
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
         vehicle_info: {

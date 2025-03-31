@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +48,14 @@ const DriverEarnings = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMissions(data || []);
+      
+      const typedData: MissionRow[] = (data || []).map(item => ({
+        ...item as any,
+        pickup_address: (item as any).pickup_address || "",
+        delivery_address: (item as any).delivery_address || "",
+      }));
+      
+      setMissions(typedData);
     } catch (error) {
       console.error('Error fetching missions:', error);
       toast.error('Impossible de récupérer vos missions');
@@ -58,7 +64,6 @@ const DriverEarnings = () => {
     }
   };
 
-  // Filter missions for selected month
   const monthlyMissions = missions.filter(mission => {
     if (!mission.created_at) return false;
     
@@ -70,7 +75,6 @@ const DriverEarnings = () => {
     }
   });
 
-  // Calculate monthly stats
   const monthlyStats = useMemo(() => {
     const completedMissions = monthlyMissions.filter(m => m.status === 'termine' || m.status === 'livre');
     
@@ -86,7 +90,6 @@ const DriverEarnings = () => {
     };
   }, [monthlyMissions]);
 
-  // Generate daily earnings data for the chart
   const daysInMonth = getDaysInMonth(selectedMonth);
   const dailyEarningsData = useMemo(() => {
     const earnings = Array(daysInMonth).fill(0);
@@ -159,7 +162,6 @@ const DriverEarnings = () => {
         </div>
       ) : (
         <>
-          {/* Monthly Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader className="pb-2">
@@ -202,7 +204,6 @@ const DriverEarnings = () => {
             </Card>
           </div>
 
-          {/* Monthly Chart */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -246,7 +247,6 @@ const DriverEarnings = () => {
             </CardContent>
           </Card>
 
-          {/* Mission List Table */}
           <Card>
             <CardHeader>
               <CardTitle>Détail des missions</CardTitle>

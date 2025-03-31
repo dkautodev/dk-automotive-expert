@@ -2,11 +2,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DashboardCardsProps {
-  pendingQuotesCount: number;
-  ongoingMissionsCount: number;
+  pendingQuotesCount?: number;
+  ongoingMissionsCount?: number;
 }
 
-const DashboardCards = ({ pendingQuotesCount, ongoingMissionsCount }: DashboardCardsProps) => {
+const DashboardCards = ({ pendingQuotesCount = 0, ongoingMissionsCount = 0 }: DashboardCardsProps) => {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
       <Card>

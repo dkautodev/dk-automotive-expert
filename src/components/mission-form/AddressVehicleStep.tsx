@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from "react-hook-form";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
       // Calculate distance
       const calculatedDistance = await calculateDistance(pickupAddress, deliveryAddress);
       setDistance(calculatedDistance);
-      form.setValue("distance", `${calculatedDistance} km`);
+      form.setValue("distance", calculatedDistance);
 
       // Calculate price
       const priceResult = await calculatePrice(vehicleType, calculatedDistance);

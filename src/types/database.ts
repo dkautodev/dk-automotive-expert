@@ -1,4 +1,3 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 export type MissionRow = {
@@ -6,9 +5,15 @@ export type MissionRow = {
   client_id: string;
   driver_id: string | null;
   quote_id: string | null;
-  status: 'en_attente' | 'confirme' | 'confirmé' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'termine';
-  mission_type: 'livraison' | 'restitution';
+  mission_type: "livraison" | "restitution";
+  status: "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule";
   mission_number: string | null;
+  quote_number: string | null;
+  pickup_address: string;
+  delivery_address: string;
+  distance: string;
+  price_ht: number | null;
+  price_ttc: number | null;
   vehicle_info: any | null;
   pickup_date: string | null;
   pickup_time: string | null;
@@ -16,15 +21,12 @@ export type MissionRow = {
   delivery_time: string | null;
   pickup_contact: any | null;
   delivery_contact: any | null;
-  distance: string | null;
-  price_ht: number | null;
-  price_ttc: number | null;
   created_at: string;
   updated_at: string | null;
-  pickup_address: string;
-  delivery_address: string;
   vehicles: any | null;
-  quote_number: string | null;
+  additional_info?: string | null;
 };
+
+export type DocumentType = "kbis" | "driving_license" | "id_card" | "vigilance_certificate";
 
 export type Tables = Database['public']['Tables'];
