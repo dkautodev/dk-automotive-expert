@@ -10,7 +10,6 @@ export const missionFormSchema = z.object({
   price_ht: z.string().optional(),
   price_ttc: z.string().optional(),
   vehicle_type: z.string().min(1, "Le type de véhicule est requis"),
-  suggested_vehicle: z.string().optional(),
   brand: z.string().min(1, "La marque est requise"),
   model: z.string().min(1, "Le modèle est requis"),
   year: z.string().min(1, "L'année est requise"),

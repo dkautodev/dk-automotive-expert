@@ -16,13 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MissionFormValues } from "../../mission-form/missionFormSchema";
-import VehicleTypeSelector from "./VehicleTypeSelector";
-import { 
-  getBrandsByCategory, 
-  getModelsByBrandAndCategory 
-} from "@/lib/vehicleTypes";
-import { useEffect, useState } from "react";
+import { MissionFormValues } from "./missionFormSchema";
+import { carBrands, getModelsByBrand } from "@/components/quote-form/vehicleData";
 
 interface VehicleInfoStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -31,33 +26,8 @@ interface VehicleInfoStepProps {
 }
 
 const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => {
-  const selectedVehicleType = form.watch("vehicle_type");
   const selectedBrand = form.watch("brand");
-  const [availableBrands, setAvailableBrands] = useState<string[]>([]);
-  const [availableModels, setAvailableModels] = useState<string[]>([]);
-  
-  // Effect pour mettre à jour les marques disponibles quand le type de véhicule change
-  useEffect(() => {
-    if (selectedVehicleType) {
-      const brands = getBrandsByCategory(selectedVehicleType);
-      setAvailableBrands(brands);
-      
-      // Réinitialiser la marque et le modèle
-      form.setValue("brand", "");
-      form.setValue("model", "");
-    }
-  }, [selectedVehicleType, form]);
-  
-  // Effect pour mettre à jour les modèles disponibles quand la marque change
-  useEffect(() => {
-    if (selectedVehicleType && selectedBrand) {
-      const models = getModelsByBrandAndCategory(selectedVehicleType, selectedBrand);
-      setAvailableModels(models);
-      
-      // Réinitialiser seulement le modèle
-      form.setValue("model", "");
-    }
-  }, [selectedVehicleType, selectedBrand, form]);
+  const models = selectedBrand ? getModelsByBrand(selectedBrand) : [];
 
   return (
     <div className="space-y-6">
@@ -66,71 +36,61 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
         Veuillez fournir les informations détaillées du véhicule à convoyer
       </p>
 
-      <div className="space-y-4">
-        <VehicleTypeSelector form={form} />
-        
-        {selectedVehicleType && availableBrands.length > 0 && (
-          <FormField
-            control={form.control}
-            name="brand"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Marque</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  value={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner une marque" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {availableBrands.map((brand) => (
-                      <SelectItem key={brand} value={brand}>
-                        {brand}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-        
-        {selectedVehicleType && selectedBrand && availableModels.length > 0 && (
-          <FormField
-            control={form.control}
-            name="model"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Modèle</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  value={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un modèle" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {availableModels.map((model) => (
-                      <SelectItem key={model} value={model}>
-                        {model}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FormField
+          control={form.control}
+          name="brand"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Marque</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une marque" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {carBrands.map((brand) => (
+                    <SelectItem key={brand} value={brand}>
+                      {brand}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="model"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Modèle</FormLabel>
+              <Select 
+                onValueChange={field.onChange} 
+                value={field.value}
+                disabled={!selectedBrand}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={selectedBrand ? "Sélectionner un modèle" : "Sélectionner d'abord une marque"} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {models.map((model) => (
+                    <SelectItem key={model} value={model}>
+                      {model}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="year"
