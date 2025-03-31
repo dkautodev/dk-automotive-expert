@@ -2,6 +2,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Routes, Route, Navigate } from "react-router-dom";
+import DriverSidebar from "@/components/driver/DriverSidebar";
+import DriverHome from "@/components/driver/DriverHome";
+import DriverMissions from "@/components/driver/DriverMissions";
+import DriverProfile from "@/components/driver/DriverProfile";
+import DriverDocuments from "@/components/driver/DriverDocuments";
+import DriverEarnings from "@/components/driver/DriverEarnings";
 import { useAuthContext } from "@/context/AuthContext";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
@@ -48,13 +55,16 @@ const DriverDashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        {/* Contenu du tableau de bord chauffeur */}
-        <main className="flex-1">
-          <h1 className="text-2xl font-bold p-6">Tableau de bord Chauffeur</h1>
-          <div className="p-6">
-            <p>Bienvenue sur votre espace chauffeur.</p>
-            {/* Contenu à compléter selon les besoins */}
-          </div>
+        <DriverSidebar />
+        <main className="flex-1 pl-52">
+          <Routes>
+            <Route index element={<DriverHome />} />
+            <Route path="missions" element={<DriverMissions />} />
+            <Route path="profile" element={<DriverProfile />} />
+            <Route path="documents" element={<DriverDocuments />} />
+            <Route path="earnings" element={<DriverEarnings />} />
+            <Route path="*" element={<Navigate to="/dashboard/driver" replace />} />
+          </Routes>
         </main>
       </div>
     </SidebarProvider>
