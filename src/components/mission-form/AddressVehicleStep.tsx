@@ -9,6 +9,8 @@ import CalculateButton from "./CalculateButton";
 import DistancePriceCard from "./DistancePriceCard";
 import ClientStateDisplay from "./ClientStateDisplay";
 import { useAddressVehicleStep } from "./hooks/useAddressVehicleStep";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -28,7 +30,9 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
-    vehicleType
+    vehicleType,
+    avoidTolls,
+    toggleAvoidTolls
   } = useAddressVehicleStep(form, onNext, onPrevious);
 
   return (
@@ -55,6 +59,11 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
         <VehicleTypeSelector form={form} />
 
         <div className="md:col-span-2">
+          <div className="flex items-center space-x-2 mb-4">
+            <Switch id="avoid-tolls" checked={avoidTolls} onCheckedChange={toggleAvoidTolls} />
+            <Label htmlFor="avoid-tolls" className="cursor-pointer">Éviter les péages</Label>
+          </div>
+          
           <CalculateButton 
             onClick={calculateDistanceAndPrice}
             isCalculating={isCalculating}

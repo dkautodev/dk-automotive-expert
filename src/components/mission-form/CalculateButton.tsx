@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Check, RotateCw } from "lucide-react";
+import { CalculatorIcon } from "lucide-react";
 
 interface CalculateButtonProps {
   onClick: () => void;
@@ -9,29 +9,30 @@ interface CalculateButtonProps {
   disabled: boolean;
 }
 
-const CalculateButton = ({ onClick, isCalculating, distance, disabled }: CalculateButtonProps) => {
+const CalculateButton = ({ 
+  onClick, 
+  isCalculating, 
+  distance, 
+  disabled 
+}: CalculateButtonProps) => {
   return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={onClick}
-      disabled={disabled || isCalculating}
-      className="w-full"
-    >
-      {isCalculating ? (
-        <>
-          <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-          Calcul en cours...
-        </>
-      ) : distance ? (
-        <>
-          <Check className="mr-2 h-4 w-4" />
-          Recalculer la distance et le prix
-        </>
-      ) : (
-        "Calculer la distance et le prix"
+    <div className="flex flex-col items-center w-full">
+      <Button
+        type="button"
+        className="w-full md:w-auto flex items-center gap-2"
+        onClick={onClick}
+        disabled={disabled || isCalculating}
+      >
+        <CalculatorIcon className="h-5 w-5" />
+        {isCalculating ? "Calcul en cours..." : "Calculer la distance et le prix"}
+      </Button>
+      
+      {distance === null && !isCalculating && (
+        <p className="text-sm text-muted-foreground mt-2">
+          Cliquez sur le bouton pour calculer la distance et le prix
+        </p>
       )}
-    </Button>
+    </div>
   );
 };
 

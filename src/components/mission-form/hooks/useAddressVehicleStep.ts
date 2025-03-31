@@ -12,10 +12,11 @@ export const useAddressVehicleStep = (
   onNext: () => void,
   onPrevious: () => void
 ) => {
-  const { calculateDistance, isCalculating: isDistanceCalculating } = useDistanceCalculation();
+  const { calculateDistanceWithAvoidTolls, isCalculating: isDistanceCalculating } = useDistanceCalculation();
   const { calculatePrice, isCalculating: isPriceCalculating, priceHT, priceTTC } = usePriceCalculation();
   const [distance, setDistance] = useState<number | null>(null);
   const [isCalculatingTotal, setIsCalculatingTotal] = useState<boolean>(false);
+  const [avoidTolls, setAvoidTolls] = useState<boolean>(false);
 
   const { 
     clients, 
@@ -60,9 +61,11 @@ export const useAddressVehicleStep = (
     
     try {
       console.log("Calcul de distance entre:", pickupAddress, "et", deliveryAddress);
-      // Calculate distance
-      const calculatedDistance = await calculateDistance(pickupAddress, deliveryAddress);
-      console.log("Distance calculée:", calculatedDistance);
+      console.log("Option éviter péages:", avoidTolls);
+      
+      // Calculate distance with toll preference
+      const calculatedDistance = await calculateDistanceWithAvoidTolls(pickupAddress, deliveryAddress, avoidTolls);
+      console.log("Distance calculée:", calculatedDistance, "km");
       
       setDistance(calculatedDistance);
       form.setValue("distance", calculatedDistance);
@@ -75,12 +78,21 @@ export const useAddressVehicleStep = (
       form.setValue("price_ttc", priceResult.priceTTC);
       
       toast.success("Calcul effectué avec succès");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calculating distance and price:", error);
-      toast.error("Erreur lors du calcul de la distance et du prix");
+      
+      // Ne pas afficher de message toast ici car il est déjà géré dans les hooks
+      setDistance(null);
+      form.setValue("distance", null);
+      form.setValue("price_ht", null);
+      form.setValue("price_ttc", null);
     } finally {
       setIsCalculatingTotal(false);
     }
+  };
+
+  const toggleAvoidTolls = () => {
+    setAvoidTolls(!avoidTolls);
   };
 
   return {
@@ -94,6 +106,8 @@ export const useAddressVehicleStep = (
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
-    vehicleType
+    vehicleType,
+    avoidTolls,
+    toggleAvoidTolls
   };
 };
