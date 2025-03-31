@@ -351,6 +351,36 @@ export type Database = {
           is_per_km: boolean
         }[]
       }
+      create_mission: {
+        Args: {
+          mission_data: Json
+          mission_type_value: string
+        }
+        Returns: {
+          additional_info: string | null
+          client_id: string
+          created_at: string | null
+          delivery_contact: Json | null
+          delivery_date: string | null
+          delivery_time: string | null
+          distance: string | null
+          driver_id: string | null
+          id: string
+          mission_number: string | null
+          mission_type: string
+          pickup_contact: Json | null
+          pickup_date: string | null
+          pickup_time: string | null
+          price_ht: number | null
+          price_ttc: number | null
+          quote_id: string | null
+          quote_number: string | null
+          status: string
+          updated_at: string | null
+          vehicle_info: Json | null
+          vehicles: Json | null
+        }[]
+      }
       generate_mission_number: {
         Args: {
           mission_type: string
