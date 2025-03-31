@@ -2,10 +2,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { ClientData, NewClientData } from './types/clientTypes';
-import { fetchClientsData, addClientData } from './services/clientService';
+import { clientService } from './services/clientService';
 
 export type { ClientData, NewClientData } from './types/clientTypes';
 
+/**
+ * Hook for managing clients in the application
+ */
 export const useClients = (form?: any) => {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,13 +22,16 @@ export const useClients = (form?: any) => {
     phone: '',
   });
 
+  /**
+   * Fetches clients from the backend
+   */
   const fetchClients = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       
       console.log("Début de la récupération des clients");
-      const { clients: fetchedClients, error: fetchError } = await fetchClientsData();
+      const { clients: fetchedClients, error: fetchError } = await clientService.fetchClientsData();
       console.log("Clients récupérés:", fetchedClients);
       
       if (fetchError) {
@@ -47,10 +53,9 @@ export const useClients = (form?: any) => {
     }
   }, []);
 
-  const addClient = async (newClientData: NewClientData): Promise<string | null> => {
-    return await addClientData(newClientData);
-  };
-
+  /**
+   * Creates a new client based on form data
+   */
   const createClient = async (): Promise<boolean> => {
     try {
       setIsSubmitting(true);
@@ -62,7 +67,7 @@ export const useClients = (form?: any) => {
       }
       
       console.log("Tentative de création d'un client:", newClient);
-      const clientId = await addClient(newClient);
+      const clientId = await clientService.addClientData(newClient);
       
       if (clientId) {
         toast.success('Client créé avec succès');
@@ -130,7 +135,7 @@ export const useClients = (form?: any) => {
     isLoading, 
     error, 
     fetchClients, 
-    addClient,
+    addClient: clientService.addClientData,
     newClient,
     setNewClient,
     createClient,
