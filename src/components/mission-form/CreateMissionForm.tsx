@@ -124,7 +124,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       console.log("Type de mission:", values.mission_type);
 
       // Utiliser la fonction RPC create_mission avec le bon typage
-      const { data, error } = await supabase.rpc<MissionRow[]>('create_mission', {
+      const { data, error } = await supabase.rpc('create_mission', {
         mission_data: missionData,
         mission_type_value: values.mission_type // Passer le type de mission séparément
       });
