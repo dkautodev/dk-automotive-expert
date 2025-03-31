@@ -20,6 +20,7 @@ const CreateMissionDialog = ({ onMissionCreated }: CreateMissionDialogProps) => 
 
   const handleSuccess = () => {
     setOpen(false);
+    console.log("Mission créée avec succès, notification du parent");
     if (onMissionCreated) {
       onMissionCreated();
     }

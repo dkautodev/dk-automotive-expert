@@ -11,7 +11,9 @@ const AdminHome = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleMissionCreated = () => {
+    // Incrémente le déclencheur de rafraîchissement pour forcer la mise à jour des tables
     setRefreshTrigger(prev => prev + 1);
+    console.log("Mission créée, rafraîchissement du tableau de bord avec valeur:", refreshTrigger + 1);
   };
 
   return (
