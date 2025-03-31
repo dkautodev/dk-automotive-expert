@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
 
 interface MissionDetailsDialogProps {
@@ -26,13 +27,18 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
 
   const vehicleInfo = mission.vehicle_info as any || {};
   
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "Non spécifié";
+    return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
+  };
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Détails de la mission {mission.mission_number}</DialogTitle>
           <DialogDescription>
-            Créée le {formatDate(mission.created_at)}
+            Créée le {format(new Date(mission.created_at), "Pp", { locale: fr })}
           </DialogDescription>
         </DialogHeader>
         
@@ -52,10 +58,10 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             <h3 className="font-semibold">Véhicule</h3>
             <p>
               {vehicleInfo.brand || "N/A"} {vehicleInfo.model || ""} {vehicleInfo.year || ""}
-              {vehicleInfo.fuel_type ? ` - ${vehicleInfo.fuel_type}` : ""}
+              {vehicleInfo.fuel ? ` - ${vehicleInfo.fuel}` : ""}
             </p>
-            {vehicleInfo.license_plate && (
-              <p>Immatriculation: {vehicleInfo.license_plate}</p>
+            {vehicleInfo.licensePlate && (
+              <p>Immatriculation: {vehicleInfo.licensePlate}</p>
             )}
           </div>
 
@@ -64,12 +70,12 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <p className="text-sm text-muted-foreground">Prix HT</p>
-                <p>{mission.price_ht ? formatCurrency(mission.price_ht) : "Non spécifié"}</p>
+                <p>{mission.price_ht ? `${mission.price_ht}€` : "Non spécifié"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Prix TTC</p>
                 <p className="font-medium">
-                  {mission.price_ttc ? formatCurrency(mission.price_ttc) : "Non spécifié"}
+                  {mission.price_ttc ? `${mission.price_ttc}€` : "Non spécifié"}
                 </p>
               </div>
             </div>
@@ -80,12 +86,12 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <p className="text-sm text-muted-foreground">Prise en charge</p>
-                <p>{mission.pickup_date ? formatDate(mission.pickup_date) : "Non spécifié"}</p>
+                <p>{formatDate(mission.pickup_date)}</p>
                 <p className="text-sm">{mission.pickup_time || ""}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Livraison</p>
-                <p>{mission.delivery_date ? formatDate(mission.delivery_date) : "Non spécifié"}</p>
+                <p>{formatDate(mission.delivery_date)}</p>
                 <p className="text-sm">{mission.delivery_time || ""}</p>
               </div>
             </div>
