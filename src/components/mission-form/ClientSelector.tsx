@@ -12,6 +12,8 @@ interface ClientSelectorProps {
 }
 
 const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
+  console.log("Liste des clients disponibles:", clients);
+  
   return (
     <FormField
       control={form.control}
@@ -23,7 +25,10 @@ const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
             <Select
               disabled={loading}
               value={field.value}
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                console.log("Client sélectionné:", value);
+                field.onChange(value);
+              }}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choisir un client" />

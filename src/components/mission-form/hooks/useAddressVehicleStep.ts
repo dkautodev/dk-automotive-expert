@@ -40,8 +40,18 @@ export const useAddressVehicleStep = (
     }
   }, [clientsError, fetchClients]);
 
+  // Log address changes for debugging
+  useEffect(() => {
+    console.log("Adresse de prise en charge actuelle:", pickupAddress);
+  }, [pickupAddress]);
+  
+  useEffect(() => {
+    console.log("Adresse de livraison actuelle:", deliveryAddress);
+  }, [deliveryAddress]);
+
   const calculateDistanceAndPrice = async () => {
     if (!pickupAddress || !deliveryAddress || !vehicleType) {
+      console.warn("Impossible de calculer: adresses ou type de véhicule manquants");
       return;
     }
 
