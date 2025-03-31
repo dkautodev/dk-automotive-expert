@@ -5,8 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { MissionFormValues, missionFormSchema } from "./missionFormSchema";
 import MissionTypeStep from "./MissionTypeStep";
 import AddressVehicleStep from "./AddressVehicleStep";
@@ -134,7 +132,9 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
         throw error;
       }
 
-      const createdMission = data && data.length > 0 ? data[0] : null;
+      // Vérifier si data est un tableau et contient au moins un élément
+      const createdMission = Array.isArray(data) && data.length > 0 ? data[0] as MissionRow : null;
+      
       toast.success(`Mission ${createdMission?.mission_number || ''} créée avec succès`);
       onSuccess();
     } catch (error: any) {
