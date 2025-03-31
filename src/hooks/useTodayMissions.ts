@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MissionRow } from "@/types/database";
+import { MissionRow, MissionStatus } from "@/types/database";
 
-interface UseTodayMissionsOptions {
+export interface UseTodayMissionsOptions {
   userId?: string;
   userRole?: string;
 }

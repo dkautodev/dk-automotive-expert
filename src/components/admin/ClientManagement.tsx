@@ -4,13 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader } from "@/components/ui/loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface UserData {
   id: string;
@@ -30,6 +29,7 @@ const ClientManagement = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserData | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { session } = useAuthContext();
 
   useEffect(() => {
     fetchUsersWithProfiles();
@@ -39,18 +39,39 @@ const ClientManagement = () => {
     try {
       setLoading(true);
       
-      // Using RPC function to get users with their profiles
-      const { data, error } = await supabase.rpc(
-        'get_users_with_profiles'
-      );
+      const { data, error } = await supabase
+        .from('users')
+        .select(`
+          id, 
+          email, 
+          user_type, 
+          user_profiles:user_profiles(
+            first_name,
+            last_name,
+            company_name,
+            phone
+          )
+        `);
 
       if (error) {
         throw error;
       }
 
+      // Transform the data into the format we need
+      const transformedUsers = data.map(user => ({
+        id: user.id,
+        email: user.email,
+        user_type: user.user_type,
+        first_name: user.user_profiles?.[0]?.first_name || '',
+        last_name: user.user_profiles?.[0]?.last_name || '',
+        company_name: user.user_profiles?.[0]?.company_name,
+        phone: user.user_profiles?.[0]?.phone,
+        created_at: null // You may want to fetch and add this
+      }));
+
       // Filter users by type
-      const clientsList = data.filter(user => user.user_type === 'client');
-      const driversList = data.filter(user => user.user_type === 'chauffeur');
+      const clientsList = transformedUsers.filter(user => user.user_type === 'client');
+      const driversList = transformedUsers.filter(user => user.user_type === 'chauffeur');
       
       setClients(clientsList);
       setDrivers(driversList);
@@ -73,11 +94,11 @@ const ClientManagement = () => {
     try {
       setIsDeleting(true);
       
-      // Using RPC function to delete user
-      const { error } = await supabase.rpc(
-        'admin_delete_user',
-        { user_id: userToDelete.id }
-      );
+      // Delete the user
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userToDelete.id);
 
       if (error) {
         throw error;

@@ -4,3 +4,5 @@ project_id = "lqjwvaqqhqgmkjsriijw"
 verify_jwt = true
 [functions.admin_delete_user]
 verify_jwt = true
+[functions.update_document_type]
+verify_jwt = true

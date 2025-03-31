@@ -1,3 +1,4 @@
+
 import { Database } from "@/integrations/supabase/types";
 
 export type MissionRow = {
@@ -6,7 +7,7 @@ export type MissionRow = {
   driver_id: string | null;
   quote_id: string | null;
   mission_type: "livraison" | "restitution";
-  status: "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule";
+  status: MissionStatus;
   mission_number: string | null;
   quote_number: string | null;
   pickup_address: string;
@@ -26,6 +27,8 @@ export type MissionRow = {
   vehicles: any | null;
   additional_info?: string | null;
 };
+
+export type MissionStatus = "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule";
 
 export type DocumentType = "kbis" | "driving_license" | "id_card" | "vigilance_certificate";
 

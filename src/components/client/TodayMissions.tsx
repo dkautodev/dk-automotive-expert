@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useAuthContext } from '@/context/AuthContext';
-import { useTodayMissions, Mission } from '@/hooks/useTodayMissions';
+import { useTodayMissions } from '@/hooks/useTodayMissions';
 import { MissionStatusBadge } from './MissionStatusBadge';
+import { MissionRow } from '@/types/database';
 import { 
   Card, 
   CardContent, 
@@ -22,7 +23,7 @@ import { Loader } from "@/components/ui/loader";
 import { MapPin, Truck, Calendar, Clock } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 
-const getMissionProgress = (status: Mission['status']) => {
+const getMissionProgress = (status: MissionRow['status']) => {
   switch (status) {
     case 'en_attente': return 10;
     case 'confirme': 
@@ -38,7 +39,10 @@ const getMissionProgress = (status: Mission['status']) => {
 
 const TodayMissions: React.FC = () => {
   const { user } = useAuthContext();
-  const { data: missions, isLoading, error } = useTodayMissions(user?.id);
+  const { missions, loading, error } = useTodayMissions({
+    userId: user?.id,
+    userRole: user?.user_metadata?.user_type || 'client'
+  });
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -48,7 +52,7 @@ const TodayMissions: React.FC = () => {
     });
   };
 
-  if (isLoading) {
+  if (loading) {
     return <Loader className="my-8" />;
   }
 
