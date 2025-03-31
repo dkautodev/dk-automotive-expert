@@ -42,14 +42,15 @@ export const useDashboardCounts = (userId: string | undefined) => {
         console.error('Error fetching missions:', missionsError);
       }
 
+      // Inclure à la fois 'confirme' et 'confirmé' et 'prise_en_charge' comme statuts pour les missions en cours
       const ongoingShipments = (missions as MissionRow[] || []).filter(m => 
-        m.status === 'prise_en_charge').length;
+        m.status === 'confirme' || m.status === 'confirmé' || m.status === 'prise_en_charge').length;
         
       const completedShipments = (missions as MissionRow[] || []).filter(m => 
         m.status === 'termine').length;
         
       const pendingInvoices = (missions as MissionRow[] || []).filter(m => 
-        m.status === 'confirme' || m.status === 'confirmé').length;
+        m.status === 'livre').length;
 
       return {
         pendingQuotes: pendingMissions?.length || 0,

@@ -29,11 +29,11 @@ const DashboardCards = ({
         
         if (pendingError) throw pendingError;
         
-        // Fetch ongoing missions count
+        // Fetch ongoing missions count - Include both 'confirmé' and 'confirme' statuses
         const { count: ongoingCount, error: ongoingError } = await extendedSupabase
           .from('missions')
           .select('*', { count: 'exact', head: true })
-          .in('status', ['confirmé', 'en cours']);
+          .in('status', ['confirmé', 'confirme', 'prise_en_charge']);
         
         if (ongoingError) throw ongoingError;
         

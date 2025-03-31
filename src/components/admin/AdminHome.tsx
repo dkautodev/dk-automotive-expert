@@ -4,6 +4,7 @@ import DashboardCards from "./DashboardCards";
 import ClientManagement from "./ClientManagement";
 import PendingInvoicesTable from "./PendingInvoicesTable";
 import CompletedMissionsTable from "./CompletedMissionsTable";
+import OngoingMissionsTable from "./OngoingMissionsTable";
 import CreateMissionDialog from "../mission-form/CreateMissionDialog";
 
 const AdminHome = () => {
@@ -23,8 +24,12 @@ const AdminHome = () => {
       <DashboardCards refreshTrigger={refreshTrigger} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PendingInvoicesTable refreshTrigger={refreshTrigger} />
+        <OngoingMissionsTable refreshTrigger={refreshTrigger} />
         <CompletedMissionsTable refreshTrigger={refreshTrigger} />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PendingInvoicesTable refreshTrigger={refreshTrigger} />
       </div>
       
       <ClientManagement />

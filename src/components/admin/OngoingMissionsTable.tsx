@@ -1,10 +1,6 @@
 
-import { useState, useEffect } from "react";
-import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { MissionRow } from "@/types/database";
-import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
-import { formatDate } from "@/lib/utils";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -13,83 +9,96 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
+import { MissionRow } from "@/types/database";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader } from "@/components/ui/loader";
-import { Card } from "@/components/ui/card";
+import { formatDate } from "@/lib/utils";
 
-const OngoingShipments = () => {
+interface OngoingMissionsTableProps {
+  refreshTrigger?: number;
+}
+
+const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({ 
+  refreshTrigger = 0 
+}) => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuthContext();
 
   useEffect(() => {
-    const fetchOngoingMissions = async () => {
-      if (!user?.id) return;
-      
+    const fetchMissions = async () => {
       try {
         setLoading(true);
+        // Récupérer les missions avec le statut "confirmé", "confirme" ou "prise_en_charge"
         const { data, error } = await supabase
           .from('missions')
-          .select('*')
-          .eq('client_id', user.id)
+          .select(`
+            *,
+            clientProfile:client_id(
+              first_name,
+              last_name,
+              company_name
+            )
+          `)
           .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(10);
 
         if (error) throw error;
-
+        
         setMissions(data as MissionRow[] || []);
       } catch (err) {
-        console.error("Error fetching ongoing missions:", err);
+        console.error('Error fetching ongoing missions:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOngoingMissions();
-  }, [user?.id]);
+    fetchMissions();
+  }, [refreshTrigger]);
 
   if (loading) {
     return (
-      <div className="p-6 flex justify-center">
-        <Loader className="h-8 w-8" />
-      </div>
+      <Card className="col-span-1">
+        <CardHeader>
+          <CardTitle>Missions en cours</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center">
+          <Loader className="h-8 w-8" />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Convoyages en cours</h1>
-      <Card className="rounded-lg border">
+    <Card className="col-span-1">
+      <CardHeader>
+        <CardTitle>Missions en cours</CardTitle>
+      </CardHeader>
+      <CardContent>
         {missions.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Numéro</TableHead>
+                <TableHead>Client</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Adresses</TableHead>
                 <TableHead>Véhicule</TableHead>
                 <TableHead>Statut</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {missions.map((mission) => {
+                const client = mission.clientProfile as any;
                 const vehicleInfo = mission.vehicle_info as any;
                 
                 return (
                   <TableRow key={mission.id}>
                     <TableCell className="font-medium">{mission.mission_number}</TableCell>
-                    <TableCell>{formatDate(mission.created_at)}</TableCell>
                     <TableCell>
-                      <div className="text-xs space-y-1">
-                        <div>
-                          <span className="font-semibold">De: </span>
-                          {vehicleInfo?.pickup_address || "Non spécifié"}
-                        </div>
-                        <div>
-                          <span className="font-semibold">À: </span>
-                          {vehicleInfo?.delivery_address || "Non spécifié"}
-                        </div>
-                      </div>
+                      {client?.company_name || `${client?.first_name || ''} ${client?.last_name || ''}`}
                     </TableCell>
+                    <TableCell>{formatDate(mission.created_at)}</TableCell>
                     <TableCell>
                       {vehicleInfo ? (
                         <span>
@@ -108,11 +117,11 @@ const OngoingShipments = () => {
             </TableBody>
           </Table>
         ) : (
-          <p className="p-4">Aucun convoyage en cours actuellement.</p>
+          <p className="text-center text-muted-foreground py-4">Aucune mission en cours</p>
         )}
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
-export default OngoingShipments;
+export default OngoingMissionsTable;
