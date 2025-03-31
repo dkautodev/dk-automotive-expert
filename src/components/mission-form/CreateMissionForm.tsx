@@ -83,7 +83,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       
       // Format data for database - Specifions explicitement les colonnes dans notre objet
       const missionData = {
-        status: "confirmé", // Changé de "en_attente" à "confirmé" pour les missions créées par l'admin
+        status: "en_attente", // Utiliser un statut valide selon la contrainte missions_status_check
         client_id: values.client_id || user?.id, // Utilisation de l'ID du client sélectionné
         distance: values.distance?.toString(), // Convert to string as required by the database
         price_ht: parseFloat(values.price_ht || "0"),
@@ -121,7 +121,7 @@ const CreateMissionForm = ({ onSuccess }: CreateMissionFormProps) => {
       console.log("Données de mission à envoyer:", missionData);
       console.log("Type de mission:", values.mission_type);
 
-      // Appel modifié de la fonction RPC pour éviter l'ambiguïté de colonne
+      // Appel de la fonction RPC avec la nouvelle structure
       const { data, error } = await supabase.rpc(
         'create_mission',
         {
