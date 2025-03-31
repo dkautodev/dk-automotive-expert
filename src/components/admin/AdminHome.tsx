@@ -23,13 +23,13 @@ const AdminHome = () => {
       
       <DashboardCards refreshTrigger={refreshTrigger} />
       
+      <div className="grid grid-cols-1 gap-6">
+        <OngoingMissionsTable refreshTrigger={refreshTrigger} showAllMissions={true} />
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <OngoingMissionsTable refreshTrigger={refreshTrigger} />
         <CompletedMissionsTable refreshTrigger={refreshTrigger} />
-      </div>
-      
-      <div className="grid grid-cols-1 gap-6">
-        <OngoingMissionsTable refreshTrigger={refreshTrigger} showAllMissions={true} />
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
