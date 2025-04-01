@@ -8,82 +8,52 @@ import { fr } from "date-fns/locale";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { FileText, Eye, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAuthContext } from "@/context/AuthContext";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
-import { extractPostalCodeAndCity } from "@/lib/utils";
+import { extractPostalCodeAndCity } from "@/utils/addressUtils";
 import { generateMissionPDF } from "@/utils/missionPdfGenerator";
+import { useMissionCancellation } from "@/hooks/useMissionCancellation";
+import { CancelMissionDialog } from "@/components/missions/CancelMissionDialog";
 
 const PendingQuotes = () => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState<boolean>(false);
-  const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { user } = useAuthContext();
+  
+  const { 
+    isCancelDialogOpen, 
+    isLoading, 
+    handleCancelMission, 
+    confirmCancelMission, 
+    setIsCancelDialogOpen 
+  } = useMissionCancellation({ 
+    onSuccess: fetchMissions 
+  });
 
-  const fetchMissions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('missions')
-        .select('*')
-        .eq('status', 'en_attente')
-        .eq('client_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error("Error fetching missions:", error);
-        throw error;
-      }
-
-      if (data) {
-        setMissions(data as MissionRow[]);
-      }
-    } catch (error) {
-      console.error("Error in fetchMissions:", error);
-      toast.error("Erreur lors de la récupération des missions");
-    }
-  };
+  function fetchMissions() {
+    if (!user?.id) return;
+    
+    supabase
+      .from('missions')
+      .select('*')
+      .eq('status', 'en_attente')
+      .eq('client_id', user?.id)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error fetching missions:", error);
+        } else {
+          setMissions(data as MissionRow[]);
+        }
+      });
+  }
 
   useEffect(() => {
     if (user?.id) {
       fetchMissions();
     }
   }, [user]);
-
-  const handleCancelMission = (missionId: string) => {
-    setSelectedMissionId(missionId);
-    setIsDialogOpen(true);
-  };
-
-  const confirmCancelMission = async () => {
-    if (!selectedMissionId) return;
-    
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('missions')
-        .update({ status: 'annulé' })
-        .eq('id', selectedMissionId);
-        
-      if (error) {
-        console.error("Error cancelling mission:", error);
-        throw error;
-      }
-      
-      toast.success("La mission a été annulée avec succès");
-      fetchMissions(); // Refresh missions after cancellation
-    } catch (error) {
-      console.error("Error cancelling mission:", error);
-      toast.error("Erreur lors de l'annulation de la mission");
-    } finally {
-      setIsLoading(false);
-      setIsDialogOpen(false);
-      setSelectedMissionId(null);
-    }
-  };
 
   const handleViewDetails = (mission: MissionRow) => {
     setSelectedMission(mission);
@@ -185,33 +155,20 @@ const PendingQuotes = () => {
         </Table>
       </Card>
 
-      {/* Dialog for cancel confirmation */}
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmation d'annulation</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir annuler cette mission ? Cette action ne peut pas être annulée.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmCancelMission} 
-              className="bg-red-500 hover:bg-red-600"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Annulation en cours...' : 'Confirmer'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       {/* Dialog for mission details */}
       <MissionDetailsDialog
         mission={selectedMission}
         isOpen={isDetailsDialogOpen}
         onClose={() => setIsDetailsDialogOpen(false)}
+      />
+
+      {/* Dialog for cancel confirmation */}
+      <CancelMissionDialog
+        isOpen={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+        onConfirm={confirmCancelMission}
+        isLoading={isLoading}
+        missionNumber={selectedMission?.mission_number}
       />
     </div>
   );

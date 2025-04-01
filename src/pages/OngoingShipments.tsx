@@ -4,7 +4,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { MissionRow } from "@/types/database";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -15,97 +15,62 @@ import {
 } from "@/components/ui/table";
 import { Loader } from "@/components/ui/loader";
 import { Card } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
+import { useMissionCancellation } from "@/hooks/useMissionCancellation";
+import { CancelMissionDialog } from "@/components/missions/CancelMissionDialog";
 
 const OngoingShipments = () => {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
-  const [missionToCancel, setMissionToCancel] = useState<MissionRow | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const { 
+    isCancelDialogOpen, 
+    isLoading, 
+    handleCancelMission, 
+    confirmCancelMission, 
+    setIsCancelDialogOpen 
+  } = useMissionCancellation({ 
+    onSuccess: fetchOngoingMissions 
+  });
 
   useEffect(() => {
     fetchOngoingMissions();
   }, [user?.id]);
 
-  const fetchOngoingMissions = async () => {
+  function fetchOngoingMissions() {
     if (!user?.id) return;
     
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('missions')
-        .select('*')
-        .eq('client_id', user.id)
-        .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setMissions(data as MissionRow[] || []);
-    } catch (err) {
-      console.error("Error fetching ongoing missions:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLoading(true);
+    supabase
+      .from('missions')
+      .select('*')
+      .eq('client_id', user.id)
+      .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error fetching ongoing missions:", error);
+        } else {
+          setMissions(data as MissionRow[] || []);
+        }
+        setLoading(false);
+      });
+  }
 
   const handleRowClick = (mission: MissionRow) => {
     setSelectedMission(mission);
     setIsDetailsOpen(true);
   };
 
-  const handleCancelMission = async () => {
-    if (!missionToCancel) return;
-    
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('missions')
-        .update({ status: 'annulé' })
-        .eq('id', missionToCancel.id);
-      
-      if (error) {
-        console.error("Error cancelling mission:", error);
-        throw error;
-      }
-      
-      // Update local state to reflect the change
-      setMissions(missions.filter(m => m.id !== missionToCancel.id));
-      toast.success("Mission annulée avec succès");
-      
-      // Close dialog
-      setMissionToCancel(null);
-      setIsCancelDialogOpen(false);
-    } catch (err) {
-      console.error("Error cancelling mission:", err);
-      toast.error("Erreur lors de l'annulation de la mission");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const confirmCancel = (mission: MissionRow, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click event
-    setMissionToCancel(mission);
-    setIsCancelDialogOpen(true);
+    setSelectedMission(mission);
+    handleCancelMission(mission.id);
   };
 
   if (loading) {
@@ -207,26 +172,13 @@ const OngoingShipments = () => {
       />
 
       {/* Cancel Confirmation Dialog */}
-      <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmer l'annulation</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir annuler cette mission ? Cette action est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleCancelMission} 
-              className="bg-red-500 hover:bg-red-600"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Annulation en cours...' : 'Confirmer l\'annulation'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CancelMissionDialog
+        isOpen={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+        onConfirm={confirmCancelMission}
+        isLoading={isLoading}
+        missionNumber={selectedMission?.mission_number}
+      />
     </div>
   );
 };
