@@ -37,7 +37,7 @@ const AddressVehicleStep = ({
   } = useAddressVehicleStep(form, onNext, onPrevious);
   return <div className="space-y-6">
       <div className="text-2xl font-semibold">Adresses et type de véhicule</div>
-      <p className="text-muted-foreground">Veuillez saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule. Utilisez les flèches ⬆️ ⬇️ pour ensuite sélectionner votre adresse finale. </p>
+      <p className="text-red-600">Veuillez saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule. Utilisez les flèches ⬆️ ⬇️ pour ensuite sélectionner votre adresse finale. </p>
 
       <ClientStateDisplay isLoading={clientsLoading} error={clientsError} clientsCount={clients.length} />
 
