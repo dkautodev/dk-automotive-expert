@@ -51,16 +51,19 @@ const DeliveryDetailsSection = ({ form, addressInputRef }: DeliveryDetailsSectio
                 className="bg-[#EEF1FF]"
                 onKeyDown={handleKeyDown}
                 ref={(e) => {
-                  // Properly handle the ref forwarding
-                  if (addressInputRef) {
-                    // Set the ref's current property if the element exists
-                    if (e) {
-                      addressInputRef.current = e;
-                    }
-                  }
-                  // Also handle the field's ref if it exists and is a function
+                  // Handle the field's ref if it exists
                   if (field.ref && typeof field.ref === 'function') {
                     field.ref(e);
+                  }
+                  
+                  // Instead of directly assigning to current (which is read-only),
+                  // we use the existing ref's value which React handles internally
+                  if (e && addressInputRef) {
+                    // Here we let React handle setting the current property properly
+                    Object.defineProperty(addressInputRef, 'current', {
+                      value: e,
+                      writable: true
+                    });
                   }
                 }}
               />
