@@ -54,7 +54,17 @@ const ContactForm = ({ contact, onCancel, onSubmit }: ContactFormProps) => {
   });
 
   const handleSubmit = (values: ContactFormValues) => {
-    onSubmit(values);
+    // Ensure all required fields are passed to onSubmit
+    const contactData: Omit<ContactEntry, 'id'> = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phone: values.phone,
+      type: values.type,
+      notes: values.notes || '',
+    };
+    
+    onSubmit(contactData);
   };
 
   return (

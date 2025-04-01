@@ -2,14 +2,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import { ContactEntry } from "@/types/addressBook";
 import { useAuthContext } from "@/context/AuthContext";
+import { safeTable } from "@/utils/supabase-helper";
 
 export const addressBookService = {
   async getContacts() {
     try {
-      const { data: contacts, error } = await supabase
-        .from('contacts')
+      const { data: contacts, error } = await safeTable('contacts')
         .select('*')
-        .order('lastName', { ascending: true });
+        .order('last_name', { ascending: true });
 
       if (error) throw error;
       
@@ -39,11 +39,10 @@ export const addressBookService = {
         phone: contact.phone,
         type: contact.type,
         notes: contact.notes,
-        user_id: supabase.auth.getUser().then(res => res.data.user?.id) // Get the current user ID
+        user_id: (await supabase.auth.getUser()).data.user?.id // Get the current user ID
       };
 
-      const { data, error } = await supabase
-        .from('contacts')
+      const { data, error } = await safeTable('contacts')
         .insert([dbContact])
         .select();
 
@@ -76,8 +75,7 @@ export const addressBookService = {
       if (updates.type !== undefined) dbUpdates.type = updates.type;
       if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
 
-      const { data, error } = await supabase
-        .from('contacts')
+      const { data, error } = await safeTable('contacts')
         .update(dbUpdates)
         .eq('id', id)
         .select();
@@ -102,8 +100,7 @@ export const addressBookService = {
 
   async deleteContact(id: string) {
     try {
-      const { error } = await supabase
-        .from('contacts')
+      const { error } = await safeTable('contacts')
         .delete()
         .eq('id', id);
 
