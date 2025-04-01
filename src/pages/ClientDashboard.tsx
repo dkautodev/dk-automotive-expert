@@ -10,6 +10,7 @@ import PendingInvoices from "./PendingInvoices";
 import CompletedShipments from "./CompletedShipments";
 import PendingQuotes from "./PendingQuotes";
 import MissionHistory from "./MissionHistory";
+import AddressBook from "./AddressBook";
 import Profile from "@/components/client/Profile";
 import { useAuthContext } from "@/context/AuthContext";
 import { Loader } from "@/components/ui/loader";
@@ -84,6 +85,7 @@ const ClientDashboard = () => {
               <Route path="pending-invoices" element={<PendingInvoices />} />
               <Route path="pending-quotes" element={<PendingQuotes />} />
               <Route path="mission-history" element={<MissionHistory />} />
+              <Route path="address-book" element={<AddressBook />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<Navigate to="/dashboard/client" replace />} />
             </Routes>
