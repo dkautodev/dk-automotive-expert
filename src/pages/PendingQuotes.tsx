@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MissionRow } from "@/types/database";
@@ -64,7 +65,7 @@ const PendingQuotes = () => {
       setIsLoading(true);
       const { error } = await supabase
         .from('missions')
-        .update({ status: 'annule' })
+        .update({ status: 'annulé' })
         .eq('id', selectedMissionId);
         
       if (error) {

@@ -1,3 +1,4 @@
+
 import { Database } from "@/integrations/supabase/types";
 
 export type MissionRow = {
@@ -41,8 +42,8 @@ export type UserProfileRow = {
   vat_number?: string | null;
 };
 
-// Updated MissionStatus to ensure 'annule' is the correct value for cancellation
-export type MissionStatus = "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule";
+// Updated MissionStatus to ensure both 'annule' and 'annulé' are valid values for cancellation
+export type MissionStatus = "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule" | "annulé";
 
 export type DocumentType = "kbis" | "driving_license" | "id_card" | "vigilance_certificate";
 

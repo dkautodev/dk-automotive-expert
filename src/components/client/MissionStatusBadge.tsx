@@ -22,7 +22,8 @@ export const MissionStatusBadge: React.FC<MissionStatusBadgeProps> = ({ status }
       case 'incident':
         return { label: 'Incident', variant: 'destructive' as const };
       case 'annule':
-        return { label: 'Annulé', variant: 'outline' as const };
+      case 'annulé':
+        return { label: 'Annulé', variant: 'destructive' as const };
       case 'termine':
         return { label: 'Terminé', variant: 'success' as const };
       default:
