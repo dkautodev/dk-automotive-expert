@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -28,6 +27,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({ missions, onMissio
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Fonction pour extraire le code postal et la ville
   const extractPostalCodeAndCity = (address: string | undefined) => {
@@ -70,12 +70,16 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({ missions, onMissio
     if (!selectedMission) return;
     
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('missions')
         .update({ status: 'annule' })
         .eq('id', selectedMission.id);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Error cancelling mission:", error);
+        throw error;
+      }
       
       toast.success(`La mission ${selectedMission.mission_number} a été annulée`);
       
@@ -86,6 +90,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({ missions, onMissio
       console.error("Error cancelling mission:", error);
       toast.error("Erreur lors de l'annulation de la mission");
     } finally {
+      setIsLoading(false);
       setIsCancelDialogOpen(false);
       setSelectedMission(null);
     }
@@ -195,8 +200,12 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({ missions, onMissio
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancelMission} className="bg-red-500 hover:bg-red-600">
-              Confirmer
+            <AlertDialogAction 
+              onClick={confirmCancelMission} 
+              className="bg-red-500 hover:bg-red-600"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Annulation en cours...' : 'Confirmer'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

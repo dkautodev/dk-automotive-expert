@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +38,7 @@ const OngoingShipments = () => {
   const [missionToCancel, setMissionToCancel] = useState<MissionRow | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchOngoingMissions();
@@ -75,12 +75,16 @@ const OngoingShipments = () => {
     if (!missionToCancel) return;
     
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('missions')
         .update({ status: 'annule' })
         .eq('id', missionToCancel.id);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error cancelling mission:", error);
+        throw error;
+      }
       
       // Update local state to reflect the change
       setMissions(missions.filter(m => m.id !== missionToCancel.id));
@@ -92,6 +96,8 @@ const OngoingShipments = () => {
     } catch (err) {
       console.error("Error cancelling mission:", err);
       toast.error("Erreur lors de l'annulation de la mission");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -174,6 +180,7 @@ const OngoingShipments = () => {
                             size="icon" 
                             onClick={(e) => confirmCancel(mission, e)}
                             className="h-6 w-6"
+                            disabled={isLoading}
                             title="Annuler la mission"
                           >
                             <X className="h-4 w-4 text-red-500" />
@@ -209,8 +216,12 @@ const OngoingShipments = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCancelMission} className="bg-red-500 hover:bg-red-600">
-              Confirmer l'annulation
+            <AlertDialogAction 
+              onClick={handleCancelMission} 
+              className="bg-red-500 hover:bg-red-600"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Annulation en cours...' : 'Confirmer l\'annulation'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
