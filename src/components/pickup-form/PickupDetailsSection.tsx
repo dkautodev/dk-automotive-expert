@@ -104,8 +104,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
               <Input
                 placeholder="Commencez à taper une adresse..."
                 className="bg-[#EEF1FF]"
-                value={field.value || ''}
-                onChange={(e) => form.setValue("address", e.target.value)}
+                {...field}
                 ref={(e) => {
                   addressInputRef.current = e;
                 }}
