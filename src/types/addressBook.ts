@@ -5,8 +5,6 @@ export interface ContactEntry {
   lastName: string;
   email: string;
   phone: string;
-  type: 'pickup' | 'delivery';
-  notes?: string;
 }
 
 export interface AddressBookState {

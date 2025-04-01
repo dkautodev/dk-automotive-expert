@@ -11,19 +11,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { SearchIcon, BookOpen } from 'lucide-react';
 import ContactList from './ContactList';
 
 interface ContactSelectorProps {
-  contactType: 'pickup' | 'delivery' | 'all';
+  contactType?: 'pickup' | 'delivery'; // Keep for backward compatibility but ignore
   onSelectContact: (contact: ContactEntry) => void;
   buttonClassName?: string;
 }
 
 const ContactSelector = ({ 
-  contactType, 
   onSelectContact,
   buttonClassName = '',
 }: ContactSelectorProps) => {
@@ -32,15 +30,10 @@ const ContactSelector = ({
   const { contacts, isLoading } = useAddressBook();
 
   const filteredContacts = contacts.filter(contact => {
-    // If contactType is 'all', show all contacts, otherwise filter by type
-    const typeMatch = contactType === 'all' || contact.type === contactType;
-    const searchMatch = 
-      searchTerm === '' ||
+    return searchTerm === '' ||
       contact.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    return typeMatch && searchMatch;
   });
 
   const handleSelectContact = (contact: ContactEntry) => {
