@@ -27,6 +27,13 @@ interface DeliveryDetailsSectionProps {
 }
 
 const DeliveryDetailsSection = ({ form, addressInputRef }: DeliveryDetailsSectionProps) => {
+  // Empêcher la soumission du formulaire lors de l'appui sur Entrée
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <FormField
@@ -42,7 +49,19 @@ const DeliveryDetailsSection = ({ form, addressInputRef }: DeliveryDetailsSectio
                 placeholder="Commencez à taper une adresse..."
                 {...field}
                 className="bg-[#EEF1FF]"
-                ref={addressInputRef}
+                onKeyDown={handleKeyDown}
+                ref={(e) => {
+                  if (addressInputRef) {
+                    if (typeof addressInputRef === 'function') {
+                      addressInputRef(e);
+                    } else {
+                      addressInputRef.current = e;
+                    }
+                  }
+                  if (typeof field.ref === 'function') {
+                    field.ref(e);
+                  }
+                }}
               />
             </FormControl>
             <FormMessage />

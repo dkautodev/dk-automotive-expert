@@ -90,6 +90,13 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
     }
   }, [mapsLoaded, addressInputRef, form, autocomplete]);
 
+  // Empêcher la soumission du formulaire lors de l'appui sur Entrée
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <FormField
@@ -105,8 +112,12 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
                 placeholder="Commencez à taper une adresse..."
                 className="bg-[#EEF1FF]"
                 {...field}
+                onKeyDown={handleKeyDown}
                 ref={(e) => {
                   addressInputRef.current = e;
+                  if (typeof field.ref === 'function') {
+                    field.ref(e);
+                  }
                 }}
               />
             </FormControl>

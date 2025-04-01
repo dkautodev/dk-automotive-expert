@@ -75,13 +75,6 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
           }
         });
         
-        // Désactiver la soumission du formulaire quand l'utilisateur appuie sur Entrée
-        inputRef.current.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-          }
-        });
-        
         return autocomplete;
       } catch (error) {
         console.error(`Erreur lors de l'initialisation de l'autocomplétion pour ${fieldName}:`, error);
@@ -105,6 +98,13 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
     }
   }, [mapsLoaded, form, autocompletes]);
 
+  // Empêcher la soumission du formulaire lors de l'appui sur Entrée dans les champs d'adresse
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <>
       <FormField
@@ -120,7 +120,13 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
                   placeholder="Saisissez l'adresse complète" 
                   className="pl-8"
                   {...field}
-                  ref={pickupInputRef}
+                  onKeyDown={handleKeyDown}
+                  ref={(el) => {
+                    pickupInputRef.current = el;
+                    if (typeof field.ref === 'function') {
+                      field.ref(el);
+                    }
+                  }}
                 />
               </div>
             </FormControl>
@@ -142,7 +148,13 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
                   placeholder="Saisissez l'adresse complète" 
                   className="pl-8"
                   {...field}
-                  ref={deliveryInputRef}
+                  onKeyDown={handleKeyDown}
+                  ref={(el) => {
+                    deliveryInputRef.current = el;
+                    if (typeof field.ref === 'function') {
+                      field.ref(el);
+                    }
+                  }}
                 />
               </div>
             </FormControl>
