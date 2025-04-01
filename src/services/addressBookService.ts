@@ -21,6 +21,8 @@ export const addressBookService = {
           last_name: string;
           email: string;
           phone: string;
+          type: string;
+          notes: string | null;
         };
         
         return {
@@ -45,6 +47,7 @@ export const addressBookService = {
         last_name: contact.lastName,
         email: contact.email,
         phone: contact.phone,
+        type: 'contact', // Always set default type to 'contact'
         user_id: (await supabase.auth.getUser()).data.user?.id // Get the current user ID
       };
 
