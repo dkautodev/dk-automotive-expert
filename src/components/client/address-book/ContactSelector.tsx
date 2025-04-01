@@ -17,7 +17,7 @@ import { SearchIcon, BookOpen } from 'lucide-react';
 import ContactList from './ContactList';
 
 interface ContactSelectorProps {
-  contactType: 'pickup' | 'delivery';
+  contactType: 'pickup' | 'delivery' | 'all';
   onSelectContact: (contact: ContactEntry) => void;
   buttonClassName?: string;
 }
@@ -32,6 +32,7 @@ const ContactSelector = ({
   const { contacts, isLoading } = useAddressBook();
 
   const filteredContacts = contacts.filter(contact => {
+    // If contactType is 'all', show all contacts, otherwise filter by type
     const typeMatch = contactType === 'all' || contact.type === contactType;
     const searchMatch = 
       searchTerm === '' ||
