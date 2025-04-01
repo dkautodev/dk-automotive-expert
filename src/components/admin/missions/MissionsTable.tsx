@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -73,7 +74,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({ missions, onMissio
       setIsLoading(true);
       const { error } = await supabase
         .from('missions')
-        .update({ status: 'annule' })
+        .update({ status: 'annulé' })
         .eq('id', selectedMission.id);
         
       if (error) {

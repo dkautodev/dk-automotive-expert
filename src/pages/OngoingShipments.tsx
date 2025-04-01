@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,7 +79,7 @@ const OngoingShipments = () => {
       setIsLoading(true);
       const { error } = await supabase
         .from('missions')
-        .update({ status: 'annule' })
+        .update({ status: 'annulé' })
         .eq('id', missionToCancel.id);
       
       if (error) {
