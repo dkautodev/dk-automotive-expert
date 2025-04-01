@@ -13,6 +13,47 @@ export interface ExtendedDatabase extends Database {
       price_grids: Database['public']['Tables']['price_grids'];
       user_profiles: Database['public']['Tables']['user_profiles'];
       
+      // Add our contacts table
+      contacts: {
+        Row: {
+          id: string;
+          user_id: string;
+          first_name: string;
+          last_name: string;
+          email: string;
+          phone: string;
+          type: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          first_name: string;
+          last_name: string;
+          email: string;
+          phone: string;
+          type: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          first_name?: string;
+          last_name?: string;
+          email?: string;
+          phone?: string;
+          type?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      
       // Add our new tables with the correct types that match the generated types
       notifications: {
         Row: {
