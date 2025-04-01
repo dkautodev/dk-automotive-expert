@@ -50,19 +50,19 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>
-            Détails de la mission {mission.mission_number}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
+              Détails de la mission {mission.mission_number}
+            </DialogTitle>
+            <MissionStatusBadge status={mission.status} />
+          </div>
           <DialogDescription>
             Créée le {format(new Date(mission.created_at), "Pp", { locale: fr })}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <MissionStatusBadge status={mission.status} />
-            </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <h3 className="font-semibold">Type de mission</h3>
               <p>{mission.mission_type === "livraison" ? "Livraison" : "Restitution"}</p>
@@ -129,7 +129,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
           
           <div className="mt-8 pt-5 border-t border-gray-200">
             <h3 className="font-semibold mb-3 border-b inline-block border-gray-400">Tarification</h3>
-            <p className="text-base">
+            <p className="text-sm">
               Prix total : {mission.price_ttc ? `${mission.price_ttc}€ TTC` : "Non spécifié"} 
               {mission.price_ht ? ` soit ${mission.price_ht}€ HT` : ""}
             </p>
