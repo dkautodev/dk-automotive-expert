@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { MissionFormValues } from "./missionFormSchema";
@@ -17,8 +16,11 @@ interface AddressVehicleStepProps {
   onNext: () => void;
   onPrevious: () => void;
 }
-
-const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProps) => {
+const AddressVehicleStep = ({
+  form,
+  onNext,
+  onPrevious
+}: AddressVehicleStepProps) => {
   const {
     distance,
     priceHT,
@@ -33,83 +35,43 @@ const AddressVehicleStep = ({ form, onNext, onPrevious }: AddressVehicleStepProp
     vehicleType,
     additionalInfo
   } = useAddressVehicleStep(form, onNext, onPrevious);
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="text-2xl font-semibold">Adresses et type de véhicule</div>
-      <p className="text-muted-foreground">
-        Veuillez sélectionner un client et saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule
-      </p>
+      <p className="text-muted-foreground">Veuillez saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule. Utilisez les flèches ⬆️ ⬇️ pour ensuite sélectionner votre adresse finale. </p>
 
-      <ClientStateDisplay 
-        isLoading={clientsLoading} 
-        error={clientsError} 
-        clientsCount={clients.length}
-      />
+      <ClientStateDisplay isLoading={clientsLoading} error={clientsError} clientsCount={clients.length} />
 
-      <ClientSelector 
-        form={form} 
-        clients={clients}
-        loading={clientsLoading}
-      />
+      <ClientSelector form={form} clients={clients} loading={clientsLoading} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AddressFields form={form} />
         <VehicleTypeSelector form={form} />
 
         <div className="md:col-span-2">
-          <CalculateButton 
-            onClick={calculateDistanceAndPrice}
-            isCalculating={isCalculating}
-            distance={distance}
-            disabled={!pickupAddress || !deliveryAddress || !vehicleType}
-          />
+          <CalculateButton onClick={calculateDistanceAndPrice} isCalculating={isCalculating} distance={distance} disabled={!pickupAddress || !deliveryAddress || !vehicleType} />
         </div>
       </div>
 
-      <DistancePriceCard 
-        distance={distance} 
-        priceHT={priceHT} 
-        priceTTC={priceTTC} 
-      />
+      <DistancePriceCard distance={distance} priceHT={priceHT} priceTTC={priceTTC} />
       
       {/* Ajout du champ compléments d'information */}
-      <FormField
-        control={form.control}
-        name="additional_info"
-        render={({ field }) => (
-          <FormItem>
+      <FormField control={form.control} name="additional_info" render={({
+      field
+    }) => <FormItem>
             <FormLabel>Compléments d'information</FormLabel>
             <FormControl>
-              <Textarea 
-                placeholder="Informations supplémentaires (max 250 caractères)" 
-                className="resize-none" 
-                maxLength={250}
-                {...field} 
-              />
+              <Textarea placeholder="Informations supplémentaires (max 250 caractères)" className="resize-none" maxLength={250} {...field} />
             </FormControl>
-          </FormItem>
-        )}
-      />
+          </FormItem>} />
 
       <div className="flex justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onPrevious}
-        >
+        <Button type="button" variant="outline" onClick={onPrevious}>
           Précédent
         </Button>
-        <Button
-          type="button"
-          onClick={onNext}
-          disabled={!distance}
-        >
+        <Button type="button" onClick={onNext} disabled={!distance}>
           Suivant
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AddressVehicleStep;
