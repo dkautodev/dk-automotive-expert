@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MissionRow } from "@/types/database";
@@ -21,25 +20,36 @@ const PendingQuotes = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState<boolean>(false);
   const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { user } = useAuthContext();
 
   const fetchMissions = async () => {
-    const { data, error } = await supabase
-      .from('missions')
-      .select('*')
-      .eq('status', 'en_attente')
-      .eq('client_id', user?.id)
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('missions')
+        .select('*')
+        .eq('status', 'en_attente')
+        .eq('client_id', user?.id)
+        .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setMissions(data as MissionRow[]);
-    } else {
-      console.error("Error fetching missions:", error);
+      if (error) {
+        console.error("Error fetching missions:", error);
+        throw error;
+      }
+
+      if (data) {
+        setMissions(data as MissionRow[]);
+      }
+    } catch (error) {
+      console.error("Error in fetchMissions:", error);
+      toast.error("Erreur lors de la récupération des missions");
     }
   };
 
   useEffect(() => {
-    fetchMissions();
+    if (user?.id) {
+      fetchMissions();
+    }
   }, [user]);
 
   const handleCancelMission = (missionId: string) => {
@@ -51,12 +61,16 @@ const PendingQuotes = () => {
     if (!selectedMissionId) return;
     
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('missions')
         .update({ status: 'annule' })
         .eq('id', selectedMissionId);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Error cancelling mission:", error);
+        throw error;
+      }
       
       toast.success("La mission a été annulée avec succès");
       fetchMissions(); // Refresh missions after cancellation
@@ -64,6 +78,7 @@ const PendingQuotes = () => {
       console.error("Error cancelling mission:", error);
       toast.error("Erreur lors de l'annulation de la mission");
     } finally {
+      setIsLoading(false);
       setIsDialogOpen(false);
       setSelectedMissionId(null);
     }
@@ -149,6 +164,7 @@ const PendingQuotes = () => {
                       size="icon"
                       className="text-red-500 hover:text-red-700 hover:bg-red-100"
                       onClick={() => handleCancelMission(mission.id)}
+                      disabled={isLoading}
                       title="Annuler"
                     >
                       <X className="h-4 w-4" />
@@ -179,8 +195,12 @@ const PendingQuotes = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancelMission} className="bg-red-500 hover:bg-red-600">
-              Confirmer
+            <AlertDialogAction 
+              onClick={confirmCancelMission} 
+              className="bg-red-500 hover:bg-red-600"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Annulation en cours...' : 'Confirmer'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
