@@ -121,8 +121,6 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
                   className="pl-8"
                   {...field}
                   ref={pickupInputRef}
-                  role="presentation"
-                  autoComplete="off"
                 />
               </div>
             </FormControl>
@@ -145,8 +143,6 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
                   className="pl-8"
                   {...field}
                   ref={deliveryInputRef}
-                  role="presentation"
-                  autoComplete="off"
                 />
               </div>
             </FormControl>
