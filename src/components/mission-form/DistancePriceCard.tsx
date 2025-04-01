@@ -10,6 +10,10 @@ interface DistancePriceCardProps {
 const DistancePriceCard = ({ distance, priceHT, priceTTC }: DistancePriceCardProps) => {
   if (!distance) return null;
   
+  // Format prices to display with 2 decimal places
+  const formattedPriceHT = priceHT ? Number(priceHT).toFixed(2) : null;
+  const formattedPriceTTC = priceTTC ? Number(priceTTC).toFixed(2) : null;
+  
   return (
     <Card className="mt-6 shadow-md border border-green-100">
       <CardContent className="pt-6">
@@ -20,11 +24,11 @@ const DistancePriceCard = ({ distance, priceHT, priceTTC }: DistancePriceCardPro
           </div>
           <div>
             <div className="text-sm font-medium text-gray-500">Prix HT</div>
-            <div className="text-lg font-semibold">{priceHT || "Calcul en cours..."} €</div>
+            <div className="text-lg font-semibold">{formattedPriceHT || "Calcul en cours..."} €</div>
           </div>
           <div>
             <div className="text-sm font-medium text-gray-500">Prix TTC</div>
-            <div className="text-lg font-semibold">{priceTTC || "Calcul en cours..."} €</div>
+            <div className="text-lg font-semibold">{formattedPriceTTC || "Calcul en cours..."} €</div>
           </div>
         </div>
       </CardContent>
