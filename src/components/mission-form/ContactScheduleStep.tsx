@@ -11,6 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { fr } from "date-fns/locale";
 import { format } from "date-fns";
+import ContactSelector from "../client/address-book/ContactSelector";
+import { ContactEntry } from "@/types/addressBook";
 
 interface ContactScheduleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -25,6 +27,22 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
   onPrevious,
   isSubmitting,
 }) => {
+  const handleSelectPickupContact = (contact: ContactEntry) => {
+    form.setValue("pickup_first_name", contact.firstName);
+    form.setValue("pickup_last_name", contact.lastName);
+    form.setValue("pickup_email", contact.email);
+    form.setValue("pickup_phone", contact.phone);
+    form.trigger(["pickup_first_name", "pickup_last_name", "pickup_email", "pickup_phone"]);
+  };
+
+  const handleSelectDeliveryContact = (contact: ContactEntry) => {
+    form.setValue("delivery_first_name", contact.firstName);
+    form.setValue("delivery_last_name", contact.lastName);
+    form.setValue("delivery_email", contact.email);
+    form.setValue("delivery_phone", contact.phone);
+    form.trigger(["delivery_first_name", "delivery_last_name", "delivery_email", "delivery_phone"]);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -36,7 +54,15 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
-          <h3 className="font-semibold">Contact de ramassage</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Contact de ramassage</h3>
+            <ContactSelector 
+              contactType="pickup" 
+              onSelectContact={handleSelectPickupContact} 
+              buttonClassName="h-8 text-xs"
+            />
+          </div>
+          
           <FormField
             control={form.control}
             name="pickup_first_name"
@@ -50,6 +76,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="pickup_last_name"
@@ -63,6 +90,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="pickup_email"
@@ -76,6 +104,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="pickup_phone"
@@ -92,7 +121,15 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold">Contact de livraison</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Contact de livraison</h3>
+            <ContactSelector 
+              contactType="delivery" 
+              onSelectContact={handleSelectDeliveryContact} 
+              buttonClassName="h-8 text-xs"
+            />
+          </div>
+          
           <FormField
             control={form.control}
             name="delivery_first_name"
@@ -106,6 +143,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="delivery_last_name"
@@ -119,6 +157,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="delivery_email"
@@ -132,6 +171,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="delivery_phone"
@@ -262,7 +302,6 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
         </div>
       </div>
 
-      {/* New Additional Information field */}
       <div className="mt-6">
         <h3 className="font-semibold mb-2">Compléments d'informations</h3>
         <FormField
