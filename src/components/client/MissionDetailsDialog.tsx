@@ -42,6 +42,10 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
     }
   };
   
+  // Extract contact information
+  const pickupContact = mission.pickup_contact as any || {};
+  const deliveryContact = mission.delivery_contact as any || {};
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
@@ -83,17 +87,36 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <h3 className="font-semibold">Prise en charge</h3>
-              <p>{formatDate(mission.pickup_date)}</p>
-              <p className="text-sm">{mission.pickup_time || ""}</p>
+              <p>{formatDate(mission.pickup_date)} {mission.pickup_time || ""}</p>
+              
               <p className="text-sm text-muted-foreground mt-2">Adresse de départ</p>
               <p>{mission.pickup_address || "Non spécifié"}</p>
+              
+              {pickupContact && (
+                <div className="mt-3">
+                  <p className="text-sm text-muted-foreground">Contact</p>
+                  <p>{pickupContact.firstName || ""} {pickupContact.lastName || ""}</p>
+                  {pickupContact.email && <p className="text-sm">{pickupContact.email}</p>}
+                  {pickupContact.phone && <p className="text-sm">{pickupContact.phone}</p>}
+                </div>
+              )}
             </div>
+            
             <div className="space-y-2">
               <h3 className="font-semibold">Livraison</h3>
-              <p>{formatDate(mission.delivery_date)}</p>
-              <p className="text-sm">{mission.delivery_time || ""}</p>
+              <p>{formatDate(mission.delivery_date)} {mission.delivery_time || ""}</p>
+              
               <p className="text-sm text-muted-foreground mt-2">Adresse de livraison</p>
               <p>{mission.delivery_address || "Non spécifié"}</p>
+              
+              {deliveryContact && (
+                <div className="mt-3">
+                  <p className="text-sm text-muted-foreground">Contact</p>
+                  <p>{deliveryContact.firstName || ""} {deliveryContact.lastName || ""}</p>
+                  {deliveryContact.email && <p className="text-sm">{deliveryContact.email}</p>}
+                  {deliveryContact.phone && <p className="text-sm">{deliveryContact.phone}</p>}
+                </div>
+              )}
             </div>
           </div>
 
