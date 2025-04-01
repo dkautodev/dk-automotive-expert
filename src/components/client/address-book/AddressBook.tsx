@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader } from '@/components/ui/loader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ContactEntry } from '@/types/addressBook';
 import ContactList from './ContactList';
 import ContactForm from './ContactForm';
@@ -15,19 +14,14 @@ import { EmptyState } from './EmptyState';
 const AddressBook = () => {
   const { contacts, isLoading, error, addContact, updateContact, deleteContact } = useAddressBook();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
   const [isAddingContact, setIsAddingContact] = useState(false);
   const [editingContact, setEditingContact] = useState<ContactEntry | null>(null);
 
   const filteredContacts = contacts.filter(contact => {
-    const matchesSearch = 
-      contact.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    return contact.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.phone.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (activeTab === 'all') return matchesSearch;
-    return matchesSearch && contact.type === activeTab;
   });
 
   const handleAddContact = async (contact: Omit<ContactEntry, 'id'>) => {
@@ -90,38 +84,29 @@ const AddressBook = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">Tous</TabsTrigger>
-              <TabsTrigger value="pickup">Ramassage</TabsTrigger>
-              <TabsTrigger value="delivery">Livraison</TabsTrigger>
-            </TabsList>
-            <TabsContent value={activeTab} className="mt-2">
-              {isAddingContact ? (
-                <ContactForm 
-                  onCancel={() => setIsAddingContact(false)}
-                  onSubmit={handleAddContact}
-                />
-              ) : editingContact ? (
-                <ContactForm 
-                  contact={editingContact}
-                  onCancel={() => setEditingContact(null)}
-                  onSubmit={(contact) => handleUpdateContact(editingContact.id, contact)}
-                />
-              ) : filteredContacts.length === 0 ? (
-                <EmptyState 
-                  onAddContact={() => setIsAddingContact(true)}
-                  hasContacts={contacts.length > 0}
-                />
-              ) : (
-                <ContactList 
-                  contacts={filteredContacts}
-                  onEdit={setEditingContact}
-                  onDelete={deleteContact}
-                />
-              )}
-            </TabsContent>
-          </Tabs>
+          {isAddingContact ? (
+            <ContactForm 
+              onCancel={() => setIsAddingContact(false)}
+              onSubmit={handleAddContact}
+            />
+          ) : editingContact ? (
+            <ContactForm 
+              contact={editingContact}
+              onCancel={() => setEditingContact(null)}
+              onSubmit={(contact) => handleUpdateContact(editingContact.id, contact)}
+            />
+          ) : filteredContacts.length === 0 ? (
+            <EmptyState 
+              onAddContact={() => setIsAddingContact(true)}
+              hasContacts={contacts.length > 0}
+            />
+          ) : (
+            <ContactList 
+              contacts={filteredContacts}
+              onEdit={setEditingContact}
+              onDelete={deleteContact}
+            />
+          )}
         </CardContent>
       </Card>
     </div>

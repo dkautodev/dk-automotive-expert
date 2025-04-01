@@ -5,7 +5,6 @@ import {
   Card, 
   CardContent,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, UserCircle, Mail, Phone } from 'lucide-react';
 
 interface ContactListProps {
@@ -16,14 +15,6 @@ interface ContactListProps {
 }
 
 const ContactList = ({ contacts, onEdit, onDelete, onFillForm }: ContactListProps) => {
-  const getBadgeVariant = (type: 'pickup' | 'delivery') => {
-    return type === 'pickup' ? 'secondary' : 'default';
-  };
-  
-  const getTypeLabel = (type: 'pickup' | 'delivery') => {
-    return type === 'pickup' ? 'Ramassage' : 'Livraison';
-  };
-
   return (
     <div className="space-y-3">
       {contacts.map((contact) => (
@@ -42,12 +33,6 @@ const ContactList = ({ contacts, onEdit, onDelete, onFillForm }: ContactListProp
                   <div className="text-sm text-gray-500 flex items-center gap-1">
                     <Phone className="h-3 w-3" /> {contact.phone}
                   </div>
-                  <Badge variant={getBadgeVariant(contact.type)} className="mt-2">
-                    {getTypeLabel(contact.type)}
-                  </Badge>
-                  {contact.notes && (
-                    <p className="text-xs text-gray-500 mt-2 max-w-xs">{contact.notes}</p>
-                  )}
                 </div>
               </div>
               

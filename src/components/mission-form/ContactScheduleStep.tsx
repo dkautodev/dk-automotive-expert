@@ -56,7 +56,6 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Contact de ramassage</h3>
             <ContactSelector 
-              contactType="pickup" 
               onSelectContact={handleSelectPickupContact} 
               buttonClassName="h-8 text-xs"
             />
@@ -123,7 +122,6 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Contact de livraison</h3>
             <ContactSelector 
-              contactType="delivery" 
               onSelectContact={handleSelectDeliveryContact} 
               buttonClassName="h-8 text-xs"
             />

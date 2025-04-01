@@ -21,8 +21,6 @@ export const addressBookService = {
           last_name: string;
           email: string;
           phone: string;
-          type: string;
-          notes: string | null;
         };
         
         return {
@@ -31,8 +29,6 @@ export const addressBookService = {
           lastName: contactRow.last_name,
           email: contactRow.email,
           phone: contactRow.phone,
-          type: contactRow.type as 'pickup' | 'delivery',
-          notes: contactRow.notes || ''
         };
       });
     } catch (error: any) {
@@ -49,8 +45,6 @@ export const addressBookService = {
         last_name: contact.lastName,
         email: contact.email,
         phone: contact.phone,
-        type: contact.type,
-        notes: contact.notes,
         user_id: (await supabase.auth.getUser()).data.user?.id // Get the current user ID
       };
 
@@ -72,8 +66,6 @@ export const addressBookService = {
         last_name: string;
         email: string;
         phone: string;
-        type: string;
-        notes: string | null;
       };
       
       return {
@@ -82,8 +74,6 @@ export const addressBookService = {
         lastName: insertedContact.last_name,
         email: insertedContact.email,
         phone: insertedContact.phone,
-        type: insertedContact.type as 'pickup' | 'delivery',
-        notes: insertedContact.notes || ''
       };
     } catch (error: any) {
       console.error('Error adding contact:', error);
@@ -99,8 +89,6 @@ export const addressBookService = {
       if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName;
       if (updates.email !== undefined) dbUpdates.email = updates.email;
       if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
-      if (updates.type !== undefined) dbUpdates.type = updates.type;
-      if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
 
       const { data, error } = await safeTable('contacts')
         .update(dbUpdates)
@@ -121,8 +109,6 @@ export const addressBookService = {
         last_name: string;
         email: string;
         phone: string;
-        type: string;
-        notes: string | null;
       };
       
       return {
@@ -131,8 +117,6 @@ export const addressBookService = {
         lastName: updatedContact.last_name,
         email: updatedContact.email,
         phone: updatedContact.phone,
-        type: updatedContact.type as 'pickup' | 'delivery',
-        notes: updatedContact.notes || ''
       };
     } catch (error: any) {
       console.error('Error updating contact:', error);

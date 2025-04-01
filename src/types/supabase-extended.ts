@@ -1,4 +1,3 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 // Extend the Database type with our new tables
@@ -22,8 +21,6 @@ export interface ExtendedDatabase extends Database {
           last_name: string;
           email: string;
           phone: string;
-          type: string;
-          notes: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -34,8 +31,6 @@ export interface ExtendedDatabase extends Database {
           last_name: string;
           email: string;
           phone: string;
-          type: string;
-          notes?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -46,8 +41,6 @@ export interface ExtendedDatabase extends Database {
           last_name?: string;
           email?: string;
           phone?: string;
-          type?: string;
-          notes?: string | null;
           created_at?: string;
           updated_at?: string;
         };

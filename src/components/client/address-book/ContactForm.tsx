@@ -14,22 +14,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue 
-} from '@/components/ui/select';
 
 const contactFormSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis"),
   lastName: z.string().min(1, "Le nom est requis"),
   email: z.string().email("Email invalide"),
   phone: z.string().min(10, "Numéro de téléphone invalide"),
-  type: z.enum(['pickup', 'delivery']),
-  notes: z.string().optional(),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -48,8 +38,6 @@ const ContactForm = ({ contact, onCancel, onSubmit }: ContactFormProps) => {
       lastName: contact?.lastName || '',
       email: contact?.email || '',
       phone: contact?.phone || '',
-      type: contact?.type || 'pickup',
-      notes: contact?.notes || '',
     },
   });
 
@@ -60,8 +48,6 @@ const ContactForm = ({ contact, onCancel, onSubmit }: ContactFormProps) => {
       lastName: values.lastName,
       email: values.email,
       phone: values.phone,
-      type: values.type,
-      notes: values.notes || '',
     };
     
     onSubmit(contactData);
@@ -121,50 +107,6 @@ const ContactForm = ({ contact, onCancel, onSubmit }: ContactFormProps) => {
               <FormLabel>Téléphone</FormLabel>
               <FormControl>
                 <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner le type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="pickup">Ramassage</SelectItem>
-                  <SelectItem value="delivery">Livraison</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea 
-                  {...field} 
-                  placeholder="Informations supplémentaires..."
-                  className="resize-none"
-                  rows={3}
-                />
               </FormControl>
               <FormMessage />
             </FormItem>
