@@ -1,3 +1,4 @@
+
 import { Database } from "@/integrations/supabase/types";
 
 // Extend the Database type with our new tables
@@ -12,7 +13,7 @@ export interface ExtendedDatabase extends Database {
       price_grids: Database['public']['Tables']['price_grids'];
       user_profiles: Database['public']['Tables']['user_profiles'];
       
-      // Add our contacts table
+      // Add our contacts table with the correct schema matching the database
       contacts: {
         Row: {
           id: string;
@@ -21,6 +22,8 @@ export interface ExtendedDatabase extends Database {
           last_name: string;
           email: string;
           phone: string;
+          type: string;
+          notes: string;
           created_at: string;
           updated_at: string;
         };
@@ -31,6 +34,8 @@ export interface ExtendedDatabase extends Database {
           last_name: string;
           email: string;
           phone: string;
+          type: string;
+          notes?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -41,6 +46,8 @@ export interface ExtendedDatabase extends Database {
           last_name?: string;
           email?: string;
           phone?: string;
+          type?: string;
+          notes?: string;
           created_at?: string;
           updated_at?: string;
         };
