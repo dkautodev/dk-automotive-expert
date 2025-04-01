@@ -44,13 +44,16 @@ export const useAddressBook = () => {
     setState(prev => ({ ...prev, isLoading: true }));
     try {
       const newContact = await addressBookService.addContact(contact);
-      setState(prev => ({
-        ...prev,
-        contacts: [...prev.contacts, newContact],
-        isLoading: false,
-      }));
-      toast.success('Contact ajouté avec succès');
-      return newContact;
+      if (newContact) {
+        setState(prev => ({
+          ...prev,
+          contacts: [...prev.contacts, newContact],
+          isLoading: false,
+        }));
+        toast.success('Contact ajouté avec succès');
+        return newContact;
+      }
+      throw new Error('Failed to add contact');
     } catch (error: any) {
       setState(prev => ({ ...prev, isLoading: false, error: error.message }));
       toast.error('Impossible d\'ajouter le contact');
@@ -62,13 +65,16 @@ export const useAddressBook = () => {
     setState(prev => ({ ...prev, isLoading: true }));
     try {
       const updatedContact = await addressBookService.updateContact(id, updates);
-      setState(prev => ({
-        ...prev,
-        contacts: prev.contacts.map(c => c.id === id ? updatedContact : c),
-        isLoading: false,
-      }));
-      toast.success('Contact mis à jour avec succès');
-      return updatedContact;
+      if (updatedContact) {
+        setState(prev => ({
+          ...prev,
+          contacts: prev.contacts.map(c => c.id === id ? updatedContact : c),
+          isLoading: false,
+        }));
+        toast.success('Contact mis à jour avec succès');
+        return updatedContact;
+      }
+      throw new Error('Failed to update contact');
     } catch (error: any) {
       setState(prev => ({ ...prev, isLoading: false, error: error.message }));
       toast.error('Impossible de mettre à jour le contact');
