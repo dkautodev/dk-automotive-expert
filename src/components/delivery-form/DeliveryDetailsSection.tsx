@@ -51,14 +51,15 @@ const DeliveryDetailsSection = ({ form, addressInputRef }: DeliveryDetailsSectio
                 className="bg-[#EEF1FF]"
                 onKeyDown={handleKeyDown}
                 ref={(e) => {
+                  // Properly handle the ref forwarding
                   if (addressInputRef) {
-                    if (typeof addressInputRef === 'function') {
-                      addressInputRef(e);
-                    } else {
+                    // Set the ref's current property if the element exists
+                    if (e) {
                       addressInputRef.current = e;
                     }
                   }
-                  if (typeof field.ref === 'function') {
+                  // Also handle the field's ref if it exists and is a function
+                  if (field.ref && typeof field.ref === 'function') {
                     field.ref(e);
                   }
                 }}
