@@ -430,6 +430,12 @@ export type Database = {
         }
         Returns: string
       }
+      is_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
       register_user: {
         Args: {
           email: string
