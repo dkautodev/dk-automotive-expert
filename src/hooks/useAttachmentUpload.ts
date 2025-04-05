@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -40,15 +39,21 @@ export const useAttachmentUpload = () => {
     try {
       console.log("Début du téléchargement vers Google Drive");
       
+      // Nettoyer le nom du fichier avant l'envoi
+      const sanitizedFileName = sanitizeFileName(file.name);
+      console.log("Nom de fichier original:", file.name);
+      console.log("Nom de fichier sanitizé:", sanitizedFileName);
+      
       // Convertir le fichier en base64
       const fileData = await fileToBase64(file);
       
       // Appeler l'Edge Function pour Google Drive
+      console.log("Appel de l'Edge Function Google Drive");
       const { data, error } = await supabase.functions.invoke('upload_to_google_drive', {
         body: {
           missionId,
           fileData,
-          fileName: file.name,
+          fileName: file.name, // On envoie le nom original, la fonction sanitizera également
           fileType: file.type,
           fileSize: file.size,
           uploadedBy: userId
@@ -61,6 +66,11 @@ export const useAttachmentUpload = () => {
       }
       
       console.log("Réponse de Google Drive:", data);
+      
+      if (!data.fileId) {
+        console.error("Aucun ID de fichier reçu de Google Drive");
+        throw new Error("Aucun ID de fichier reçu de Google Drive");
+      }
       
       // Créer l'enregistrement en base de données avec les informations de Google Drive
       const { error: dbError } = await supabase
@@ -85,7 +95,7 @@ export const useAttachmentUpload = () => {
       
       return true;
     } catch (error) {
-      console.error("Erreur lors du téléchargement vers Google Drive:", error);
+      console.error("Erreur détaillée lors du téléchargement vers Google Drive:", error);
       return false;
     }
   };
@@ -198,15 +208,18 @@ export const useAttachmentUpload = () => {
         
         // Essayer d'abord la méthode Google Drive
         setUploadProgress(prev => ({ ...prev, [file.name]: 30 }));
+        console.log("Tentative de téléchargement via Google Drive");
         let success = await uploadToGoogleDrive(missionId, file, userId);
         
         // Si Google Drive échoue, essayer la méthode Storage directe
         if (!success) {
+          console.log("Échec Google Drive, tentative via Storage direct");
           setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
           success = await uploadViaStorage(missionId, file, userId);
           
           // Si la méthode directe échoue aussi, essayer via Edge Function
           if (!success) {
+            console.log("Échec Storage direct, tentative via Edge Function");
             setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
             success = await uploadViaEdgeFunction(missionId, file, userId);
           }
@@ -214,8 +227,10 @@ export const useAttachmentUpload = () => {
         
         if (!success) {
           allSucceeded = false;
+          console.error(`Échec du téléchargement pour ${file.name}`);
           toast.error(`Échec du téléchargement pour ${file.name}`);
         } else {
+          console.log(`Fichier ${file.name} téléchargé avec succès`);
           setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
           toast.success(`Fichier ${file.name} téléchargé avec succès`);
         }

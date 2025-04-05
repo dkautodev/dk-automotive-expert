@@ -20,35 +20,53 @@ const sanitizeFileName = (fileName: string): string => {
   // Pour Google Drive, on peut conserver plus de caractères, mais on évite tout de même 
   // les caractères qui pourraient poser problème
   return fileName
-    .replace(/[\/\\:*?"<>|]/g, '_'); // Remplacer les caractères interdits dans les noms de fichiers
+    .replace(/[\/\\:*?"<>|]/g, '_') // Remplacer les caractères interdits dans les noms de fichiers
+    .replace(/[']/g, '') // Supprimer les apostrophes qui peuvent causer des problèmes
+    .replace(/\s+/g, '_'); // Remplacer les espaces par des underscores
 };
 
 // Fonction pour obtenir un token d'accès à partir du refresh token
 async function getAccessToken() {
   try {
+    console.log('Début de l\'obtention du token d\'accès avec les nouveaux identifiants');
+    console.log('GOOGLE_CLIENT_ID est défini:', !!GOOGLE_CLIENT_ID);
+    console.log('GOOGLE_CLIENT_SECRET est défini:', !!GOOGLE_CLIENT_SECRET);
+    console.log('GOOGLE_REFRESH_TOKEN est défini:', !!GOOGLE_REFRESH_TOKEN);
+    
+    // Vérification des identifiants avant de faire la requête
+    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+      throw new Error('Les identifiants Google Drive sont manquants ou incomplets');
+    }
+    
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID!,
-        client_secret: GOOGLE_CLIENT_SECRET!,
-        refresh_token: GOOGLE_REFRESH_TOKEN!,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        refresh_token: GOOGLE_REFRESH_TOKEN,
         grant_type: 'refresh_token',
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Erreur lors de l\'obtention du token:', errorData);
-      throw new Error(`Erreur lors de l'obtention du token: ${response.status} ${errorData}`);
+      const errorText = await response.text();
+      console.error('Réponse d\'erreur complète lors de l\'obtention du token:', errorText);
+      
+      // Log détaillé pour déboguer
+      console.error(`Statut de la réponse: ${response.status} ${response.statusText}`);
+      console.error('Headers de la réponse:', Object.fromEntries(response.headers.entries()));
+      
+      throw new Error(`Erreur lors de l'obtention du token: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('Token d\'accès obtenu avec succès');
     return data.access_token;
   } catch (error) {
-    console.error('Erreur lors de l\'obtention du token d\'accès:', error);
+    console.error('Erreur détaillée lors de l\'obtention du token d\'accès:', error);
     throw error;
   }
 }
@@ -85,6 +103,7 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     ]);
 
     // Envoyer la requête à l'API Google Drive
+    console.log('Envoi de la requête à l\'API Google Drive avec le token:', accessToken.substring(0, 5) + '...');
     const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
       method: 'POST',
       headers: {
@@ -96,9 +115,14 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Erreur lors du téléversement sur Google Drive:', errorData);
-      throw new Error(`Erreur lors du téléversement: ${response.status} ${errorData}`);
+      const errorText = await response.text();
+      console.error('Réponse d\'erreur complète lors du téléversement:', errorText);
+      
+      // Log détaillé pour déboguer
+      console.error(`Statut de la réponse: ${response.status} ${response.statusText}`);
+      console.error('Headers de la réponse:', Object.fromEntries(response.headers.entries()));
+      
+      throw new Error(`Erreur lors du téléversement: ${response.status} ${errorText}`);
     }
 
     const fileData = await response.json();
@@ -106,7 +130,7 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     
     return fileData;
   } catch (error) {
-    console.error('Erreur lors du téléversement du fichier sur Google Drive:', error);
+    console.error('Erreur détaillée lors du téléversement du fichier sur Google Drive:', error);
     throw error;
   }
 }
@@ -117,7 +141,14 @@ async function handleUploadRequest(req: Request) {
     // Vérification des identifiants
     if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
       return new Response(
-        JSON.stringify({ error: 'Configuration Google Drive incomplète' }),
+        JSON.stringify({ 
+          error: 'Configuration Google Drive incomplète',
+          details: {
+            client_id_present: !!GOOGLE_CLIENT_ID,
+            client_secret_present: !!GOOGLE_CLIENT_SECRET,
+            refresh_token_present: !!GOOGLE_REFRESH_TOKEN
+          }
+        }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -176,9 +207,12 @@ async function handleUploadRequest(req: Request) {
     );
     
   } catch (error) {
-    console.error("Erreur pendant le traitement de la requête:", error);
+    console.error("Erreur détaillée pendant le traitement de la requête:", error);
     return new Response(
-      JSON.stringify({ error: `Erreur lors du traitement: ${error.message}` }),
+      JSON.stringify({ 
+        error: `Erreur lors du traitement: ${error.message}`,
+        stack: error.stack
+      }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
