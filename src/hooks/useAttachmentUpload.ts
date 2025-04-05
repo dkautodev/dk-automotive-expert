@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -94,8 +93,9 @@ export const useAttachmentUpload = () => {
       if (uploadError) {
         console.error("Erreur détaillée du téléchargement:", uploadError);
         
-        // Si c'est une erreur de duplication, on considère comme un succès
-        if (uploadError.message === "The resource already exists" || uploadError.statusCode === 409) {
+        // Vérifier si c'est une erreur de conflit (fichier existe déjà)
+        // La propriété statusCode n'existe pas sur StorageError, utilisons le message d'erreur à la place
+        if (uploadError.message === "The resource already exists" || uploadError.message.includes("409") || uploadError.message.includes("already exists")) {
           console.log("Fichier déjà existant, utilisation du chemin existant");
           // On continue avec la création de l'enregistrement
         } else {

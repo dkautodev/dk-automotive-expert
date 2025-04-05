@@ -63,7 +63,7 @@ async function handleUpload(req: Request) {
     const supabase = createClient(supabaseUrl, supabaseKey)
     
     // Utiliser le dossier avec le numéro de mission et le nom de fichier simplifié
-    const filePath = `missions/${missionNumber}/${fileName}`;
+    let filePath = `missions/${missionNumber}/${fileName}`;
     
     console.log("Chemin de téléchargement:", filePath);
     
@@ -103,9 +103,13 @@ async function handleUpload(req: Request) {
         console.error("Erreur lors du téléchargement dans Storage:", storageError);
         throw storageError;
       }
-    } catch (storageError) {
+    } catch (storageError: any) {
       // Si l'erreur est un conflit (fichier existe déjà), on continue avec l'enregistrement
-      if (storageError.message !== "The resource already exists" && storageError.statusCode !== 409) {
+      if (
+        storageError.message !== "The resource already exists" && 
+        !storageError.message.includes("409") && 
+        !storageError.message.includes("already exists")
+      ) {
         return new Response(
           JSON.stringify({ error: `Erreur lors du téléchargement: ${storageError.message}` }),
           { 
