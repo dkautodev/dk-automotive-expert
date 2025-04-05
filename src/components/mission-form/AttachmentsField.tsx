@@ -47,7 +47,8 @@ const AttachmentsField = ({ form }: AttachmentsFieldProps) => {
           .replace(/[\/\\:*?"<>|']/g, '_')  // Remplacer caractères spéciaux
           .replace(/\s+/g, '_');            // Remplacer espaces par _
         
-        // Créer un nouveau Blob avec le même contenu mais un nom différent
+        // Créer un nouveau File avec le même contenu mais un nom différent
+        // Fix: Use the File constructor correctly
         return new File([file], cleanName, { type: file.type });
       }
       return file;
