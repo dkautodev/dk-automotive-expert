@@ -1,4 +1,3 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 export type MissionRow = {
@@ -28,6 +27,11 @@ export type MissionRow = {
   vehicles: any | null;
   additional_info?: string | null;
   clientProfile?: UserProfileRow | null;
+  // Nouvelles propriétés d'adresse structurée
+  street_number?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+  country?: string | null;
 };
 
 export type UserProfileRow = {
