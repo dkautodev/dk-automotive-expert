@@ -45,7 +45,7 @@ const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
               <SelectContent>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
-                    {transformToClientDisplay(client).name}
+                    {client.client_code || transformToClientDisplay(client).name}
                   </SelectItem>
                 ))}
               </SelectContent>
