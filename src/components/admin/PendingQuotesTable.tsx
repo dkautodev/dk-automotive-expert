@@ -83,21 +83,23 @@ function usePendingQuotes(refreshTrigger = 0) {
             ? mission.mission_type as "livraison" | "restitution"
             : "livraison"; // Default value if not a valid type
           
-          // Ensure clientProfile is either a valid UserProfileRow or null
-          // Fix: Properly check if clientProfile exists and is a valid object
-          const hasValidProfile = mission.clientProfile && 
-                                 typeof mission.clientProfile === 'object' && 
-                                 !('error' in mission.clientProfile);
+          // First, determine if the clientProfile is valid and not an error object
+          const isValidClientProfile = 
+            mission.clientProfile && 
+            typeof mission.clientProfile === 'object' && 
+            !('error' in mission.clientProfile);
           
-          const clientProfile = hasValidProfile ? mission.clientProfile : null;
+          // Create a safe client profile or null
+          const safeClientProfile = isValidClientProfile ? mission.clientProfile : null;
           
           return {
             ...mission,
             mission_type: missionType,
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
             delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
-            clientProfile: clientProfile
-          } as MissionRow;
+            // Ensure clientProfile is properly typed
+            clientProfile: safeClientProfile
+          } as MissionRow; // Force cast as MissionRow after proper validation
         });
         
         setMissions(transformedMissions);
