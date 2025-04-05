@@ -20,6 +20,63 @@ export const useAttachmentUpload = () => {
   };
 
   /**
+   * Télécharge un fichier sur Google Drive via Edge Function
+   */
+  const uploadToGoogleDrive = async (missionId: string, file: File, userId: string): Promise<boolean> => {
+    try {
+      console.log("Début du téléchargement vers Google Drive");
+      
+      // Convertir le fichier en base64
+      const fileData = await fileToBase64(file);
+      
+      // Appeler l'Edge Function pour Google Drive
+      const { data, error } = await supabase.functions.invoke('upload_to_google_drive', {
+        body: {
+          missionId,
+          fileData,
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          uploadedBy: userId
+        }
+      });
+      
+      if (error) {
+        console.error("Erreur lors de l'appel à l'Edge Function Google Drive:", error);
+        throw error;
+      }
+      
+      console.log("Réponse de Google Drive:", data);
+      
+      // Créer l'enregistrement en base de données avec les informations de Google Drive
+      const { error: dbError } = await supabase
+        .from('mission_attachments')
+        .insert({
+          mission_id: missionId,
+          file_name: file.name,
+          file_path: data.fileId, // Utiliser l'ID du fichier Google Drive
+          file_type: file.type,
+          file_size: file.size,
+          uploaded_by: userId,
+          storage_provider: 'google_drive',
+          provider_file_id: data.fileId,
+          provider_view_url: data.webViewLink,
+          provider_download_url: data.webContentLink
+        });
+      
+      if (dbError) {
+        console.error("Erreur lors de l'enregistrement en base de données:", dbError);
+        throw dbError;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Erreur lors du téléchargement vers Google Drive:", error);
+      return false;
+    }
+  };
+
+  /**
    * Télécharge un fichier directement via l'API Supabase Storage
    */
   const uploadViaStorage = async (missionId: string, file: File, userId: string): Promise<boolean> => {
@@ -54,7 +111,8 @@ export const useAttachmentUpload = () => {
           file_path: filePath,
           file_type: file.type,
           file_size: file.size,
-          uploaded_by: userId
+          uploaded_by: userId,
+          storage_provider: 'supabase'
         });
       
       if (dbError) {
@@ -119,14 +177,20 @@ export const useAttachmentUpload = () => {
         const file = files[i];
         setUploadProgress(prev => ({ ...prev, [file.name]: 10 }));
         
-        // Essayer d'abord la méthode Storage directe
+        // Essayer d'abord la méthode Google Drive
         setUploadProgress(prev => ({ ...prev, [file.name]: 30 }));
-        let success = await uploadViaStorage(missionId, file, userId);
+        let success = await uploadToGoogleDrive(missionId, file, userId);
         
-        // Si la méthode directe échoue, essayer via Edge Function
+        // Si Google Drive échoue, essayer la méthode Storage directe
         if (!success) {
           setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
-          success = await uploadViaEdgeFunction(missionId, file, userId);
+          success = await uploadViaStorage(missionId, file, userId);
+          
+          // Si la méthode directe échoue aussi, essayer via Edge Function
+          if (!success) {
+            setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
+            success = await uploadViaEdgeFunction(missionId, file, userId);
+          }
         }
         
         if (!success) {

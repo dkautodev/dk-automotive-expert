@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
-import { Paperclip, Trash2, Download } from "lucide-react";
+import { Paperclip, Trash2, Download, ExternalLink } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
+import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 
 interface Attachment {
   id: string;
@@ -18,6 +18,10 @@ interface Attachment {
   file_size: number;
   uploaded_by: string;
   created_at: string;
+  storage_provider?: 'supabase' | 'google_drive';
+  provider_file_id?: string;
+  provider_view_url?: string;
+  provider_download_url?: string;
 }
 
 interface MissionAttachmentsDialogProps {
@@ -34,8 +38,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   missionNumber
 }) => {
   const { user } = useAuthContext();
+  const { uploadAttachments, isUploading } = useAttachmentUpload();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -76,16 +80,6 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  // Fonction pour sanitizer le nom de fichier
-  const sanitizeFileName = (fileName: string): string => {
-    // Remplacer les espaces, apostrophes et caractères spéciaux
-    return fileName
-      .normalize('NFD') // Décomposer les caractères accentués
-      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-      .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_') // Remplacer les caractères spéciaux par _
-      .replace(/\s+/g, '_'); // Remplacer les espaces par _
-  };
-
   const handleUpload = async () => {
     if (!missionId || !user) return;
     
@@ -94,60 +88,24 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       return;
     }
     
-    setIsLoading(true);
+    const success = await uploadAttachments(missionId, files, user.id);
     
-    try {
-      for (const file of files) {
-        // Sanitize file name to avoid invalid key issues
-        const sanitizedFileName = sanitizeFileName(file.name);
-        const uniqueId = Date.now().toString();
-        const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`;
-        
-        console.log("Uploading file with path:", filePath);
-        
-        // Upload file to storage
-        const { data: fileData, error: uploadError } = await supabase.storage
-          .from('mission-attachments')
-          .upload(filePath, file);
-
-        if (uploadError) {
-          console.error("Upload error:", uploadError);
-          throw uploadError;
-        }
-
-        console.log("File uploaded successfully, saving record in database");
-
-        // Create record in database
-        const { error: dbError } = await supabase
-          .from('mission_attachments')
-          .insert({
-            mission_id: missionId,
-            file_name: file.name,
-            file_path: filePath,
-            file_type: file.type,
-            file_size: file.size,
-            uploaded_by: user.id
-          });
-
-        if (dbError) {
-          console.error("Database error:", dbError);
-          throw dbError;
-        }
-      }
-
-      toast.success("Fichiers téléchargés avec succès");
+    if (success) {
       setFiles([]);
       loadAttachments();
-    } catch (error: any) {
-      console.error("Error uploading files:", error.message);
-      toast.error(`Erreur lors du téléchargement des fichiers: ${error.message}`);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleDownload = async (attachment: Attachment) => {
     try {
+      // Si c'est un fichier Google Drive
+      if (attachment.storage_provider === 'google_drive' && attachment.provider_download_url) {
+        // Ouvrir l'URL de téléchargement Google Drive dans un nouvel onglet
+        window.open(attachment.provider_download_url, '_blank');
+        return;
+      }
+      
+      // Sinon, c'est un fichier Supabase Storage
       const { data, error } = await supabase.storage
         .from('mission-attachments')
         .download(attachment.file_path);
@@ -173,7 +131,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  const handleDelete = async (attachmentId: string, filePath: string) => {
+  const handleDelete = async (attachment: Attachment) => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce fichier ?")) {
       return;
     }
@@ -183,19 +141,23 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       const { error: dbError } = await supabase
         .from('mission_attachments')
         .delete()
-        .eq('id', attachmentId);
+        .eq('id', attachment.id);
 
       if (dbError) throw dbError;
 
-      // Then delete from storage
-      const { error: storageError } = await supabase.storage
-        .from('mission-attachments')
-        .remove([filePath]);
+      // If it's a Supabase Storage file, delete from storage
+      if (attachment.storage_provider === 'supabase' || !attachment.storage_provider) {
+        const { error: storageError } = await supabase.storage
+          .from('mission-attachments')
+          .remove([attachment.file_path]);
 
-      if (storageError) {
-        console.error("Error deleting file from storage:", storageError);
-        // Continue even if storage delete fails
+        if (storageError) {
+          console.error("Error deleting file from storage:", storageError);
+          // Continue even if storage delete fails
+        }
       }
+      // Note: For Google Drive files, we keep them in Google Drive for now
+      // In a complete implementation, we would add an Edge Function to delete from Google Drive
 
       toast.success("Fichier supprimé avec succès");
       loadAttachments();
@@ -203,6 +165,10 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       console.error("Error deleting attachment:", error.message);
       toast.error("Erreur lors de la suppression du fichier");
     }
+  };
+
+  const handleViewInGoogleDrive = (url: string) => {
+    window.open(url, '_blank');
   };
 
   const formatFileSize = (bytes: number) => {
@@ -232,8 +198,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                     className="block w-full"
                   />
                 </div>
-                <Button onClick={handleUpload} disabled={isLoading || files.length === 0}>
-                  {isLoading ? <Loader className="mr-2 h-4 w-4" /> : <Paperclip className="mr-2 h-4 w-4" />}
+                <Button onClick={handleUpload} disabled={isUploading || files.length === 0}>
+                  {isUploading ? <Loader className="mr-2 h-4 w-4" /> : <Paperclip className="mr-2 h-4 w-4" />}
                   Télécharger
                 </Button>
               </div>
@@ -264,10 +230,23 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{attachment.file_name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {formatFileSize(attachment.file_size)} • {new Date(attachment.created_at).toLocaleDateString()}
+                          {formatFileSize(attachment.file_size)} • {new Date(attachment.created_at).toLocaleDateString()} 
+                          {attachment.storage_provider && (
+                            <span className="ml-1">• {attachment.storage_provider === 'google_drive' ? 'Google Drive' : 'Supabase'}</span>
+                          )}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
+                        {attachment.storage_provider === 'google_drive' && attachment.provider_view_url && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewInGoogleDrive(attachment.provider_view_url!)}
+                            title="Voir dans Google Drive"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -279,7 +258,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDelete(attachment.id, attachment.file_path)}
+                          onClick={() => handleDelete(attachment)}
                           title="Supprimer"
                           className="text-destructive hover:text-destructive/80"
                         >
