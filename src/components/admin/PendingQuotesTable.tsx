@@ -84,11 +84,12 @@ function usePendingQuotes(refreshTrigger = 0) {
             : "livraison"; // Default value if not a valid type
           
           // Ensure clientProfile is either a valid UserProfileRow or null
-          const clientProfile = mission.clientProfile && 
-            typeof mission.clientProfile === 'object' && 
-            !('error' in mission.clientProfile) 
+          const clientProfile = mission.clientProfile ? 
+            (typeof mission.clientProfile === 'object' && 
+             !('error' in mission.clientProfile) 
               ? mission.clientProfile 
-              : null;
+              : null)
+            : null;
           
           return {
             ...mission,
