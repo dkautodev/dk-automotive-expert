@@ -28,7 +28,7 @@ const sanitizeFileName = (fileName: string): string => {
 // Fonction pour obtenir un token d'accès à partir du refresh token
 async function getAccessToken() {
   try {
-    console.log('Début de l\'obtention du token d\'accès avec les nouveaux identifiants');
+    console.log('Début de l\'obtention du token d\'accès');
     console.log('GOOGLE_CLIENT_ID est défini:', !!GOOGLE_CLIENT_ID);
     console.log('GOOGLE_CLIENT_SECRET est défini:', !!GOOGLE_CLIENT_SECRET);
     console.log('GOOGLE_REFRESH_TOKEN est défini:', !!GOOGLE_REFRESH_TOKEN);
@@ -54,16 +54,13 @@ async function getAccessToken() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Réponse d\'erreur complète lors de l\'obtention du token:', errorText);
-      
-      // Log détaillé pour déboguer
       console.error(`Statut de la réponse: ${response.status} ${response.statusText}`);
       console.error('Headers de la réponse:', Object.fromEntries(response.headers.entries()));
-      
       throw new Error(`Erreur lors de l'obtention du token: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Token d\'accès obtenu avec succès');
+    console.log('Token d\'accès obtenu avec succès', { token_type: data.token_type, expires_in: data.expires_in });
     return data.access_token;
   } catch (error) {
     console.error('Erreur détaillée lors de l\'obtention du token d\'accès:', error);
@@ -84,13 +81,16 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
       mimeType: mimeType,
     };
 
+    console.log('Métadonnées du fichier:', metadata);
+    console.log('Taille du fichier:', fileContent.length, 'octets');
+
     // Créer les limites pour les données multipart
     const boundary = '-------314159265358979323846';
     const delimiter = `\r\n--${boundary}\r\n`;
     const closeDelimiter = `\r\n--${boundary}--`;
 
     // Construire le corps de la requête
-    const requestBody = new Uint8Array([
+    let requestBody = new Uint8Array([
       ...new TextEncoder().encode(
         delimiter +
         'Content-Type: application/json\r\n\r\n' +
@@ -103,8 +103,8 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     ]);
 
     // Envoyer la requête à l'API Google Drive
-    console.log('Envoi de la requête à l\'API Google Drive avec le token:', accessToken.substring(0, 5) + '...');
-    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    console.log('Envoi de la requête à l\'API Google Drive');
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,webContentLink', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -117,11 +117,8 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Réponse d\'erreur complète lors du téléversement:', errorText);
-      
-      // Log détaillé pour déboguer
       console.error(`Statut de la réponse: ${response.status} ${response.statusText}`);
       console.error('Headers de la réponse:', Object.fromEntries(response.headers.entries()));
-      
       throw new Error(`Erreur lors du téléversement: ${response.status} ${errorText}`);
     }
 
@@ -169,17 +166,35 @@ async function handleUploadRequest(req: Request) {
       );
     }
 
-    console.log(`Traitement de la requête pour téléverser ${fileName} pour la mission ${missionId}`);
+    console.log(`Traitement de la requête pour téléverser ${fileName} pour la mission ${missionId}`, {
+      fileType,
+      fileSize,
+      uploadedBy
+    });
 
     // Récupérer un token d'accès
     const accessToken = await getAccessToken();
+    console.log('Token d\'accès obtenu');
     
     // Décodage du fichier base64
-    const base64Data = fileData.split(',')[1] || fileData;
+    let base64Data;
+    if (fileData.includes(',')) {
+      base64Data = fileData.split(',')[1];
+    } else {
+      base64Data = fileData;
+    }
+    
+    if (!base64Data) {
+      throw new Error('Données base64 invalides');
+    }
+    
+    console.log('Données base64 extraites, longueur:', base64Data.length);
+    
+    // Conversion en binaire
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    console.log('Taille binaire du fichier:', binaryData.length, 'octets');
     
     // Téléverser le fichier sur Google Drive
-    const folderPath = `missions/${missionId}`;
     const driveResponse = await uploadFileToDrive(
       accessToken, 
       fileName,
@@ -187,8 +202,7 @@ async function handleUploadRequest(req: Request) {
       fileType || 'application/octet-stream'
     );
     
-    // Utiliser l'ID du fichier Google Drive comme filePath
-    const filePath = driveResponse.id;
+    console.log('Réponse de Google Drive:', driveResponse);
     
     // Retourner la réponse
     return new Response(
