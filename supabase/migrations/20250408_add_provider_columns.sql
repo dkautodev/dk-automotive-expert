@@ -1,13 +1,9 @@
 
--- Add new columns to mission_attachments table for Google Drive integration
--- Ajout des colonnes pour Google Drive dans la table mission_attachments
+-- Add storage_provider column to mission_attachments table
 ALTER TABLE public.mission_attachments 
-ADD COLUMN IF NOT EXISTS storage_provider TEXT,
-ADD COLUMN IF NOT EXISTS provider_file_id TEXT,
-ADD COLUMN IF NOT EXISTS provider_view_url TEXT,
-ADD COLUMN IF NOT EXISTS provider_download_url TEXT;
+ADD COLUMN IF NOT EXISTS storage_provider TEXT;
 
--- Update RLS policies to cover new columns
+-- Update RLS policies to cover new column
 ALTER POLICY "Users can view mission attachments" 
 ON public.mission_attachments 
 USING (true);
