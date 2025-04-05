@@ -24,6 +24,8 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     filterStatus: status
   });
 
+  console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, missions.length=${missions.length}`);
+
   const handleMissionCancelled = () => {
     // This will be handled by the refreshTrigger from the parent component
     console.log("Mission cancelled, parent will handle refresh");
