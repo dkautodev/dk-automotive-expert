@@ -15,7 +15,6 @@ import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
 import { Button } from "@/components/ui/button";
 import { FileText, Paperclip, PenLine } from "lucide-react";
 import { generateMissionPDF } from "@/utils/missionPdfGenerator";
-import { formatCurrency } from "@/lib/utils";
 import { MissionAttachmentsDialog } from "@/components/admin/missions/MissionAttachmentsDialog";
 import { useAuthContext } from "@/context/AuthContext";
 import { EditMissionDetailsDialog } from "@/components/admin/missions/EditMissionDetailsDialog";
@@ -76,10 +75,6 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
   // Extract contact information
   const pickupContact = mission.pickup_contact as any || {};
   const deliveryContact = mission.delivery_contact as any || {};
-  
-  // Format prices to always show two decimal places
-  const formattedPriceHT = mission.price_ht ? Number(mission.price_ht).toFixed(2) : null;
-  const formattedPriceTTC = mission.price_ttc ? Number(mission.price_ttc).toFixed(2) : null;
   
   // Determine if the user has permission to see attachments and edit mission (admin only)
   const isAdmin = role === 'admin';
@@ -184,8 +179,8 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
             <div className="mt-8 pt-5 border-t border-gray-200">
               <h3 className="font-semibold mb-3 border-b inline-block border-gray-400">Tarification</h3>
               <p className="text-sm">
-                Prix total : {formattedPriceTTC ? `${formattedPriceTTC}€ TTC` : "Non spécifié"} 
-                {formattedPriceHT ? ` soit ${formattedPriceHT}€ HT` : ""}
+                Prix total : {mission.price_ttc ? `${Number(mission.price_ttc).toFixed(2)}€ TTC` : "Non spécifié"} 
+                {mission.price_ht ? ` soit ${Number(mission.price_ht).toFixed(2)}€ HT` : ""}
               </p>
             </div>
           </div>
