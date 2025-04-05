@@ -24,6 +24,11 @@ interface ClientListProps {
 }
 
 const ClientList = ({ form, clients, loading }: ClientListProps) => {
+  // Fonction pour formater l'affichage du client (si nécessaire)
+  const formatClientName = (name: string) => {
+    return name; // Le nom est déjà formaté comme NOM-PRENOM-SOCIÉTÉ dans les données
+  };
+  
   return (
     <FormField
       control={form.control}
@@ -43,7 +48,7 @@ const ClientList = ({ form, clients, loading }: ClientListProps) => {
               <SelectContent>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
-                    {client.name}
+                    {formatClientName(client.name)}
                   </SelectItem>
                 ))}
               </SelectContent>

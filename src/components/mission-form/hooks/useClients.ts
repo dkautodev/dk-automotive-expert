@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { ClientData, NewClientData } from './types/clientTypes';
 import { clientService } from './services/clientService';
+import { transformToClientDisplayList } from './utils/clientTransformers';
 
 export type { ClientData, NewClientData } from './types/clientTypes';
 
@@ -68,8 +69,12 @@ export const useClients = (form?: any) => {
     console.log("État actuel des clients:", clients);
   }, [clients]);
 
+  // Transformer les clients en format d'affichage
+  const clientDisplayList = transformToClientDisplayList(clients);
+
   return { 
     clients, 
+    clientDisplayList,  // Ajout de la liste formatée
     isLoading, 
     error, 
     fetchClients
