@@ -331,11 +331,20 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
                   </div>
                   <div className="col-span-2">
                     <Label htmlFor="fuel">Carburant</Label>
-                    <Input
-                      id="fuel"
+                    <Select
                       value={vehicleInfo.fuel}
-                      onChange={(e) => setVehicleInfo({...vehicleInfo, fuel: e.target.value})}
-                    />
+                      onValueChange={(value) => setVehicleInfo({...vehicleInfo, fuel: value})}
+                    >
+                      <SelectTrigger id="fuel">
+                        <SelectValue placeholder="Sélectionner un type de carburant" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Diesel">Diesel</SelectItem>
+                        <SelectItem value="Essence">Essence</SelectItem>
+                        <SelectItem value="Électrique">Électrique</SelectItem>
+                        <SelectItem value="Hybride">Hybride</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
