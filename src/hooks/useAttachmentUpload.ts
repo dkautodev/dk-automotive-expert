@@ -57,64 +57,31 @@ export const useAttachmentUpload = () => {
         throw new Error("Aucun ID de fichier reçu de Google Drive");
       }
       
-      // Vérifier si le tableau existe et contient les colonnes nécessaires
-      try {
-        // Créer l'enregistrement en base de données avec les informations de Google Drive
-        const dbData = {
-          mission_id: missionId,
-          file_name: file.name,
-          file_path: data.fileId, // Utiliser l'ID du fichier Google Drive
-          file_type: file.type,
-          file_size: file.size,
-          uploaded_by: userId,
-          storage_provider: 'google_drive',
-          provider_file_id: data.fileId
-        };
-        
-        // Ajouter conditionnellement les URLs si elles sont disponibles
-        if (data.webViewLink) {
-          Object.assign(dbData, { provider_view_url: data.webViewLink });
-        }
-        
-        if (data.webContentLink) {
-          Object.assign(dbData, { provider_download_url: data.webContentLink });
-        }
-        
-        const { error: dbError } = await supabase
-          .from('mission_attachments')
-          .insert(dbData);
-        
-        if (dbError) {
-          console.error("Erreur lors de l'enregistrement en base de données:", dbError);
-          throw dbError;
-        }
-        
-        console.log("Enregistrement en base de données réussi");
-        return true;
-      } catch (dbError) {
-        console.error("Erreur détaillée lors de l'enregistrement en BDD:", dbError);
-        
-        // Fallback: Enregistrer sans les colonnes problématiques
-        const { error: fallbackError } = await supabase
-          .from('mission_attachments')
-          .insert({
-            mission_id: missionId,
-            file_name: file.name,
-            file_path: data.fileId,
-            file_type: file.type,
-            file_size: file.size,
-            uploaded_by: userId,
-            storage_provider: 'google_drive'
-          });
-          
-        if (fallbackError) {
-          console.error("Erreur lors de l'enregistrement fallback:", fallbackError);
-          return false;
-        }
-        
-        console.log("Enregistrement fallback réussi");
-        return true;
+      // Créer l'enregistrement en base de données avec les informations de Google Drive
+      const dbData = {
+        mission_id: missionId,
+        file_name: file.name,
+        file_path: data.fileId, // Utiliser l'ID du fichier Google Drive
+        file_type: file.type,
+        file_size: file.size,
+        uploaded_by: userId,
+        storage_provider: 'google_drive',
+        provider_file_id: data.fileId,
+        provider_view_url: data.webViewLink || `https://drive.google.com/file/d/${data.fileId}/view`,
+        provider_download_url: data.webContentLink || `https://drive.google.com/uc?id=${data.fileId}&export=download`
+      };
+      
+      const { error: dbError } = await supabase
+        .from('mission_attachments')
+        .insert(dbData);
+      
+      if (dbError) {
+        console.error("Erreur lors de l'enregistrement en base de données:", dbError);
+        throw dbError;
       }
+      
+      console.log("Enregistrement en base de données réussi avec les liens Google Drive");
+      return true;
     } catch (error) {
       console.error("Erreur détaillée lors du téléchargement vers Google Drive:", error);
       return false;

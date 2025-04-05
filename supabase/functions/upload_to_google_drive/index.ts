@@ -163,6 +163,41 @@ async function findOrCreateFolder(accessToken: string, folderName: string) {
   }
 }
 
+// Fonction pour définir des permissions publiques sur un fichier
+async function setPublicPermissions(accessToken: string, fileId: string) {
+  try {
+    console.log(`Définition des permissions pour le fichier ID: ${fileId}`);
+    
+    // Créer une permission de lecture pour "anyone"
+    const permission = {
+      role: 'reader',
+      type: 'anyone',
+    };
+    
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(permission),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Erreur lors de la définition des permissions: ${response.status} ${errorText}`);
+      throw new Error(`Erreur lors de la définition des permissions: ${errorText}`);
+    }
+    
+    const permissionData = await response.json();
+    console.log('Permissions définies avec succès:', permissionData);
+    return permissionData;
+  } catch (error) {
+    console.error('Erreur lors de la définition des permissions:', error);
+    throw error;
+  }
+}
+
 // Fonction pour téléverser un fichier sur Google Drive dans un dossier spécifique
 async function uploadFileToDrive(accessToken: string, fileName: string, fileContent: Uint8Array, mimeType: string, missionNumber: string, fileIndex: number = 1) {
   try {
@@ -202,7 +237,7 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
       ...new TextEncoder().encode(closeDelimiter),
     ]);
 
-    // Envoyer la requête à l'API Google Drive
+    // Envoyer la requête à l'API Google Drive avec le champ fields pour récupérer toutes les informations nécessaires
     console.log('Envoi de la requête à l\'API Google Drive');
     const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,webContentLink', {
       method: 'POST',
@@ -225,7 +260,25 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     const fileData = await response.json();
     console.log('Fichier téléversé avec succès:', fileData);
     
-    return fileData;
+    // Définir les permissions publiques pour le fichier
+    await setPublicPermissions(accessToken, fileData.id);
+    
+    // Récupérer les informations complètes du fichier, y compris les liens
+    const fileInfoResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${fileData.id}?fields=id,name,webViewLink,webContentLink`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+    
+    if (!fileInfoResponse.ok) {
+      console.warn('Impossible de récupérer les informations complètes du fichier, utilisation des données partielles');
+      return fileData;
+    }
+    
+    const completeFileData = await fileInfoResponse.json();
+    console.log('Informations complètes du fichier:', completeFileData);
+    
+    return completeFileData;
   } catch (error) {
     console.error('Erreur détaillée lors du téléversement du fichier sur Google Drive:', error);
     throw error;

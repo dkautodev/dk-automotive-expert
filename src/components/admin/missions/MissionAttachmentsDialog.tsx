@@ -190,8 +190,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
           // Continue even if storage delete fails
         }
       }
-      // Note: For Google Drive files, we keep them in Google Drive for now
-      // In a complete implementation, we would add an Edge Function to delete from Google Drive
+      // Note: Pour les fichiers Google Drive, nous ne les supprimons pas de Google Drive pour l'instant
 
       toast.success("Fichier supprimé avec succès");
       loadAttachments();
