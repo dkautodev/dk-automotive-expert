@@ -83,11 +83,19 @@ function usePendingQuotes(refreshTrigger = 0) {
             ? mission.mission_type as "livraison" | "restitution"
             : "livraison"; // Default value if not a valid type
           
+          // Ensure clientProfile is either a valid UserProfileRow or null
+          const clientProfile = mission.clientProfile && 
+            typeof mission.clientProfile === 'object' && 
+            !('error' in mission.clientProfile) 
+              ? mission.clientProfile 
+              : null;
+          
           return {
             ...mission,
             mission_type: missionType,
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
             delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
+            clientProfile: clientProfile
           } as MissionRow;
         });
         
