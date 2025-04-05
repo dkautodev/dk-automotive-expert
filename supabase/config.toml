@@ -1,9 +1,5 @@
 
 project_id = "lqjwvaqqhqgmkjsriijw"
-[functions.get_users_with_profiles]
-verify_jwt = true
-[functions.admin_delete_user]
-verify_jwt = true
-[functions.update_document_type]
-verify_jwt = true
 
+[functions.upload_mission_attachments]
+verify_jwt = true

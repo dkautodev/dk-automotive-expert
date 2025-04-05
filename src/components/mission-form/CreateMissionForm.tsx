@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,9 +93,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
     }
   };
 
-  // Function to sanitize file names
   const sanitizeFileName = (fileName: string): string => {
-    // Replace spaces, apostrophes and special characters
     return fileName
       .normalize('NFD') // Decompose accented characters
       .replace(/[\u0300-\u036f]/g, '') // Remove accents
@@ -109,14 +106,12 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
     
     for (const file of attachments) {
       try {
-        // Sanitize file name
         const sanitizedFileName = sanitizeFileName(file.name);
         const uniqueId = Date.now().toString();
         const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`;
         
         console.log("Uploading file:", file.name, "to path:", filePath);
         
-        // Upload file to storage
         const { data: fileData, error: uploadError } = await supabase.storage
           .from('mission-attachments')
           .upload(filePath, file);
@@ -128,7 +123,6 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
 
         console.log("File uploaded successfully, saving record in database");
 
-        // Create record in database
         const { error: dbError } = await supabase
           .from('mission_attachments')
           .insert({
@@ -171,8 +165,6 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
 
       console.log(`Création de mission avec statut: ${statusToUse}`);
 
-      // Résolution du problème de clé étrangère: Ne pas fixer d'admin_id par défaut
-      // Si l'utilisateur est admin, utiliser son ID comme admin_id
       let admin_id = null;
       if (role === 'admin' && user?.id) {
         admin_id = user.id;
@@ -184,12 +176,10 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       const missionData = {
         status: statusToUse,
         client_id: values.client_id || user?.id,
-        // Utiliser admin_id uniquement si on a une valeur valide
         ...(admin_id && { admin_id }),
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
-        // Composantes d'adresse structurées
         street_number: pickupAddressComponents?.street_number || '',
         postal_code: pickupAddressComponents?.postal_code || '',
         city: pickupAddressComponents?.city || '',
@@ -251,7 +241,6 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
         console.log("Client ID:", createdMission.client_id);
         console.log("Admin ID:", createdMission.admin_id);
         
-        // Upload attachments if any
         if (values.attachments && values.attachments.length > 0) {
           console.log(`Téléchargement de ${values.attachments.length} pièces jointes pour la mission ${createdMission.id}`);
           await uploadAttachments(createdMission.id, values.attachments as File[]);
