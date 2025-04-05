@@ -90,7 +90,10 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       let statusToUse = clientDefaultStatus;
       if (role === 'admin') {
         statusToUse = "confirmé";
+        console.log("Mode admin détecté, statut de mission défini sur 'confirmé'");
       }
+
+      console.log(`Création de mission avec statut: ${statusToUse}`);
 
       const missionData = {
         status: statusToUse,
@@ -147,7 +150,11 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       const createdMission = Array.isArray(data) && data.length > 0 ? data[0] as MissionRow : null;
       
       if (createdMission) {
-        console.log("Mission créée:", createdMission);
+        console.log("Mission créée avec succès:", createdMission);
+        console.log("ID mission:", createdMission.id);
+        console.log("Numéro mission:", createdMission.mission_number);
+        console.log("Statut mission:", createdMission.status);
+        
         if (statusToUse === "en_attente") {
           toast.success(`Demande de devis ${createdMission.mission_number} envoyée avec succès`);
         } else {

@@ -1,14 +1,17 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardCards from "./DashboardCards";
 import CreateMissionDialog from "../mission-form/CreateMissionDialog";
 import MissionsByStatusTable from "./missions/MissionsByStatusTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const AdminHome = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState("pending");
 
   // Effect to force refresh on initial load
   useEffect(() => {
@@ -20,32 +23,50 @@ const AdminHome = () => {
     // Increment refresh trigger to force dashboard updates
     const newValue = refreshTrigger + 1;
     setRefreshTrigger(newValue);
-    console.log("Dashboard refreshed with value:", newValue);
+    console.log("Dashboard explicitement rafraîchi avec la valeur:", newValue);
+    toast.success("Tableau de bord rafraîchi");
   }, [refreshTrigger]);
 
   const handleMissionCreated = useCallback(() => {
-    handleRefresh();
+    // Force une mise à jour plus agressive après la création d'une mission
+    const newValue = refreshTrigger + 1;
+    setRefreshTrigger(newValue);
+    console.log("Nouvelle mission créée, rafraîchissement du tableau de bord avec valeur:", newValue);
     toast.success("Mission créée avec succès! Le tableau de bord est mis à jour.");
-  }, [handleRefresh]);
+  }, [refreshTrigger]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Refresh data when changing tabs
+    handleRefresh();
+  };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 className="text-3xl font-bold">Tableau de bord administrateur</h1>
         <div className="flex items-center gap-2">
-          <button 
+          <Button 
             onClick={handleRefresh}
-            className="p-2 text-sm text-blue-600 hover:text-blue-800"
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
           >
+            <RefreshCw className="h-4 w-4" />
             Rafraîchir
-          </button>
+          </Button>
           <CreateMissionDialog onMissionCreated={handleMissionCreated} />
         </div>
       </div>
       
       <DashboardCards refreshTrigger={refreshTrigger} />
       
-      <Tabs defaultValue="pending" className="w-full">
+      <Tabs 
+        defaultValue="pending" 
+        className="w-full"
+        value={activeTab}
+        onValueChange={handleTabChange}
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="pending">Devis en attente</TabsTrigger>
           <TabsTrigger value="ongoing">Missions en cours</TabsTrigger>
@@ -55,8 +76,11 @@ const AdminHome = () => {
         
         <TabsContent value="pending" className="mt-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Devis en attente</CardTitle>
+              <span className="text-sm text-muted-foreground">
+                Actualisé à {new Date().toLocaleTimeString()}
+              </span>
             </CardHeader>
             <CardContent>
               <MissionsByStatusTable 
@@ -71,8 +95,11 @@ const AdminHome = () => {
         
         <TabsContent value="ongoing" className="mt-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Missions en cours</CardTitle>
+              <span className="text-sm text-muted-foreground">
+                Actualisé à {new Date().toLocaleTimeString()}
+              </span>
             </CardHeader>
             <CardContent>
               <MissionsByStatusTable 
@@ -87,8 +114,11 @@ const AdminHome = () => {
         
         <TabsContent value="completed" className="mt-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Missions terminées</CardTitle>
+              <span className="text-sm text-muted-foreground">
+                Actualisé à {new Date().toLocaleTimeString()}
+              </span>
             </CardHeader>
             <CardContent>
               <MissionsByStatusTable 
@@ -103,8 +133,11 @@ const AdminHome = () => {
         
         <TabsContent value="all" className="mt-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Toutes les missions</CardTitle>
+              <span className="text-sm text-muted-foreground">
+                Actualisé à {new Date().toLocaleTimeString()}
+              </span>
             </CardHeader>
             <CardContent>
               <MissionsByStatusTable 
