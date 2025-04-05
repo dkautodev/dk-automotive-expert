@@ -76,7 +76,7 @@ const TotalCourses = () => {
             refreshTrigger={refreshTrigger} 
             showAllMissions={true}
             emptyMessage="Aucune mission trouvée dans la base de données"
-            forceAdminView={true}
+            forceAdminView={true}  // S'assurer que ce paramètre est bien passé à true
           />
         </CardContent>
       </Card>
