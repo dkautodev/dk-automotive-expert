@@ -52,24 +52,37 @@ export const useAttachmentUpload = () => {
       
       console.log("Réponse de Google Drive:", data);
       
-      if (!data || !data.fileId) {
-        console.error("Aucun ID de fichier reçu de Google Drive", data);
-        throw new Error("Aucun ID de fichier reçu de Google Drive");
+      if (!data || !data.fileId || !data.success) {
+        console.error("Réponse invalide de Google Drive", data);
+        throw new Error("Réponse invalide de Google Drive");
+      }
+      
+      // Vérifier que nous avons bien tous les liens nécessaires
+      if (!data.webViewLink) {
+        console.warn("Lien de visualisation manquant, utilisant URL par défaut");
+        data.webViewLink = `https://drive.google.com/file/d/${data.fileId}/view`;
+      }
+      
+      if (!data.webContentLink) {
+        console.warn("Lien de téléchargement manquant, utilisant URL par défaut");
+        data.webContentLink = `https://drive.google.com/uc?id=${data.fileId}&export=download`;
       }
       
       // Créer l'enregistrement en base de données avec les informations de Google Drive
       const dbData = {
         mission_id: missionId,
         file_name: file.name,
-        file_path: data.fileId, // Utiliser l'ID du fichier Google Drive
+        file_path: data.fileId, // Utiliser l'ID du fichier Google Drive comme chemin
         file_type: file.type,
         file_size: file.size,
         uploaded_by: userId,
         storage_provider: 'google_drive',
         provider_file_id: data.fileId,
-        provider_view_url: data.webViewLink || `https://drive.google.com/file/d/${data.fileId}/view`,
-        provider_download_url: data.webContentLink || `https://drive.google.com/uc?id=${data.fileId}&export=download`
+        provider_view_url: data.webViewLink,
+        provider_download_url: data.webContentLink
       };
+      
+      console.log("Enregistrement en base de données avec ces données:", dbData);
       
       const { error: dbError } = await supabase
         .from('mission_attachments')
