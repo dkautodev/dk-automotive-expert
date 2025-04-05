@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,6 +48,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       pickup_time: "",
       delivery_time: "",
       additional_info: "",
+      attachments: [],
     },
   });
 
@@ -89,6 +91,63 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
     } catch (error) {
       console.error("Erreur lors de l'extraction de l'adresse:", error);
       return null;
+    }
+  };
+
+  // Function to sanitize file names
+  const sanitizeFileName = (fileName: string): string => {
+    // Replace spaces, apostrophes and special characters
+    return fileName
+      .normalize('NFD') // Decompose accented characters
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_') // Replace special characters with _
+      .replace(/\s+/g, '_'); // Replace spaces with _
+  };
+
+  const uploadAttachments = async (missionId: string, attachments: File[]) => {
+    if (!attachments || attachments.length === 0) return;
+    
+    for (const file of attachments) {
+      try {
+        // Sanitize file name
+        const sanitizedFileName = sanitizeFileName(file.name);
+        const uniqueId = Date.now().toString();
+        const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`;
+        
+        console.log("Uploading file:", file.name, "to path:", filePath);
+        
+        // Upload file to storage
+        const { data: fileData, error: uploadError } = await supabase.storage
+          .from('mission-attachments')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Error uploading file:", uploadError);
+          throw uploadError;
+        }
+
+        console.log("File uploaded successfully, saving record in database");
+
+        // Create record in database
+        const { error: dbError } = await supabase
+          .from('mission_attachments')
+          .insert({
+            mission_id: missionId,
+            file_name: file.name,
+            file_path: filePath,
+            file_type: file.type,
+            file_size: file.size,
+            uploaded_by: user!.id
+          });
+
+        if (dbError) {
+          console.error("Database error when saving attachment:", dbError);
+          throw dbError;
+        }
+      } catch (error: any) {
+        console.error("Error processing attachment:", error);
+        toast.error(`Erreur lors de l'ajout de la pièce jointe ${file.name}: ${error.message}`);
+      }
     }
   };
 
@@ -191,6 +250,12 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
         console.log("Statut mission:", createdMission.status);
         console.log("Client ID:", createdMission.client_id);
         console.log("Admin ID:", createdMission.admin_id);
+        
+        // Upload attachments if any
+        if (values.attachments && values.attachments.length > 0) {
+          console.log(`Téléchargement de ${values.attachments.length} pièces jointes pour la mission ${createdMission.id}`);
+          await uploadAttachments(createdMission.id, values.attachments as File[]);
+        }
         
         if (statusToUse === "en_attente") {
           toast.success(`Demande de devis ${createdMission.mission_number} envoyée avec succès`);
