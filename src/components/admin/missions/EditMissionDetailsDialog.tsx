@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface ContactInfo {
-  name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email?: string;
 }
@@ -61,21 +62,23 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
   const [pickupContact, setPickupContact] = useState<ContactInfo>(
     mission?.pickup_contact ? 
       { 
-        name: (mission.pickup_contact as any)?.name || '',
+        firstName: (mission.pickup_contact as any)?.firstName || '',
+        lastName: (mission.pickup_contact as any)?.lastName || '',
         phone: (mission.pickup_contact as any)?.phone || '',
         email: (mission.pickup_contact as any)?.email || ''
       } :
-      { name: '', phone: '', email: '' }
+      { firstName: '', lastName: '', phone: '', email: '' }
   );
   
   const [deliveryContact, setDeliveryContact] = useState<ContactInfo>(
     mission?.delivery_contact ? 
       { 
-        name: (mission.delivery_contact as any)?.name || '',
+        firstName: (mission.delivery_contact as any)?.firstName || '',
+        lastName: (mission.delivery_contact as any)?.lastName || '',
         phone: (mission.delivery_contact as any)?.phone || '',
         email: (mission.delivery_contact as any)?.email || ''
       } :
-      { name: '', phone: '', email: '' }
+      { firstName: '', lastName: '', phone: '', email: '' }
   );
   
   const [missionType, setMissionType] = useState<"livraison" | "restitution">(
@@ -137,14 +140,46 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
   // Update state when mission changes
   useEffect(() => {
     if (mission) {
+      // Gérer la compatibilité avec l'ancien format (name) et le nouveau format (firstName, lastName)
+      let pickupFirstName = '';
+      let pickupLastName = '';
+      let deliveryFirstName = '';
+      let deliveryLastName = '';
+      
+      if ((mission.pickup_contact as any)?.name) {
+        // Ancien format avec un seul champ "name"
+        const fullName = (mission.pickup_contact as any)?.name || '';
+        const nameParts = fullName.split(' ');
+        pickupFirstName = nameParts[0] || '';
+        pickupLastName = nameParts.slice(1).join(' ') || '';
+      } else {
+        // Nouveau format avec firstName et lastName séparés
+        pickupFirstName = (mission.pickup_contact as any)?.firstName || '';
+        pickupLastName = (mission.pickup_contact as any)?.lastName || '';
+      }
+      
+      if ((mission.delivery_contact as any)?.name) {
+        // Ancien format avec un seul champ "name"
+        const fullName = (mission.delivery_contact as any)?.name || '';
+        const nameParts = fullName.split(' ');
+        deliveryFirstName = nameParts[0] || '';
+        deliveryLastName = nameParts.slice(1).join(' ') || '';
+      } else {
+        // Nouveau format avec firstName et lastName séparés
+        deliveryFirstName = (mission.delivery_contact as any)?.firstName || '';
+        deliveryLastName = (mission.delivery_contact as any)?.lastName || '';
+      }
+      
       setPickupContact({ 
-        name: (mission.pickup_contact as any)?.name || '',
+        firstName: pickupFirstName,
+        lastName: pickupLastName,
         phone: (mission.pickup_contact as any)?.phone || '',
         email: (mission.pickup_contact as any)?.email || ''
       });
       
       setDeliveryContact({ 
-        name: (mission.delivery_contact as any)?.name || '',
+        firstName: deliveryFirstName,
+        lastName: deliveryLastName,
         phone: (mission.delivery_contact as any)?.phone || '',
         email: (mission.delivery_contact as any)?.email || ''
       });
@@ -187,12 +222,14 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
             fuel: vehicleInfo.fuel,
           },
           pickup_contact: {
-            name: pickupContact.name,
+            firstName: pickupContact.firstName,
+            lastName: pickupContact.lastName,
             phone: pickupContact.phone,
             email: pickupContact.email,
           },
           delivery_contact: {
-            name: deliveryContact.name,
+            firstName: deliveryContact.firstName,
+            lastName: deliveryContact.lastName,
             phone: deliveryContact.phone,
             email: deliveryContact.email,
           },
@@ -353,11 +390,19 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
                 <h3 className="text-sm font-medium">Contact de départ</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label htmlFor="pickup-name">Nom</Label>
+                    <Label htmlFor="pickup-firstname">Prénom</Label>
                     <Input
-                      id="pickup-name"
-                      value={pickupContact.name}
-                      onChange={(e) => setPickupContact({...pickupContact, name: e.target.value})}
+                      id="pickup-firstname"
+                      value={pickupContact.firstName}
+                      onChange={(e) => setPickupContact({...pickupContact, firstName: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pickup-lastname">Nom</Label>
+                    <Input
+                      id="pickup-lastname"
+                      value={pickupContact.lastName}
+                      onChange={(e) => setPickupContact({...pickupContact, lastName: e.target.value})}
                     />
                   </div>
                   <div>
@@ -368,7 +413,7 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
                       onChange={(e) => setPickupContact({...pickupContact, phone: e.target.value})}
                     />
                   </div>
-                  <div className="col-span-2">
+                  <div>
                     <Label htmlFor="pickup-email">Email</Label>
                     <Input
                       id="pickup-email"
@@ -383,11 +428,19 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
                 <h3 className="text-sm font-medium">Contact de livraison</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label htmlFor="delivery-name">Nom</Label>
+                    <Label htmlFor="delivery-firstname">Prénom</Label>
                     <Input
-                      id="delivery-name"
-                      value={deliveryContact.name}
-                      onChange={(e) => setDeliveryContact({...deliveryContact, name: e.target.value})}
+                      id="delivery-firstname"
+                      value={deliveryContact.firstName}
+                      onChange={(e) => setDeliveryContact({...deliveryContact, firstName: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="delivery-lastname">Nom</Label>
+                    <Input
+                      id="delivery-lastname"
+                      value={deliveryContact.lastName}
+                      onChange={(e) => setDeliveryContact({...deliveryContact, lastName: e.target.value})}
                     />
                   </div>
                   <div>
@@ -398,7 +451,7 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
                       onChange={(e) => setDeliveryContact({...deliveryContact, phone: e.target.value})}
                     />
                   </div>
-                  <div className="col-span-2">
+                  <div>
                     <Label htmlFor="delivery-email">Email</Label>
                     <Input
                       id="delivery-email"

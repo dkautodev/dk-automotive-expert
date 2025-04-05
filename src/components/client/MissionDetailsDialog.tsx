@@ -60,6 +60,19 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
     setIsEditDialogOpen(true);
   };
   
+  // Format contact information
+  const formatContactName = (contact: any) => {
+    if (!contact) return "";
+    
+    // Si le format est firstName/lastName
+    if (contact.firstName || contact.lastName) {
+      return `${contact.firstName || ""} ${contact.lastName || ""}`.trim();
+    }
+    
+    // Fallback vers l'ancien format avec juste 'name'
+    return contact.name || "";
+  };
+  
   // Extract contact information
   const pickupContact = mission.pickup_contact as any || {};
   const deliveryContact = mission.delivery_contact as any || {};
@@ -136,7 +149,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
                 {pickupContact && (
                   <div className="mt-3">
                     <p className="text-sm text-muted-foreground">Contact</p>
-                    <p>{pickupContact.name || ""}</p>
+                    <p>{formatContactName(pickupContact)}</p>
                     {pickupContact.email && <p className="text-sm">{pickupContact.email}</p>}
                     {pickupContact.phone && <p className="text-sm">{pickupContact.phone}</p>}
                   </div>
@@ -153,7 +166,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
                 {deliveryContact && (
                   <div className="mt-3">
                     <p className="text-sm text-muted-foreground">Contact</p>
-                    <p>{deliveryContact.name || ""}</p>
+                    <p>{formatContactName(deliveryContact)}</p>
                     {deliveryContact.email && <p className="text-sm">{deliveryContact.email}</p>}
                     {deliveryContact.phone && <p className="text-sm">{deliveryContact.phone}</p>}
                   </div>
