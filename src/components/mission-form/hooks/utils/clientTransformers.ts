@@ -3,9 +3,18 @@ import { ClientData, ClientDisplay } from "../types/clientTypes";
 
 /**
  * Transforms a ClientData object into a ClientDisplay object
- * with standardized name formatting
+ * with standardized code formatting
  */
 export const transformToClientDisplay = (client: ClientData): ClientDisplay => {
+  // Si le client a un client_code généré, l'utiliser en priorité
+  if (client.client_code) {
+    return {
+      id: client.id,
+      name: client.client_code
+    };
+  }
+  
+  // Sinon, utiliser le format précédent comme fallback
   const nameParts = [];
   
   if (client.last_name) nameParts.push(client.last_name.toUpperCase());

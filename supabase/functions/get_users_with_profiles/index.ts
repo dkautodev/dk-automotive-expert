@@ -60,6 +60,7 @@ serve(async (req) => {
             last_name: profile?.last_name || user.user_metadata?.last_name || '',
             company_name: profile?.company_name || '',
             phone: profile?.phone || '',
+            client_code: profile?.client_code || ''
           };
         });
       }
@@ -82,6 +83,7 @@ serve(async (req) => {
           last_name: profile.last_name || '',
           company_name: profile.company_name || '',
           phone: profile.phone || '',
+          client_code: profile.client_code || ''
         };
       });
     }
@@ -108,6 +110,7 @@ serve(async (req) => {
             last_name: '',
             company_name: '',
             phone: '',
+            client_code: ''
           };
         });
       } else if (usersError) {

@@ -11,6 +11,7 @@ export interface ClientData {
   address?: string;
   first_name?: string;
   last_name?: string;
+  client_code?: string; // Ajout du champ client_code
 }
 
 /**
@@ -21,9 +22,9 @@ export interface NewClientData {
   email: string;
   phone?: string;
   company?: string;
-  first_name?: string; // Adding first_name
-  last_name?: string;  // Adding last_name
-  address?: string;    // Adding address
+  first_name?: string;
+  last_name?: string;
+  address?: string;
 }
 
 /**

@@ -1,87 +1,73 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { safeTable } from "@/utils/supabase-helper";
 import { ClientData } from "../../types/clientTypes";
 import { clientMappingService } from "../mappers/clientMappingService";
-import { userDataService } from "./userDataService";
-
-type FetchResult = {
-  success: boolean;
-  clients: ClientData[];
-  error?: string;
-};
 
 /**
- * Client data fetching module
+ * Service for fetching client data from different sources
  */
 export const clientFetchingService = {
   /**
-   * Fetches clients via user profiles
+   * Fetch clients via user profiles table
    */
-  fetchClientsViaProfiles: async (): Promise<FetchResult> => {
+  fetchClientsViaProfiles: async () => {
     try {
-      const { data: profiles, error } = await supabase
+      // Récupérer les profils utilisateurs
+      const { data: profiles, error: profilesError } = await supabase
         .from("user_profiles")
         .select("*");
 
-      if (error) {
-        console.error("Error fetching profiles:", error);
-        return { success: false, clients: [], error: error.message };
+      if (profilesError) {
+        console.error("Erreur lors de la récupération des profils:", profilesError);
+        return { success: false, clients: [] };
       }
 
-      // For each profile, fetch the corresponding user data
-      const clients: ClientData[] = [];
+      console.log("Profils récupérés:", profiles?.length || 0);
 
-      for (const profile of profiles || []) {
-        // Skip profiles without a user_id
-        if (!profile.user_id) continue;
-
-        try {
-          const userData = await userDataService.fetchUserById(profile.user_id);
-          
-          if (userData) {
-            const client = clientMappingService.mapProfileToClient(profile, userData);
-            clients.push(client);
-          }
-        } catch (err) {
-          console.warn(`Error fetching user data for profile ${profile.user_id}:`, err);
-          // Continue with other profiles even if one fails
-        }
+      // Si pas de profils, retourner un tableau vide
+      if (!profiles || profiles.length === 0) {
+        return { success: true, clients: [] };
       }
+
+      // Transformation des profils en format client
+      const clients: ClientData[] = profiles.map((profile) => {
+        return clientMappingService.mapProfileToClient(profile, { email: "" });
+      });
 
       return { success: true, clients };
-    } catch (error: any) {
-      console.error("Error in fetchClientsViaProfiles:", error);
-      return { success: false, clients: [], error: error.message };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des clients via profils:", error);
+      return { success: false, clients: [] };
     }
   },
 
   /**
-   * Fetches clients via Edge Function
+   * Fetch clients via edge function
    */
-  fetchClientsViaEdgeFunction: async (): Promise<FetchResult> => {
+  fetchClientsViaEdgeFunction: async () => {
     try {
-      const { data: usersData, error: usersError } = await supabase.functions.invoke<any[]>(
-        'get_users_with_profiles'
-      );
-      
-      if (usersError) {
-        console.error("Error fetching users via Edge Function:", usersError);
-        return { success: false, clients: [], error: usersError.message };
+      const { data, error } = await supabase.functions.invoke("get_users_with_profiles");
+
+      if (error) {
+        console.error("Erreur Edge Function:", error);
+        return { success: false, clients: [] };
       }
-      
-      if (!usersData || !Array.isArray(usersData)) {
-        console.warn("Invalid user data returned from Edge Function");
-        return { success: false, clients: [], error: "Invalid data format" };
-      }
-      
-      const clients: ClientData[] = usersData
-        .filter(user => user)
-        .map(userData => clientMappingService.mapUserToClient(userData));
-      
+
+      console.log("Données de l'Edge Function:", data?.length || 0);
+
+      // Filtrer pour ne garder que les clients
+      const clientUsers = Array.isArray(data)
+        ? data.filter((user) => user.user_type === "client")
+        : [];
+
+      // Transformer les données en format ClientData
+      const clients: ClientData[] = clientUsers.map(clientMappingService.mapUserToClient);
+
       return { success: true, clients };
-    } catch (error: any) {
-      console.error("Error in fetchClientsViaEdgeFunction:", error);
-      return { success: false, clients: [], error: error.message };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des clients via Edge Function:", error);
+      return { success: false, clients: [] };
     }
   }
 };

@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ClientData } from "./hooks/types/clientTypes";
 import { MissionFormValues } from "./missionFormSchema";
 import { useAuthContext } from "@/context/AuthContext";
+import { transformToClientDisplay } from "./hooks/utils/clientTransformers";
 
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;
@@ -22,15 +23,20 @@ const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
   
   console.log("Liste des clients disponibles:", clients);
   
-  // Fonction pour formater l'affichage du client
+  // Fonction pour formater l'affichage du client - priorité au client_code
   const formatClientDisplay = (client: ClientData) => {
-    const nameParts = [];
-    if (client.last_name) nameParts.push(client.last_name.toUpperCase());
-    if (client.first_name) nameParts.push(client.first_name);
-    if (client.company) nameParts.push(client.company);
+    // Si l'utilisateur est admin, montrer l'email à côté du code client
+    if (role === 'admin' && client.email) {
+      // Récupérer le nom formaté via le transformateur
+      const clientDisplay = transformToClientDisplay(client);
+      
+      // Ajouter l'email entre parenthèses
+      return `${clientDisplay.name} (${client.email})`;
+    }
     
-    // Retourner le format NOM-PRENOM-SOCIÉTÉ si des informations sont disponibles
-    return nameParts.length > 0 ? nameParts.join('-') : client.email || 'Client sans nom';
+    // Pour les utilisateurs non-admin, utiliser uniquement le code client
+    const clientDisplay = transformToClientDisplay(client);
+    return clientDisplay.name;
   };
   
   return (
