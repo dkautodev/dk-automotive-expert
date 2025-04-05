@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
 import { EmptyMissionsState } from "./EmptyMissionsState";
@@ -30,13 +30,33 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     forceAdminView // Explicitement passer le flag admin
   });
 
-  console.log(`MissionsByStatusTable: 
-    - status: ${Array.isArray(status) ? status.join(', ') : status}
-    - showAllMissions: ${showAllMissions}
-    - forceAdminView: ${forceAdminView}
-    - missions.length: ${missions.length}
-    - error: ${error ? 'Oui' : 'Non'}
-  `);
+  // Utiliser useEffect pour journaliser les informations sur les missions à chaque mise à jour
+  useEffect(() => {
+    console.log(`MissionsByStatusTable [${new Date().toISOString()}]: 
+      - status: ${Array.isArray(status) ? status.join(', ') : status}
+      - showAllMissions: ${showAllMissions}
+      - forceAdminView: ${forceAdminView}
+      - refreshTrigger: ${refreshTrigger}
+      - missions.length: ${missions.length}
+      - error: ${error ? 'Oui' : 'Non'}
+      - loading: ${loading ? 'Oui' : 'Non'}
+    `);
+    
+    if (missions.length > 0) {
+      console.log("Premier ID de mission:", missions[0].id);
+      console.log("Premier numéro de mission:", missions[0].mission_number);
+    }
+  }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger]);
+
+  // Forcer un rafraîchissement périodique
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      console.log("Rafraîchissement forcé de MissionsByStatusTable");
+      refetch();
+    }, 10000); // Refetch every 10 seconds
+    
+    return () => clearInterval(intervalId);
+  }, [refetch]);
 
   const handleMissionCancelled = () => {
     // Trigger a refresh when a mission is cancelled
