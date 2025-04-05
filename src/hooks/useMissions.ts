@@ -22,11 +22,12 @@ export function useMissions({
   forceAdminView = false
 }: UseMissionsProps = {}) {
   const { user } = useAuthContext();
+  // Explicitly handle the admin status - if forceAdminView is true, we're in admin mode
   const isAdmin = forceAdminView || (user?.email === 'dkautomotive70@gmail.com');
   
   const fetchMissions = useCallback(async () => {
     console.log(`Fetching missions with refreshTrigger: ${refreshTrigger}, showAllMissions: ${showAllMissions}, filterStatus:`, filterStatus);
-    console.log(`Is admin view: ${isAdmin}`);
+    console.log(`Is admin view: ${isAdmin}, Admin force flag: ${forceAdminView}`);
     
     // Start building the query to fetch missions
     let query = supabase
@@ -45,10 +46,12 @@ export function useMissions({
       }
     }
     
-    // If not admin mode, filter by client_id (don't filter for admin)
+    // IMPORTANT: Only filter by client_id if we're NOT in admin mode
     if (!isAdmin && user?.id) {
-      console.log(`Filtering by client_id: ${user.id}`);
+      console.log(`Filtering by client_id: ${user.id} (non-admin view)`);
       query = query.eq('client_id', user.id);
+    } else {
+      console.log(`Admin view enabled - fetching all client missions`);
     }
 
     // Apply limit if provided
@@ -139,7 +142,7 @@ export function useMissions({
     
     console.log(`Number of transformed missions: ${transformedMissions.length}`);
     return transformedMissions;
-  }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user]);
+  }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user, forceAdminView]);
 
   // Use react-query for better caching and state management
   const { 
@@ -148,7 +151,7 @@ export function useMissions({
     error, 
     refetch 
   } = useQuery({
-    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id],
+    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView],
     queryFn: fetchMissions,
     staleTime: 3 * 60 * 1000, // 3 minutes
     meta: {
