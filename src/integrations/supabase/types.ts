@@ -315,6 +315,7 @@ export type Database = {
       user_profiles: {
         Row: {
           billing_address: string | null
+          client_code: string | null
           company_name: string | null
           first_name: string
           id: string
@@ -327,6 +328,7 @@ export type Database = {
         }
         Insert: {
           billing_address?: string | null
+          client_code?: string | null
           company_name?: string | null
           first_name: string
           id?: string
@@ -339,6 +341,7 @@ export type Database = {
         }
         Update: {
           billing_address?: string | null
+          client_code?: string | null
           company_name?: string | null
           first_name?: string
           id?: string

@@ -23,6 +23,7 @@ export const clientMappingService = {
       address: profile.billing_address || '',
       first_name: profile.first_name || userData?.first_name || '',
       last_name: profile.last_name || userData?.last_name || '',
+      client_code: profile.client_code || ''
     };
   },
 
@@ -44,6 +45,7 @@ export const clientMappingService = {
       address: '',
       first_name: userData.first_name || '',
       last_name: userData.last_name || '',
+      client_code: userData.client_code || ''
     };
   }
 };

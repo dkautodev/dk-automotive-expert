@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { ClientDisplay } from "./types";
 import { MissionFormValues } from "./missionFormSchema";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface ClientListProps {
   form: UseFormReturn<MissionFormValues>;
@@ -24,9 +25,12 @@ interface ClientListProps {
 }
 
 const ClientList = ({ form, clients, loading }: ClientListProps) => {
-  // Fonction pour formater l'affichage du client (si nécessaire)
+  const { role } = useAuthContext();
+  
+  // Fonction pour formater l'affichage du client
+  // Le formatage est déjà géré dans le transformateur, mais on peut ajouter une logique supplémentaire ici si nécessaire
   const formatClientName = (name: string) => {
-    return name; // Le nom est déjà formaté comme NOM-PRENOM-SOCIÉTÉ dans les données
+    return name;
   };
   
   return (
