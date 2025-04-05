@@ -36,12 +36,28 @@ const AttachmentsField = ({ form }: AttachmentsFieldProps) => {
       alert("La taille totale des fichiers ne peut pas dépasser 10 Mo");
       return;
     }
+
+    // Ajouter une validation des noms de fichiers
+    const cleanedFiles = validFiles.map(file => {
+      // Si le nom contient des caractères problématiques, créer un Blob avec le même contenu mais un nom nettoyé
+      if (/[\/\\:*?"<>|']/g.test(file.name)) {
+        const cleanName = file.name
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')  // Supprimer les accents
+          .replace(/[\/\\:*?"<>|']/g, '_')  // Remplacer caractères spéciaux
+          .replace(/\s+/g, '_');            // Remplacer espaces par _
+        
+        // Créer un nouveau Blob avec le même contenu mais un nom différent
+        return new File([file], cleanName, { type: file.type });
+      }
+      return file;
+    });
     
     // Add valid files
-    setAttachments(prev => [...prev, ...validFiles]);
+    setAttachments(prev => [...prev, ...cleanedFiles]);
     
     // Update form value
-    form.setValue("attachments", [...attachments, ...validFiles]);
+    form.setValue("attachments", [...attachments, ...cleanedFiles]);
   };
   
   const removeAttachment = (index: number) => {

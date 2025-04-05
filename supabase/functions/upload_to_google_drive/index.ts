@@ -15,14 +15,21 @@ const GOOGLE_REFRESH_TOKEN = Deno.env.get("GOOGLE_REFRESH_TOKEN");
 
 /**
  * Nettoie et sanitize un nom de fichier pour le téléversement vers Google Drive
+ * Version plus stricte pour éviter les problèmes avec les API externes
  */
 const sanitizeFileName = (fileName: string): string => {
-  // Pour Google Drive, on peut conserver plus de caractères, mais on évite tout de même 
-  // les caractères qui pourraient poser problème
-  return fileName
-    .replace(/[\/\\:*?"<>|]/g, '_') // Remplacer les caractères interdits dans les noms de fichiers
-    .replace(/[']/g, '') // Supprimer les apostrophes qui peuvent causer des problèmes
-    .replace(/\s+/g, '_'); // Remplacer les espaces par des underscores
+  console.log("Sanitizing file name:", fileName);
+  
+  // Plus stricte pour Google Drive - ne conserver que les caractères alphanumériques, points, tirets et underscores
+  const sanitized = fileName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+    .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
+    .replace(/[^a-zA-Z0-9._-]/g, '_') // Remplacer tous les autres caractères spéciaux par des underscores
+    .replace(/__+/g, '_'); // Éviter les underscores multiples
+  
+  console.log("Sanitized to:", sanitized);
+  return sanitized;
 };
 
 // Fonction pour obtenir un token d'accès à partir du refresh token

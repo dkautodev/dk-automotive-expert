@@ -24,12 +24,12 @@ export const useAttachmentUpload = () => {
    * Supprime les caractères spéciaux et les espaces
    */
   const sanitizeFileName = (fileName: string): string => {
-    // Remplacer les apostrophes et autres caractères problématiques par des underscores
+    // Supprimer complètement tous les caractères problématiques sans les remplacer par des underscores
     return fileName
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
       .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
-      .replace(/[&\/\\#,+()$~%.'":*?<>{}\s]/g, '_') // Remplacer autres caractères spéciaux et espaces par _
+      .replace(/[^a-zA-Z0-9._-]/g, '_') // Remplacer tous les autres caractères spéciaux par des underscores
       .replace(/__+/g, '_'); // Éviter les underscores multiples
   };
 
@@ -55,7 +55,7 @@ export const useAttachmentUpload = () => {
         body: {
           missionId,
           fileData,
-          fileName: file.name, // On envoie le nom original, la fonction sanitizera également
+          fileName: sanitizedFileName, // Envoyer le nom déjà sanitizé
           fileType: file.type,
           fileSize: file.size,
           uploadedBy: userId
@@ -165,12 +165,14 @@ export const useAttachmentUpload = () => {
       // Sanitize le nom du fichier avant d'envoyer à la fonction Edge
       const fileName = sanitizeFileName(file.name);
       
+      console.log("Téléchargement via Edge Function: nom de fichier sanitizé =", fileName);
+      
       // Appeler l'Edge Function
       const { data, error } = await supabase.functions.invoke('upload_mission_attachments', {
         body: {
           missionId,
           fileData,
-          fileName: fileName,
+          fileName: fileName, // Envoyer le nom déjà sanitizé
           fileType: file.type,
           fileSize: file.size,
           uploadedBy: userId
