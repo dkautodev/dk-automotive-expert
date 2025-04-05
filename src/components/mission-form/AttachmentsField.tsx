@@ -4,7 +4,7 @@ import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/for
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Paperclip, Trash2, File } from "lucide-react";
+import { Paperclip, Trash2 } from "lucide-react";
 import { MissionFormValues } from "./missionFormSchema";
 
 interface AttachmentsFieldProps {
@@ -37,10 +37,8 @@ const AttachmentsField = ({ form }: AttachmentsFieldProps) => {
       return;
     }
 
-    // On prend les fichiers tels quels, sans modification des noms
-    // La simplification des noms se fera au moment de l'upload
-    
-    // Add valid files
+    // Ajout des fichiers tels quels sans modification des noms
+    // Le nommage sera géré au moment de l'upload sur le serveur
     setAttachments(prev => [...prev, ...validFiles]);
     
     // Update form value

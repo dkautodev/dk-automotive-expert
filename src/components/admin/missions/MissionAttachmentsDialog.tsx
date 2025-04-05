@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -48,17 +49,23 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     
     setIsFetching(true);
     try {
+      console.log("Chargement des pièces jointes pour la mission:", missionId);
+      
       const { data, error } = await supabase
         .from('mission_attachments')
         .select('*')
         .eq('mission_id', missionId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur SQL lors de la récupération des pièces jointes:", error);
+        throw error;
+      }
       
+      console.log("Pièces jointes récupérées:", data);
       setAttachments(data as Attachment[]);
     } catch (error: any) {
-      console.error("Error fetching attachments:", error.message);
+      console.error("Erreur lors de la récupération des pièces jointes:", error.message);
       toast.error("Erreur lors de la récupération des pièces jointes");
     } finally {
       setIsFetching(false);
@@ -100,17 +107,23 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     try {
       // Si c'est un fichier Google Drive
       if (attachment.storage_provider === 'google_drive' && attachment.provider_download_url) {
+        console.log("Téléchargement depuis Google Drive:", attachment.provider_download_url);
         // Ouvrir l'URL de téléchargement Google Drive dans un nouvel onglet
         window.open(attachment.provider_download_url, '_blank');
         return;
       }
       
       // Sinon, c'est un fichier Supabase Storage
+      console.log("Téléchargement depuis Supabase Storage:", attachment.file_path);
+      
       const { data, error } = await supabase.storage
         .from('mission-attachments')
         .download(attachment.file_path);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur lors du téléchargement du fichier:", error);
+        throw error;
+      }
 
       // Create URL for the file
       const url = URL.createObjectURL(data);
@@ -126,7 +139,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error: any) {
-      console.error("Error downloading file:", error.message);
+      console.error("Erreur lors du téléchargement du fichier:", error.message);
       toast.error("Erreur lors du téléchargement du fichier");
     }
   };
@@ -137,6 +150,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
     
     try {
+      console.log("Suppression de la pièce jointe:", attachment);
+      
       // Delete from database first
       const { error: dbError } = await supabase
         .from('mission_attachments')
@@ -152,7 +167,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
           .remove([attachment.file_path]);
 
         if (storageError) {
-          console.error("Error deleting file from storage:", storageError);
+          console.error("Erreur lors de la suppression du fichier de storage:", storageError);
           // Continue even if storage delete fails
         }
       }
@@ -162,7 +177,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       toast.success("Fichier supprimé avec succès");
       loadAttachments();
     } catch (error: any) {
-      console.error("Error deleting attachment:", error.message);
+      console.error("Erreur lors de la suppression de la pièce jointe:", error.message);
       toast.error("Erreur lors de la suppression du fichier");
     }
   };
