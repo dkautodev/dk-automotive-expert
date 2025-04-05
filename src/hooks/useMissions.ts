@@ -39,6 +39,7 @@ export function useMissions({
       - isAdmin: ${isAdmin}
       - user.email: ${user?.email}
       - role: ${role}
+      - timestamp: ${new Date().toISOString()}
     `);
     
     try {
@@ -80,7 +81,7 @@ export function useMissions({
         throw error;
       }
       
-      console.log(`Missions récupérées: ${data?.length || 0}`);
+      console.log(`Missions récupérées: ${data?.length || 0} à ${new Date().toISOString()}`);
       
       if (!data || data.length === 0) {
         console.log("Aucune mission trouvée dans la base de données");
@@ -169,10 +170,10 @@ export function useMissions({
     error, 
     refetch 
   } = useQuery({
-    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
+    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role, Date.now()], // Ajout de Date.now() pour forcer les requêtes
     queryFn: fetchMissions,
-    staleTime: 30 * 1000, // 30 secondes - extrêmement réactif pour voir les nouvelles missions
-    refetchInterval: 30 * 1000, // Rafraîchissement automatique toutes les 30 secondes
+    staleTime: 0, // 0 secondes - considère toujours les données comme obsolètes pour forcer le rafraîchissement
+    refetchInterval: 5000, // Rafraîchissement automatique toutes les 5 secondes
     meta: {
       onError: (err: any) => {
         console.error('Error in useMissions hook:', err);

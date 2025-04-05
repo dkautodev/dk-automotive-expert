@@ -23,14 +23,25 @@ const CreateMissionDialog = ({ onMissionCreated }: CreateMissionDialogProps) => 
     setOpen(false);
     
     // Log pour déboguer
-    console.log("Mission créée avec succès via le dialogue, notification du parent");
+    console.log("Mission créée avec succès via le dialogue, notification du parent", new Date().toISOString());
     
     // Important: Notifier explicitement le parent pour forcer le rafraîchissement
     if (onMissionCreated) {
+      // Notification immédiate
+      onMissionCreated();
+      console.log("Callback onMissionCreated appelé immédiatement", new Date().toISOString());
+      
+      // Deuxième notification après un délai pour s'assurer de la mise à jour
       setTimeout(() => {
         onMissionCreated();
-        console.log("Callback onMissionCreated appelé avec délai");
-      }, 500); // Petit délai pour permettre à la BD de se mettre à jour
+        console.log("Callback onMissionCreated appelé avec délai", new Date().toISOString());
+      }, 1000); // Délai de 1000ms pour permettre à la BD de se mettre à jour
+      
+      // Troisième notification après un plus long délai
+      setTimeout(() => {
+        onMissionCreated();
+        console.log("Callback onMissionCreated appelé avec délai plus long", new Date().toISOString());
+      }, 3000); // Délai de 3000ms
     }
   };
 
