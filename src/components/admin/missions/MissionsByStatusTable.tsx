@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
@@ -17,7 +16,7 @@ interface MissionsByStatusTableProps {
   limit?: number;
   forceAdminView?: boolean;
   showRefreshButton?: boolean;
-  displayType?: 'pending' | 'ongoing' | 'delivered' | 'incident' | 'completed';
+  displayType?: 'pending' | 'ongoing' | 'delivered' | 'incident' | 'completed' | 'default';
 }
 
 const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({ 
