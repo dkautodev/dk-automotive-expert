@@ -55,6 +55,7 @@ export interface ExtendedDatabase extends Database {
       };
       
       // Add our new mission_attachments table with the correct types
+      // Including the storage_provider field to match the database
       mission_attachments: {
         Row: {
           id: string;
@@ -66,6 +67,7 @@ export interface ExtendedDatabase extends Database {
           uploaded_by: string;
           created_at: string;
           updated_at: string;
+          storage_provider: string | null; // Added this field to match the database
         };
         Insert: {
           id?: string;
@@ -77,6 +79,7 @@ export interface ExtendedDatabase extends Database {
           uploaded_by: string;
           created_at?: string;
           updated_at?: string;
+          storage_provider?: string | null; // Added this field to match the database
         };
         Update: {
           id?: string;
@@ -88,6 +91,7 @@ export interface ExtendedDatabase extends Database {
           uploaded_by?: string;
           created_at?: string;
           updated_at?: string;
+          storage_provider?: string | null; // Added this field to match the database
         };
         Relationships: [
           {
