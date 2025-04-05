@@ -31,7 +31,8 @@ export function useMissions({
   const isAdmin = forceAdminView || role === 'admin' || (user?.email === adminEmail);
   
   const fetchMissions = useCallback(async () => {
-    console.log(`[DEBUG] Fetching missions with: 
+    const timestamp = new Date().toISOString();
+    console.log(`[DEBUG] Fetching missions at ${timestamp} with: 
       - refreshTrigger: ${refreshTrigger}
       - showAllMissions: ${showAllMissions}
       - filterStatus: ${Array.isArray(filterStatus) ? filterStatus.join(', ') : filterStatus}
@@ -39,7 +40,6 @@ export function useMissions({
       - isAdmin: ${isAdmin}
       - user.email: ${user?.email}
       - role: ${role}
-      - timestamp: ${new Date().toISOString()}
     `);
     
     try {
@@ -65,7 +65,7 @@ export function useMissions({
         console.log(`Mode client: Filtering by client_id: ${user.id}`);
         query = query.eq('client_id', user.id);
       } else {
-        console.log(`Mode admin: Affichage de toutes les missions`);
+        console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id`);
         // Dans le mode admin, nous ne filtrons pas par client_id pour voir toutes les missions
       }
 
@@ -81,7 +81,7 @@ export function useMissions({
         throw error;
       }
       
-      console.log(`Missions récupérées: ${data?.length || 0} à ${new Date().toISOString()}`);
+      console.log(`Missions récupérées: ${data?.length || 0} à ${timestamp}`);
       
       if (!data || data.length === 0) {
         console.log("Aucune mission trouvée dans la base de données");
@@ -149,13 +149,13 @@ export function useMissions({
               };
             });
             
-            console.log(`Nombre de missions avec profiles: ${missionsWithProfiles.length}`);
+            console.log(`Requête terminée avec succès: ${missionsWithProfiles.length} missions avec profiles`);
             return missionsWithProfiles;
           }
         }
       }
       
-      console.log(`Nombre de missions transformées: ${transformedMissions.length}`);
+      console.log(`Requête terminée avec succès: ${transformedMissions.length} missions (sans profiles)`);
       return transformedMissions;
     } catch (error) {
       console.error("Error in fetchMissions:", error);
@@ -163,17 +163,19 @@ export function useMissions({
     }
   }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user, forceAdminView, role]);
 
-  // Use react-query for better caching and state management
+  // Use react-query for better caching and state management with improved refresh settings
   const { 
     data: missions = [], 
     isLoading: loading, 
     error, 
     refetch 
   } = useQuery({
-    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role, Date.now()], // Ajout de Date.now() pour forcer les requêtes
+    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role, Date.now()],
     queryFn: fetchMissions,
-    staleTime: 0, // 0 secondes - considère toujours les données comme obsolètes pour forcer le rafraîchissement
-    refetchInterval: 5000, // Rafraîchissement automatique toutes les 5 secondes
+    staleTime: 0, // Toujours considérer les données comme obsolètes
+    refetchInterval: 3000, // Rafraîchissement automatique toutes les 3 secondes
+    retryDelay: 1000, // Attendre 1 seconde entre les tentatives
+    retry: 3, // Maximum de 3 tentatives en cas d'échec
     meta: {
       onError: (err: any) => {
         console.error('Error in useMissions hook:', err);

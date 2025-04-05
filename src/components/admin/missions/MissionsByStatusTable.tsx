@@ -33,7 +33,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   // Utiliser useEffect pour journaliser les informations sur les missions à chaque mise à jour
   useEffect(() => {
     console.log(`MissionsByStatusTable [${new Date().toISOString()}]: 
-      - status: ${Array.isArray(status) ? status.join(', ') : status}
+      - status: ${Array.isArray(status) ? status.join(', ') : status || 'Tous'}
       - showAllMissions: ${showAllMissions}
       - forceAdminView: ${forceAdminView}
       - refreshTrigger: ${refreshTrigger}
@@ -48,12 +48,12 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     }
   }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger]);
 
-  // Forcer un rafraîchissement périodique
+  // Forcer un rafraîchissement périodique plus fréquent
   useEffect(() => {
     const intervalId = setInterval(() => {
-      console.log("Rafraîchissement forcé de MissionsByStatusTable");
+      console.log("Rafraîchissement forcé de MissionsByStatusTable", new Date().toISOString());
       refetch();
-    }, 10000); // Refetch every 10 seconds
+    }, 5000); // Refetch every 5 seconds
     
     return () => clearInterval(intervalId);
   }, [refetch]);
@@ -65,7 +65,8 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   };
 
   // If there's an error and no missions, show the empty state with error message
-  if (error && missions.length === 0) {
+  if (error) {
+    console.error("Erreur dans MissionsByStatusTable:", error);
     return (
       <EmptyMissionsState 
         showAllMissions={showAllMissions} 
@@ -77,7 +78,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   return (
     <>
       {loading ? (
-        <MissionsTableSkeleton />
+        <MissionsTableSkeleton message="Chargement des missions en cours..." />
       ) : missions.length > 0 ? (
         <MissionsTable 
           missions={missions} 
