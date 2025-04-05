@@ -13,25 +13,29 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
 import { Button } from "@/components/ui/button";
-import { FileText, Paperclip } from "lucide-react";
+import { FileText, Paperclip, PenLine } from "lucide-react";
 import { generateMissionPDF } from "@/utils/missionPdfGenerator";
 import { formatCurrency } from "@/lib/utils";
 import { MissionAttachmentsDialog } from "@/components/admin/missions/MissionAttachmentsDialog";
 import { useAuthContext } from "@/context/AuthContext";
+import { EditMissionDetailsDialog } from "@/components/admin/missions/EditMissionDetailsDialog";
 
 interface MissionDetailsDialogProps {
   mission: MissionRow | null;
   isOpen: boolean;
   onClose: () => void;
+  onMissionUpdated?: () => void;
 }
 
 export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
   mission,
   isOpen,
   onClose,
+  onMissionUpdated = () => {},
 }) => {
   const { role } = useAuthContext();
   const [isAttachmentsDialogOpen, setIsAttachmentsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   if (!mission) return null;
 
@@ -51,6 +55,10 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
   const openAttachmentsDialog = () => {
     setIsAttachmentsDialogOpen(true);
   };
+
+  const openEditDialog = () => {
+    setIsEditDialogOpen(true);
+  };
   
   // Extract contact information
   const pickupContact = mission.pickup_contact as any || {};
@@ -60,8 +68,8 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
   const formattedPriceHT = mission.price_ht ? Number(mission.price_ht).toFixed(2) : null;
   const formattedPriceTTC = mission.price_ttc ? Number(mission.price_ttc).toFixed(2) : null;
   
-  // Determine if the user has permission to see attachments (admin or client who owns the mission)
-  const canAccessAttachments = role === 'admin';
+  // Determine if the user has permission to see attachments and edit mission (admin only)
+  const isAdmin = role === 'admin';
   
   return (
     <>
@@ -72,7 +80,22 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
               <DialogTitle>
                 Détails de la mission {mission.mission_number}
               </DialogTitle>
-              <MissionStatusBadge status={mission.status} />
+              <div className="flex items-center gap-2">
+                <MissionStatusBadge status={mission.status} />
+                {isAdmin && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="ml-2 text-primary hover:text-primary hover:bg-primary/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditDialog();
+                    }}
+                  >
+                    <PenLine className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
             <DialogDescription>
               Créée le {format(new Date(mission.created_at), "Pp", { locale: fr })}
@@ -113,7 +136,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
                 {pickupContact && (
                   <div className="mt-3">
                     <p className="text-sm text-muted-foreground">Contact</p>
-                    <p>{pickupContact.firstName || ""} {pickupContact.lastName || ""}</p>
+                    <p>{pickupContact.name || ""}</p>
                     {pickupContact.email && <p className="text-sm">{pickupContact.email}</p>}
                     {pickupContact.phone && <p className="text-sm">{pickupContact.phone}</p>}
                   </div>
@@ -130,7 +153,7 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
                 {deliveryContact && (
                   <div className="mt-3">
                     <p className="text-sm text-muted-foreground">Contact</p>
-                    <p>{deliveryContact.firstName || ""} {deliveryContact.lastName || ""}</p>
+                    <p>{deliveryContact.name || ""}</p>
                     {deliveryContact.email && <p className="text-sm">{deliveryContact.email}</p>}
                     {deliveryContact.phone && <p className="text-sm">{deliveryContact.phone}</p>}
                   </div>
@@ -155,16 +178,14 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
           </div>
 
           <DialogFooter className="flex flex-row justify-end space-x-2">
-            {canAccessAttachments && (
-              <Button 
-                onClick={openAttachmentsDialog} 
-                variant="outline" 
-                className="flex items-center gap-1"
-              >
-                <Paperclip className="h-4 w-4" />
-                <span>Pièces jointes</span>
-              </Button>
-            )}
+            <Button 
+              onClick={openAttachmentsDialog} 
+              variant="outline" 
+              className="flex items-center gap-1"
+            >
+              <Paperclip className="h-4 w-4" />
+              <span>Pièces jointes</span>
+            </Button>
             <Button 
               onClick={handleGeneratePDF} 
               variant="outline" 
@@ -177,12 +198,21 @@ export const MissionDetailsDialog: React.FC<MissionDetailsDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {canAccessAttachments && mission && (
+      {mission && (
         <MissionAttachmentsDialog
           isOpen={isAttachmentsDialogOpen}
           onClose={() => setIsAttachmentsDialogOpen(false)}
           missionId={mission.id}
           missionNumber={mission.mission_number}
+        />
+      )}
+
+      {isAdmin && mission && (
+        <EditMissionDetailsDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          mission={mission}
+          onMissionUpdated={onMissionUpdated}
         />
       )}
     </>
