@@ -49,7 +49,7 @@ const OngoingShipments = () => {
     setLoading(true);
     supabase
       .from('missions')
-      .select('*')
+      .select('*, clientProfile:user_profiles(*)') // Joindre les profils utilisateurs
       .eq('client_id', user.id)
       .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
       .order('created_at', { ascending: false })
@@ -71,6 +71,15 @@ const OngoingShipments = () => {
   const confirmCancel = (mission: MissionRow, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click event
     handleCancelMission(mission);
+  };
+
+  // Obtenir le code client ou un autre identifiant approprié
+  const getClientIdentifier = (mission: MissionRow) => {
+    if (mission.clientProfile && mission.clientProfile.client_code) {
+      return mission.clientProfile.client_code;
+    }
+    
+    return "Client";
   };
 
   if (loading) {
