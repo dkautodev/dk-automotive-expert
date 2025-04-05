@@ -63,6 +63,8 @@ export function useMissions({
         query = query.eq('client_id', user.id);
       } else {
         console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id. isAdmin=${isAdmin}`);
+        // Pour les admins, nous n'appliquons pas de filtre client_id
+        // Si un admin_id est défini dans la BDD, nous pourrions filtrer par admin_id ici aussi
       }
 
       // Application de la limite si fournie
@@ -112,7 +114,8 @@ export function useMissions({
           status: validateStatus(mission.status),
           pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
           delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
-          clientProfile: null // Sera rempli plus tard
+          clientProfile: null, // Sera rempli plus tard
+          admin_id: mission.admin_id || null // Ajout du champ admin_id
         };
         
         return typedMission;

@@ -95,9 +95,12 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
 
       console.log(`Création de mission avec statut: ${statusToUse}`);
 
+      const defaultAdminId = '00000000-0000-0000-0000-000000000000';
+      
       const missionData = {
         status: statusToUse,
         client_id: values.client_id || user?.id,
+        admin_id: defaultAdminId,
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
@@ -133,6 +136,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       console.log("Données de mission à envoyer:", missionData);
       console.log("Type de mission:", values.mission_type);
       console.log("Statut de la mission:", statusToUse);
+      console.log("Admin ID utilisé:", defaultAdminId);
 
       const { data, error } = await supabase.rpc(
         'create_mission',
@@ -154,6 +158,8 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
         console.log("ID mission:", createdMission.id);
         console.log("Numéro mission:", createdMission.mission_number);
         console.log("Statut mission:", createdMission.status);
+        console.log("Client ID:", createdMission.client_id);
+        console.log("Admin ID:", createdMission.admin_id);
         
         if (statusToUse === "en_attente") {
           toast.success(`Demande de devis ${createdMission.mission_number} envoyée avec succès`);

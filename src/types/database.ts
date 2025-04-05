@@ -5,6 +5,7 @@ export type MissionRow = {
   id: string;
   client_id: string;
   driver_id: string | null;
+  admin_id: string | null; // Added admin_id
   quote_id: string | null;
   mission_type: "livraison" | "restitution";
   status: MissionStatus;
