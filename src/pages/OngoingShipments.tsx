@@ -33,7 +33,8 @@ const OngoingShipments = () => {
     isLoading, 
     handleCancelMission, 
     confirmCancelMission, 
-    setIsCancelDialogOpen 
+    setIsCancelDialogOpen,
+    selectedMission: missionToCancel 
   } = useMissionCancellation({ 
     onSuccess: fetchOngoingMissions 
   });
@@ -69,7 +70,6 @@ const OngoingShipments = () => {
 
   const confirmCancel = (mission: MissionRow, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click event
-    setSelectedMission(mission);
     handleCancelMission(mission);
   };
 
@@ -177,7 +177,7 @@ const OngoingShipments = () => {
         onOpenChange={setIsCancelDialogOpen}
         onConfirm={confirmCancelMission}
         isLoading={isLoading}
-        missionNumber={selectedMission?.mission_number}
+        missionNumber={missionToCancel?.mission_number}
       />
     </div>
   );
