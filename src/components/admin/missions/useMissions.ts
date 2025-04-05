@@ -7,9 +7,14 @@ import { toast } from "sonner";
 interface UseMissionsProps {
   refreshTrigger?: number;
   showAllMissions?: boolean;
+  filterStatus?: string | string[];
 }
 
-export function useMissions({ refreshTrigger = 0, showAllMissions = false }: UseMissionsProps) {
+export function useMissions({ 
+  refreshTrigger = 0, 
+  showAllMissions = false,
+  filterStatus = ['confirmé', 'confirme', 'prise_en_charge']
+}: UseMissionsProps) {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,8 +30,14 @@ export function useMissions({ refreshTrigger = 0, showAllMissions = false }: Use
           .select('*')
           .order('created_at', { ascending: false });
         
-        // We don't apply any filters if showAllMissions is true
-        // This ensures we get ALL missions regardless of status
+        // Apply status filter only if showAllMissions is false
+        if (!showAllMissions && filterStatus) {
+          if (Array.isArray(filterStatus)) {
+            query = query.in('status', filterStatus);
+          } else {
+            query = query.eq('status', filterStatus);
+          }
+        }
         
         const { data: missionsData, error: missionsError } = await query;
 
@@ -59,20 +70,8 @@ export function useMissions({ refreshTrigger = 0, showAllMissions = false }: Use
         
         console.log(`Nombre de missions transformées: ${transformedMissions.length}`);
         
-        // Filter missions by status only if showAllMissions is false
-        const filteredMissions = showAllMissions 
-          ? transformedMissions 
-          : transformedMissions.filter(mission => 
-              mission.status === 'confirmé' || 
-              mission.status === 'confirme' || 
-              mission.status === 'prise_en_charge'
-            );
-        
-        console.log(`Missions filtrées (${filteredMissions.length}):`, filteredMissions);
-        console.log("Statuts des missions:", filteredMissions.map(m => m.status).join(', '));
-        
         // Get client profiles for all missions
-        await enrichWithClientProfiles(filteredMissions, setMissions);
+        await enrichWithClientProfiles(transformedMissions, setMissions);
         
       } catch (err) {
         console.error('Erreur globale lors de la récupération des missions:', err);
@@ -84,7 +83,7 @@ export function useMissions({ refreshTrigger = 0, showAllMissions = false }: Use
     };
 
     fetchMissions();
-  }, [refreshTrigger, showAllMissions]);
+  }, [refreshTrigger, showAllMissions, filterStatus]);
 
   return { missions, loading };
 }
