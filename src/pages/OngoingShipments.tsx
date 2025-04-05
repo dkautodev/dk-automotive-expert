@@ -49,7 +49,7 @@ const OngoingShipments = () => {
     setLoading(true);
     supabase
       .from('missions')
-      .select('*, clientProfile:user_profiles(*)')
+      .select('*')
       .eq('client_id', user.id)
       .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
       .order('created_at', { ascending: false })
@@ -57,18 +57,49 @@ const OngoingShipments = () => {
         if (error) {
           console.error("Error fetching ongoing missions:", error);
         } else if (data) {
-          // Transform the data to ensure it matches the MissionRow type
-          const transformedMissions: MissionRow[] = data.map(mission => ({
-            ...mission,
-            pickup_address: mission.pickup_address || 'Non spécifié',
-            delivery_address: mission.delivery_address || 'Non spécifié',
-            // Ensure clientProfile is properly cast
-            clientProfile: mission.clientProfile || null
-          })) as MissionRow[];
+          // First, fetch missions
+          const missionsData = data;
           
-          setMissions(transformedMissions);
+          // Then, fetch user profiles for these missions
+          if (missionsData.length > 0) {
+            // Get client profiles separately to avoid the relation error
+            supabase
+              .from('user_profiles')
+              .select('*')
+              .in('user_id', missionsData.map(m => m.client_id))
+              .then(({ data: profiles, error: profileError }) => {
+                if (profileError) {
+                  console.error("Error fetching client profiles:", profileError);
+                }
+                
+                // Transform the data to ensure it matches the MissionRow type
+                const transformedMissions: MissionRow[] = missionsData.map(mission => {
+                  const vehicleInfo = mission.vehicle_info as any;
+                  
+                  // Find corresponding profile
+                  const profile = profiles ? profiles.find(p => p.user_id === mission.client_id) : null;
+                  
+                  return {
+                    ...mission,
+                    // Get pickup_address and delivery_address from vehicle_info if they don't exist
+                    pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
+                    delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
+                    // Attach the client profile or set to null if not found
+                    clientProfile: profile || null
+                  } as MissionRow;
+                });
+                
+                setMissions(transformedMissions);
+                setLoading(false);
+              });
+          } else {
+            setMissions([]);
+            setLoading(false);
+          }
+        } else {
+          setMissions([]);
+          setLoading(false);
         }
-        setLoading(false);
       });
   }
 
