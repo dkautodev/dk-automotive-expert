@@ -37,7 +37,14 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   missionNumber
 }) => {
   const { user } = useAuthContext();
-  const { uploadAttachments, isUploading, getFileDownloadUrl, uploadProgress } = useAttachmentUpload();
+  const { 
+    uploadAttachments, 
+    isUploading, 
+    getFileDownloadUrl, 
+    deleteAttachment, 
+    isDeleting, 
+    uploadProgress 
+  } = useAttachmentUpload();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
@@ -157,26 +164,13 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     try {
       console.log("Suppression de la pièce jointe:", attachment);
       
-      // Delete from database first
-      const { error: dbError } = await supabase
-        .from('mission_attachments')
-        .delete()
-        .eq('id', attachment.id);
-
-      if (dbError) throw dbError;
-
-      // Delete from storage
-      const { error: storageError } = await supabase.storage
-        .from('mission-attachments')
-        .remove([attachment.file_path]);
-
-      if (storageError) {
-        console.error("Erreur lors de la suppression du fichier de storage:", storageError);
-        // Continue even if storage delete fails
+      const result = await deleteAttachment(attachment.id, attachment.file_path);
+      
+      if (result.success) {
+        loadAttachments(); // Recharger la liste des pièces jointes
+      } else {
+        throw result.error || new Error("Échec de la suppression du fichier");
       }
-
-      toast.success("Fichier supprimé avec succès");
-      loadAttachments();
     } catch (error: any) {
       console.error("Erreur lors de la suppression de la pièce jointe:", error.message);
       toast.error("Erreur lors de la suppression du fichier");
@@ -314,9 +308,10 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                           size="icon"
                           onClick={() => handleDelete(attachment)}
                           title="Supprimer"
+                          disabled={isDeleting}
                           className="text-destructive hover:text-destructive/80"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {isDeleting ? <Loader className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
                         </Button>
                       </div>
                     </li>
