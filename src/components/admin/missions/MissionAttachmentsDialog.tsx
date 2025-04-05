@@ -106,10 +106,29 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   const handleDownload = async (attachment: Attachment) => {
     try {
       // Si c'est un fichier Google Drive
-      if (attachment.storage_provider === 'google_drive' && attachment.provider_download_url) {
-        console.log("Téléchargement depuis Google Drive:", attachment.provider_download_url);
-        // Ouvrir l'URL de téléchargement Google Drive dans un nouvel onglet
-        window.open(attachment.provider_download_url, '_blank');
+      if (attachment.storage_provider === 'google_drive') {
+        // Utiliser d'abord provider_download_url s'il existe
+        if (attachment.provider_download_url) {
+          console.log("Téléchargement depuis Google Drive:", attachment.provider_download_url);
+          window.open(attachment.provider_download_url, '_blank');
+          return;
+        }
+        
+        // Fallback: ouvrir l'URL de visualisation
+        if (attachment.provider_view_url) {
+          console.log("Ouverture de la visionneuse Google Drive:", attachment.provider_view_url);
+          window.open(attachment.provider_view_url, '_blank');
+          return;
+        }
+        
+        // Dernier recours: utiliser l'ID du fichier
+        if (attachment.provider_file_id) {
+          console.log("Ouverture via ID Google Drive:", attachment.provider_file_id);
+          window.open(`https://drive.google.com/file/d/${attachment.provider_file_id}/view`, '_blank');
+          return;
+        }
+        
+        toast.error("Lien de téléchargement non disponible");
         return;
       }
       
@@ -182,8 +201,20 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  const handleViewInGoogleDrive = (url: string) => {
-    window.open(url, '_blank');
+  const handleViewInGoogleDrive = (attachment: Attachment) => {
+    // Utiliser d'abord provider_view_url s'il existe
+    if (attachment.provider_view_url) {
+      window.open(attachment.provider_view_url, '_blank');
+      return;
+    }
+    
+    // Sinon, utiliser l'ID du fichier
+    if (attachment.provider_file_id) {
+      window.open(`https://drive.google.com/file/d/${attachment.provider_file_id}/view`, '_blank');
+      return;
+    }
+    
+    toast.error("Lien de visualisation non disponible");
   };
 
   const formatFileSize = (bytes: number) => {
@@ -252,11 +283,11 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        {attachment.storage_provider === 'google_drive' && attachment.provider_view_url && (
+                        {attachment.storage_provider === 'google_drive' && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleViewInGoogleDrive(attachment.provider_view_url!)}
+                            onClick={() => handleViewInGoogleDrive(attachment)}
                             title="Voir dans Google Drive"
                           >
                             <ExternalLink className="h-4 w-4" />
