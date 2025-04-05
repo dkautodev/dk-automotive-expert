@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,7 +115,7 @@ export function useMissions({
           pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
           delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
           clientProfile: null, // Sera rempli plus tard
-          admin_id: mission.admin_id || null // Ajout du champ admin_id
+          admin_id: mission.admin_id || null // S'assurer que admin_id est correctement copié depuis les données
         };
         
         return typedMission;
