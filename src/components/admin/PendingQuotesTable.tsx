@@ -6,7 +6,7 @@ import { MissionsTableSkeleton } from "./missions/MissionsTableSkeleton";
 import { EmptyMissionsState } from "./missions/EmptyMissionsState";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { MissionRow, UserProfileRow } from "@/types/database";
+import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
 
 interface PendingQuotesTableProps {
   refreshTrigger?: number;
@@ -99,10 +99,23 @@ function usePendingQuotes(refreshTrigger = 0) {
             ? mission.clientProfile as UserProfileRow 
             : null;
           
+          // Validate and cast the status to MissionStatus type
+          const validateStatus = (status: string): MissionStatus => {
+            const validStatuses: MissionStatus[] = [
+              "termine", "prise_en_charge", "en_attente", "confirme", 
+              "confirmé", "livre", "incident", "annule", "annulé"
+            ];
+            
+            return validStatuses.includes(status as MissionStatus) 
+              ? status as MissionStatus 
+              : "en_attente"; // Default to "en_attente" if invalid status
+          };
+          
           // Create a properly typed mission object
           const typedMission: MissionRow = {
             ...mission,
             mission_type: missionType,
+            status: validateStatus(mission.status),
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
             delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
             clientProfile: safeClientProfile
