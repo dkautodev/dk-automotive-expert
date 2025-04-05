@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
@@ -16,6 +17,7 @@ interface MissionsByStatusTableProps {
   limit?: number;
   forceAdminView?: boolean;
   showRefreshButton?: boolean;
+  displayType?: 'pending' | 'ongoing' | 'delivered' | 'incident' | 'completed';
 }
 
 const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({ 
@@ -25,7 +27,8 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   emptyMessage = "Aucune mission disponible",
   limit,
   forceAdminView = false,
-  showRefreshButton = true
+  showRefreshButton = true,
+  displayType = 'default'
 }) => {
   const { role } = useAuthContext();
   const [localRefreshTrigger, setLocalRefreshTrigger] = useState(refreshTrigger);
@@ -49,6 +52,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       - missions.length: ${missions.length}
       - error: ${error ? 'Oui' : 'Non'}
       - loading: ${loading ? 'Oui' : 'Non'}
+      - displayType: ${displayType}
     `);
     
     if (missions.length > 0) {
@@ -58,7 +62,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       console.log("Client ID de la première mission:", missions[0].client_id);
       console.log("Admin ID de la première mission:", missions[0].admin_id);
     }
-  }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger, localRefreshTrigger]);
+  }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger, localRefreshTrigger, displayType]);
 
   useEffect(() => {
     setLocalRefreshTrigger(refreshTrigger);
@@ -132,6 +136,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
           missions={missions} 
           onMissionCancelled={handleMissionCancelled}
           onMissionUpdated={handleMissionUpdated}
+          displayType={displayType}
         />
       ) : (
         <EmptyMissionsState 
