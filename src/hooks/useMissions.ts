@@ -27,10 +27,7 @@ export function useMissions({
         // Start building the query to fetch missions
         let query = supabase
           .from('missions')
-          .select(`
-            *,
-            clientProfile:client_id(*)
-          `)
+          .select('*')
           .order('created_at', { ascending: false });
         
         // Apply status filter only if showAllMissions is false and filterStatus is provided
@@ -67,22 +64,6 @@ export function useMissions({
             ? mission.mission_type as "livraison" | "restitution"
             : "livraison"; // Default value if not a valid type
           
-          // Create a type guard function to validate clientProfile
-          const isValidClientProfile = (profile: any): profile is UserProfileRow => {
-            return profile && 
-                  typeof profile === 'object' && 
-                  !('error' in profile) &&
-                  'id' in profile &&
-                  'user_id' in profile &&
-                  'first_name' in profile &&
-                  'last_name' in profile;
-          };
-          
-          // Apply the type guard to create a properly typed clientProfile
-          const safeClientProfile = isValidClientProfile(mission.clientProfile) 
-            ? mission.clientProfile as UserProfileRow 
-            : null;
-          
           // Validate and cast the status to MissionStatus type
           const validateStatus = (status: string): MissionStatus => {
             const validStatuses: MissionStatus[] = [
@@ -95,18 +76,53 @@ export function useMissions({
               : "en_attente"; // Default to "en_attente" if invalid status
           };
           
-          // Create a properly typed mission object
+          // Create a properly typed mission object (without clientProfile for now)
           const typedMission: MissionRow = {
             ...mission,
             mission_type: missionType,
             status: validateStatus(mission.status),
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
             delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
-            clientProfile: safeClientProfile
+            clientProfile: null // Will be populated later
           };
           
           return typedMission;
         });
+        
+        // Now fetch all client profiles in a single query
+        if (transformedMissions.length > 0) {
+          // Extract unique client IDs
+          const clientIds = [...new Set(transformedMissions.map(m => m.client_id))].filter(Boolean);
+          
+          if (clientIds.length > 0) {
+            const { data: profiles, error: profilesError } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .in('user_id', clientIds);
+              
+            if (profilesError) {
+              console.error("Error fetching client profiles:", profilesError);
+              // Continue without profiles rather than failing completely
+            } else if (profiles) {
+              // Attach profiles to respective missions
+              const missionsWithProfiles = transformedMissions.map(mission => {
+                const clientProfile = profiles.find(
+                  profile => profile.user_id === mission.client_id
+                ) || null;
+                
+                return {
+                  ...mission,
+                  clientProfile
+                };
+              });
+              
+              console.log(`Number of missions with profiles: ${missionsWithProfiles.length}`);
+              setMissions(missionsWithProfiles);
+              setLoading(false);
+              return;
+            }
+          }
+        }
         
         console.log(`Number of transformed missions: ${transformedMissions.length}`);
         setMissions(transformedMissions);
