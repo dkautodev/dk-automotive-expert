@@ -52,6 +52,18 @@ export const useAttachmentUpload = () => {
   };
 
   /**
+   * Génère un nom de fichier unique
+   */
+  const generateUniqueFileName = (fileIndex: number, originalName: string): string => {
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const extension = originalName.split('.').pop() || '';
+    const paddedIndex = fileIndex.toString().padStart(2, '0');
+    
+    return `fichier${paddedIndex}_${timestamp}_${randomString}${extension ? `.${extension}` : ''}`;
+  };
+
+  /**
    * Télécharge un fichier directement via l'API Supabase Storage
    */
   const uploadViaStorage = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
@@ -63,24 +75,32 @@ export const useAttachmentUpload = () => {
         return false;
       }
       
-      // Générer un nom de fichier simple
-      const extension = file.name.split('.').pop() || '';
-      const paddedIndex = fileIndex.toString().padStart(2, '0');
-      const simpleFileName = `fichier${paddedIndex}${extension ? `.${extension}` : ''}`;
+      // Générer un nom de fichier unique
+      const uniqueFileName = generateUniqueFileName(fileIndex, file.name);
       
       // Créer le chemin de fichier avec le numéro de mission comme dossier
-      const filePath = `missions/${missionNumber}/${simpleFileName}`;
+      const filePath = `missions/${missionNumber}/${uniqueFileName}`;
       
       console.log("Téléchargement direct: Chemin de fichier =", filePath);
       
       // Télécharger le fichier
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('mission-attachments')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false // Ne pas écraser les fichiers existants
+        });
       
       if (uploadError) {
         console.error("Erreur détaillée du téléchargement:", uploadError);
-        throw uploadError;
+        
+        // Si c'est une erreur de duplication, on considère comme un succès
+        if (uploadError.message === "The resource already exists" || uploadError.statusCode === 409) {
+          console.log("Fichier déjà existant, utilisation du chemin existant");
+          // On continue avec la création de l'enregistrement
+        } else {
+          throw uploadError;
+        }
       }
       
       // Créer l'enregistrement en base de données
@@ -97,8 +117,8 @@ export const useAttachmentUpload = () => {
         });
       
       if (dbError) {
-        // Nettoyer le fichier si l'enregistrement échoue
-        await supabase.storage.from('mission-attachments').remove([filePath]);
+        console.error("Erreur lors de la création de l'enregistrement:", dbError);
+        // On ne supprime pas le fichier car il pourrait être référencé ailleurs
         throw dbError;
       }
       
@@ -129,12 +149,10 @@ export const useAttachmentUpload = () => {
         reader.onerror = error => reject(error);
       });
       
-      // Générer un nom de fichier simple
-      const extension = file.name.split('.').pop() || '';
-      const paddedIndex = fileIndex.toString().padStart(2, '0');
-      const simpleFileName = `fichier${paddedIndex}${extension ? `.${extension}` : ''}`;
+      // Générer un nom de fichier unique
+      const uniqueFileName = generateUniqueFileName(fileIndex, file.name);
       
-      console.log("Téléchargement via Edge Function: nom de fichier =", simpleFileName);
+      console.log("Téléchargement via Edge Function: nom de fichier =", uniqueFileName);
       
       // Appeler l'Edge Function
       const { data, error } = await supabase.functions.invoke('upload_mission_attachments', {
@@ -142,7 +160,7 @@ export const useAttachmentUpload = () => {
           missionId,
           missionNumber,
           fileData,
-          fileName: simpleFileName,
+          fileName: uniqueFileName,
           originalFileName: file.name, // Conserver le nom original pour l'affichage
           fileType: file.type,
           fileSize: file.size,
@@ -186,7 +204,7 @@ export const useAttachmentUpload = () => {
   /**
    * Télécharge des fichiers pour une mission
    */
-  const uploadAttachments = async (missionId: string, files: File[], userId: string): Promise<boolean> => {
+  const uploadAttachments = async (missionId: string, files: File[], userId: string, maxRetries = 2): Promise<boolean> => {
     if (!files.length) return true;
     if (!missionId) {
       toast.error("ID de mission manquant");
@@ -210,35 +228,47 @@ export const useAttachmentUpload = () => {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileIndex = i + 1; // Index du fichier (1-based)
+        let success = false;
+        let retries = 0;
         
         setUploadProgress(prev => ({ ...prev, [file.name]: 10 }));
         
         console.log(`Tentative de téléchargement du fichier "${file.name}" (index: ${fileIndex}) pour la mission ${missionNumber}`);
         
-        // Essayer la méthode Storage directe
-        setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
-        let success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
+        // Essayer la méthode Storage directe avec quelques tentatives
+        while (!success && retries <= maxRetries) {
+          setUploadProgress(prev => ({ ...prev, [file.name]: 30 + (retries * 10) }));
+          success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
           
-        if (success) {
-          console.log(`Fichier ${file.name} téléchargé avec succès vers Supabase Storage`);
-          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-          toast.success(`Fichier ${file.name} téléchargé avec succès`);
-          continue; // Passer au fichier suivant si Storage a réussi
+          if (success) {
+            console.log(`Fichier ${file.name} téléchargé avec succès vers Supabase Storage`);
+            setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+            toast.success(`Fichier ${file.name} téléchargé avec succès`);
+            break; // Sortir de la boucle si succès
+          }
+          
+          retries++;
+          
+          if (retries <= maxRetries) {
+            console.log(`Tentative ${retries}/${maxRetries} échouée, nouvelle tentative...`);
+          }
         }
         
-        // Si la méthode directe échoue, essayer via Edge Function
-        console.log("Échec Storage direct, tentative via Edge Function");
-        setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
-        success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
-        
-        if (success) {
-          console.log(`Fichier ${file.name} téléchargé avec succès via Edge Function`);
-          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-          toast.success(`Fichier ${file.name} téléchargé avec succès`);
-        } else {
-          allSucceeded = false;
-          console.error(`Échec du téléchargement pour ${file.name}`);
-          toast.error(`Échec du téléchargement pour ${file.name}`);
+        // Si toutes les tentatives directes ont échoué, essayer via Edge Function
+        if (!success) {
+          console.log("Toutes les tentatives Storage directes ont échoué, tentative via Edge Function");
+          setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
+          success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
+          
+          if (success) {
+            console.log(`Fichier ${file.name} téléchargé avec succès via Edge Function`);
+            setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+            toast.success(`Fichier ${file.name} téléchargé avec succès`);
+          } else {
+            allSucceeded = false;
+            console.error(`Échec du téléchargement pour ${file.name}`);
+            toast.error(`Échec du téléchargement pour ${file.name}`);
+          }
         }
       }
       

@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
-import { Paperclip, Trash2, Download, FileText, File, Image, FileSpreadsheet } from "lucide-react";
+import { Paperclip, Trash2, Download, FileText, File, Image, FileSpreadsheet, AlertTriangle } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
 import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Attachment {
   id: string;
@@ -36,10 +37,11 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   missionNumber
 }) => {
   const { user } = useAuthContext();
-  const { uploadAttachments, isUploading, getFileDownloadUrl } = useAttachmentUpload();
+  const { uploadAttachments, isUploading, getFileDownloadUrl, uploadProgress } = useAttachmentUpload();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [acceptedFileTypes, setAcceptedFileTypes] = useState(
     ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
   );
@@ -76,6 +78,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   useEffect(() => {
     if (isOpen && missionId) {
       loadAttachments();
+      setUploadError(null);
+      setFiles([]);
     }
   }, [isOpen, missionId]);
 
@@ -84,6 +88,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     if (newFiles) {
       const filesArray = Array.from(newFiles);
       setFiles(filesArray);
+      setUploadError(null);
     }
   };
 
@@ -95,11 +100,20 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       return;
     }
     
-    const success = await uploadAttachments(missionId, files, user.id);
+    setUploadError(null);
     
-    if (success) {
-      setFiles([]);
-      loadAttachments();
+    try {
+      const success = await uploadAttachments(missionId, files, user.id);
+      
+      if (success) {
+        setFiles([]);
+        loadAttachments();
+      } else {
+        setUploadError("Certains fichiers n'ont pas pu être téléchargés. Veuillez réessayer.");
+      }
+    } catch (error: any) {
+      console.error("Erreur de téléchargement:", error);
+      setUploadError(`Erreur lors du téléchargement: ${error.message || "Erreur inconnue"}`);
     }
   };
 
@@ -216,13 +230,40 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                   Télécharger
                 </Button>
               </div>
+              
+              {uploadError && (
+                <Alert variant="destructive" className="mt-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    {uploadError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               {files.length > 0 && (
                 <div className="mt-2">
                   <p className="text-sm text-muted-foreground">
                     {files.length} fichier(s) sélectionné(s)
                   </p>
+                  {Object.keys(uploadProgress).length > 0 && (
+                    <div className="mt-1 space-y-1">
+                      {Object.entries(uploadProgress).map(([fileName, progress]) => (
+                        <div key={fileName} className="text-xs flex items-center gap-2">
+                          <div className="w-32 truncate">{fileName}</div>
+                          <div className="w-full bg-secondary rounded-full h-1.5">
+                            <div
+                              className="bg-primary h-1.5 rounded-full"
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
+                          <div className="w-8 text-right">{progress}%</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
+              
               <div className="mt-2">
                 <p className="text-xs text-muted-foreground">
                   Formats acceptés: images (jpg, png, gif), documents (pdf, doc, docx), tableurs (xls, xlsx), texte (txt, csv)
