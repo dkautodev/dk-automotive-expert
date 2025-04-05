@@ -4,22 +4,29 @@ import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface UseMissionsProps {
   refreshTrigger?: number;
   showAllMissions?: boolean;
   filterStatus?: string | string[];
   limit?: number;
+  forceAdminView?: boolean;
 }
 
 export function useMissions({ 
   refreshTrigger = 0, 
   showAllMissions = false,
   filterStatus,
-  limit
+  limit,
+  forceAdminView = false
 }: UseMissionsProps = {}) {
+  const { user } = useAuthContext();
+  const isAdmin = forceAdminView || (user?.email === 'dkautomotive70@gmail.com');
+  
   const fetchMissions = useCallback(async () => {
     console.log(`Fetching missions with refreshTrigger: ${refreshTrigger}, showAllMissions: ${showAllMissions}, filterStatus:`, filterStatus);
+    console.log(`Is admin view: ${isAdmin}`);
     
     // Start building the query to fetch missions
     let query = supabase
@@ -36,6 +43,12 @@ export function useMissions({
         console.log(`Filtering by single status: ${filterStatus}`);
         query = query.eq('status', filterStatus);
       }
+    }
+    
+    // If not admin mode, filter by client_id (don't filter for admin)
+    if (!isAdmin && user?.id) {
+      console.log(`Filtering by client_id: ${user.id}`);
+      query = query.eq('client_id', user.id);
     }
 
     // Apply limit if provided
@@ -126,7 +139,7 @@ export function useMissions({
     
     console.log(`Number of transformed missions: ${transformedMissions.length}`);
     return transformedMissions;
-  }, [refreshTrigger, showAllMissions, filterStatus, limit]);
+  }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user]);
 
   // Use react-query for better caching and state management
   const { 
@@ -135,7 +148,7 @@ export function useMissions({
     error, 
     refetch 
   } = useQuery({
-    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit],
+    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id],
     queryFn: fetchMissions,
     staleTime: 3 * 60 * 1000, // 3 minutes
     meta: {

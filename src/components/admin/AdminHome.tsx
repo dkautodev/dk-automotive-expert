@@ -63,6 +63,7 @@ const AdminHome = () => {
                 refreshTrigger={refreshTrigger} 
                 status="en_attente"
                 emptyMessage="Aucun devis en attente"
+                forceAdminView={true}
               />
             </CardContent>
           </Card>
@@ -78,6 +79,7 @@ const AdminHome = () => {
                 refreshTrigger={refreshTrigger} 
                 status={["confirmé", "confirme", "prise_en_charge"]}
                 emptyMessage="Aucune mission en cours"
+                forceAdminView={true}
               />
             </CardContent>
           </Card>
@@ -93,6 +95,7 @@ const AdminHome = () => {
                 refreshTrigger={refreshTrigger} 
                 status={["termine", "livre"]}
                 emptyMessage="Aucune mission terminée"
+                forceAdminView={true}
               />
             </CardContent>
           </Card>
@@ -108,6 +111,7 @@ const AdminHome = () => {
                 refreshTrigger={refreshTrigger} 
                 showAllMissions={true}
                 emptyMessage="Aucune mission trouvée"
+                forceAdminView={true}
               />
             </CardContent>
           </Card>

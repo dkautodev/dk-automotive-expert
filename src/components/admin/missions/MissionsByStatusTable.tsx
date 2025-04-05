@@ -11,6 +11,7 @@ interface MissionsByStatusTableProps {
   showAllMissions?: boolean;
   emptyMessage?: string;
   limit?: number;
+  forceAdminView?: boolean;
 }
 
 const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({ 
@@ -18,16 +19,18 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   status,
   showAllMissions = false,
   emptyMessage = "Aucune mission disponible",
-  limit
+  limit,
+  forceAdminView = true // Default to true for admin dashboard
 }) => {
   const { missions, loading, error, refetch } = useMissions({ 
     refreshTrigger,
     showAllMissions,
     filterStatus: status,
-    limit
+    limit,
+    forceAdminView
   });
 
-  console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, missions.length=${missions.length}, error=${error ? 'Yes' : 'No'}`);
+  console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, forceAdminView=${forceAdminView}, missions.length=${missions.length}, error=${error ? 'Yes' : 'No'}`);
 
   const handleMissionCancelled = () => {
     // Trigger a refresh when a mission is cancelled
