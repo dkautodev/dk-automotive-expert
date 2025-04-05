@@ -22,7 +22,7 @@ import { MissionFormValues } from "./missionFormSchema";
 
 interface DatePickerFieldProps {
   form: UseFormReturn<MissionFormValues>;
-  name: keyof MissionFormValues;
+  name: "pickup_date" | "delivery_date"; // Restrict to valid date fields
   label: string;
 }
 
@@ -45,7 +45,7 @@ const DatePickerField = ({ form, name, label }: DatePickerFieldProps) => {
                   )}
                 >
                   {field.value ? (
-                    format(field.value, "PPP")
+                    format(field.value as Date, "PPP")
                   ) : (
                     <span>Sélectionner une date</span>
                   )}
@@ -56,7 +56,7 @@ const DatePickerField = ({ form, name, label }: DatePickerFieldProps) => {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={field.value ? new Date(field.value) : undefined}
+                selected={field.value as Date}
                 onSelect={field.onChange}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
