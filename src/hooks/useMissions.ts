@@ -193,7 +193,7 @@ export function useMissions({
     queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
     queryFn: fetchMissions,
     staleTime: 0, // Toujours considérer les données comme obsolètes
-    refetchInterval: role === 'admin' ? 3000 : 90000, // 3 sec pour admin, 90 sec pour client/chauffeur
+    refetchInterval: role === 'admin' ? 90000 : 90000, // 90 sec pour tous (était 3 sec pour admin)
     retryDelay: 1000, // Attendre 1 seconde entre les tentatives
     retry: 3, // Maximum de 3 tentatives en cas d'échec
     meta: {

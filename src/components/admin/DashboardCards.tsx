@@ -93,8 +93,9 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
         };
       }
     },
-    staleTime: 60 * 1000, // 1 minute - réduit pour plus de réactivité
-    retry: 2
+    staleTime: 60 * 1000, // 1 minute
+    retry: 2,
+    refetchInterval: 90 * 1000 // Ajout d'un interval de 90 secondes pour le rafraîchissement
   });
 
   // Default counts object with zeroes to handle undefined

@@ -19,12 +19,12 @@ const AdminHome = () => {
     console.log("AdminHome initial load, setting refresh trigger to 1");
     setRefreshTrigger(1);
     
-    // Rafraîchissement automatique toutes les 15 secondes
+    // Rafraîchissement automatique toutes les 90 secondes au lieu de 15 secondes
     const intervalId = setInterval(() => {
       setRefreshTrigger(prev => prev + 1);
       setLastRefreshTime(new Date());
       console.log("Rafraîchissement automatique du dashboard admin", new Date().toISOString());
-    }, 15000);
+    }, 90000); // Changé de 15000 à 90000 (90 secondes)
     
     return () => clearInterval(intervalId);
   }, []);

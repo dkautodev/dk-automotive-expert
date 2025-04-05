@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
@@ -40,7 +39,6 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     forceAdminView
   });
 
-  // Ajouter des logs détaillés pour le débogage
   useEffect(() => {
     console.log(`MissionsByStatusTable [${new Date().toISOString()}]: 
       - status: ${Array.isArray(status) ? status.join(', ') : status || 'Tous'}
@@ -62,15 +60,12 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     }
   }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger, localRefreshTrigger]);
 
-  // Actualiser quand le refreshTrigger externe change
   useEffect(() => {
     setLocalRefreshTrigger(refreshTrigger);
   }, [refreshTrigger]);
 
-  // Rafraîchissement périodique - 90 secondes pour clients et chauffeurs, 5 secondes pour admins
   useEffect(() => {
-    // Déterminer l'intervalle de rafraîchissement basé sur le rôle
-    const refreshInterval = role === 'admin' ? 5000 : 90000; // 5 secondes pour admin, 90 secondes pour autres
+    const refreshInterval = 90000; // 90 secondes pour tous
     
     const intervalId = setInterval(() => {
       console.log(`Rafraîchissement automatique de MissionsByStatusTable [${role}]`, new Date().toISOString());
@@ -82,7 +77,6 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   }, [role]);
 
   const handleManualRefresh = () => {
-    // Déclencher un rafraîchissement manuel
     const newValue = localRefreshTrigger + 1;
     setLocalRefreshTrigger(newValue);
     setLastRefreshTime(new Date());
@@ -91,18 +85,15 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   };
 
   const handleMissionCancelled = () => {
-    // Déclencher un rafraîchissement lorsqu'une mission est annulée
     refetch();
     console.log("Mission cancelled, refreshing data");
   };
 
   const handleMissionUpdated = () => {
-    // Déclencher un rafraîchissement lorsqu'une mission est mise à jour
     refetch();
     console.log("Mission updated, refreshing data");
   };
 
-  // S'il y a une erreur et pas de missions, afficher l'état vide avec un message d'erreur
   if (error) {
     console.error("Erreur dans MissionsByStatusTable:", error);
     return (
@@ -113,12 +104,10 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     );
   }
 
-  // Formater l'heure de dernière actualisation
   const formattedRefreshTime = lastRefreshTime.toLocaleTimeString();
 
   return (
     <>
-      {/* Bouton de rafraîchissement manuel - visible uniquement pour clients et chauffeurs ou si spécifié */}
       {showRefreshButton && (role === 'client' || role === 'chauffeur' || !role) && (
         <div className="flex justify-between items-center mb-4">
           <div className="text-sm text-gray-500">
