@@ -12,9 +12,11 @@ export function useMissionCancellation({ onSuccess }: UseMissionCancellationProp
   const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
 
-  const handleCancelMission = (missionId: string) => {
-    setSelectedMissionId(missionId);
+  const handleCancelMission = (mission: MissionRow) => {
+    setSelectedMissionId(mission.id);
+    setSelectedMission(mission);
     setIsCancelDialogOpen(true);
   };
 
@@ -25,7 +27,7 @@ export function useMissionCancellation({ onSuccess }: UseMissionCancellationProp
       setIsLoading(true);
       const { error } = await supabase
         .from('missions')
-        .update({ status: 'annulé' })
+        .update({ status: 'annulé' }) // Using the correct status with accent
         .eq('id', selectedMissionId);
         
       if (error) {
@@ -45,11 +47,13 @@ export function useMissionCancellation({ onSuccess }: UseMissionCancellationProp
       setIsLoading(false);
       setIsCancelDialogOpen(false);
       setSelectedMissionId(null);
+      setSelectedMission(null);
     }
   };
 
   return {
     selectedMissionId,
+    selectedMission,
     isCancelDialogOpen,
     isLoading,
     handleCancelMission,
