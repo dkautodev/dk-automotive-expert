@@ -23,7 +23,7 @@ export function useMissions({
 }: UseMissionsProps = {}) {
   const { user, role } = useAuthContext();
   
-  // Détermination explicite du mode admin basée sur plusieurs critères
+  // Logique d'administrateur simplifiée et clarifiée
   const adminEmail = 'dkautomotive70@gmail.com';
   const isAdmin = forceAdminView || role === 'admin' || (user?.email === adminEmail);
   
@@ -32,11 +32,11 @@ export function useMissions({
     console.log(`[DEBUG] Fetching missions at ${timestamp} with: 
       - refreshTrigger: ${refreshTrigger}
       - showAllMissions: ${showAllMissions}
-      - filterStatus: ${Array.isArray(filterStatus) ? filterStatus.join(', ') : filterStatus}
+      - filterStatus: ${Array.isArray(filterStatus) ? filterStatus.join(', ') : filterStatus || 'All'}
       - forceAdminView: ${forceAdminView}
       - isAdmin: ${isAdmin}
       - user.email: ${user?.email}
-      - role: ${role}
+      - role: ${role || 'unknown'}
     `);
     
     try {
@@ -159,7 +159,7 @@ export function useMissions({
     }
   }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user, forceAdminView, role]);
 
-  // Utilisation de react-query pour une meilleure gestion du cache et de l'état avec des paramètres de rafraîchissement améliorés
+  // Utilisation de react-query pour une meilleure gestion du cache et de l'état
   const { 
     data: missions = [], 
     isLoading: loading, 

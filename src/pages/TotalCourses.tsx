@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Plus } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import MissionsByStatusTable from "@/components/admin/missions/MissionsByStatusTable";
 import CreateMissionDialog from "@/components/mission-form/CreateMissionDialog";
 
