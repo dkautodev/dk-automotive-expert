@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -95,12 +96,19 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
 
       console.log(`Création de mission avec statut: ${statusToUse}`);
 
-      const defaultAdminId = '00000000-0000-0000-0000-000000000000';
+      // Résolution du problème de clé étrangère: Ne pas fixer d'admin_id par défaut
+      // Si l'utilisateur est admin, utiliser son ID comme admin_id
+      let admin_id = null;
+      if (role === 'admin' && user?.id) {
+        admin_id = user.id;
+        console.log("Administrateur identifié, utilisation de son ID:", admin_id);
+      }
       
       const missionData = {
         status: statusToUse,
         client_id: values.client_id || user?.id,
-        admin_id: defaultAdminId,
+        // Utiliser admin_id uniquement si on a une valeur valide
+        ...(admin_id && { admin_id }),
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
@@ -136,7 +144,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       console.log("Données de mission à envoyer:", missionData);
       console.log("Type de mission:", values.mission_type);
       console.log("Statut de la mission:", statusToUse);
-      console.log("Admin ID utilisé:", defaultAdminId);
+      console.log("Admin ID utilisé:", admin_id || "Non spécifié (NULL)");
 
       const { data, error } = await supabase.rpc(
         'create_mission',
