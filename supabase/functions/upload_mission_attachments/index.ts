@@ -10,33 +10,23 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-/**
- * Nettoie et sanitize un nom de fichier pour le stockage
- * Version plus stricte pour éviter tous les problèmes avec Supabase Storage
- */
-const sanitizeFileName = (fileName: string): string => {
-  console.log("Sanitizing file name for edge function:", fileName);
-  
-  // Sanitization plus stricte - ne conserver que les caractères alphanumériques, points, tirets et underscores
-  const sanitized = fileName
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-    .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
-    .replace(/[^a-zA-Z0-9._-]/g, '_') // Remplacer tous les autres caractères spéciaux par des underscores
-    .replace(/__+/g, '_'); // Éviter les underscores multiples
-  
-  console.log("Sanitized to:", sanitized);
-  return sanitized;
-};
-
 async function handleUpload(req: Request) {
   try {
     // Récupération du body qui contient les données nécessaires
-    const { missionId, fileData, fileName, fileType, fileSize, uploadedBy } = await req.json()
+    const { missionId, missionNumber, fileData, fileName, originalFileName, fileType, fileSize, uploadedBy } = await req.json()
     
-    if (!missionId || !fileData || !fileName || !uploadedBy) {
+    if (!missionId || !fileData || !fileName || !uploadedBy || !missionNumber) {
       return new Response(
-        JSON.stringify({ error: 'Données manquantes pour le téléchargement' }),
+        JSON.stringify({ 
+          error: 'Données manquantes pour le téléchargement',
+          details: {
+            missionId: !!missionId,
+            missionNumber: !!missionNumber,
+            fileName: !!fileName,
+            fileData: !!fileData,
+            uploadedBy: !!uploadedBy
+          }
+        }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -72,11 +62,8 @@ async function handleUpload(req: Request) {
     // Initialisation du client Supabase avec la clé de service pour les autorisations complètes
     const supabase = createClient(supabaseUrl, supabaseKey)
     
-    // S'assurer que le nom du fichier est bien sanitizé avec la nouvelle méthode plus stricte
-    const sanitizedFileName = sanitizeFileName(fileName);
-    
-    const uniqueId = Date.now().toString();
-    const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`;
+    // Utiliser le dossier avec le numéro de mission et le nom de fichier simplifié
+    const filePath = `missions/${missionNumber}/${fileName}`;
     
     console.log("Chemin de téléchargement:", filePath);
     
@@ -108,7 +95,7 @@ async function handleUpload(req: Request) {
       .from('mission_attachments')
       .insert({
         mission_id: missionId,
-        file_name: fileName,
+        file_name: originalFileName || fileName, // Utiliser le nom original pour l'affichage
         file_path: filePath,
         file_type: fileType,
         file_size: fileSize,

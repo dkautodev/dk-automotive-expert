@@ -14,22 +14,18 @@ const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
 const GOOGLE_REFRESH_TOKEN = Deno.env.get("GOOGLE_REFRESH_TOKEN");
 
 /**
- * Nettoie et sanitize un nom de fichier pour le téléversement vers Google Drive
- * Version plus stricte pour éviter les problèmes avec les API externes
+ * Génère un nom de fichier simplifié pour éviter tout problème
+ * Format: fichier01, fichier02, etc. avec l'extension du fichier original
  */
-const sanitizeFileName = (fileName: string): string => {
-  console.log("Sanitizing file name:", fileName);
+const generateSimpleFileName = (originalFileName: string, index: number = 1): string => {
+  // Extraire l'extension du fichier original
+  const extension = originalFileName.split('.').pop() || '';
+  // Générer un nouveau nom avec le format fichierXX
+  const paddedIndex = index.toString().padStart(2, '0');
+  const newFileName = `fichier${paddedIndex}${extension ? `.${extension}` : ''}`;
   
-  // Plus stricte pour Google Drive - ne conserver que les caractères alphanumériques, points, tirets et underscores
-  const sanitized = fileName
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-    .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
-    .replace(/[^a-zA-Z0-9._-]/g, '_') // Remplacer tous les autres caractères spéciaux par des underscores
-    .replace(/__+/g, '_'); // Éviter les underscores multiples
-  
-  console.log("Sanitized to:", sanitized);
-  return sanitized;
+  console.log(`Nom de fichier original: ${originalFileName} => Nouveau nom: ${newFileName}`);
+  return newFileName;
 };
 
 // Fonction pour obtenir un token d'accès à partir du refresh token
@@ -75,17 +71,114 @@ async function getAccessToken() {
   }
 }
 
-// Fonction pour téléverser un fichier sur Google Drive
-async function uploadFileToDrive(accessToken: string, fileName: string, fileContent: Uint8Array, mimeType: string) {
+// Fonction pour créer un dossier sur Google Drive
+async function createFolder(accessToken: string, folderName: string, parentFolderId = null) {
   try {
-    // Sanitize le nom du fichier pour Google Drive
-    const sanitizedFileName = sanitizeFileName(fileName);
-    console.log(`Début du téléversement du fichier ${sanitizedFileName} sur Google Drive`);
+    console.log(`Création du dossier '${folderName}' sur Google Drive`);
+    
+    // Métadonnées du dossier
+    const metadata = {
+      name: folderName,
+      mimeType: 'application/vnd.google-apps.folder',
+      ...(parentFolderId && { parents: [parentFolderId] })
+    };
+    
+    // Envoi de la requête à l'API Google Drive
+    const response = await fetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(metadata)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Erreur lors de la création du dossier: ${response.status} ${errorText}`);
+      throw new Error(`Erreur lors de la création du dossier: ${errorText}`);
+    }
+    
+    const folderData = await response.json();
+    console.log(`Dossier créé avec succès, ID: ${folderData.id}`);
+    return folderData;
+  } catch (error) {
+    console.error('Erreur détaillée lors de la création du dossier:', error);
+    throw error;
+  }
+}
+
+// Fonction pour vérifier si un dossier existe déjà
+async function findFolder(accessToken: string, folderName: string) {
+  try {
+    console.log(`Recherche du dossier '${folderName}' sur Google Drive`);
+    
+    // Construire la requête de recherche pour le dossier
+    const query = `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+    const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Erreur lors de la recherche du dossier: ${response.status} ${errorText}`);
+      throw new Error(`Erreur lors de la recherche du dossier: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`Résultat de la recherche:`, data);
+    
+    if (data.files && data.files.length > 0) {
+      console.log(`Dossier trouvé, ID: ${data.files[0].id}`);
+      return data.files[0];
+    }
+    
+    console.log(`Dossier '${folderName}' non trouvé`);
+    return null;
+  } catch (error) {
+    console.error('Erreur détaillée lors de la recherche du dossier:', error);
+    throw error;
+  }
+}
+
+// Fonction pour trouver ou créer un dossier
+async function findOrCreateFolder(accessToken: string, folderName: string) {
+  try {
+    // Vérifier si le dossier existe déjà
+    const existingFolder = await findFolder(accessToken, folderName);
+    if (existingFolder) {
+      return existingFolder;
+    }
+    
+    // Si le dossier n'existe pas, le créer
+    return await createFolder(accessToken, folderName);
+  } catch (error) {
+    console.error(`Erreur lors de la recherche ou création du dossier '${folderName}':`, error);
+    throw error;
+  }
+}
+
+// Fonction pour téléverser un fichier sur Google Drive dans un dossier spécifique
+async function uploadFileToDrive(accessToken: string, fileName: string, fileContent: Uint8Array, mimeType: string, missionNumber: string, fileIndex: number = 1) {
+  try {
+    // Générer un nom de fichier simplifié
+    const simpleFileName = generateSimpleFileName(fileName, fileIndex);
+    console.log(`Début du téléversement du fichier renommé ${simpleFileName} sur Google Drive pour la mission ${missionNumber}`);
+    
+    // Trouver ou créer le dossier pour la mission
+    const missionFolder = await findOrCreateFolder(accessToken, missionNumber);
+    console.log(`Dossier de la mission (${missionNumber}), ID: ${missionFolder.id}`);
     
     // Créer les métadonnées du fichier
     const metadata = {
-      name: sanitizedFileName,
+      name: simpleFileName,
       mimeType: mimeType,
+      parents: [missionFolder.id] // Placer le fichier dans le dossier de la mission
     };
 
     console.log('Métadonnées du fichier:', metadata);
@@ -161,11 +254,20 @@ async function handleUploadRequest(req: Request) {
     }
 
     // Extraire les données de la requête
-    const { missionId, fileName, fileData, fileType, fileSize, uploadedBy } = await req.json();
+    const { missionId, missionNumber, fileName, fileData, fileType, fileSize, uploadedBy, fileIndex } = await req.json();
     
-    if (!missionId || !fileName || !fileData || !uploadedBy) {
+    if (!missionId || !fileName || !fileData || !uploadedBy || !missionNumber) {
       return new Response(
-        JSON.stringify({ error: 'Données manquantes pour le téléversement' }),
+        JSON.stringify({ 
+          error: 'Données manquantes pour le téléversement', 
+          details: {
+            missionId: !!missionId,
+            missionNumber: !!missionNumber,
+            fileName: !!fileName,
+            fileData: !!fileData,
+            uploadedBy: !!uploadedBy
+          }
+        }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -173,10 +275,11 @@ async function handleUploadRequest(req: Request) {
       );
     }
 
-    console.log(`Traitement de la requête pour téléverser ${fileName} pour la mission ${missionId}`, {
+    console.log(`Traitement de la requête pour téléverser ${fileName} pour la mission ${missionId} (${missionNumber})`, {
       fileType,
       fileSize,
-      uploadedBy
+      uploadedBy,
+      fileIndex: fileIndex || 1
     });
 
     // Récupérer un token d'accès
@@ -206,7 +309,9 @@ async function handleUploadRequest(req: Request) {
       accessToken, 
       fileName,
       binaryData,
-      fileType || 'application/octet-stream'
+      fileType || 'application/octet-stream',
+      missionNumber, // Utiliser le numéro de mission pour le dossier
+      fileIndex || 1
     );
     
     console.log('Réponse de Google Drive:', driveResponse);
