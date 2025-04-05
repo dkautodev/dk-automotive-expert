@@ -17,7 +17,7 @@ interface CreateMissionFormProps {
   clientDefaultStatus?: "en_attente" | "confirmé";
 }
 
-const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: CreateMissionFormProps) => {
+const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: CreateMissionFormProps) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, role } = useAuthContext();
@@ -87,8 +87,13 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
     try {
       const values = form.getValues();
       
+      let statusToUse = clientDefaultStatus;
+      if (role === 'admin') {
+        statusToUse = "confirmé";
+      }
+
       const missionData = {
-        status: clientDefaultStatus,
+        status: statusToUse,
         client_id: values.client_id || user?.id,
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
@@ -124,7 +129,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
 
       console.log("Données de mission à envoyer:", missionData);
       console.log("Type de mission:", values.mission_type);
-      console.log("Statut de la mission:", clientDefaultStatus);
+      console.log("Statut de la mission:", statusToUse);
 
       const { data, error } = await supabase.rpc(
         'create_mission',
@@ -143,14 +148,14 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "confirmé" }: Cre
       
       if (createdMission) {
         console.log("Mission créée:", createdMission);
-        if (clientDefaultStatus === "en_attente") {
+        if (statusToUse === "en_attente") {
           toast.success(`Demande de devis ${createdMission.mission_number} envoyée avec succès`);
         } else {
           toast.success(`Mission ${createdMission.mission_number} créée avec succès`);
         }
       } else {
         console.log("Données retournées:", data);
-        if (clientDefaultStatus === "en_attente") {
+        if (statusToUse === "en_attente") {
           toast.success("Demande de devis envoyée avec succès");
         } else {
           toast.success("Mission créée avec succès");

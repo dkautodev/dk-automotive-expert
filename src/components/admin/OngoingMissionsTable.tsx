@@ -1,40 +1,50 @@
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMissions } from "./missions/useMissions";
+import { useState, useEffect } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MissionsTable } from "./missions/MissionsTable";
 import { MissionsTableSkeleton } from "./missions/MissionsTableSkeleton";
 import { EmptyMissionsState } from "./missions/EmptyMissionsState";
+import { useMissions } from "./missions/useMissions";
 
 interface OngoingMissionsTableProps {
   refreshTrigger?: number;
   showAllMissions?: boolean;
 }
 
-const OngoingMissionsTable: React.FC<OngoingMissionsTableProps> = ({ 
-  refreshTrigger = 0,
-  showAllMissions = false
-}) => {
-  const { missions, loading } = useMissions({ refreshTrigger, showAllMissions });
-  
-  const title = showAllMissions ? "Toutes les missions" : "Missions en cours";
+const OngoingMissionsTable = ({ 
+  refreshTrigger = 0, 
+  showAllMissions = false 
+}: OngoingMissionsTableProps) => {
+  const { missions, loading } = useMissions({ 
+    refreshTrigger,
+    showAllMissions,
+    filterStatus: ['confirmé', 'confirme', 'prise_en_charge']
+  });
+
+  const handleMissionCancelled = () => {
+    // This will be handled by the refreshTrigger from the parent
+    console.log("Mission cancelled, parent will handle refresh");
+  };
 
   return (
-    <Card className="col-span-1">
+    <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle>
+          {showAllMissions ? "Toutes les missions en cours" : "Missions en cours"}
+        </CardTitle>
       </CardHeader>
-      {loading ? (
-        <MissionsTableSkeleton title={title} />
-      ) : (
-        <CardContent>
-          {missions.length > 0 ? (
-            <MissionsTable missions={missions} />
-          ) : (
-            <EmptyMissionsState showAllMissions={showAllMissions} />
-          )}
-        </CardContent>
-      )}
+      <CardContent>
+        {loading ? (
+          <MissionsTableSkeleton />
+        ) : missions.length > 0 ? (
+          <MissionsTable 
+            missions={missions} 
+            onMissionCancelled={handleMissionCancelled} 
+          />
+        ) : (
+          <EmptyMissionsState message="Aucune mission en cours" />
+        )}
+      </CardContent>
     </Card>
   );
 };

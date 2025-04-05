@@ -23,11 +23,11 @@ const DashboardCards = ({
       try {
         console.log("DashboardCards: Fetching counts with refreshTrigger:", refreshTrigger);
         
-        // Fetch pending quotes count - status 'devis'
+        // Fetch pending quotes count - status 'en_attente'
         const { count: pendingCount, error: pendingError } = await extendedSupabase
           .from('missions')
           .select('*', { count: 'exact', head: true })
-          .eq('status', 'devis');
+          .eq('status', 'en_attente');
         
         if (pendingError) {
           console.error("Error fetching pending quotes:", pendingError);
