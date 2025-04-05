@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -46,6 +47,7 @@ export const useAttachmentUpload = () => {
       
       // Convertir le fichier en base64
       const fileData = await fileToBase64(file);
+      console.log("Fichier converti en base64, taille:", fileData.length);
       
       // Appeler l'Edge Function pour Google Drive
       console.log("Appel de l'Edge Function Google Drive");
@@ -67,8 +69,8 @@ export const useAttachmentUpload = () => {
       
       console.log("Réponse de Google Drive:", data);
       
-      if (!data.fileId) {
-        console.error("Aucun ID de fichier reçu de Google Drive");
+      if (!data || !data.fileId) {
+        console.error("Aucun ID de fichier reçu de Google Drive", data);
         throw new Error("Aucun ID de fichier reçu de Google Drive");
       }
       
@@ -93,6 +95,7 @@ export const useAttachmentUpload = () => {
         throw dbError;
       }
       
+      console.log("Enregistrement en base de données réussi");
       return true;
     } catch (error) {
       console.error("Erreur détaillée lors du téléchargement vers Google Drive:", error);
