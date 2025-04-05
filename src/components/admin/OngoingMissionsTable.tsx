@@ -42,7 +42,10 @@ const OngoingMissionsTable = ({
             onMissionCancelled={handleMissionCancelled} 
           />
         ) : (
-          <EmptyMissionsState message="Aucune mission en cours" />
+          <EmptyMissionsState 
+            showAllMissions={showAllMissions} 
+            message="Aucune mission en cours" 
+          />
         )}
       </CardContent>
     </Card>

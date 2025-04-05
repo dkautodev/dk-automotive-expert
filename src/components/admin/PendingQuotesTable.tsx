@@ -34,7 +34,9 @@ const PendingQuotesTable = ({ refreshTrigger = 0 }: PendingQuotesTableProps) => 
             onMissionCancelled={handleMissionCancelled} 
           />
         ) : (
-          <EmptyMissionsState message="Aucun devis en attente" />
+          <EmptyMissionsState 
+            message="Aucun devis en attente" 
+          />
         )}
       </CardContent>
     </Card>
@@ -68,14 +70,25 @@ function usePendingQuotes(refreshTrigger = 0) {
 
         console.log("Pending quotes fetched:", data);
         
+        if (!data) {
+          setMissions([]);
+          return;
+        }
+        
         const transformedMissions = data.map(mission => {
           const vehicleInfo = mission.vehicle_info as any || {};
           
+          // Explicitly cast mission_type to the correct type
+          const missionType = mission.mission_type === 'livraison' || mission.mission_type === 'restitution' 
+            ? mission.mission_type as "livraison" | "restitution"
+            : "livraison"; // Default value if not a valid type
+          
           return {
             ...mission,
+            mission_type: missionType,
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
             delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
-          };
+          } as MissionRow;
         });
         
         setMissions(transformedMissions);
