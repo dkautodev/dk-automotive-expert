@@ -133,6 +133,7 @@ export type Database = {
           file_type: string | null
           id: string
           mission_id: string | null
+          storage_provider: string | null
           updated_at: string
           uploaded_by: string
         }
@@ -144,6 +145,7 @@ export type Database = {
           file_type?: string | null
           id?: string
           mission_id?: string | null
+          storage_provider?: string | null
           updated_at?: string
           uploaded_by: string
         }
@@ -155,6 +157,7 @@ export type Database = {
           file_type?: string | null
           id?: string
           mission_id?: string | null
+          storage_provider?: string | null
           updated_at?: string
           uploaded_by?: string
         }
