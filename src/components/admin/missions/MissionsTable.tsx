@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { 
   Eye, 
   UserCheck, 
-  Settings
+  Settings,
+  Edit,
+  Paperclip
 } from "lucide-react";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
 import { useMissionCancellation } from "@/hooks/useMissionCancellation";
@@ -24,6 +26,9 @@ import { CancelMissionDialog } from "@/components/missions/CancelMissionDialog";
 import { extractPostalCodeAndCity } from "@/utils/addressUtils";
 import { AssignDriverDialog } from "./AssignDriverDialog";
 import { UpdateStatusDialog } from "./UpdateStatusDialog";
+import { EditMissionDetailsDialog } from "./EditMissionDetailsDialog";
+import { MissionAttachmentsDialog } from "./MissionAttachmentsDialog";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface MissionsTableProps {
   missions: MissionRow[];
@@ -38,10 +43,15 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
   onMissionUpdated,
   displayType = 'default'
 }) => {
+  const { role } = useAuthContext();
+  const isAdmin = role === 'admin';
+  
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isAssignDriverDialogOpen, setIsAssignDriverDialogOpen] = useState(false);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAttachmentsDialogOpen, setIsAttachmentsDialogOpen] = useState(false);
   const [missionToAssign, setMissionToAssign] = useState<MissionRow | null>(null);
   
   const { 
@@ -66,6 +76,16 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
   const handleOpenStatusDialog = (mission: MissionRow) => {
     setSelectedMission(mission);
     setIsStatusDialogOpen(true);
+  };
+  
+  const handleEditDetails = (mission: MissionRow) => {
+    setSelectedMission(mission);
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleOpenAttachments = (mission: MissionRow) => {
+    setSelectedMission(mission);
+    setIsAttachmentsDialogOpen(true);
   };
 
   const handleDriverAssigned = () => {
@@ -179,8 +199,32 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                       <Settings className="h-4 w-4" />
                     </Button>
                     
+                    {/* Bouton pour les pièces jointes - disponible pour tous les types */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-amber-500 hover:text-amber-700 hover:bg-amber-100"
+                      onClick={() => handleOpenAttachments(mission)}
+                      title="Gérer les pièces jointes"
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    
+                    {/* Bouton pour éditer les détails - disponible pour les admins uniquement */}
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-green-500 hover:text-green-700 hover:bg-green-100"
+                        onClick={() => handleEditDetails(mission)}
+                        title="Modifier les détails"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
                     {/* Bouton d'assignation de chauffeur pour les missions confirmées */}
-                    {(mission.status === 'confirmé' || mission.status === 'confirme') && (
+                    {isAdmin && (mission.status === 'confirmé' || mission.status === 'confirme') && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -238,7 +282,22 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
         missionNumber={missionToAssign?.mission_number || null}
         onDriverAssigned={handleDriverAssigned}
       />
+      
+      {/* Edit Mission Details Dialog */}
+      <EditMissionDetailsDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        mission={selectedMission}
+        onMissionUpdated={onMissionUpdated || (() => {})}
+      />
+      
+      {/* Mission Attachments Dialog */}
+      <MissionAttachmentsDialog
+        isOpen={isAttachmentsDialogOpen}
+        onClose={() => setIsAttachmentsDialogOpen(false)}
+        missionId={selectedMission?.id || null}
+        missionNumber={selectedMission?.mission_number || null}
+      />
     </>
   );
 };
-
