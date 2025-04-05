@@ -262,23 +262,41 @@ async function uploadFileToDrive(accessToken: string, fileName: string, fileCont
     
     // Définir les permissions publiques pour le fichier
     await setPublicPermissions(accessToken, fileData.id);
+    console.log('Permissions publiques définies avec succès pour le fichier');
     
-    // Récupérer les informations complètes du fichier, y compris les liens
-    const fileInfoResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${fileData.id}?fields=id,name,webViewLink,webContentLink`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
+    // Si les liens ne sont pas présents dans la réponse initiale, récupérer les informations complètes
+    if (!fileData.webViewLink || !fileData.webContentLink) {
+      console.log('Récupération des liens manquants...');
+      const fileInfoResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${fileData.id}?fields=id,name,webViewLink,webContentLink`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        }
+      });
+      
+      if (fileInfoResponse.ok) {
+        const completeFileData = await fileInfoResponse.json();
+        console.log('Informations complètes du fichier récupérées:', completeFileData);
+        
+        if (completeFileData.webViewLink) fileData.webViewLink = completeFileData.webViewLink;
+        if (completeFileData.webContentLink) fileData.webContentLink = completeFileData.webContentLink;
+      } else {
+        console.warn('Impossible de récupérer les liens complets, utilisation des données partielles');
       }
-    });
-    
-    if (!fileInfoResponse.ok) {
-      console.warn('Impossible de récupérer les informations complètes du fichier, utilisation des données partielles');
-      return fileData;
     }
     
-    const completeFileData = await fileInfoResponse.json();
-    console.log('Informations complètes du fichier:', completeFileData);
+    // Si le lien de visualisation n'est toujours pas disponible, génération manuelle
+    if (!fileData.webViewLink) {
+      fileData.webViewLink = `https://drive.google.com/file/d/${fileData.id}/view`;
+      console.log('Lien de visualisation généré manuellement:', fileData.webViewLink);
+    }
     
-    return completeFileData;
+    // Si le lien de téléchargement n'est toujours pas disponible, génération manuelle
+    if (!fileData.webContentLink) {
+      fileData.webContentLink = `https://drive.google.com/uc?id=${fileData.id}&export=download`;
+      console.log('Lien de téléchargement généré manuellement:', fileData.webContentLink);
+    }
+    
+    return fileData;
   } catch (error) {
     console.error('Erreur détaillée lors du téléversement du fichier sur Google Drive:', error);
     throw error;
@@ -367,18 +385,12 @@ async function handleUploadRequest(req: Request) {
       fileIndex || 1
     );
     
-    console.log('Réponse de Google Drive:', driveResponse);
+    console.log('Réponse de Google Drive complète:', driveResponse);
     
-    // S'assurer que les URLs nécessaires sont bien présentes
-    if (!driveResponse.webViewLink) {
-      console.warn('Avertissement: webViewLink manquant dans la réponse de Google Drive');
-    }
-    
-    if (!driveResponse.webContentLink) {
-      console.warn('Avertissement: webContentLink manquant dans la réponse de Google Drive');
-      // Générer une URL de téléchargement alternative si celle-ci n'est pas fournie
-      driveResponse.webContentLink = `https://drive.google.com/uc?id=${driveResponse.id}&export=download`;
-    }
+    // Vérification finale des liens
+    console.log('Liens générés:');
+    console.log('- webViewLink:', driveResponse.webViewLink);
+    console.log('- webContentLink:', driveResponse.webContentLink);
     
     // Retourner la réponse
     return new Response(

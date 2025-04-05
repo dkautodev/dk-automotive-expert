@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
-import { Paperclip, Trash2, Download, ExternalLink } from "lucide-react";
+import { Paperclip, Trash2, Download, ExternalLink, File } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
 import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 
@@ -216,6 +216,12 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     toast.error("Lien de visualisation non disponible");
   };
 
+  const getFileIcon = (fileType: string) => {
+    if (fileType.startsWith('image/')) return '🖼️';
+    if (fileType === 'application/pdf') return '📄';
+    return '📎';
+  };
+
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
@@ -273,13 +279,35 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                   {attachments.map((attachment) => (
                     <li key={attachment.id} className="p-3 flex items-center justify-between">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{attachment.file_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatFileSize(attachment.file_size)} • {new Date(attachment.created_at).toLocaleDateString()} 
-                          {attachment.storage_provider && (
-                            <span className="ml-1">• {attachment.storage_provider === 'google_drive' ? 'Google Drive' : 'Supabase'}</span>
-                          )}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="flex-shrink-0">
+                            {getFileIcon(attachment.file_type)}
+                          </span>
+                          <div>
+                            <p className="text-sm font-medium truncate">{attachment.file_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatFileSize(attachment.file_size)} • {new Date(attachment.created_at).toLocaleDateString()} 
+                              {attachment.storage_provider && (
+                                <span className="ml-1">• {attachment.storage_provider === 'google_drive' ? (
+                                  <span className="text-blue-500 font-medium">Google Drive</span>
+                                ) : 'Supabase'}</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                        {attachment.storage_provider === 'google_drive' && attachment.provider_view_url && (
+                          <div className="mt-1 text-xs text-blue-500 truncate">
+                            <a 
+                              href={attachment.provider_view_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="hover:underline flex items-center gap-1"
+                            >
+                              <File className="h-3 w-3" />
+                              {attachment.provider_view_url}
+                            </a>
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center space-x-2">
                         {attachment.storage_provider === 'google_drive' && (
