@@ -10,11 +10,19 @@ interface DashboardCardsProps {
   refreshTrigger?: number;
 }
 
+// Define a proper interface for the dashboard counts
+interface DashboardCounts {
+  totalMissionsCount: number;
+  pendingQuotesCount: number;
+  ongoingMissionsCount: number;
+  completedMissionsCount: number;
+}
+
 const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
   // Use react-query for better caching and state management
-  const { data: counts = {}, isLoading } = useQuery({
+  const { data: counts, isLoading } = useQuery({
     queryKey: ['dashboard-counts', refreshTrigger],
-    queryFn: async () => {
+    queryFn: async (): Promise<DashboardCounts> => {
       try {
         console.log("DashboardCards: Fetching counts with refreshTrigger:", refreshTrigger);
         
@@ -89,6 +97,17 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
     retry: 2
   });
 
+  // Default counts object with zeroes to handle undefined
+  const defaultCounts: DashboardCounts = {
+    totalMissionsCount: 0,
+    pendingQuotesCount: 0,
+    ongoingMissionsCount: 0,
+    completedMissionsCount: 0
+  };
+
+  // Use counts or defaultCounts if counts is undefined
+  const displayCounts = counts || defaultCounts;
+
   return (
     <div className="grid gap-6 md:grid-cols-4 mb-6">
       <Card>
@@ -97,7 +116,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{isLoading ? '...' : counts.totalMissionsCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : displayCounts.totalMissionsCount}</p>
         </CardContent>
       </Card>
 
@@ -107,7 +126,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <Circle className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{isLoading ? '...' : counts.pendingQuotesCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : displayCounts.pendingQuotesCount}</p>
         </CardContent>
       </Card>
 
@@ -117,7 +136,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <AlertCircle className="h-4 w-4 text-yellow-500" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{isLoading ? '...' : counts.ongoingMissionsCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : displayCounts.ongoingMissionsCount}</p>
         </CardContent>
       </Card>
 
@@ -127,7 +146,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <CheckCircle className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{isLoading ? '...' : counts.completedMissionsCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : displayCounts.completedMissionsCount}</p>
         </CardContent>
       </Card>
     </div>
