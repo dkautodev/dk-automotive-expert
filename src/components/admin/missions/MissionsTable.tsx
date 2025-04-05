@@ -13,23 +13,28 @@ import { MissionRow } from "@/types/database";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { Eye, X, FileText } from "lucide-react";
+import { Eye, X, UserCheck } from "lucide-react";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
 import { useMissionCancellation } from "@/hooks/useMissionCancellation";
 import { CancelMissionDialog } from "@/components/missions/CancelMissionDialog";
 import { extractPostalCodeAndCity } from "@/utils/addressUtils";
+import { AssignDriverDialog } from "./AssignDriverDialog";
 
 interface MissionsTableProps {
   missions: MissionRow[];
   onMissionCancelled?: () => void;
+  onMissionUpdated?: () => void;
 }
 
 export const MissionsTable: React.FC<MissionsTableProps> = ({ 
   missions, 
-  onMissionCancelled 
+  onMissionCancelled,
+  onMissionUpdated
 }) => {
   const [selectedMission, setSelectedMission] = useState<MissionRow | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isAssignDriverDialogOpen, setIsAssignDriverDialogOpen] = useState(false);
+  const [missionToAssign, setMissionToAssign] = useState<MissionRow | null>(null);
   
   const { 
     isCancelDialogOpen, 
@@ -43,6 +48,18 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
   const handleViewDetails = (mission: MissionRow) => {
     setSelectedMission(mission);
     setIsDetailsDialogOpen(true);
+  };
+
+  const handleAssignDriver = (mission: MissionRow) => {
+    setMissionToAssign(mission);
+    setIsAssignDriverDialogOpen(true);
+  };
+
+  const handleDriverAssigned = () => {
+    // Trigger refresh of missions data
+    if (onMissionUpdated) {
+      onMissionUpdated();
+    }
   };
 
   const formatDate = (dateString: string | null) => {
@@ -115,6 +132,20 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
+                    
+                    {/* Bouton d'assignation de chauffeur pour les missions confirmées */}
+                    {(mission.status === 'confirmé' || mission.status === 'confirme') && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-100"
+                        onClick={() => handleAssignDriver(mission)}
+                        title="Assigner un chauffeur"
+                      >
+                        <UserCheck className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
                     {mission.status === 'en_attente' && (
                       <Button
                         variant="ghost"
@@ -156,6 +187,15 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
         onConfirm={confirmCancelMission}
         isLoading={isLoading}
         missionNumber={missionToCancel?.mission_number}
+      />
+
+      {/* Assign Driver Dialog */}
+      <AssignDriverDialog
+        isOpen={isAssignDriverDialogOpen}
+        onClose={() => setIsAssignDriverDialogOpen(false)}
+        missionId={missionToAssign?.id || null}
+        missionNumber={missionToAssign?.mission_number || null}
+        onDriverAssigned={handleDriverAssigned}
       />
     </>
   );
