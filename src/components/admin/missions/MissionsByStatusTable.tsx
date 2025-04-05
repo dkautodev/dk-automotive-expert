@@ -20,14 +20,14 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   showAllMissions = false,
   emptyMessage = "Aucune mission disponible",
   limit,
-  forceAdminView = true // Default to true for admin dashboard
+  forceAdminView = false // Par défaut à false, sera explicitement passé
 }) => {
   const { missions, loading, error, refetch } = useMissions({ 
     refreshTrigger,
     showAllMissions,
     filterStatus: status,
     limit,
-    forceAdminView // Explicitement passer le flag admin
+    forceAdminView // Transmettre explicitement le flag admin
   });
 
   // Utiliser useEffect pour journaliser les informations sur les missions à chaque mise à jour
@@ -48,7 +48,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     }
   }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger]);
 
-  // Forcer un rafraîchissement périodique plus fréquent
+  // Rafraîchissement périodique plus fréquent
   useEffect(() => {
     const intervalId = setInterval(() => {
       console.log("Rafraîchissement forcé de MissionsByStatusTable", new Date().toISOString());
@@ -59,12 +59,12 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   }, [refetch]);
 
   const handleMissionCancelled = () => {
-    // Trigger a refresh when a mission is cancelled
+    // Déclencher un rafraîchissement lorsqu'une mission est annulée
     refetch();
     console.log("Mission cancelled, refreshing data");
   };
 
-  // If there's an error and no missions, show the empty state with error message
+  // S'il y a une erreur et pas de missions, afficher l'état vide avec un message d'erreur
   if (error) {
     console.error("Erreur dans MissionsByStatusTable:", error);
     return (

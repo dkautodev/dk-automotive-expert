@@ -23,10 +23,7 @@ export function useMissions({
 }: UseMissionsProps = {}) {
   const { user, role } = useAuthContext();
   
-  // Déterminez explicitement le statut admin en utilisant plusieurs critères
-  // 1. Si forceAdminView est true
-  // 2. Si l'utilisateur a le rôle 'admin'
-  // 3. Si l'email de l'utilisateur est l'email admin spécifique
+  // Détermination explicite du mode admin basée sur plusieurs critères
   const adminEmail = 'dkautomotive70@gmail.com';
   const isAdmin = forceAdminView || role === 'admin' || (user?.email === adminEmail);
   
@@ -43,13 +40,13 @@ export function useMissions({
     `);
     
     try {
-      // Start building the query to fetch missions
+      // Construction de la requête pour récupérer les missions
       let query = supabase
         .from('missions')
         .select('*')
         .order('created_at', { ascending: false });
       
-      // Apply status filter only if showAllMissions is false and filterStatus is provided
+      // Application du filtre de statut si showAllMissions est false et filterStatus est fourni
       if (!showAllMissions && filterStatus) {
         if (Array.isArray(filterStatus)) {
           console.log(`Filtering by multiple statuses: ${filterStatus.join(', ')}`);
@@ -60,16 +57,15 @@ export function useMissions({
         }
       }
       
-      // IMPORTANT: Nous sommes en mode admin, NE PAS filtrer par client_id
+      // IMPORTANT: Mode admin, ne pas filtrer par client_id
       if (!isAdmin && user?.id) {
         console.log(`Mode client: Filtering by client_id: ${user.id}`);
         query = query.eq('client_id', user.id);
       } else {
         console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id`);
-        // Dans le mode admin, nous ne filtrons pas par client_id pour voir toutes les missions
       }
 
-      // Apply limit if provided
+      // Application de la limite si fournie
       if (limit) {
         query = query.limit(limit);
       }
@@ -88,16 +84,16 @@ export function useMissions({
         return [];
       }
       
-      // Transform missions to include properly typed objects
+      // Transformation des missions pour inclure des objets correctement typés
       const transformedMissions = data.map(mission => {
         const vehicleInfo = mission.vehicle_info as any || {};
         
-        // Explicitly cast mission_type to the correct type
+        // Cast explicite de mission_type au type correct
         const missionType = mission.mission_type === 'livraison' || mission.mission_type === 'restitution' 
           ? mission.mission_type as "livraison" | "restitution"
-          : "livraison"; // Default value if not a valid type
+          : "livraison"; // Valeur par défaut si ce n'est pas un type valide
         
-        // Validate and cast the status to MissionStatus type
+        // Validation et cast du statut au type MissionStatus
         const validateStatus = (status: string): MissionStatus => {
           const validStatuses: MissionStatus[] = [
             "termine", "prise_en_charge", "en_attente", "confirme", 
@@ -106,25 +102,25 @@ export function useMissions({
           
           return validStatuses.includes(status as MissionStatus) 
             ? status as MissionStatus 
-            : "en_attente"; // Default to "en_attente" if invalid status
+            : "en_attente"; // Par défaut "en_attente" si statut invalide
         };
         
-        // Create a properly typed mission object (without clientProfile for now)
+        // Création d'un objet mission correctement typé (sans clientProfile pour l'instant)
         const typedMission: MissionRow = {
           ...mission,
           mission_type: missionType,
           status: validateStatus(mission.status),
           pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
           delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
-          clientProfile: null // Will be populated later
+          clientProfile: null // Sera rempli plus tard
         };
         
         return typedMission;
       });
       
-      // Now fetch all client profiles in a single query
+      // Récupération de tous les profils clients en une seule requête
       if (transformedMissions.length > 0) {
-        // Extract unique client IDs
+        // Extraction des ID clients uniques
         const clientIds = [...new Set(transformedMissions.map(m => m.client_id))].filter(Boolean);
         
         if (clientIds.length > 0) {
@@ -135,9 +131,9 @@ export function useMissions({
             
           if (profilesError) {
             console.error("Error fetching client profiles:", profilesError);
-            // Continue without profiles rather than failing completely
+            // Continuer sans profils plutôt que d'échouer complètement
           } else if (profiles) {
-            // Attach profiles to respective missions
+            // Attachement des profils aux missions respectives
             const missionsWithProfiles = transformedMissions.map(mission => {
               const clientProfile = profiles.find(
                 profile => profile.user_id === mission.client_id
@@ -163,14 +159,14 @@ export function useMissions({
     }
   }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user, forceAdminView, role]);
 
-  // Use react-query for better caching and state management with improved refresh settings
+  // Utilisation de react-query pour une meilleure gestion du cache et de l'état avec des paramètres de rafraîchissement améliorés
   const { 
     data: missions = [], 
     isLoading: loading, 
     error, 
     refetch 
   } = useQuery({
-    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role, Date.now()],
+    queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
     queryFn: fetchMissions,
     staleTime: 0, // Toujours considérer les données comme obsolètes
     refetchInterval: 3000, // Rafraîchissement automatique toutes les 3 secondes
