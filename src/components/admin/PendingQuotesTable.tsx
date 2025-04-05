@@ -6,7 +6,7 @@ import { MissionsTableSkeleton } from "./missions/MissionsTableSkeleton";
 import { EmptyMissionsState } from "./missions/EmptyMissionsState";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { MissionRow } from "@/types/database";
+import { MissionRow, UserProfileRow } from "@/types/database";
 
 interface PendingQuotesTableProps {
   refreshTrigger?: number;
@@ -83,23 +83,32 @@ function usePendingQuotes(refreshTrigger = 0) {
             ? mission.mission_type as "livraison" | "restitution"
             : "livraison"; // Default value if not a valid type
           
-          // First, determine if the clientProfile is valid and not an error object
-          const isValidClientProfile = 
-            mission.clientProfile && 
-            typeof mission.clientProfile === 'object' && 
-            !('error' in mission.clientProfile);
+          // Create a type guard function to validate clientProfile
+          const isValidClientProfile = (profile: any): profile is UserProfileRow => {
+            return profile && 
+                  typeof profile === 'object' && 
+                  !('error' in profile) &&
+                  'id' in profile &&
+                  'user_id' in profile &&
+                  'first_name' in profile &&
+                  'last_name' in profile;
+          };
           
-          // Create a safe client profile or null
-          const safeClientProfile = isValidClientProfile ? mission.clientProfile : null;
+          // Apply the type guard to create a properly typed clientProfile
+          const safeClientProfile = isValidClientProfile(mission.clientProfile) 
+            ? mission.clientProfile as UserProfileRow 
+            : null;
           
-          return {
+          // Create a properly typed mission object
+          const typedMission: MissionRow = {
             ...mission,
             mission_type: missionType,
             pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
             delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
-            // Ensure clientProfile is properly typed
             clientProfile: safeClientProfile
-          } as MissionRow; // Force cast as MissionRow after proper validation
+          };
+          
+          return typedMission;
         });
         
         setMissions(transformedMissions);
