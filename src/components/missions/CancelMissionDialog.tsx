@@ -26,7 +26,7 @@ export const CancelMissionDialog: React.FC<CancelMissionDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
           <AlertDialogAction 
             onClick={(e) => {
               e.preventDefault();
