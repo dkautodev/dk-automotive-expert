@@ -22,6 +22,17 @@ const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
   
   console.log("Liste des clients disponibles:", clients);
   
+  // Fonction pour formater l'affichage du client
+  const formatClientDisplay = (client: ClientData) => {
+    const nameParts = [];
+    if (client.last_name) nameParts.push(client.last_name.toUpperCase());
+    if (client.first_name) nameParts.push(client.first_name);
+    if (client.company) nameParts.push(client.company);
+    
+    // Retourner le format NOM-PRENOM-SOCIÉTÉ si des informations sont disponibles
+    return nameParts.length > 0 ? nameParts.join('-') : client.email || 'Client sans nom';
+  };
+  
   return (
     <FormField
       control={form.control}
@@ -44,7 +55,7 @@ const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
               <SelectContent>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
-                    {client.name} {client.company ? `(${client.company})` : ''}
+                    {formatClientDisplay(client)}
                   </SelectItem>
                 ))}
               </SelectContent>

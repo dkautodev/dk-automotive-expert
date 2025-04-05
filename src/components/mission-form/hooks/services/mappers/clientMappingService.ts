@@ -20,7 +20,9 @@ export const clientMappingService = {
       email: userData?.email || '',
       phone: profile.phone || '',
       company: profile.company_name || '',
-      address: profile.billing_address || ''
+      address: profile.billing_address || '',
+      first_name: profile.first_name || userData?.first_name || '',
+      last_name: profile.last_name || userData?.last_name || '',
     };
   },
 
@@ -39,7 +41,9 @@ export const clientMappingService = {
       email: userData.email || '',
       phone: userData.phone || '',
       company: userData.company_name || '',
-      address: ''
+      address: '',
+      first_name: userData.first_name || '',
+      last_name: userData.last_name || '',
     };
   }
 };
