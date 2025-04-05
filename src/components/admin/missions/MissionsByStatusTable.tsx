@@ -47,6 +47,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       console.log("Premier numéro de mission:", missions[0].mission_number);
       console.log("Premier statut de mission:", missions[0].status);
       console.log("Client ID de la première mission:", missions[0].client_id);
+      console.log("Admin ID de la première mission:", missions[0].admin_id);
     }
   }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger]);
 
