@@ -27,11 +27,19 @@ export function useMissions({
   // 1. Si forceAdminView est true
   // 2. Si l'utilisateur a le rôle 'admin'
   // 3. Si l'email de l'utilisateur est l'email admin spécifique
-  const isAdmin = forceAdminView || role === 'admin' || (user?.email === 'dkautomotive70@gmail.com');
+  const adminEmail = 'dkautomotive70@gmail.com';
+  const isAdmin = forceAdminView || role === 'admin' || (user?.email === adminEmail);
   
   const fetchMissions = useCallback(async () => {
-    console.log(`Fetching missions with refreshTrigger: ${refreshTrigger}, showAllMissions: ${showAllMissions}, filterStatus:`, filterStatus);
-    console.log(`Is admin view: ${isAdmin}, Admin force flag: ${forceAdminView}, User role: ${role}, User email: ${user?.email}`);
+    console.log(`[DEBUG] Fetching missions with: 
+      - refreshTrigger: ${refreshTrigger}
+      - showAllMissions: ${showAllMissions}
+      - filterStatus: ${Array.isArray(filterStatus) ? filterStatus.join(', ') : filterStatus}
+      - forceAdminView: ${forceAdminView}
+      - isAdmin: ${isAdmin}
+      - user.email: ${user?.email}
+      - role: ${role}
+    `);
     
     try {
       // Start building the query to fetch missions
@@ -51,12 +59,13 @@ export function useMissions({
         }
       }
       
-      // IMPORTANT: Seulement filtrer par client_id si nous ne sommes PAS en mode admin
+      // IMPORTANT: Nous sommes en mode admin, NE PAS filtrer par client_id
       if (!isAdmin && user?.id) {
-        console.log(`Filtering by client_id: ${user.id} (non-admin view)`);
+        console.log(`Mode client: Filtering by client_id: ${user.id}`);
         query = query.eq('client_id', user.id);
       } else {
-        console.log(`Admin view enabled - fetching all client missions`);
+        console.log(`Mode admin: Affichage de toutes les missions`);
+        // Dans le mode admin, nous ne filtrons pas par client_id pour voir toutes les missions
       }
 
       // Apply limit if provided
@@ -71,10 +80,10 @@ export function useMissions({
         throw error;
       }
       
-      console.log(`Missions fetched: ${data?.length || 0}`);
+      console.log(`Missions récupérées: ${data?.length || 0}`);
       
       if (!data || data.length === 0) {
-        console.log("No missions found in database");
+        console.log("Aucune mission trouvée dans la base de données");
         return [];
       }
       
@@ -139,13 +148,13 @@ export function useMissions({
               };
             });
             
-            console.log(`Number of missions with profiles: ${missionsWithProfiles.length}`);
+            console.log(`Nombre de missions avec profiles: ${missionsWithProfiles.length}`);
             return missionsWithProfiles;
           }
         }
       }
       
-      console.log(`Number of transformed missions: ${transformedMissions.length}`);
+      console.log(`Nombre de missions transformées: ${transformedMissions.length}`);
       return transformedMissions;
     } catch (error) {
       console.error("Error in fetchMissions:", error);
@@ -162,7 +171,7 @@ export function useMissions({
   } = useQuery({
     queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
     queryFn: fetchMissions,
-    staleTime: 3 * 60 * 1000, // 3 minutes
+    staleTime: 60 * 1000, // 1 minute - réduit pour plus de réactivité
     meta: {
       onError: (err: any) => {
         console.error('Error in useMissions hook:', err);
@@ -171,6 +180,5 @@ export function useMissions({
     }
   });
 
-  // Expose a simpler interface
   return { missions, loading, error, refetch };
 }

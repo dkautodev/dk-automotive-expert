@@ -93,7 +93,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
         };
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 60 * 1000, // 1 minute - réduit pour plus de réactivité
     retry: 2
   });
 

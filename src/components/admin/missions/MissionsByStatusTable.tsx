@@ -30,7 +30,13 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     forceAdminView // Explicitement passer le flag admin
   });
 
-  console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, forceAdminView=${forceAdminView}, missions.length=${missions.length}, error=${error ? 'Yes' : 'No'}`);
+  console.log(`MissionsByStatusTable: 
+    - status: ${Array.isArray(status) ? status.join(', ') : status}
+    - showAllMissions: ${showAllMissions}
+    - forceAdminView: ${forceAdminView}
+    - missions.length: ${missions.length}
+    - error: ${error ? 'Oui' : 'Non'}
+  `);
 
   const handleMissionCancelled = () => {
     // Trigger a refresh when a mission is cancelled
