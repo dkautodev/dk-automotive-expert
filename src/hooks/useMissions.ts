@@ -171,7 +171,8 @@ export function useMissions({
   } = useQuery({
     queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
     queryFn: fetchMissions,
-    staleTime: 60 * 1000, // 1 minute - réduit pour plus de réactivité
+    staleTime: 30 * 1000, // 30 secondes - extrêmement réactif pour voir les nouvelles missions
+    refetchInterval: 30 * 1000, // Rafraîchissement automatique toutes les 30 secondes
     meta: {
       onError: (err: any) => {
         console.error('Error in useMissions hook:', err);

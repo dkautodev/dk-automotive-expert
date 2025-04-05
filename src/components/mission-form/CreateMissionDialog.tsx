@@ -21,11 +21,17 @@ const CreateMissionDialog = ({ onMissionCreated }: CreateMissionDialogProps) => 
 
   const handleSuccess = () => {
     setOpen(false);
-    console.log("Mission créée avec succès, notification du parent");
+    
+    // Log pour déboguer
+    console.log("Mission créée avec succès via le dialogue, notification du parent");
+    
+    // Important: Notifier explicitement le parent pour forcer le rafraîchissement
     if (onMissionCreated) {
-      onMissionCreated();
+      setTimeout(() => {
+        onMissionCreated();
+        console.log("Callback onMissionCreated appelé avec délai");
+      }, 500); // Petit délai pour permettre à la BD de se mettre à jour
     }
-    toast.success("Mission créée avec succès");
   };
 
   return (
@@ -40,7 +46,7 @@ const CreateMissionDialog = ({ onMissionCreated }: CreateMissionDialogProps) => 
         <DialogHeader>
           <DialogTitle>Créer une nouvelle mission de convoyage</DialogTitle>
         </DialogHeader>
-        <CreateMissionForm onSuccess={handleSuccess} />
+        <CreateMissionForm onSuccess={handleSuccess} clientDefaultStatus="confirmé" />
       </DialogContent>
     </Dialog>
   );
