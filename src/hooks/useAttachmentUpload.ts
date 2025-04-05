@@ -8,96 +8,25 @@ export const useAttachmentUpload = () => {
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
 
   /**
-   * Convertit un fichier en chaîne base64
+   * Obtient le numéro de mission à partir de l'ID
    */
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
-  };
-
-  /**
-   * Télécharge un fichier sur Google Drive via Edge Function
-   */
-  const uploadToGoogleDrive = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
+  const getMissionNumber = async (missionId: string): Promise<string | null> => {
     try {
-      console.log("Début du téléchargement vers Google Drive");
+      const { data, error } = await supabase
+        .from('missions')
+        .select('mission_number')
+        .eq('id', missionId)
+        .single();
       
-      // Convertir le fichier en base64
-      const fileData = await fileToBase64(file);
-      console.log("Fichier converti en base64, taille:", fileData.length);
-      
-      // Appeler l'Edge Function pour Google Drive
-      console.log("Appel de l'Edge Function Google Drive");
-      const { data, error } = await supabase.functions.invoke('upload_to_google_drive', {
-        body: {
-          missionId,
-          missionNumber,
-          fileData,
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          uploadedBy: userId,
-          fileIndex
-        }
-      });
-      
-      if (error) {
-        console.error("Erreur lors de l'appel à l'Edge Function Google Drive:", error);
-        throw error;
+      if (error || !data) {
+        console.error("Erreur lors de la récupération du numéro de mission:", error);
+        return null;
       }
       
-      console.log("Réponse de Google Drive:", data);
-      
-      if (!data || !data.fileId || !data.success) {
-        console.error("Réponse invalide de Google Drive", data);
-        throw new Error("Réponse invalide de Google Drive");
-      }
-      
-      // Vérifier que nous avons bien tous les liens nécessaires
-      if (!data.webViewLink) {
-        console.warn("Lien de visualisation manquant, utilisant URL par défaut");
-        data.webViewLink = `https://drive.google.com/file/d/${data.fileId}/view`;
-      }
-      
-      if (!data.webContentLink) {
-        console.warn("Lien de téléchargement manquant, utilisant URL par défaut");
-        data.webContentLink = `https://drive.google.com/uc?id=${data.fileId}&export=download`;
-      }
-      
-      // Créer l'enregistrement en base de données avec les informations de Google Drive
-      const dbData = {
-        mission_id: missionId,
-        file_name: file.name,
-        file_path: data.fileId, // Utiliser l'ID du fichier Google Drive comme chemin
-        file_type: file.type,
-        file_size: file.size,
-        uploaded_by: userId,
-        storage_provider: 'google_drive',
-        provider_file_id: data.fileId,
-        provider_view_url: data.webViewLink,
-        provider_download_url: data.webContentLink
-      };
-      
-      console.log("Enregistrement en base de données avec ces données:", dbData);
-      
-      const { error: dbError } = await supabase
-        .from('mission_attachments')
-        .insert(dbData);
-      
-      if (dbError) {
-        console.error("Erreur lors de l'enregistrement en base de données:", dbError);
-        throw dbError;
-      }
-      
-      console.log("Enregistrement en base de données réussi avec les liens Google Drive");
-      return true;
+      return data.mission_number;
     } catch (error) {
-      console.error("Erreur détaillée lors du téléchargement vers Google Drive:", error);
-      return false;
+      console.error("Erreur lors de la récupération du numéro de mission:", error);
+      return null;
     }
   };
 
@@ -158,7 +87,12 @@ export const useAttachmentUpload = () => {
   const uploadViaEdgeFunction = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
     try {
       // Convertir le fichier en base64
-      const fileData = await fileToBase64(file);
+      const reader = new FileReader();
+      const fileData = await new Promise<string>((resolve, reject) => {
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = error => reject(error);
+      });
       
       // Générer un nom de fichier simple
       const extension = file.name.split('.').pop() || '';
@@ -194,29 +128,6 @@ export const useAttachmentUpload = () => {
   };
 
   /**
-   * Obtient le numéro de mission à partir de l'ID
-   */
-  const getMissionNumber = async (missionId: string): Promise<string | null> => {
-    try {
-      const { data, error } = await supabase
-        .from('missions')
-        .select('mission_number')
-        .eq('id', missionId)
-        .single();
-      
-      if (error || !data) {
-        console.error("Erreur lors de la récupération du numéro de mission:", error);
-        return null;
-      }
-      
-      return data.mission_number;
-    } catch (error) {
-      console.error("Erreur lors de la récupération du numéro de mission:", error);
-      return null;
-    }
-  };
-
-  /**
    * Télécharge des fichiers pour une mission
    */
   const uploadAttachments = async (missionId: string, files: File[], userId: string): Promise<boolean> => {
@@ -248,22 +159,9 @@ export const useAttachmentUpload = () => {
         
         console.log(`Tentative de téléchargement du fichier "${file.name}" (index: ${fileIndex}) pour la mission ${missionNumber}`);
         
-        // Priorité à la méthode Google Drive
-        setUploadProgress(prev => ({ ...prev, [file.name]: 30 }));
-        console.log("Tentative de téléchargement via Google Drive");
-        let success = await uploadToGoogleDrive(missionId, missionNumber, file, userId, fileIndex);
-        
-        if (success) {
-          console.log(`Fichier ${file.name} téléchargé avec succès vers Google Drive`);
-          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-          toast.success(`Fichier ${file.name} téléchargé avec succès`);
-          continue; // Passer au fichier suivant si Google Drive a réussi
-        }
-        
-        // Si Google Drive échoue, essayer la méthode Storage directe
-        console.log("Échec Google Drive, tentative via Storage direct");
+        // Essayer la méthode Storage directe
         setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
-        success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
+        let success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
           
         if (success) {
           console.log(`Fichier ${file.name} téléchargé avec succès vers Supabase Storage`);
@@ -272,7 +170,7 @@ export const useAttachmentUpload = () => {
           continue; // Passer au fichier suivant si Storage a réussi
         }
         
-        // Si la méthode directe échoue aussi, essayer via Edge Function
+        // Si la méthode directe échoue, essayer via Edge Function
         console.log("Échec Storage direct, tentative via Edge Function");
         setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
         success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);

@@ -3,6 +3,3 @@ project_id = "lqjwvaqqhqgmkjsriijw"
 
 [functions.upload_mission_attachments]
 verify_jwt = true
-
-[functions.upload_to_google_drive]
-verify_jwt = true

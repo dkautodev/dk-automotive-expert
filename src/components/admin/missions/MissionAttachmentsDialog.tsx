@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
-import { Paperclip, Trash2, Download, ExternalLink, File } from "lucide-react";
+import { Paperclip, Trash2, Download } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
 import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 
@@ -19,10 +19,7 @@ interface Attachment {
   file_size: number;
   uploaded_by: string;
   created_at: string;
-  storage_provider?: 'supabase' | 'google_drive';
-  provider_file_id?: string;
-  provider_view_url?: string;
-  provider_download_url?: string;
+  storage_provider?: string;
 }
 
 interface MissionAttachmentsDialogProps {
@@ -105,34 +102,6 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
 
   const handleDownload = async (attachment: Attachment) => {
     try {
-      // Si c'est un fichier Google Drive
-      if (attachment.storage_provider === 'google_drive') {
-        // Utiliser d'abord provider_download_url s'il existe
-        if (attachment.provider_download_url) {
-          console.log("Téléchargement depuis Google Drive:", attachment.provider_download_url);
-          window.open(attachment.provider_download_url, '_blank');
-          return;
-        }
-        
-        // Fallback: ouvrir l'URL de visualisation
-        if (attachment.provider_view_url) {
-          console.log("Ouverture de la visionneuse Google Drive:", attachment.provider_view_url);
-          window.open(attachment.provider_view_url, '_blank');
-          return;
-        }
-        
-        // Dernier recours: utiliser l'ID du fichier
-        if (attachment.provider_file_id) {
-          console.log("Ouverture via ID Google Drive:", attachment.provider_file_id);
-          window.open(`https://drive.google.com/file/d/${attachment.provider_file_id}/view`, '_blank');
-          return;
-        }
-        
-        toast.error("Lien de téléchargement non disponible");
-        return;
-      }
-      
-      // Sinon, c'est un fichier Supabase Storage
       console.log("Téléchargement depuis Supabase Storage:", attachment.file_path);
       
       const { data, error } = await supabase.storage
@@ -179,18 +148,15 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
 
       if (dbError) throw dbError;
 
-      // If it's a Supabase Storage file, delete from storage
-      if (attachment.storage_provider === 'supabase' || !attachment.storage_provider) {
-        const { error: storageError } = await supabase.storage
-          .from('mission-attachments')
-          .remove([attachment.file_path]);
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('mission-attachments')
+        .remove([attachment.file_path]);
 
-        if (storageError) {
-          console.error("Erreur lors de la suppression du fichier de storage:", storageError);
-          // Continue even if storage delete fails
-        }
+      if (storageError) {
+        console.error("Erreur lors de la suppression du fichier de storage:", storageError);
+        // Continue even if storage delete fails
       }
-      // Note: Pour les fichiers Google Drive, nous ne les supprimons pas de Google Drive pour l'instant
 
       toast.success("Fichier supprimé avec succès");
       loadAttachments();
@@ -198,22 +164,6 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       console.error("Erreur lors de la suppression de la pièce jointe:", error.message);
       toast.error("Erreur lors de la suppression du fichier");
     }
-  };
-
-  const handleViewInGoogleDrive = (attachment: Attachment) => {
-    // Utiliser d'abord provider_view_url s'il existe
-    if (attachment.provider_view_url) {
-      window.open(attachment.provider_view_url, '_blank');
-      return;
-    }
-    
-    // Sinon, utiliser l'ID du fichier
-    if (attachment.provider_file_id) {
-      window.open(`https://drive.google.com/file/d/${attachment.provider_file_id}/view`, '_blank');
-      return;
-    }
-    
-    toast.error("Lien de visualisation non disponible");
   };
 
   const getFileIcon = (fileType: string) => {
@@ -287,39 +237,11 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                             <p className="text-sm font-medium truncate">{attachment.file_name}</p>
                             <p className="text-xs text-muted-foreground">
                               {formatFileSize(attachment.file_size)} • {new Date(attachment.created_at).toLocaleDateString()} 
-                              {attachment.storage_provider && (
-                                <span className="ml-1">• {attachment.storage_provider === 'google_drive' ? (
-                                  <span className="text-blue-500 font-medium">Google Drive</span>
-                                ) : 'Supabase'}</span>
-                              )}
                             </p>
                           </div>
                         </div>
-                        {attachment.storage_provider === 'google_drive' && attachment.provider_view_url && (
-                          <div className="mt-1 text-xs text-blue-500 truncate">
-                            <a 
-                              href={attachment.provider_view_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="hover:underline flex items-center gap-1"
-                            >
-                              <File className="h-3 w-3" />
-                              {attachment.provider_view_url}
-                            </a>
-                          </div>
-                        )}
                       </div>
                       <div className="flex items-center space-x-2">
-                        {attachment.storage_provider === 'google_drive' && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleViewInGoogleDrive(attachment)}
-                            title="Voir dans Google Drive"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
                         <Button
                           variant="ghost"
                           size="icon"
