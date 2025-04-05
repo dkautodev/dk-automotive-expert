@@ -33,8 +33,10 @@ export function useMissions({
         // Apply status filter only if showAllMissions is false and filterStatus is provided
         if (!showAllMissions && filterStatus) {
           if (Array.isArray(filterStatus)) {
+            console.log(`Filtering by multiple statuses: ${filterStatus.join(', ')}`);
             query = query.in('status', filterStatus);
           } else {
+            console.log(`Filtering by single status: ${filterStatus}`);
             query = query.eq('status', filterStatus);
           }
         }
