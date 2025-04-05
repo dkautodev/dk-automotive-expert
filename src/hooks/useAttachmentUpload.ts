@@ -20,30 +20,11 @@ export const useAttachmentUpload = () => {
   };
 
   /**
-   * Nettoie et sanitize un nom de fichier pour le stockage
-   * Supprime les caractères spéciaux et les espaces
-   */
-  const sanitizeFileName = (fileName: string): string => {
-    // Supprimer complètement tous les caractères problématiques sans les remplacer par des underscores
-    return fileName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-      .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
-      .replace(/[^a-zA-Z0-9._-]/g, '_') // Remplacer tous les autres caractères spéciaux par des underscores
-      .replace(/__+/g, '_'); // Éviter les underscores multiples
-  };
-
-  /**
    * Télécharge un fichier sur Google Drive via Edge Function
    */
-  const uploadToGoogleDrive = async (missionId: string, file: File, userId: string): Promise<boolean> => {
+  const uploadToGoogleDrive = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
     try {
       console.log("Début du téléchargement vers Google Drive");
-      
-      // Nettoyer le nom du fichier avant l'envoi
-      const sanitizedFileName = sanitizeFileName(file.name);
-      console.log("Nom de fichier original:", file.name);
-      console.log("Nom de fichier sanitizé:", sanitizedFileName);
       
       // Convertir le fichier en base64
       const fileData = await fileToBase64(file);
@@ -54,11 +35,13 @@ export const useAttachmentUpload = () => {
       const { data, error } = await supabase.functions.invoke('upload_to_google_drive', {
         body: {
           missionId,
+          missionNumber, // Ajouter le numéro de mission pour le dossier
           fileData,
-          fileName: sanitizedFileName, // Envoyer le nom déjà sanitizé
+          fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
-          uploadedBy: userId
+          uploadedBy: userId,
+          fileIndex // Ajouter l'index du fichier pour le nommage
         }
       });
       
@@ -106,17 +89,17 @@ export const useAttachmentUpload = () => {
   /**
    * Télécharge un fichier directement via l'API Supabase Storage
    */
-  const uploadViaStorage = async (missionId: string, file: File, userId: string): Promise<boolean> => {
+  const uploadViaStorage = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
     try {
-      // Préparer le nom du fichier
-      const fileName = file.name;
-      const fileExt = fileName.split('.').pop();
-      const sanitizedName = sanitizeFileName(fileName);
+      // Générer un nom de fichier simple
+      const extension = file.name.split('.').pop() || '';
+      const paddedIndex = fileIndex.toString().padStart(2, '0');
+      const simpleFileName = `fichier${paddedIndex}${extension ? `.${extension}` : ''}`;
       
-      const uniqueId = Date.now();
-      const filePath = `missions/${missionId}/${uniqueId}_${sanitizedName}`;
+      // Créer le chemin de fichier avec le numéro de mission comme dossier
+      const filePath = `missions/${missionNumber}/${simpleFileName}`;
       
-      console.log("Téléchargement direct: Chemin de fichier sanitisé =", filePath);
+      console.log("Téléchargement direct: Chemin de fichier =", filePath);
       
       // Télécharger le fichier
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -133,7 +116,7 @@ export const useAttachmentUpload = () => {
         .from('mission_attachments')
         .insert({
           mission_id: missionId,
-          file_name: fileName,
+          file_name: file.name, // Garder le nom original pour l'affichage
           file_path: filePath,
           file_type: file.type,
           file_size: file.size,
@@ -157,22 +140,26 @@ export const useAttachmentUpload = () => {
   /**
    * Télécharge un fichier en utilisant Edge Function
    */
-  const uploadViaEdgeFunction = async (missionId: string, file: File, userId: string): Promise<boolean> => {
+  const uploadViaEdgeFunction = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
     try {
       // Convertir le fichier en base64
       const fileData = await fileToBase64(file);
       
-      // Sanitize le nom du fichier avant d'envoyer à la fonction Edge
-      const fileName = sanitizeFileName(file.name);
+      // Générer un nom de fichier simple
+      const extension = file.name.split('.').pop() || '';
+      const paddedIndex = fileIndex.toString().padStart(2, '0');
+      const simpleFileName = `fichier${paddedIndex}${extension ? `.${extension}` : ''}`;
       
-      console.log("Téléchargement via Edge Function: nom de fichier sanitizé =", fileName);
+      console.log("Téléchargement via Edge Function: nom de fichier =", simpleFileName);
       
       // Appeler l'Edge Function
       const { data, error } = await supabase.functions.invoke('upload_mission_attachments', {
         body: {
           missionId,
+          missionNumber,
           fileData,
-          fileName: fileName, // Envoyer le nom déjà sanitizé
+          fileName: simpleFileName,
+          originalFileName: file.name, // Conserver le nom original pour l'affichage
           fileType: file.type,
           fileSize: file.size,
           uploadedBy: userId
@@ -192,6 +179,29 @@ export const useAttachmentUpload = () => {
   };
 
   /**
+   * Obtient le numéro de mission à partir de l'ID
+   */
+  const getMissionNumber = async (missionId: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('missions')
+        .select('mission_number')
+        .eq('id', missionId)
+        .single();
+      
+      if (error || !data) {
+        console.error("Erreur lors de la récupération du numéro de mission:", error);
+        return null;
+      }
+      
+      return data.mission_number;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du numéro de mission:", error);
+      return null;
+    }
+  };
+
+  /**
    * Télécharge des fichiers pour une mission
    */
   const uploadAttachments = async (missionId: string, files: File[], userId: string): Promise<boolean> => {
@@ -205,28 +215,40 @@ export const useAttachmentUpload = () => {
     let allSucceeded = true;
     
     try {
+      // Récupérer le numéro de mission
+      const missionNumber = await getMissionNumber(missionId);
+      
+      if (!missionNumber) {
+        toast.error("Impossible de récupérer le numéro de mission");
+        return false;
+      }
+      
+      console.log(`Téléchargement pour la mission ${missionId} (${missionNumber})`);
+      
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        const fileIndex = i + 1; // Index du fichier (1-based)
+        
         setUploadProgress(prev => ({ ...prev, [file.name]: 10 }));
         
-        console.log(`Tentative de téléchargement du fichier "${file.name}" pour la mission ${missionId}`);
+        console.log(`Tentative de téléchargement du fichier "${file.name}" (index: ${fileIndex}) pour la mission ${missionNumber}`);
         
         // Essayer d'abord la méthode Google Drive
         setUploadProgress(prev => ({ ...prev, [file.name]: 30 }));
         console.log("Tentative de téléchargement via Google Drive");
-        let success = await uploadToGoogleDrive(missionId, file, userId);
+        let success = await uploadToGoogleDrive(missionId, missionNumber, file, userId, fileIndex);
         
         // Si Google Drive échoue, essayer la méthode Storage directe
         if (!success) {
           console.log("Échec Google Drive, tentative via Storage direct");
           setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
-          success = await uploadViaStorage(missionId, file, userId);
+          success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
           
           // Si la méthode directe échoue aussi, essayer via Edge Function
           if (!success) {
             console.log("Échec Storage direct, tentative via Edge Function");
             setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
-            success = await uploadViaEdgeFunction(missionId, file, userId);
+            success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
           }
         }
         
