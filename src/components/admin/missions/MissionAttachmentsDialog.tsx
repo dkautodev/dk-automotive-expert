@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { Paperclip, Trash2, Download } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
 
 interface Attachment {
   id: string;
@@ -45,7 +44,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     
     setIsFetching(true);
     try {
-      const { data, error } = await extendedSupabase
+      const { data, error } = await supabase
         .from('mission_attachments')
         .select('*')
         .eq('mission_id', missionId)
@@ -77,6 +76,16 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
+  // Fonction pour sanitizer le nom de fichier
+  const sanitizeFileName = (fileName: string): string => {
+    // Remplacer les espaces, apostrophes et caractères spéciaux
+    return fileName
+      .normalize('NFD') // Décomposer les caractères accentués
+      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+      .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_') // Remplacer les caractères spéciaux par _
+      .replace(/\s+/g, '_'); // Remplacer les espaces par _
+  };
+
   const handleUpload = async () => {
     if (!missionId || !user) return;
     
@@ -89,16 +98,27 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     
     try {
       for (const file of files) {
+        // Sanitize file name to avoid invalid key issues
+        const sanitizedFileName = sanitizeFileName(file.name);
+        const uniqueId = Date.now().toString();
+        const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`;
+        
+        console.log("Uploading file with path:", filePath);
+        
         // Upload file to storage
-        const filePath = `missions/${missionId}/${Date.now()}_${file.name}`;
-        const { error: uploadError } = await supabase.storage
+        const { data: fileData, error: uploadError } = await supabase.storage
           .from('mission-attachments')
           .upload(filePath, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw uploadError;
+        }
+
+        console.log("File uploaded successfully, saving record in database");
 
         // Create record in database
-        const { error: dbError } = await extendedSupabase
+        const { error: dbError } = await supabase
           .from('mission_attachments')
           .insert({
             mission_id: missionId,
@@ -109,7 +129,10 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
             uploaded_by: user.id
           });
 
-        if (dbError) throw dbError;
+        if (dbError) {
+          console.error("Database error:", dbError);
+          throw dbError;
+        }
       }
 
       toast.success("Fichiers téléchargés avec succès");
@@ -117,7 +140,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       loadAttachments();
     } catch (error: any) {
       console.error("Error uploading files:", error.message);
-      toast.error("Erreur lors du téléchargement des fichiers");
+      toast.error(`Erreur lors du téléchargement des fichiers: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +180,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     
     try {
       // Delete from database first
-      const { error: dbError } = await extendedSupabase
+      const { error: dbError } = await supabase
         .from('mission_attachments')
         .delete()
         .eq('id', attachmentId);
