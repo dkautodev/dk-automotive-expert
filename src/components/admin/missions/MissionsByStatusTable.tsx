@@ -66,6 +66,12 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     console.log("Mission cancelled, refreshing data");
   };
 
+  const handleMissionUpdated = () => {
+    // Déclencher un rafraîchissement lorsqu'une mission est mise à jour
+    refetch();
+    console.log("Mission updated, refreshing data");
+  };
+
   // S'il y a une erreur et pas de missions, afficher l'état vide avec un message d'erreur
   if (error) {
     console.error("Erreur dans MissionsByStatusTable:", error);
@@ -84,7 +90,8 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       ) : missions.length > 0 ? (
         <MissionsTable 
           missions={missions} 
-          onMissionCancelled={handleMissionCancelled} 
+          onMissionCancelled={handleMissionCancelled}
+          onMissionUpdated={handleMissionUpdated}
         />
       ) : (
         <EmptyMissionsState 
