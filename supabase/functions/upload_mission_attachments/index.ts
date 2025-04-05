@@ -71,23 +71,51 @@ async function handleUpload(req: Request) {
     const base64Data = fileData.split(',')[1] || fileData;
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    // Upload du fichier vers Storage
-    const { data: storageData, error: storageError } = await supabase.storage
+    // Vérifier si le fichier existe déjà pour éviter le conflit 409
+    const { data: existingFile } = await supabase.storage
       .from('mission-attachments')
-      .upload(filePath, binaryData, {
-        contentType: fileType || 'application/octet-stream',
-        upsert: false
+      .list(`missions/${missionNumber}`, {
+        search: fileName
       });
     
-    if (storageError) {
-      console.error("Erreur lors du téléchargement dans Storage:", storageError);
-      return new Response(
-        JSON.stringify({ error: `Erreur lors du téléchargement: ${storageError.message}` }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    if (existingFile && existingFile.length > 0) {
+      console.log("Le fichier existe déjà, génération d'un nouveau nom...");
+      // Ajouter un timestamp au nom du fichier pour éviter les conflits
+      const timestamp = new Date().getTime();
+      const fileNameParts = fileName.split('.');
+      const extension = fileNameParts.pop() || '';
+      const newFileName = `${fileNameParts.join('.')}_${timestamp}.${extension}`;
+      filePath = `missions/${missionNumber}/${newFileName}`;
+      console.log("Nouveau chemin:", filePath);
+    }
+    
+    // Upload du fichier vers Storage avec la gestion des erreurs
+    try {
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('mission-attachments')
+        .upload(filePath, binaryData, {
+          contentType: fileType || 'application/octet-stream',
+          cacheControl: '3600',
+          upsert: true // Écraser si le fichier existe déjà
+        });
+      
+      if (storageError) {
+        console.error("Erreur lors du téléchargement dans Storage:", storageError);
+        throw storageError;
+      }
+    } catch (storageError) {
+      // Si l'erreur est un conflit (fichier existe déjà), on continue avec l'enregistrement
+      if (storageError.message !== "The resource already exists" && storageError.statusCode !== 409) {
+        return new Response(
+          JSON.stringify({ error: `Erreur lors du téléchargement: ${storageError.message}` }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      console.log("Fichier déjà existant, continuant avec l'enregistrement en base de données");
     }
     
     // Création de l'enregistrement en base de données
@@ -105,8 +133,6 @@ async function handleUpload(req: Request) {
     
     if (dbError) {
       console.error("Erreur lors de l'enregistrement en BDD:", dbError);
-      // Nettoyage du fichier si l'enregistrement en BDD échoue
-      await supabase.storage.from('mission-attachments').remove([filePath]);
       
       return new Response(
         JSON.stringify({ error: `Erreur lors de l'enregistrement: ${dbError.message}` }),
