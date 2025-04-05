@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
-import { extractPostalCodeAndCity } from "@/lib/utils";
+import { extractPostalCodeAndCity } from "@/utils/addressUtils";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
 import { generateMissionPDF } from "@/utils/missionPdfGenerator";
 
@@ -28,6 +28,7 @@ const MissionHistory = () => {
       .from('missions')
       .select('*')
       .eq('client_id', user?.id)
+      .in('status', ['termine', 'annulé', 'annule']) // Filter for only completed or cancelled missions
       .order('created_at', { ascending: false });
 
     if (!error && data) {
@@ -98,7 +99,7 @@ const MissionHistory = () => {
             ) : missions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9} className="text-center text-gray-500 py-8">
-                  Aucune mission trouvée
+                  Aucune mission terminée ou annulée trouvée
                 </TableCell>
               </TableRow>
             ) : (
