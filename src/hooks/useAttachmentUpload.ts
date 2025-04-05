@@ -35,13 +35,13 @@ export const useAttachmentUpload = () => {
       const { data, error } = await supabase.functions.invoke('upload_to_google_drive', {
         body: {
           missionId,
-          missionNumber, // Ajouter le numéro de mission pour le dossier
+          missionNumber,
           fileData,
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
           uploadedBy: userId,
-          fileIndex // Ajouter l'index du fichier pour le nommage
+          fileIndex
         }
       });
       
@@ -233,33 +233,43 @@ export const useAttachmentUpload = () => {
         
         console.log(`Tentative de téléchargement du fichier "${file.name}" (index: ${fileIndex}) pour la mission ${missionNumber}`);
         
-        // Essayer d'abord la méthode Google Drive
+        // Priorité à la méthode Google Drive
         setUploadProgress(prev => ({ ...prev, [file.name]: 30 }));
         console.log("Tentative de téléchargement via Google Drive");
         let success = await uploadToGoogleDrive(missionId, missionNumber, file, userId, fileIndex);
         
-        // Si Google Drive échoue, essayer la méthode Storage directe
-        if (!success) {
-          console.log("Échec Google Drive, tentative via Storage direct");
-          setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
-          success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
-          
-          // Si la méthode directe échoue aussi, essayer via Edge Function
-          if (!success) {
-            console.log("Échec Storage direct, tentative via Edge Function");
-            setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
-            success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
-          }
+        if (success) {
+          console.log(`Fichier ${file.name} téléchargé avec succès vers Google Drive`);
+          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+          toast.success(`Fichier ${file.name} téléchargé avec succès`);
+          continue; // Passer au fichier suivant si Google Drive a réussi
         }
         
-        if (!success) {
+        // Si Google Drive échoue, essayer la méthode Storage directe
+        console.log("Échec Google Drive, tentative via Storage direct");
+        setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
+        success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
+          
+        if (success) {
+          console.log(`Fichier ${file.name} téléchargé avec succès vers Supabase Storage`);
+          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+          toast.success(`Fichier ${file.name} téléchargé avec succès`);
+          continue; // Passer au fichier suivant si Storage a réussi
+        }
+        
+        // Si la méthode directe échoue aussi, essayer via Edge Function
+        console.log("Échec Storage direct, tentative via Edge Function");
+        setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
+        success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
+        
+        if (success) {
+          console.log(`Fichier ${file.name} téléchargé avec succès via Edge Function`);
+          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+          toast.success(`Fichier ${file.name} téléchargé avec succès`);
+        } else {
           allSucceeded = false;
           console.error(`Échec du téléchargement pour ${file.name}`);
           toast.error(`Échec du téléchargement pour ${file.name}`);
-        } else {
-          console.log(`Fichier ${file.name} téléchargé avec succès`);
-          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-          toast.success(`Fichier ${file.name} téléchargé avec succès`);
         }
       }
       

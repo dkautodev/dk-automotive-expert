@@ -316,6 +316,17 @@ async function handleUploadRequest(req: Request) {
     
     console.log('Réponse de Google Drive:', driveResponse);
     
+    // S'assurer que les URLs nécessaires sont bien présentes
+    if (!driveResponse.webViewLink) {
+      console.warn('Avertissement: webViewLink manquant dans la réponse de Google Drive');
+    }
+    
+    if (!driveResponse.webContentLink) {
+      console.warn('Avertissement: webContentLink manquant dans la réponse de Google Drive');
+      // Générer une URL de téléchargement alternative si celle-ci n'est pas fournie
+      driveResponse.webContentLink = `https://drive.google.com/uc?id=${driveResponse.id}&export=download`;
+    }
+    
     // Retourner la réponse
     return new Response(
       JSON.stringify({ 
