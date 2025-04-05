@@ -26,7 +26,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
       try {
         console.log("DashboardCards: Fetching counts with refreshTrigger:", refreshTrigger);
         
-        // Fetch total missions count
+        // Fetch total missions count (no filtering for admin dashboard)
         const { count: totalCount, error: totalError } = await extendedSupabase
           .from('missions')
           .select('*', { count: 'exact', head: true });
