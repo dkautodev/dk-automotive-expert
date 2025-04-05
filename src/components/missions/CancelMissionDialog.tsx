@@ -28,7 +28,10 @@ export const CancelMissionDialog: React.FC<CancelMissionDialogProps> = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction 
-            onClick={onConfirm} 
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }} 
             className="bg-red-500 hover:bg-red-600"
             disabled={isLoading}
           >
