@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -70,12 +71,17 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
     const client = mission.clientProfile;
     if (!client) return "Non spécifié";
     
-    // Priorité au nom de la société, puis au nom complet
+    // Priorité au code client s'il existe
+    if (client.client_code && client.client_code.trim() !== "") {
+      return client.client_code;
+    }
+    
+    // Si pas de code client, utiliser le nom de la société
     if (client.company_name && client.company_name.trim() !== "") {
       return client.company_name;
     }
     
-    // Si pas de société, utiliser le nom complet
+    // En dernier recours, utiliser le nom complet
     const fullName = `${client.first_name} ${client.last_name}`.trim();
     return fullName || "Non spécifié";
   };

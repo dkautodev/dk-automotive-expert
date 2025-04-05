@@ -1,3 +1,4 @@
+
 import { Database } from "@/integrations/supabase/types";
 
 export type MissionRow = {
@@ -45,6 +46,7 @@ export type UserProfileRow = {
   billing_address?: string | null;
   siret_number?: string | null;
   vat_number?: string | null;
+  client_code?: string | null; // Assurer que le client_code est défini
 };
 
 // Updated MissionStatus to ensure both 'annule' and 'annulé' are valid values for cancellation
