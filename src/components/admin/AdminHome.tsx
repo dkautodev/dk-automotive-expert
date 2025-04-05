@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardCards from "./DashboardCards";
@@ -16,19 +16,31 @@ const AdminHome = () => {
     setRefreshTrigger(1);
   }, []);
 
-  const handleMissionCreated = () => {
+  const handleRefresh = useCallback(() => {
     // Increment refresh trigger to force dashboard updates
     const newValue = refreshTrigger + 1;
     setRefreshTrigger(newValue);
-    console.log("Mission créée, rafraîchissement du tableau de bord avec valeur:", newValue);
+    console.log("Dashboard refreshed with value:", newValue);
+  }, [refreshTrigger]);
+
+  const handleMissionCreated = useCallback(() => {
+    handleRefresh();
     toast.success("Mission créée avec succès! Le tableau de bord est mis à jour.");
-  };
+  }, [handleRefresh]);
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 className="text-3xl font-bold">Tableau de bord administrateur</h1>
-        <CreateMissionDialog onMissionCreated={handleMissionCreated} />
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handleRefresh}
+            className="p-2 text-sm text-blue-600 hover:text-blue-800"
+          >
+            Rafraîchir
+          </button>
+          <CreateMissionDialog onMissionCreated={handleMissionCreated} />
+        </div>
       </div>
       
       <DashboardCards refreshTrigger={refreshTrigger} />

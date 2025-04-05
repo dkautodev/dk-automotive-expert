@@ -10,27 +10,40 @@ interface MissionsByStatusTableProps {
   status?: string | string[];
   showAllMissions?: boolean;
   emptyMessage?: string;
+  limit?: number;
 }
 
 const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({ 
   refreshTrigger = 0, 
   status,
   showAllMissions = false,
-  emptyMessage = "Aucune mission disponible"
+  emptyMessage = "Aucune mission disponible",
+  limit
 }) => {
-  const { missions, loading, refetch } = useMissions({ 
+  const { missions, loading, error, refetch } = useMissions({ 
     refreshTrigger,
     showAllMissions,
-    filterStatus: status
+    filterStatus: status,
+    limit
   });
 
-  console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, missions.length=${missions.length}`);
+  console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, missions.length=${missions.length}, error=${error ? 'Yes' : 'No'}`);
 
   const handleMissionCancelled = () => {
     // Trigger a refresh when a mission is cancelled
     refetch();
     console.log("Mission cancelled, refreshing data");
   };
+
+  // If there's an error and no missions, show the empty state with error message
+  if (error && missions.length === 0) {
+    return (
+      <EmptyMissionsState 
+        showAllMissions={showAllMissions} 
+        message="Erreur lors de la récupération des missions" 
+      />
+    );
+  }
 
   return (
     <>
