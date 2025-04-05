@@ -107,26 +107,37 @@ export function useMissions({
             : "en_attente"; // Par défaut "en_attente" si statut invalide
         };
         
-        // S'assurer que les champs d'adresse structurée sont disponibles
-        // Si les colonnes street_number, postal_code, etc. sont vides, les extraire de pickup_address
-        if (!mission.city && mission.pickup_address) {
-          const { streetNumber, postalCode, city, country } = extractAddressComponents(mission.pickup_address);
-          mission.street_number = mission.street_number || streetNumber;
-          mission.postal_code = mission.postal_code || postalCode;
-          mission.city = mission.city || city;
-          mission.country = mission.country || country;
-        }
+        // S'assurer que les données d'adresse structurée sont disponibles
+        // Vérifier si les propriétés existent dans l'objet mission
+        const missAny = mission as any;
+        const hasCityData = missAny.city !== undefined;
+        const hasPickupAddress = missAny.pickup_address !== undefined;
         
         // Création d'un objet mission correctement typé (sans clientProfile pour l'instant)
         const typedMission: MissionRow = {
           ...mission,
           mission_type: missionType,
-          status: validateStatus(mission.status),
-          pickup_address: vehicleInfo?.pickup_address || 'Non spécifié',
-          delivery_address: vehicleInfo?.delivery_address || 'Non spécifié',
+          status: validateStatus(missAny.status),
+          pickup_address: hasPickupAddress ? missAny.pickup_address : (vehicleInfo?.pickup_address || 'Non spécifié'),
+          delivery_address: missAny.delivery_address || vehicleInfo?.delivery_address || 'Non spécifié',
           clientProfile: null, // Sera rempli plus tard
-          admin_id: mission.admin_id || null // S'assurer que admin_id est correctement copié depuis les données
+          admin_id: missAny.admin_id || null, // S'assurer que admin_id est correctement copié
+          // Ajouter les propriétés d'adresse structurée
+          street_number: missAny.street_number || null,
+          postal_code: missAny.postal_code || null,
+          city: missAny.city || null,
+          country: missAny.country || 'France'
         };
+        
+        // Si les colonnes city et postal_code sont vides, mais qu'il y a une adresse de pickup,
+        // essayer d'extraire les composantes de l'adresse
+        if (!typedMission.city && typedMission.pickup_address && typedMission.pickup_address !== 'Non spécifié') {
+          const addressComponents = extractAddressComponents(typedMission.pickup_address);
+          typedMission.street_number = typedMission.street_number || addressComponents.streetNumber;
+          typedMission.postal_code = typedMission.postal_code || addressComponents.postalCode;
+          typedMission.city = typedMission.city || addressComponents.city;
+          typedMission.country = typedMission.country || addressComponents.country;
+        }
         
         return typedMission;
       });

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -83,7 +82,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
 
   const getAddressDisplay = (mission: MissionRow, addressType: 'pickup' | 'delivery') => {
     // Utiliser les nouvelles colonnes structurées si disponibles
-    if (addressType === 'pickup' && mission.city) {
+    if (addressType === 'pickup' && mission.city && mission.postal_code) {
       return `${mission.postal_code || ''} ${mission.city || ''}`.trim() || "Non spécifié";
     }
     

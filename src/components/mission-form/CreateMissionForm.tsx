@@ -11,6 +11,7 @@ import VehicleInfoStep from "./VehicleInfoStep";
 import ContactScheduleStep from "./ContactScheduleStep";
 import { useAuthContext } from "@/context/AuthContext";
 import { MissionRow } from "@/types/database";
+import { extractAddressComponents } from "@/utils/addressUtils";
 
 interface CreateMissionFormProps {
   onSuccess: () => void;
