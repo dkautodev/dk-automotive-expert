@@ -1,4 +1,3 @@
-
 import { ChevronLeft, LayoutDashboard, FileText, User, ClipboardList, LogOut, X, History, BookOpen } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,25 +7,26 @@ import { useAuthContext } from "@/context/AuthContext";
 import NotificationBell from "../notifications/NotificationBell";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 const ClientSidebar = () => {
-  const { collapsed, toggleCollapsed } = useSidebar();
-  const { signOut } = useAuthContext();
+  const {
+    collapsed,
+    toggleCollapsed
+  } = useSidebar();
+  const {
+    signOut
+  } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-
   const handleLogout = async () => {
     await signOut();
     navigate("/auth");
   };
-
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   // Si on est sur mobile, utiliser le composant Sidebar qui s'adaptera
   if (isMobile) {
-    return (
-      <Sidebar className="fixed left-0 top-0 z-50 pt-16 h-screen bg-white">
+    return <Sidebar className="fixed left-0 top-0 z-50 pt-16 h-screen bg-white">
         <div className="flex flex-col h-full">
           <div className="flex justify-end px-4">
             <Button variant="ghost" size="icon" onClick={toggleCollapsed} className="h-8 w-8">
@@ -72,12 +72,9 @@ const ClientSidebar = () => {
             </Button>
           </div>
         </div>
-      </Sidebar>
-    );
+      </Sidebar>;
   }
-
-  return (
-    <div className="fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10">
+  return <div className="fixed inset-y-0 left-0 w-52 bg-white border-r border-gray-200 z-10">
       <div className="h-16 flex items-center justify-between px-4">
         <Link to="/dashboard/client" className="font-semibold">
           DK Automotive
@@ -107,13 +104,11 @@ const ClientSidebar = () => {
       </div>
       
       <div className="p-2">
-        <Button variant="ghost" className="w-full justify-start font-normal" onClick={handleLogout}>
+        <Button variant="ghost" onClick={handleLogout} className="w-full justify-start font-normal text-red-600">
           <LogOut className="h-4 w-4 mr-2" />
           Se déconnecter
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ClientSidebar;
