@@ -54,6 +54,52 @@ export interface ExtendedDatabase extends Database {
         Relationships: [];
       };
       
+      // Add our new mission_attachments table with the correct types
+      mission_attachments: {
+        Row: {
+          id: string;
+          mission_id: string | null;
+          file_name: string;
+          file_path: string;
+          file_type: string | null;
+          file_size: number | null;
+          uploaded_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          mission_id?: string | null;
+          file_name: string;
+          file_path: string;
+          file_type?: string | null;
+          file_size?: number | null;
+          uploaded_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          mission_id?: string | null;
+          file_name?: string;
+          file_path?: string;
+          file_type?: string | null;
+          file_size?: number | null;
+          uploaded_by?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "mission_attachments_mission_id_fkey";
+            columns: ["mission_id"];
+            isOneToOne: false;
+            referencedRelation: "missions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      
       // Add our new tables with the correct types that match the generated types
       notifications: {
         Row: {

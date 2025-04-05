@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { Paperclip, Trash2, Download } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
-import { safeTable } from "@/utils/supabase-helper";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 
 interface Attachment {
   id: string;
@@ -45,14 +45,15 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     
     setIsFetching(true);
     try {
-      const { data, error } = await safeTable('mission_attachments')
+      const { data, error } = await extendedSupabase
+        .from('mission_attachments')
         .select('*')
         .eq('mission_id', missionId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      setAttachments(data as unknown as Attachment[]);
+      setAttachments(data as Attachment[]);
     } catch (error: any) {
       console.error("Error fetching attachments:", error.message);
       toast.error("Erreur lors de la récupération des pièces jointes");
@@ -97,7 +98,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
         if (uploadError) throw uploadError;
 
         // Create record in database
-        const { error: dbError } = await safeTable('mission_attachments')
+        const { error: dbError } = await extendedSupabase
+          .from('mission_attachments')
           .insert({
             mission_id: missionId,
             file_name: file.name,
@@ -155,7 +157,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     
     try {
       // Delete from database first
-      const { error: dbError } = await safeTable('mission_attachments')
+      const { error: dbError } = await extendedSupabase
+        .from('mission_attachments')
         .delete()
         .eq('id', attachmentId);
 
