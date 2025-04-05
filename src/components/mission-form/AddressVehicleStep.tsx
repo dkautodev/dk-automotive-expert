@@ -57,12 +57,7 @@ const AddressVehicleStep = ({
       {/* Ajout du champ compléments d'information */}
       <FormField control={form.control} name="additional_info" render={({
       field
-    }) => <FormItem>
-            <FormLabel>Compléments d'information</FormLabel>
-            <FormControl>
-              <Textarea placeholder="Informations supplémentaires (max 250 caractères)" className="resize-none" maxLength={250} {...field} />
-            </FormControl>
-          </FormItem>} />
+    }) => {}} />
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onPrevious}>
