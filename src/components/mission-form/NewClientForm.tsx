@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormLabel } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
-import { NewClientData } from "./hooks/useClients";
+import { NewClientData } from "./hooks/types/clientTypes";
 
 interface NewClientFormProps {
   newClient: NewClientData;
@@ -34,7 +34,7 @@ const NewClientForm = ({
           <Input
             id="first_name"
             name="first_name"
-            value={newClient.first_name}
+            value={newClient.first_name || ''}
             onChange={handleChange}
             required
           />
@@ -44,7 +44,7 @@ const NewClientForm = ({
           <Input
             id="last_name"
             name="last_name"
-            value={newClient.last_name}
+            value={newClient.last_name || ''}
             onChange={handleChange}
             required
           />

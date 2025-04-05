@@ -32,11 +32,11 @@ export const clientCreationService = {
         .from('user_profiles')
         .insert({
           user_id: authData.user.id,
-          first_name: newClientData.first_name,
-          last_name: newClientData.last_name,
+          first_name: newClientData.first_name || '',
+          last_name: newClientData.last_name || '',
           phone: newClientData.phone,
           company_name: newClientData.company,
-          billing_address: newClientData.address,
+          billing_address: newClientData.address || '',
           user_type: 'client'
         })
         .select();
@@ -60,11 +60,11 @@ export const clientCreationService = {
     const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
       .insert({
-        first_name: newClientData.first_name,
-        last_name: newClientData.last_name,
+        first_name: newClientData.first_name || '',
+        last_name: newClientData.last_name || '',
         phone: newClientData.phone,
         company_name: newClientData.company,
-        billing_address: newClientData.address,
+        billing_address: newClientData.address || '',
         user_type: 'client'
       })
       .select();
