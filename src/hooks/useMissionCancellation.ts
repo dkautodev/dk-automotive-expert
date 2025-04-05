@@ -25,9 +25,11 @@ export function useMissionCancellation({ onSuccess }: UseMissionCancellationProp
     
     try {
       setIsLoading(true);
+      console.log("Cancelling mission with ID:", selectedMissionId);
+      
       const { error } = await supabase
         .from('missions')
-        .update({ status: 'annulé' }) // Using the correct status with accent
+        .update({ status: 'annulé' })
         .eq('id', selectedMissionId);
         
       if (error) {
