@@ -49,15 +49,24 @@ const OngoingShipments = () => {
     setLoading(true);
     supabase
       .from('missions')
-      .select('*, clientProfile:user_profiles(*)') // Joindre les profils utilisateurs
+      .select('*, clientProfile:user_profiles(*)')
       .eq('client_id', user.id)
       .in('status', ['confirmé', 'confirme', 'prise_en_charge'])
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (error) {
           console.error("Error fetching ongoing missions:", error);
-        } else {
-          setMissions(data as MissionRow[] || []);
+        } else if (data) {
+          // Transform the data to ensure it matches the MissionRow type
+          const transformedMissions: MissionRow[] = data.map(mission => ({
+            ...mission,
+            pickup_address: mission.pickup_address || 'Non spécifié',
+            delivery_address: mission.delivery_address || 'Non spécifié',
+            // Ensure clientProfile is properly cast
+            clientProfile: mission.clientProfile || null
+          })) as MissionRow[];
+          
+          setMissions(transformedMissions);
         }
         setLoading(false);
       });
