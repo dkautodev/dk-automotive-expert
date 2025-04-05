@@ -88,11 +88,12 @@ const AdminHome = () => {
         value={activeTab}
         onValueChange={handleTabChange}
       >
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="pending">Devis en attente</TabsTrigger>
           <TabsTrigger value="ongoing">Missions en cours</TabsTrigger>
+          <TabsTrigger value="delivered">Véhicules livrés</TabsTrigger>
+          <TabsTrigger value="incident">Incidents</TabsTrigger>
           <TabsTrigger value="completed">Missions terminées</TabsTrigger>
-          <TabsTrigger value="all">Toutes les missions</TabsTrigger>
         </TabsList>
         
         <TabsContent value="pending" className="mt-4">
@@ -109,6 +110,7 @@ const AdminHome = () => {
                 status="en_attente"
                 emptyMessage="Aucun devis en attente"
                 forceAdminView={true}
+                displayType="pending"
               />
             </CardContent>
           </Card>
@@ -128,6 +130,47 @@ const AdminHome = () => {
                 status={["confirmé", "confirme", "prise_en_charge"]}
                 emptyMessage="Aucune mission en cours"
                 forceAdminView={true}
+                displayType="ongoing"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="delivered" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Véhicules livrés</CardTitle>
+              <span className="text-sm text-muted-foreground">
+                Actualisé à {formattedRefreshTime}
+              </span>
+            </CardHeader>
+            <CardContent>
+              <MissionsByStatusTable 
+                refreshTrigger={refreshTrigger} 
+                status="livre"
+                emptyMessage="Aucun véhicule livré"
+                forceAdminView={true}
+                displayType="delivered"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="incident" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Incidents</CardTitle>
+              <span className="text-sm text-muted-foreground">
+                Actualisé à {formattedRefreshTime}
+              </span>
+            </CardHeader>
+            <CardContent>
+              <MissionsByStatusTable 
+                refreshTrigger={refreshTrigger} 
+                status="incident"
+                emptyMessage="Aucun incident"
+                forceAdminView={true}
+                displayType="incident"
               />
             </CardContent>
           </Card>
@@ -144,28 +187,10 @@ const AdminHome = () => {
             <CardContent>
               <MissionsByStatusTable 
                 refreshTrigger={refreshTrigger} 
-                status={["termine", "livre"]}
+                status="termine"
                 emptyMessage="Aucune mission terminée"
                 forceAdminView={true}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="all" className="mt-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Toutes les missions</CardTitle>
-              <span className="text-sm text-muted-foreground">
-                Actualisé à {formattedRefreshTime}
-              </span>
-            </CardHeader>
-            <CardContent>
-              <MissionsByStatusTable 
-                refreshTrigger={refreshTrigger} 
-                showAllMissions={true}
-                emptyMessage="Aucune mission trouvée"
-                forceAdminView={true}
+                displayType="completed"
               />
             </CardContent>
           </Card>
