@@ -12,6 +12,8 @@ export const transformProfileToClient = (profile: any): ClientData => {
       id: 'invalid-profile',
       name: 'Profil invalide',
       email: '',
+      first_name: '',
+      last_name: '',
     };
   }
 
@@ -26,7 +28,9 @@ export const transformProfileToClient = (profile: any): ClientData => {
     email: profile.email || '', // Profile might not have email
     phone: profile.phone || '',
     company: profile.company_name || '',
-    address: profile.billing_address || ''
+    address: profile.billing_address || '',
+    first_name: profile.first_name || '',
+    last_name: profile.last_name || '',
   };
 };
 
@@ -40,6 +44,8 @@ export const transformUserToClient = (user: any, profiles?: any[]): ClientData =
       id: 'invalid-user',
       name: 'Client invalide',
       email: '',
+      first_name: '',
+      last_name: '',
     };
   }
 
@@ -75,6 +81,8 @@ export const transformUserToClient = (user: any, profiles?: any[]): ClientData =
     email: userEmail,
     phone: phone,
     company: company,
-    address: profile?.billing_address || ''
+    address: profile?.billing_address || '',
+    first_name: firstName,
+    last_name: lastName,
   };
 };

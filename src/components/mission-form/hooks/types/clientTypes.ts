@@ -1,5 +1,7 @@
 
-// Client data types used across the application
+/**
+ * Client data structure used throughout the application
+ */
 export interface ClientData {
   id: string;
   name: string;
@@ -7,19 +9,23 @@ export interface ClientData {
   phone?: string;
   company?: string;
   address?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
-// Form data for creating a new client
+/**
+ * New client data for creation
+ */
 export interface NewClientData {
-  first_name: string;
-  last_name: string;
+  name: string;
   email: string;
-  phone: string;
+  phone?: string;
   company?: string;
-  address?: string;
 }
 
-// For displaying clients in selectors
+/**
+ * Client display format
+ */
 export interface ClientDisplay {
   id: string;
   name: string;

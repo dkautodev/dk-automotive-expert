@@ -12,9 +12,17 @@ interface ContactListProps {
   onEdit: (contact: ContactEntry) => void;
   onDelete: (id: string) => void;
   onFillForm?: (contact: ContactEntry) => void;
+  formatContactDisplay?: (contact: ContactEntry) => string;
 }
 
-const ContactList = ({ contacts, onEdit, onDelete, onFillForm }: ContactListProps) => {
+const ContactList = ({ contacts, onEdit, onDelete, onFillForm, formatContactDisplay }: ContactListProps) => {
+  // Fonction par défaut si aucune n'est fournie
+  const defaultFormatContact = (contact: ContactEntry) => {
+    return `${contact.firstName} ${contact.lastName}`;
+  };
+
+  const displayContact = formatContactDisplay || defaultFormatContact;
+
   return (
     <div className="space-y-3">
       {contacts.map((contact) => (
@@ -26,7 +34,7 @@ const ContactList = ({ contacts, onEdit, onDelete, onFillForm }: ContactListProp
                   <UserCircle className="h-8 w-8 text-gray-400" />
                 </div>
                 <div>
-                  <div className="font-medium">{contact.firstName} {contact.lastName}</div>
+                  <div className="font-medium">{displayContact(contact)}</div>
                   <div className="text-sm text-gray-500 flex items-center gap-1">
                     <Mail className="h-3 w-3" /> {contact.email}
                   </div>

@@ -29,10 +29,19 @@ const ContactSelector = ({
   const [searchTerm, setSearchTerm] = useState('');
   const { contacts, isLoading } = useAddressBook();
 
+  // Format d'affichage: NOM-PRENOM-SOCIÉTÉ
+  const formatContactDisplay = (contact: ContactEntry) => {
+    const parts = [];
+    if (contact.lastName) parts.push(contact.lastName.toUpperCase());
+    if (contact.firstName) parts.push(contact.firstName);
+    if (contact.company) parts.push(contact.company);
+    return parts.join('-') || contact.email;
+  };
+
   const filteredContacts = contacts.filter(contact => {
-    return searchTerm === '' ||
-      contact.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const displayFormat = formatContactDisplay(contact).toLowerCase();
+    return searchTerm === '' || 
+      displayFormat.includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
@@ -83,6 +92,7 @@ const ContactSelector = ({
             onEdit={() => {}} 
             onDelete={() => {}}
             onFillForm={handleSelectContact}
+            formatContactDisplay={formatContactDisplay}
           />
         )}
       </DialogContent>

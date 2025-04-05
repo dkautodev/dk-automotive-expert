@@ -29,6 +29,15 @@ export const UserTable = ({
     return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || '??';
   };
 
+  const formatUserDisplay = (user: UserData) => {
+    const nameParts = [];
+    if (user.last_name) nameParts.push(user.last_name.toUpperCase());
+    if (user.first_name) nameParts.push(user.first_name);
+    if (user.company_name) nameParts.push(user.company_name);
+    
+    return nameParts.length > 0 ? nameParts.join('-') : (user.email?.split('@')[0] || `${userType} sans nom`);
+  };
+
   const handleSort = (field: keyof UserData) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -107,10 +116,7 @@ export const UserTable = ({
                     <AvatarImage src={`https://avatar.vercel.sh/${user.email}.png`} alt={user.first_name} />
                     <AvatarFallback>{getInitials(user.first_name, user.last_name)}</AvatarFallback>
                   </Avatar>
-                  <span>{user.first_name && user.last_name ? 
-                    `${user.first_name} ${user.last_name}` : 
-                    (user.email?.split('@')[0] || `${displayName} sans nom`)}
-                  </span>
+                  <span>{formatUserDisplay(user)}</span>
                 </div>
               </TableCell>
               <TableCell>{user.email}</TableCell>
