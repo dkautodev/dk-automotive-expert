@@ -27,7 +27,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     showAllMissions,
     filterStatus: status,
     limit,
-    forceAdminView // Explicitly pass the admin flag
+    forceAdminView // Explicitement passer le flag admin
   });
 
   console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, forceAdminView=${forceAdminView}, missions.length=${missions.length}, error=${error ? 'Yes' : 'No'}`);
