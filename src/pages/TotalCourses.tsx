@@ -17,8 +17,8 @@ const TotalCourses = () => {
     console.log("TotalCourses: Chargement initial");
     setRefreshTrigger(1);
     
-    // Rafraîchissement automatique moins fréquent (toutes les 90 secondes pour les clients/chauffeurs)
-    const refreshInterval = role === 'admin' ? 10000 : 90000; // 10 sec pour admin, 90 sec pour autres
+    // Rafraîchissement automatique à 90 secondes pour tous
+    const refreshInterval = 90000; // 90 sec pour tous (était 10 sec pour admin)
     
     const intervalId = setInterval(() => {
       setRefreshTrigger(prev => prev + 1);
