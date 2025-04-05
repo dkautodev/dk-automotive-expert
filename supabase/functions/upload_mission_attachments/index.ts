@@ -10,6 +10,20 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+/**
+ * Nettoie et sanitize un nom de fichier pour le stockage
+ * Supprime les caractères spéciaux et les espaces
+ */
+const sanitizeFileName = (fileName: string): string => {
+  // Remplacer les apostrophes et autres caractères problématiques par des underscores
+  return fileName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+    .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
+    .replace(/[&\/\\#,+()$~%.'":*?<>{}\s]/g, '_') // Remplacer autres caractères spéciaux et espaces par _
+    .replace(/__+/g, '_'); // Éviter les underscores multiples
+};
+
 async function handleUpload(req: Request) {
   try {
     // Récupération du body qui contient les données nécessaires
@@ -54,19 +68,17 @@ async function handleUpload(req: Request) {
     const supabase = createClient(supabaseUrl, supabaseKey)
     
     // Construction du chemin de fichier avec des conventions de nommage sécurisées
-    const sanitizedFileName = fileName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_')
-      .replace(/\s+/g, '_')
+    // S'assurer que le nom du fichier est bien sanitizé
+    const sanitizedFileName = sanitizeFileName(fileName);
     
-    const uniqueId = Date.now().toString()
-    const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`
+    const uniqueId = Date.now().toString();
+    const filePath = `missions/${missionId}/${uniqueId}_${sanitizedFileName}`;
     
-    console.log("Chemin de téléchargement:", filePath)
+    console.log("Chemin de téléchargement:", filePath);
     
     // Décodage du fichier base64
-    const binaryData = Uint8Array.from(atob(fileData.split(',')[1]), c => c.charCodeAt(0))
+    const base64Data = fileData.split(',')[1] || fileData;
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
     // Upload du fichier vers Storage
     const { data: storageData, error: storageError } = await supabase.storage
@@ -74,17 +86,17 @@ async function handleUpload(req: Request) {
       .upload(filePath, binaryData, {
         contentType: fileType || 'application/octet-stream',
         upsert: false
-      })
+      });
     
     if (storageError) {
-      console.error("Erreur lors du téléchargement dans Storage:", storageError)
+      console.error("Erreur lors du téléchargement dans Storage:", storageError);
       return new Response(
         JSON.stringify({ error: `Erreur lors du téléchargement: ${storageError.message}` }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
-      )
+      );
     }
     
     // Création de l'enregistrement en base de données
@@ -96,13 +108,14 @@ async function handleUpload(req: Request) {
         file_path: filePath,
         file_type: fileType,
         file_size: fileSize,
-        uploaded_by: uploadedBy
-      })
+        uploaded_by: uploadedBy,
+        storage_provider: 'supabase'
+      });
     
     if (dbError) {
-      console.error("Erreur lors de l'enregistrement en BDD:", dbError)
+      console.error("Erreur lors de l'enregistrement en BDD:", dbError);
       // Nettoyage du fichier si l'enregistrement en BDD échoue
-      await supabase.storage.from('mission-attachments').remove([filePath])
+      await supabase.storage.from('mission-attachments').remove([filePath]);
       
       return new Response(
         JSON.stringify({ error: `Erreur lors de l'enregistrement: ${dbError.message}` }),
@@ -110,7 +123,7 @@ async function handleUpload(req: Request) {
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
-      )
+      );
     }
     
     return new Response(
@@ -123,17 +136,17 @@ async function handleUpload(req: Request) {
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-    )
+    );
     
   } catch (error) {
-    console.error("Erreur:", error.message)
+    console.error("Erreur:", error.message);
     return new Response(
       JSON.stringify({ error: `Erreur lors du traitement: ${error.message}` }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-    )
+    );
   }
 }
 
@@ -143,12 +156,12 @@ Deno.serve(async (req) => {
     return new Response(null, {
       status: 204,
       headers: corsHeaders,
-    })
+    });
   }
   
   // Seules les requêtes POST sont acceptées pour le téléchargement
   if (req.method === 'POST') {
-    return await handleUpload(req)
+    return await handleUpload(req);
   }
   
   // Toute autre méthode HTTP est refusée
@@ -158,5 +171,5 @@ Deno.serve(async (req) => {
       status: 405, 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     }
-  )
-})
+  );
+});

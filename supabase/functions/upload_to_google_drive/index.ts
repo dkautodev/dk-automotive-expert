@@ -13,6 +13,16 @@ const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
 const GOOGLE_REFRESH_TOKEN = Deno.env.get("GOOGLE_REFRESH_TOKEN");
 
+/**
+ * Nettoie et sanitize un nom de fichier pour le téléversement vers Google Drive
+ */
+const sanitizeFileName = (fileName: string): string => {
+  // Pour Google Drive, on peut conserver plus de caractères, mais on évite tout de même 
+  // les caractères qui pourraient poser problème
+  return fileName
+    .replace(/[\/\\:*?"<>|]/g, '_'); // Remplacer les caractères interdits dans les noms de fichiers
+};
+
 // Fonction pour obtenir un token d'accès à partir du refresh token
 async function getAccessToken() {
   try {
@@ -46,11 +56,13 @@ async function getAccessToken() {
 // Fonction pour téléverser un fichier sur Google Drive
 async function uploadFileToDrive(accessToken: string, fileName: string, fileContent: Uint8Array, mimeType: string) {
   try {
-    console.log(`Début du téléversement du fichier ${fileName} sur Google Drive`);
+    // Sanitize le nom du fichier pour Google Drive
+    const sanitizedFileName = sanitizeFileName(fileName);
+    console.log(`Début du téléversement du fichier ${sanitizedFileName} sur Google Drive`);
     
     // Créer les métadonnées du fichier
     const metadata = {
-      name: fileName,
+      name: sanitizedFileName,
       mimeType: mimeType,
     };
 
@@ -132,7 +144,7 @@ async function handleUploadRequest(req: Request) {
     const accessToken = await getAccessToken();
     
     // Décodage du fichier base64
-    const base64Data = fileData.split(',')[1];
+    const base64Data = fileData.split(',')[1] || fileData;
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
     // Téléverser le fichier sur Google Drive

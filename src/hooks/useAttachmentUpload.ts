@@ -20,6 +20,20 @@ export const useAttachmentUpload = () => {
   };
 
   /**
+   * Nettoie et sanitize un nom de fichier pour le stockage
+   * Supprime les caractères spéciaux et les espaces
+   */
+  const sanitizeFileName = (fileName: string): string => {
+    // Remplacer les apostrophes et autres caractères problématiques par des underscores
+    return fileName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+      .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
+      .replace(/[&\/\\#,+()$~%.'":*?<>{}\s]/g, '_') // Remplacer autres caractères spéciaux et espaces par _
+      .replace(/__+/g, '_'); // Éviter les underscores multiples
+  };
+
+  /**
    * Télécharge un fichier sur Google Drive via Edge Function
    */
   const uploadToGoogleDrive = async (missionId: string, file: File, userId: string): Promise<boolean> => {
@@ -84,14 +98,12 @@ export const useAttachmentUpload = () => {
       // Préparer le nom du fichier
       const fileName = file.name;
       const fileExt = fileName.split('.').pop();
-      const sanitizedName = fileName
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_')
-        .replace(/\s+/g, '_');
+      const sanitizedName = sanitizeFileName(fileName);
       
       const uniqueId = Date.now();
       const filePath = `missions/${missionId}/${uniqueId}_${sanitizedName}`;
+      
+      console.log("Téléchargement direct: Chemin de fichier sanitisé =", filePath);
       
       // Télécharger le fichier
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -99,6 +111,7 @@ export const useAttachmentUpload = () => {
         .upload(filePath, file);
       
       if (uploadError) {
+        console.error("Erreur détaillée du téléchargement:", uploadError);
         throw uploadError;
       }
       
@@ -136,12 +149,15 @@ export const useAttachmentUpload = () => {
       // Convertir le fichier en base64
       const fileData = await fileToBase64(file);
       
+      // Sanitize le nom du fichier avant d'envoyer à la fonction Edge
+      const fileName = sanitizeFileName(file.name);
+      
       // Appeler l'Edge Function
       const { data, error } = await supabase.functions.invoke('upload_mission_attachments', {
         body: {
           missionId,
           fileData,
-          fileName: file.name,
+          fileName: fileName,
           fileType: file.type,
           fileSize: file.size,
           uploadedBy: userId
@@ -149,6 +165,7 @@ export const useAttachmentUpload = () => {
       });
       
       if (error) {
+        console.error("Erreur détaillée Edge Function:", error);
         throw error;
       }
       
@@ -177,6 +194,8 @@ export const useAttachmentUpload = () => {
         const file = files[i];
         setUploadProgress(prev => ({ ...prev, [file.name]: 10 }));
         
+        console.log(`Tentative de téléchargement du fichier "${file.name}" pour la mission ${missionId}`);
+        
         // Essayer d'abord la méthode Google Drive
         setUploadProgress(prev => ({ ...prev, [file.name]: 30 }));
         let success = await uploadToGoogleDrive(missionId, file, userId);
@@ -198,12 +217,13 @@ export const useAttachmentUpload = () => {
           toast.error(`Échec du téléchargement pour ${file.name}`);
         } else {
           setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+          toast.success(`Fichier ${file.name} téléchargé avec succès`);
         }
       }
       
-      if (allSucceeded) {
+      if (allSucceeded && files.length > 1) {
         toast.success("Tous les fichiers ont été téléchargés avec succès");
-      } else if (files.length > 1) {
+      } else if (!allSucceeded && files.length > 1) {
         toast.warning("Certains fichiers n'ont pas pu être téléchargés");
       }
       
