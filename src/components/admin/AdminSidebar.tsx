@@ -1,5 +1,5 @@
 
-import { Home, CreditCard, User, Settings, CircleDollarSign, Truck, Users } from "lucide-react";
+import { Home, CreditCard, User, Settings, CircleDollarSign, Truck, Users, List } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,16 @@ const AdminSidebar = () => {
               }
             >
               <Home className="h-4 w-4" /> Accueil
+            </NavLink>
+            <NavLink 
+              to="/dashboard/admin/total-courses" 
+              className={({ isActive }) => 
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
+                  isActive ? 'bg-secondary' : 'hover:bg-secondary/80'
+                }`
+              }
+            >
+              <List className="h-4 w-4" /> Total Course
             </NavLink>
             <NavLink 
               to="/dashboard/admin/pricing-grids" 
