@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { MissionRow } from "@/types/database";
+import { Paperclip } from "lucide-react";
+import { MissionAttachmentsDialog } from "./MissionAttachmentsDialog";
 
 interface ContactInfo {
   name: string;
@@ -29,6 +31,7 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
   onMissionUpdated
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isAttachmentsDialogOpen, setIsAttachmentsDialogOpen] = useState(false);
   
   const [pickupContact, setPickupContact] = useState<ContactInfo>(
     mission?.pickup_contact ? 
@@ -55,7 +58,7 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
   const [additionalInfo, setAdditionalInfo] = useState(mission?.additional_info || '');
 
   // Update state when mission changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (mission) {
       setPickupContact({ 
         name: (mission.pickup_contact as any)?.name || '',
@@ -117,121 +120,147 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
     }
   };
 
+  const openAttachmentsDialog = () => {
+    setIsAttachmentsDialogOpen(true);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Modifier les détails de la mission</DialogTitle>
-        </DialogHeader>
-        
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Contact de départ</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="pickup-name">Nom</Label>
-                <Input
-                  id="pickup-name"
-                  value={pickupContact.name}
-                  onChange={(e) => setPickupContact({...pickupContact, name: e.target.value})}
-                />
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Modifier les détails de la mission</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Contact de départ</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="pickup-name">Nom</Label>
+                  <Input
+                    id="pickup-name"
+                    value={pickupContact.name}
+                    onChange={(e) => setPickupContact({...pickupContact, name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pickup-phone">Téléphone</Label>
+                  <Input
+                    id="pickup-phone"
+                    value={pickupContact.phone}
+                    onChange={(e) => setPickupContact({...pickupContact, phone: e.target.value})}
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="pickup-phone">Téléphone</Label>
-                <Input
-                  id="pickup-phone"
-                  value={pickupContact.phone}
-                  onChange={(e) => setPickupContact({...pickupContact, phone: e.target.value})}
-                />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Contact de livraison</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="delivery-name">Nom</Label>
+                  <Input
+                    id="delivery-name"
+                    value={deliveryContact.name}
+                    onChange={(e) => setDeliveryContact({...deliveryContact, name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="delivery-phone">Téléphone</Label>
+                  <Input
+                    id="delivery-phone"
+                    value={deliveryContact.phone}
+                    onChange={(e) => setDeliveryContact({...deliveryContact, phone: e.target.value})}
+                  />
+                </div>
               </div>
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Dates et heures</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="pickup-date">Date de départ</Label>
+                  <Input
+                    id="pickup-date"
+                    type="date"
+                    value={pickupDate ? new Date(pickupDate).toISOString().split('T')[0] : ''}
+                    onChange={(e) => setPickupDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pickup-time">Heure de départ</Label>
+                  <Input
+                    id="pickup-time"
+                    type="time"
+                    value={pickupTime || ''}
+                    onChange={(e) => setPickupTime(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="delivery-date">Date de livraison</Label>
+                  <Input
+                    id="delivery-date"
+                    type="date"
+                    value={deliveryDate ? new Date(deliveryDate).toISOString().split('T')[0] : ''}
+                    onChange={(e) => setDeliveryDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="delivery-time">Heure de livraison</Label>
+                  <Input
+                    id="delivery-time"
+                    type="time"
+                    value={deliveryTime || ''}
+                    onChange={(e) => setDeliveryTime(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="additional-info">Informations supplémentaires</Label>
+              <Textarea
+                id="additional-info"
+                value={additionalInfo || ''}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+                rows={3}
+              />
             </div>
           </div>
           
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Contact de livraison</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="delivery-name">Nom</Label>
-                <Input
-                  id="delivery-name"
-                  value={deliveryContact.name}
-                  onChange={(e) => setDeliveryContact({...deliveryContact, name: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="delivery-phone">Téléphone</Label>
-                <Input
-                  id="delivery-phone"
-                  value={deliveryContact.phone}
-                  onChange={(e) => setDeliveryContact({...deliveryContact, phone: e.target.value})}
-                />
-              </div>
+          <DialogFooter className="flex justify-between">
+            <Button 
+              variant="outline" 
+              onClick={openAttachmentsDialog}
+              type="button"
+              className="flex items-center gap-1"
+            >
+              <Paperclip className="h-4 w-4" />
+              Pièces jointes
+            </Button>
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={onClose}>
+                Annuler
+              </Button>
+              <Button onClick={handleSubmit} disabled={isLoading}>
+                {isLoading ? <Loader className="mr-2 h-4 w-4" /> : null}
+                Enregistrer
+              </Button>
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Dates et heures</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="pickup-date">Date de départ</Label>
-                <Input
-                  id="pickup-date"
-                  type="date"
-                  value={pickupDate ? new Date(pickupDate).toISOString().split('T')[0] : ''}
-                  onChange={(e) => setPickupDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="pickup-time">Heure de départ</Label>
-                <Input
-                  id="pickup-time"
-                  type="time"
-                  value={pickupTime || ''}
-                  onChange={(e) => setPickupTime(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="delivery-date">Date de livraison</Label>
-                <Input
-                  id="delivery-date"
-                  type="date"
-                  value={deliveryDate ? new Date(deliveryDate).toISOString().split('T')[0] : ''}
-                  onChange={(e) => setDeliveryDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="delivery-time">Heure de livraison</Label>
-                <Input
-                  id="delivery-time"
-                  type="time"
-                  value={deliveryTime || ''}
-                  onChange={(e) => setDeliveryTime(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="additional-info">Informations supplémentaires</Label>
-            <Textarea
-              id="additional-info"
-              value={additionalInfo || ''}
-              onChange={(e) => setAdditionalInfo(e.target.value)}
-              rows={3}
-            />
-          </div>
-        </div>
-        
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Annuler
-          </Button>
-          <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? <Loader className="mr-2 h-4 w-4" /> : null}
-            Enregistrer
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {mission && (
+        <MissionAttachmentsDialog
+          isOpen={isAttachmentsDialogOpen}
+          onClose={() => setIsAttachmentsDialogOpen(false)}
+          missionId={mission.id}
+          missionNumber={mission.mission_number}
+        />
+      )}
+    </>
   );
 };
