@@ -1,22 +1,20 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { toast } from "sonner";
 import { Circle, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 interface DashboardCardsProps {
   refreshTrigger?: number;
 }
 
 const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
-  const [pendingQuotesCount, setPendingQuotesCount] = useState(0);
-  const [ongoingMissionsCount, setOngoingMissionsCount] = useState(0);
-  const [completedMissionsCount, setCompletedMissionsCount] = useState(0);
-  const [totalMissionsCount, setTotalMissionsCount] = useState(0);
-
-  useEffect(() => {
-    const fetchCounts = async () => {
+  // Use react-query for better caching and state management
+  const { data: counts = {}, isLoading } = useQuery({
+    queryKey: ['dashboard-counts', refreshTrigger],
+    queryFn: async () => {
       try {
         console.log("DashboardCards: Fetching counts with refreshTrigger:", refreshTrigger);
         
@@ -70,18 +68,26 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           completed: completedCount
         });
         
-        setTotalMissionsCount(totalCount || 0);
-        setPendingQuotesCount(pendingCount || 0);
-        setOngoingMissionsCount(ongoingCount || 0);
-        setCompletedMissionsCount(completedCount || 0);
+        return {
+          totalMissionsCount: totalCount || 0,
+          pendingQuotesCount: pendingCount || 0,
+          ongoingMissionsCount: ongoingCount || 0,
+          completedMissionsCount: completedCount || 0
+        };
       } catch (error: any) {
         console.error('Error fetching dashboard counts:', error);
         toast.error(`Erreur: ${error.message}`);
+        return {
+          totalMissionsCount: 0,
+          pendingQuotesCount: 0,
+          ongoingMissionsCount: 0,
+          completedMissionsCount: 0
+        };
       }
-    };
-
-    fetchCounts();
-  }, [refreshTrigger]);
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2
+  });
 
   return (
     <div className="grid gap-6 md:grid-cols-4 mb-6">
@@ -91,7 +97,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{totalMissionsCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : counts.totalMissionsCount}</p>
         </CardContent>
       </Card>
 
@@ -101,7 +107,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <Circle className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{pendingQuotesCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : counts.pendingQuotesCount}</p>
         </CardContent>
       </Card>
 
@@ -111,7 +117,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <AlertCircle className="h-4 w-4 text-yellow-500" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{ongoingMissionsCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : counts.ongoingMissionsCount}</p>
         </CardContent>
       </Card>
 
@@ -121,7 +127,7 @@ const DashboardCards = ({ refreshTrigger = 0 }: DashboardCardsProps) => {
           <CheckCircle className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{completedMissionsCount}</p>
+          <p className="text-2xl font-bold">{isLoading ? '...' : counts.completedMissionsCount}</p>
         </CardContent>
       </Card>
     </div>
