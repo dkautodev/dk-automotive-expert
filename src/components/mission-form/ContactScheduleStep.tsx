@@ -1,17 +1,22 @@
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { MissionFormValues } from "./missionFormSchema";
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea"; 
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { fr } from "date-fns/locale";
-import { format } from "date-fns";
-import ContactSelector from "../client/address-book/ContactSelector";
-import { ContactEntry } from "@/types/addressBook";
+import { Loader2 } from "lucide-react";
+import ClientSelector from "./ClientSelector";
+import { useClients } from "./hooks/useClients";
+import { MissionFormValues } from "./missionFormSchema";
+import DatePickerField from "./DatePickerField";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface ContactScheduleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -20,47 +25,27 @@ interface ContactScheduleStepProps {
   isSubmitting: boolean;
 }
 
-const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
+const ContactScheduleStep = ({
   form,
   onSubmit,
   onPrevious,
   isSubmitting,
-}) => {
-  const handleSelectPickupContact = (contact: ContactEntry) => {
-    form.setValue("pickup_first_name", contact.firstName);
-    form.setValue("pickup_last_name", contact.lastName);
-    form.setValue("pickup_email", contact.email);
-    form.setValue("pickup_phone", contact.phone);
-    form.trigger(["pickup_first_name", "pickup_last_name", "pickup_email", "pickup_phone"]);
-  };
-
-  const handleSelectDeliveryContact = (contact: ContactEntry) => {
-    form.setValue("delivery_first_name", contact.firstName);
-    form.setValue("delivery_last_name", contact.lastName);
-    form.setValue("delivery_email", contact.email);
-    form.setValue("delivery_phone", contact.phone);
-    form.trigger(["delivery_first_name", "delivery_last_name", "delivery_email", "delivery_phone"]);
-  };
+}: ContactScheduleStepProps) => {
+  const { clients, isLoading: clientsLoading } = useClients();
+  const { role } = useAuthContext();
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold">Contact & Horaires</h2>
-        <p className="text-muted-foreground">
-          Informations de contact et horaires pour le ramassage et la livraison
-        </p>
-      </div>
+      <h2 className="text-xl font-semibold">Informations de contact et planning</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Sélecteur de client (uniquement visible pour les administrateurs) */}
+      {role === "admin" && (
+        <ClientSelector form={form} clients={clients} loading={clientsLoading} />
+      )}
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Contact de ramassage</h3>
-            <ContactSelector 
-              onSelectContact={handleSelectPickupContact} 
-              buttonClassName="h-8 text-xs"
-            />
-          </div>
-          
+          <h3 className="text-lg font-medium">Contact d'enlèvement</h3>
           <FormField
             control={form.control}
             name="pickup_first_name"
@@ -68,13 +53,12 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Prénom</FormLabel>
                 <FormControl>
-                  <Input placeholder="Prénom" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
           <FormField
             control={form.control}
             name="pickup_last_name"
@@ -82,13 +66,12 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Nom</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nom" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
           <FormField
             control={form.control}
             name="pickup_email"
@@ -96,13 +79,12 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Email" type="email" {...field} />
+                  <Input type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
           <FormField
             control={form.control}
             name="pickup_phone"
@@ -110,7 +92,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Téléphone</FormLabel>
                 <FormControl>
-                  <Input placeholder="Téléphone" {...field} />
+                  <Input type="tel" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -119,14 +101,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Contact de livraison</h3>
-            <ContactSelector 
-              onSelectContact={handleSelectDeliveryContact} 
-              buttonClassName="h-8 text-xs"
-            />
-          </div>
-          
+          <h3 className="text-lg font-medium">Contact de livraison</h3>
           <FormField
             control={form.control}
             name="delivery_first_name"
@@ -134,13 +109,12 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Prénom</FormLabel>
                 <FormControl>
-                  <Input placeholder="Prénom" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
           <FormField
             control={form.control}
             name="delivery_last_name"
@@ -148,13 +122,12 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Nom</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nom" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
           <FormField
             control={form.control}
             name="delivery_email"
@@ -162,13 +135,12 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Email" type="email" {...field} />
+                  <Input type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
           <FormField
             control={form.control}
             name="delivery_phone"
@@ -176,7 +148,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Téléphone</FormLabel>
                 <FormControl>
-                  <Input placeholder="Téléphone" {...field} />
+                  <Input type="tel" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -185,56 +157,22 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-4">
-          <h3 className="font-semibold">Horaires de ramassage</h3>
-          <FormField
-            control={form.control}
+          <h3 className="text-lg font-medium">Planning d'enlèvement</h3>
+          <DatePickerField
+            form={form}
             name="pickup_date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date de ramassage</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className="pl-3 text-left font-normal flex justify-between"
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: fr })
-                        ) : (
-                          <span>Choisir une date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      locale={fr}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Date d'enlèvement"
           />
           <FormField
             control={form.control}
             name="pickup_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Heure de ramassage</FormLabel>
+                <FormLabel>Heure d'enlèvement</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="time" 
-                    placeholder="Heure de ramassage" 
-                    {...field} 
-                  />
+                  <Input type="time" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -243,41 +181,11 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold">Horaires de livraison</h3>
-          <FormField
-            control={form.control}
+          <h3 className="text-lg font-medium">Planning de livraison</h3>
+          <DatePickerField
+            form={form}
             name="delivery_date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date de livraison</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className="pl-3 text-left font-normal flex justify-between"
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: fr })
-                        ) : (
-                          <span>Choisir une date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      locale={fr}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Date de livraison"
           />
           <FormField
             control={form.control}
@@ -286,11 +194,7 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
               <FormItem>
                 <FormLabel>Heure de livraison</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="time" 
-                    placeholder="Heure de livraison" 
-                    {...field} 
-                  />
+                  <Input type="time" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -299,41 +203,44 @@ const ContactScheduleStep: React.FC<ContactScheduleStepProps> = ({
         </div>
       </div>
 
-      <div className="mt-6">
-        <h3 className="font-semibold mb-2">Compléments d'informations</h3>
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Informations complémentaires</h3>
         <FormField
           control={form.control}
           name="additional_info"
           render={({ field }) => (
             <FormItem>
+              <FormLabel>Notes additionnelles</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Informations complémentaires pour le chauffeur (250 caractères max)"
+                <Textarea
+                  placeholder="Informations supplémentaires pour la mission"
                   className="min-h-[100px]"
-                  maxLength={250}
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
-                {field.value ? field.value.length : 0}/250 caractères
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
 
-      <div className="flex justify-between mt-8">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onPrevious}
-          disabled={isSubmitting}
-        >
+      <div className="flex justify-between pt-4">
+        <Button type="button" variant="outline" onClick={onPrevious}>
           Précédent
         </Button>
-        <Button onClick={onSubmit} disabled={isSubmitting}>
-          {isSubmitting ? "Création en cours..." : "Créer la mission"}
+        <Button
+          type="button"
+          onClick={onSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Création en cours...
+            </>
+          ) : (
+            "Créer la mission"
+          )}
         </Button>
       </div>
     </div>
