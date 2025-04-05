@@ -69,7 +69,7 @@ export const useAddressVehicleStep = (
       console.log("Distance calculée:", calculatedDistance, "km");
       
       setDistance(calculatedDistance);
-      form.setValue("distance", calculatedDistance);
+      form.setValue("distance", calculatedDistance.toString());
 
       // Calculate price
       const priceResult = await calculatePrice(vehicleType, calculatedDistance);
