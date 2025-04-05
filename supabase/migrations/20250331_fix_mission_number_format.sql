@@ -11,18 +11,18 @@ DECLARE
 BEGIN
     -- Set the prefix based on mission type
     IF mission_type = 'livraison' THEN
-        prefix := 'DK-LIV-';
+        prefix := 'DK-L-';
     ELSE
-        prefix := 'DK-REST-';
+        prefix := 'DK-R-';
     END IF;
     
     -- Count existing missions of this type
-    SELECT COUNT(*) + 100 INTO mission_count 
+    SELECT COUNT(*) + 1 INTO mission_count 
     FROM missions 
     WHERE mission_type = $1;
     
-    -- Generate the mission number with the correct format
-    new_mission_number := prefix || LPAD(mission_count::TEXT, 8, '0');
+    -- Generate the mission number with the correct format (5 digit number starting at 00001)
+    new_mission_number := prefix || LPAD(mission_count::TEXT, 5, '0');
     
     RETURN new_mission_number;
 END;
