@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
-import { Paperclip, Trash2, Download } from "lucide-react";
+import { Paperclip, Trash2, Download, FileText, File, Image, FileSpreadsheet } from "lucide-react";
 import { useAuthContext } from "@/context/AuthContext";
 import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 
@@ -15,8 +15,8 @@ interface Attachment {
   id: string;
   file_name: string;
   file_path: string;
-  file_type: string;
-  file_size: number;
+  file_type: string | null;
+  file_size: number | null;
   uploaded_by: string;
   created_at: string;
   storage_provider?: string;
@@ -36,10 +36,13 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   missionNumber
 }) => {
   const { user } = useAuthContext();
-  const { uploadAttachments, isUploading } = useAttachmentUpload();
+  const { uploadAttachments, isUploading, getFileDownloadUrl } = useAttachmentUpload();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
+  const [acceptedFileTypes, setAcceptedFileTypes] = useState(
+    ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+  );
 
   const loadAttachments = async () => {
     if (!missionId) return;
@@ -167,9 +170,17 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   };
 
   const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith('image/')) return '🖼️';
-    if (fileType === 'application/pdf') return '📄';
-    return '📎';
+    if (fileType.startsWith('image/')) {
+      return <Image className="h-4 w-4 text-blue-500" />;
+    } else if (fileType === 'application/pdf') {
+      return <FileText className="h-4 w-4 text-red-500" />;
+    } else if (fileType.includes('spreadsheet') || fileType.includes('excel')) {
+      return <FileSpreadsheet className="h-4 w-4 text-green-500" />;
+    } else if (fileType.includes('word') || fileType.includes('document')) {
+      return <FileText className="h-4 w-4 text-blue-600" />;
+    } else {
+      return <File className="h-4 w-4 text-gray-500" />;
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -195,6 +206,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                     id="file-upload"
                     type="file"
                     onChange={handleFileChange}
+                    accept={acceptedFileTypes}
                     multiple
                     className="block w-full"
                   />
@@ -211,6 +223,11 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                   </p>
                 </div>
               )}
+              <div className="mt-2">
+                <p className="text-xs text-muted-foreground">
+                  Formats acceptés: images (jpg, png, gif), documents (pdf, doc, docx), tableurs (xls, xlsx), texte (txt, csv)
+                </p>
+              </div>
             </div>
             
             <div className="border rounded-lg overflow-hidden">
@@ -231,12 +248,13 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="flex-shrink-0">
-                            {getFileIcon(attachment.file_type)}
+                            {getFileIcon(attachment.file_type || '')}
                           </span>
                           <div>
                             <p className="text-sm font-medium truncate">{attachment.file_name}</p>
                             <p className="text-xs text-muted-foreground">
-                              {formatFileSize(attachment.file_size)} • {new Date(attachment.created_at).toLocaleDateString()} 
+                              {formatFileSize(attachment.file_size || 0)} • {new Date(attachment.created_at).toLocaleDateString()} 
+                              {attachment.storage_provider && ` • ${attachment.storage_provider}`}
                             </p>
                           </div>
                         </div>

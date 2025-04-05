@@ -31,10 +31,38 @@ export const useAttachmentUpload = () => {
   };
 
   /**
+   * Vérifie si le type de fichier est autorisé
+   */
+  const isFileTypeAllowed = (fileType: string): boolean => {
+    // Liste des types MIME autorisés
+    const allowedTypes = [
+      // Images
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+      // Documents
+      'application/pdf', 
+      'application/msword', // .doc
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'application/vnd.ms-excel', // .xls
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'text/plain', // .txt
+      'text/csv' // .csv
+    ];
+    
+    return allowedTypes.includes(fileType);
+  };
+
+  /**
    * Télécharge un fichier directement via l'API Supabase Storage
    */
   const uploadViaStorage = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
     try {
+      // Vérifier le type de fichier
+      if (!isFileTypeAllowed(file.type)) {
+        console.error(`Type de fichier non autorisé: ${file.type}`);
+        toast.error(`Le type de fichier "${file.type}" n'est pas autorisé`);
+        return false;
+      }
+      
       // Générer un nom de fichier simple
       const extension = file.name.split('.').pop() || '';
       const paddedIndex = fileIndex.toString().padStart(2, '0');
@@ -86,6 +114,13 @@ export const useAttachmentUpload = () => {
    */
   const uploadViaEdgeFunction = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
     try {
+      // Vérifier le type de fichier
+      if (!isFileTypeAllowed(file.type)) {
+        console.error(`Type de fichier non autorisé: ${file.type}`);
+        toast.error(`Le type de fichier "${file.type}" n'est pas autorisé`);
+        return false;
+      }
+      
       // Convertir le fichier en base64
       const reader = new FileReader();
       const fileData = await new Promise<string>((resolve, reject) => {
@@ -124,6 +159,27 @@ export const useAttachmentUpload = () => {
     } catch (error) {
       console.error("Erreur Edge Function:", error);
       return false;
+    }
+  };
+
+  /**
+   * Obtient une URL de téléchargement pour un fichier
+   */
+  const getFileDownloadUrl = async (filePath: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('mission-attachments')
+        .createSignedUrl(filePath, 60); // URL valide pendant 60 secondes
+      
+      if (error) {
+        console.error("Erreur lors de la création de l'URL signée:", error);
+        return null;
+      }
+      
+      return data.signedUrl;
+    } catch (error) {
+      console.error("Erreur lors de la création de l'URL signée:", error);
+      return null;
     }
   };
 
@@ -205,6 +261,7 @@ export const useAttachmentUpload = () => {
 
   return {
     uploadAttachments,
+    getFileDownloadUrl,
     isUploading,
     uploadProgress
   };
