@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";

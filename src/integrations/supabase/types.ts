@@ -148,6 +148,7 @@ export type Database = {
       missions: {
         Row: {
           additional_info: string | null
+          admin_id: string | null
           client_id: string
           created_at: string | null
           delivery_contact: Json | null
@@ -172,6 +173,7 @@ export type Database = {
         }
         Insert: {
           additional_info?: string | null
+          admin_id?: string | null
           client_id: string
           created_at?: string | null
           delivery_contact?: Json | null
@@ -196,6 +198,7 @@ export type Database = {
         }
         Update: {
           additional_info?: string | null
+          admin_id?: string | null
           client_id?: string
           created_at?: string | null
           delivery_contact?: Json | null
@@ -397,6 +400,7 @@ export type Database = {
         }
         Returns: {
           additional_info: string | null
+          admin_id: string | null
           client_id: string
           created_at: string | null
           delivery_contact: Json | null
