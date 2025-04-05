@@ -36,7 +36,8 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
     isLoading, 
     handleCancelMission, 
     confirmCancelMission, 
-    setIsCancelDialogOpen 
+    setIsCancelDialogOpen,
+    selectedMission: missionToCancel 
   } = useMissionCancellation({ onSuccess: onMissionCancelled });
 
   const handleViewDetails = (mission: MissionRow) => {
@@ -110,7 +111,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                       variant="ghost"
                       size="icon"
                       className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                      onClick={() => handleCancelMission(mission.id)}
+                      onClick={() => handleCancelMission(mission)}
                       disabled={isLoading}
                       title="Annuler"
                     >
@@ -144,7 +145,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
         onOpenChange={setIsCancelDialogOpen}
         onConfirm={confirmCancelMission}
         isLoading={isLoading}
-        missionNumber={selectedMission?.mission_number}
+        missionNumber={missionToCancel?.mission_number}
       />
     </>
   );
