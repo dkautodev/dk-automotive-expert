@@ -1,80 +1,64 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MissionsTable } from "./missions/MissionsTable";
-import { MissionsTableSkeleton } from "./missions/MissionsTableSkeleton";
-import { EmptyMissionsState } from "./missions/EmptyMissionsState";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-interface PendingQuotesTableProps {
+interface UseMissionsProps {
   refreshTrigger?: number;
+  showAllMissions?: boolean;
+  filterStatus?: string | string[];
 }
 
-const PendingQuotesTable = ({ refreshTrigger = 0 }: PendingQuotesTableProps) => {
-  const { missions, loading } = usePendingQuotes(refreshTrigger);
-
-  const handleMissionCancelled = () => {
-    // This will trigger a refresh in the parent component
-    console.log("Mission cancelled, refreshing table...");
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Devis en attente</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <MissionsTableSkeleton />
-        ) : missions.length > 0 ? (
-          <MissionsTable 
-            missions={missions} 
-            onMissionCancelled={handleMissionCancelled} 
-          />
-        ) : (
-          <EmptyMissionsState 
-            message="Aucun devis en attente" 
-          />
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
-// Custom hook to fetch only pending quotes
-function usePendingQuotes(refreshTrigger = 0) {
+export function useMissions({ 
+  refreshTrigger = 0, 
+  showAllMissions = false,
+  filterStatus
+}: UseMissionsProps = {}) {
   const [missions, setMissions] = useState<MissionRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPendingQuotes = async () => {
+    const fetchMissions = async () => {
       try {
         setLoading(true);
-        console.log("Fetching pending quotes with refreshTrigger:", refreshTrigger);
+        console.log(`Fetching missions with refreshTrigger: ${refreshTrigger}, showAllMissions: ${showAllMissions}, filterStatus:`, filterStatus);
         
-        const { data, error } = await supabase
+        // Start building the query to fetch missions
+        let query = supabase
           .from('missions')
           .select(`
             *,
             clientProfile:client_id(*)
           `)
-          .eq('status', 'en_attente')
           .order('created_at', { ascending: false });
+        
+        // Apply status filter only if showAllMissions is false and filterStatus is provided
+        if (!showAllMissions && filterStatus) {
+          if (Array.isArray(filterStatus)) {
+            query = query.in('status', filterStatus);
+          } else {
+            query = query.eq('status', filterStatus);
+          }
+        }
+        
+        const { data, error } = await query;
 
         if (error) {
-          console.error("Error fetching pending quotes:", error);
+          console.error("Error fetching missions:", error);
           throw error;
         }
-
-        console.log("Pending quotes fetched:", data);
         
-        if (!data) {
+        console.log("Missions fetched:", data);
+        
+        if (!data || data.length === 0) {
+          console.log("No missions found in database");
           setMissions([]);
+          setLoading(false);
           return;
         }
         
+        // Transform missions to include properly typed objects
         const transformedMissions = data.map(mission => {
           const vehicleInfo = mission.vehicle_info as any || {};
           
@@ -124,20 +108,19 @@ function usePendingQuotes(refreshTrigger = 0) {
           return typedMission;
         });
         
+        console.log(`Number of transformed missions: ${transformedMissions.length}`);
         setMissions(transformedMissions);
-      } catch (error) {
-        console.error("Error in usePendingQuotes:", error);
-        toast.error("Erreur lors de la récupération des devis en attente");
+      } catch (err) {
+        console.error('Error in useMissions hook:', err);
+        toast.error("Erreur lors de la récupération des missions");
         setMissions([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPendingQuotes();
-  }, [refreshTrigger]);
+    fetchMissions();
+  }, [refreshTrigger, showAllMissions, filterStatus]);
 
   return { missions, loading };
 }
-
-export default PendingQuotesTable;
