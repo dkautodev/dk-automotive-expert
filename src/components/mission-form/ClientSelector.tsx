@@ -25,17 +25,15 @@ const ClientSelector = ({ form, clients, loading }: ClientSelectorProps) => {
   
   // Fonction pour formater l'affichage du client - priorité au client_code
   const formatClientDisplay = (client: ClientData) => {
+    // Récupérer le nom formaté via le transformateur
+    const clientDisplay = transformToClientDisplay(client);
+    
     // Si l'utilisateur est admin, montrer l'email à côté du code client
     if (role === 'admin' && client.email) {
-      // Récupérer le nom formaté via le transformateur
-      const clientDisplay = transformToClientDisplay(client);
-      
-      // Ajouter l'email entre parenthèses
       return `${clientDisplay.name} (${client.email})`;
     }
     
     // Pour les utilisateurs non-admin, utiliser uniquement le code client
-    const clientDisplay = transformToClientDisplay(client);
     return clientDisplay.name;
   };
   
