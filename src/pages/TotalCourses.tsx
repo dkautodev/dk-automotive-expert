@@ -15,12 +15,12 @@ const TotalCourses = () => {
     console.log("TotalCourses: Chargement initial");
     setRefreshTrigger(1);
     
-    // Rafraîchissement automatique toutes les 15 secondes
+    // Rafraîchissement automatique toutes les 10 secondes
     const intervalId = setInterval(() => {
       setRefreshTrigger(prev => prev + 1);
       setLastRefreshTime(new Date());
       console.log("TotalCourses: Rafraîchissement automatique", new Date().toISOString());
-    }, 15000);
+    }, 10000);
     
     return () => clearInterval(intervalId);
   }, []);
@@ -29,14 +29,24 @@ const TotalCourses = () => {
     const newValue = refreshTrigger + 1;
     setRefreshTrigger(newValue);
     setLastRefreshTime(new Date());
-    console.log("TotalCourses: Rafraîchissement manuel", new Date().toISOString());
+    console.log("TotalCourses: Rafraîchissement manuel", new Date().toISOString(), "nouvelle valeur:", newValue);
     toast.success("Tableau de missions rafraîchi");
   };
 
   const handleMissionCreated = () => {
     console.log("TotalCourses: Nouvelle mission créée, rafraîchissement");
-    setRefreshTrigger(prev => prev + 1);
+    
+    // Rafraîchir immédiatement
+    const newValue = refreshTrigger + 1;
+    setRefreshTrigger(newValue);
     setLastRefreshTime(new Date());
+    
+    // Puis à nouveau après un court délai pour s'assurer que les données sont à jour
+    setTimeout(() => {
+      setRefreshTrigger(prev => prev + 1);
+      console.log("TotalCourses: Rafraîchissement différé après création de mission");
+    }, 2000);
+    
     toast.success("Mission créée, actualisation du tableau");
   };
 
@@ -76,7 +86,7 @@ const TotalCourses = () => {
             refreshTrigger={refreshTrigger} 
             showAllMissions={true}
             emptyMessage="Aucune mission trouvée dans la base de données"
-            forceAdminView={true}  // S'assurer que ce paramètre est bien passé à true
+            forceAdminView={true}  // S'assurer que ce paramètre est explicitement défini à true
           />
         </CardContent>
       </Card>

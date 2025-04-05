@@ -23,9 +23,9 @@ export function useMissions({
 }: UseMissionsProps = {}) {
   const { user, role } = useAuthContext();
   
-  // Logique d'administrateur simplifiée et clarifiée
+  // Amélioration de la détection des administrateurs
   const adminEmail = 'dkautomotive70@gmail.com';
-  const isAdmin = forceAdminView || role === 'admin' || (user?.email === adminEmail);
+  const isAdmin = Boolean(forceAdminView || role === 'admin' || (user?.email === adminEmail));
   
   const fetchMissions = useCallback(async () => {
     const timestamp = new Date().toISOString();
@@ -34,7 +34,7 @@ export function useMissions({
       - showAllMissions: ${showAllMissions}
       - filterStatus: ${Array.isArray(filterStatus) ? filterStatus.join(', ') : filterStatus || 'All'}
       - forceAdminView: ${forceAdminView}
-      - isAdmin: ${isAdmin}
+      - isAdmin: ${isAdmin} (${typeof isAdmin})
       - user.email: ${user?.email}
       - role: ${role || 'unknown'}
     `);
@@ -57,12 +57,12 @@ export function useMissions({
         }
       }
       
-      // IMPORTANT: Mode admin, ne pas filtrer par client_id
+      // CORRECTION: Vérification stricte si l'utilisateur n'est PAS un admin
       if (!isAdmin && user?.id) {
         console.log(`Mode client: Filtering by client_id: ${user.id}`);
         query = query.eq('client_id', user.id);
       } else {
-        console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id`);
+        console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id. isAdmin=${isAdmin}`);
       }
 
       // Application de la limite si fournie

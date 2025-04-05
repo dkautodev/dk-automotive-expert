@@ -30,7 +30,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     forceAdminView // Transmettre explicitement le flag admin
   });
 
-  // Utiliser useEffect pour journaliser les informations sur les missions à chaque mise à jour
+  // Ajouter des logs détaillés pour le débogage
   useEffect(() => {
     console.log(`MissionsByStatusTable [${new Date().toISOString()}]: 
       - status: ${Array.isArray(status) ? status.join(', ') : status || 'Tous'}
@@ -45,6 +45,8 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     if (missions.length > 0) {
       console.log("Premier ID de mission:", missions[0].id);
       console.log("Premier numéro de mission:", missions[0].mission_number);
+      console.log("Premier statut de mission:", missions[0].status);
+      console.log("Client ID de la première mission:", missions[0].client_id);
     }
   }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger]);
 
