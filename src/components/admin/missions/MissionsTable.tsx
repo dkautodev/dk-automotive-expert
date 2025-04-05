@@ -13,7 +13,7 @@ import { MissionRow } from "@/types/database";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { Eye, X } from "lucide-react";
+import { Eye, X, FileText } from "lucide-react";
 import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
 import { useMissionCancellation } from "@/hooks/useMissionCancellation";
 import { CancelMissionDialog } from "@/components/missions/CancelMissionDialog";
@@ -50,6 +50,15 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
     return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
   };
 
+  const getClientName = (mission: MissionRow) => {
+    const client = mission.clientProfile;
+    if (!client) return "Non spécifié";
+    
+    return client.company_name ? 
+      client.company_name : 
+      `${client.first_name} ${client.last_name}`.trim();
+  };
+
   return (
     <>
       <Table>
@@ -67,7 +76,6 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
         </TableHeader>
         <TableBody>
           {missions.map((mission) => {
-            const client = mission.clientProfile as any;
             const vehicleInfo = mission.vehicle_info as any || {};
             
             return (
@@ -76,7 +84,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                   {mission.mission_number || "Non attribué"}
                 </TableCell>
                 <TableCell>
-                  {client?.company_name || `${client?.first_name || ''} ${client?.last_name || ''}` || "Non spécifié"}
+                  {getClientName(mission)}
                 </TableCell>
                 <TableCell>
                   {vehicleInfo ? (
@@ -107,16 +115,18 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                      onClick={() => handleCancelMission(mission)}
-                      disabled={isLoading}
-                      title="Annuler"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {mission.status === 'en_attente' && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                        onClick={() => handleCancelMission(mission)}
+                        disabled={isLoading}
+                        title="Annuler"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

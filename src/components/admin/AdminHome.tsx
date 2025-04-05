@@ -1,25 +1,23 @@
 
 import { useEffect, useState } from "react";
-import DashboardCards from "./DashboardCards";
-import ClientManagement from "./ClientManagement";
-import PendingInvoicesTable from "./PendingInvoicesTable";
-import CompletedMissionsTable from "./CompletedMissionsTable";
-import OngoingMissionsTable from "./OngoingMissionsTable";
-import PendingQuotesTable from "./PendingQuotesTable";
-import CreateMissionDialog from "../mission-form/CreateMissionDialog";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DashboardCards from "./DashboardCards";
+import CreateMissionDialog from "../mission-form/CreateMissionDialog";
+import MissionsByStatusTable from "./missions/MissionsByStatusTable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminHome = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Effet pour forcer l'actualisation lors du chargement initial
+  // Effect to force refresh on initial load
   useEffect(() => {
     console.log("AdminHome initial load, setting refresh trigger to 1");
     setRefreshTrigger(1);
   }, []);
 
   const handleMissionCreated = () => {
-    // Incrémente le déclencheur de rafraîchissement pour forcer la mise à jour des tables
+    // Increment refresh trigger to force dashboard updates
     const newValue = refreshTrigger + 1;
     setRefreshTrigger(newValue);
     console.log("Mission créée, rafraîchissement du tableau de bord avec valeur:", newValue);
@@ -35,20 +33,74 @@ const AdminHome = () => {
       
       <DashboardCards refreshTrigger={refreshTrigger} />
       
-      <div className="grid grid-cols-1 gap-6">
-        <PendingQuotesTable refreshTrigger={refreshTrigger} />
-      </div>
-      
-      <div className="grid grid-cols-1 gap-6">
-        <OngoingMissionsTable refreshTrigger={refreshTrigger} showAllMissions={false} />
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CompletedMissionsTable refreshTrigger={refreshTrigger} />
-        <PendingInvoicesTable refreshTrigger={refreshTrigger} />
-      </div>
-      
-      <ClientManagement />
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="pending">Devis en attente</TabsTrigger>
+          <TabsTrigger value="ongoing">Missions en cours</TabsTrigger>
+          <TabsTrigger value="completed">Missions terminées</TabsTrigger>
+          <TabsTrigger value="all">Toutes les missions</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="pending" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Devis en attente</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MissionsByStatusTable 
+                refreshTrigger={refreshTrigger} 
+                status="en_attente"
+                emptyMessage="Aucun devis en attente"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="ongoing" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Missions en cours</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MissionsByStatusTable 
+                refreshTrigger={refreshTrigger} 
+                status={["confirmé", "confirme", "prise_en_charge"]}
+                emptyMessage="Aucune mission en cours"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="completed" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Missions terminées</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MissionsByStatusTable 
+                refreshTrigger={refreshTrigger} 
+                status={["termine", "livre"]}
+                emptyMessage="Aucune mission terminée"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="all" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Toutes les missions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MissionsByStatusTable 
+                refreshTrigger={refreshTrigger} 
+                showAllMissions={true}
+                emptyMessage="Aucune mission trouvée"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
