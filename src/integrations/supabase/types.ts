@@ -149,7 +149,9 @@ export type Database = {
         Row: {
           additional_info: string | null
           admin_id: string | null
+          city: string | null
           client_id: string
+          country: string | null
           created_at: string | null
           delivery_contact: Json | null
           delivery_date: string | null
@@ -162,11 +164,13 @@ export type Database = {
           pickup_contact: Json | null
           pickup_date: string | null
           pickup_time: string | null
+          postal_code: string | null
           price_ht: number | null
           price_ttc: number | null
           quote_id: string | null
           quote_number: string | null
           status: string
+          street_number: string | null
           updated_at: string | null
           vehicle_info: Json | null
           vehicles: Json | null
@@ -174,7 +178,9 @@ export type Database = {
         Insert: {
           additional_info?: string | null
           admin_id?: string | null
+          city?: string | null
           client_id: string
+          country?: string | null
           created_at?: string | null
           delivery_contact?: Json | null
           delivery_date?: string | null
@@ -187,11 +193,13 @@ export type Database = {
           pickup_contact?: Json | null
           pickup_date?: string | null
           pickup_time?: string | null
+          postal_code?: string | null
           price_ht?: number | null
           price_ttc?: number | null
           quote_id?: string | null
           quote_number?: string | null
           status?: string
+          street_number?: string | null
           updated_at?: string | null
           vehicle_info?: Json | null
           vehicles?: Json | null
@@ -199,7 +207,9 @@ export type Database = {
         Update: {
           additional_info?: string | null
           admin_id?: string | null
+          city?: string | null
           client_id?: string
+          country?: string | null
           created_at?: string | null
           delivery_contact?: Json | null
           delivery_date?: string | null
@@ -212,11 +222,13 @@ export type Database = {
           pickup_contact?: Json | null
           pickup_date?: string | null
           pickup_time?: string | null
+          postal_code?: string | null
           price_ht?: number | null
           price_ttc?: number | null
           quote_id?: string | null
           quote_number?: string | null
           status?: string
+          street_number?: string | null
           updated_at?: string | null
           vehicle_info?: Json | null
           vehicles?: Json | null
@@ -401,7 +413,9 @@ export type Database = {
         Returns: {
           additional_info: string | null
           admin_id: string | null
+          city: string | null
           client_id: string
+          country: string | null
           created_at: string | null
           delivery_contact: Json | null
           delivery_date: string | null
@@ -414,11 +428,13 @@ export type Database = {
           pickup_contact: Json | null
           pickup_date: string | null
           pickup_time: string | null
+          postal_code: string | null
           price_ht: number | null
           price_ttc: number | null
           quote_id: string | null
           quote_number: string | null
           status: string
+          street_number: string | null
           updated_at: string | null
           vehicle_info: Json | null
           vehicles: Json | null

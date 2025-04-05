@@ -71,9 +71,25 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
     const client = mission.clientProfile;
     if (!client) return "Non spécifié";
     
-    return client.company_name ? 
-      client.company_name : 
-      `${client.first_name} ${client.last_name}`.trim();
+    // Priorité au nom de la société, puis au nom complet
+    if (client.company_name && client.company_name.trim() !== "") {
+      return client.company_name;
+    }
+    
+    // Si pas de société, utiliser le nom complet
+    const fullName = `${client.first_name} ${client.last_name}`.trim();
+    return fullName || "Non spécifié";
+  };
+
+  const getAddressDisplay = (mission: MissionRow, addressType: 'pickup' | 'delivery') => {
+    // Utiliser les nouvelles colonnes structurées si disponibles
+    if (addressType === 'pickup' && mission.city) {
+      return `${mission.postal_code || ''} ${mission.city || ''}`.trim() || "Non spécifié";
+    }
+    
+    // Sinon utiliser la méthode d'extraction existante
+    const address = addressType === 'pickup' ? mission.pickup_address : mission.delivery_address;
+    return extractPostalCodeAndCity(address) || "Non spécifié";
   };
 
   return (
@@ -114,7 +130,7 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                 </TableCell>
                 <TableCell>{formatDate(mission.delivery_date)}</TableCell>
                 <TableCell title={mission.pickup_address}>
-                  {extractPostalCodeAndCity(mission.pickup_address)}
+                  {getAddressDisplay(mission, 'pickup')}
                 </TableCell>
                 <TableCell title={mission.delivery_address}>
                   {extractPostalCodeAndCity(mission.delivery_address)}

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthContext } from "@/context/AuthContext";
+import { extractAddressComponents } from "@/utils/addressUtils";
 
 interface UseMissionsProps {
   refreshTrigger?: number;
@@ -64,7 +65,6 @@ export function useMissions({
       } else {
         console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id. isAdmin=${isAdmin}`);
         // Pour les admins, nous n'appliquons pas de filtre client_id
-        // Si un admin_id est défini dans la BDD, nous pourrions filtrer par admin_id ici aussi
       }
 
       // Application de la limite si fournie
@@ -106,6 +106,16 @@ export function useMissions({
             ? status as MissionStatus 
             : "en_attente"; // Par défaut "en_attente" si statut invalide
         };
+        
+        // S'assurer que les champs d'adresse structurée sont disponibles
+        // Si les colonnes street_number, postal_code, etc. sont vides, les extraire de pickup_address
+        if (!mission.city && mission.pickup_address) {
+          const { streetNumber, postalCode, city, country } = extractAddressComponents(mission.pickup_address);
+          mission.street_number = mission.street_number || streetNumber;
+          mission.postal_code = mission.postal_code || postalCode;
+          mission.city = mission.city || city;
+          mission.country = mission.country || country;
+        }
         
         // Création d'un objet mission correctement typé (sans clientProfile pour l'instant)
         const typedMission: MissionRow = {
@@ -172,7 +182,7 @@ export function useMissions({
     queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
     queryFn: fetchMissions,
     staleTime: 0, // Toujours considérer les données comme obsolètes
-    refetchInterval: 3000, // Rafraîchissement automatique toutes les 3 secondes
+    refetchInterval: role === 'admin' ? 3000 : 90000, // 3 sec pour admin, 90 sec pour client/chauffeur
     retryDelay: 1000, // Attendre 1 seconde entre les tentatives
     retry: 3, // Maximum de 3 tentatives en cas d'échec
     meta: {
