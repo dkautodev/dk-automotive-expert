@@ -8,6 +8,7 @@ import AdminHome from "@/components/admin/AdminHome";
 import PricingGrids from "@/pages/PricingGrids";
 import PendingInvoices from "@/pages/PendingInvoices";
 import ProfileManagement from "@/pages/ProfileManagement";
+import TotalCourses from "@/pages/TotalCourses";
 import { useAuthContext } from "@/context/AuthContext";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
@@ -54,6 +55,7 @@ const AdminDashboard = () => {
             <Route path="pricing-grids" element={<PricingGrids />} />
             <Route path="pending-invoices" element={<PendingInvoices />} />
             <Route path="profile-management" element={<ProfileManagement />} />
+            <Route path="total-courses" element={<TotalCourses />} />
             <Route path="*" element={<Navigate to="/dashboard/admin" replace />} />
           </Routes>
         </main>
