@@ -26,7 +26,7 @@ interface MissionsTableProps {
   missions: MissionRow[];
   onMissionCancelled?: () => void;
   onMissionUpdated?: () => void;
-  displayType?: 'pending' | 'ongoing' | 'delivered' | 'incident' | 'completed';
+  displayType?: 'pending' | 'ongoing' | 'delivered' | 'incident' | 'completed' | 'default';
 }
 
 export const MissionsTable: React.FC<MissionsTableProps> = ({ 
