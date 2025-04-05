@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -76,6 +75,22 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
     setStep(step - 1);
   };
 
+  const handleCalculateAddress = async (address: string) => {
+    try {
+      const { streetNumber, postalCode, city, country } = extractAddressComponents(address);
+      
+      return {
+        street_number: streetNumber,
+        postal_code: postalCode,
+        city: city,
+        country: country
+      };
+    } catch (error) {
+      console.error("Erreur lors de l'extraction de l'adresse:", error);
+      return null;
+    }
+  };
+
   const onSubmit = async () => {
     const isValid = await form.trigger();
     if (!isValid) {
@@ -104,6 +119,8 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
         console.log("Administrateur identifié, utilisation de son ID:", admin_id);
       }
       
+      const pickupAddressComponents = await handleCalculateAddress(values.pickup_address);
+      
       const missionData = {
         status: statusToUse,
         client_id: values.client_id || user?.id,
@@ -112,6 +129,11 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
+        // Composantes d'adresse structurées
+        street_number: pickupAddressComponents?.street_number || '',
+        postal_code: pickupAddressComponents?.postal_code || '',
+        city: pickupAddressComponents?.city || '',
+        country: pickupAddressComponents?.country || 'France',
         vehicle_info: {
           brand: values.brand,
           model: values.model,

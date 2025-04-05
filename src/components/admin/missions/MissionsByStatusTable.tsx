@@ -1,9 +1,13 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
 import { EmptyMissionsState } from "./EmptyMissionsState";
 import { useMissions } from "@/hooks/useMissions";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import { useAuthContext } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface MissionsByStatusTableProps {
   refreshTrigger?: number;
@@ -12,6 +16,7 @@ interface MissionsByStatusTableProps {
   emptyMessage?: string;
   limit?: number;
   forceAdminView?: boolean;
+  showRefreshButton?: boolean;
 }
 
 const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({ 
@@ -20,14 +25,19 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   showAllMissions = false,
   emptyMessage = "Aucune mission disponible",
   limit,
-  forceAdminView = false // Par défaut à false, sera explicitement passé
+  forceAdminView = false,
+  showRefreshButton = true
 }) => {
+  const { role } = useAuthContext();
+  const [localRefreshTrigger, setLocalRefreshTrigger] = useState(refreshTrigger);
+  const [lastRefreshTime, setLastRefreshTime] = useState(new Date());
+  
   const { missions, loading, error, refetch } = useMissions({ 
-    refreshTrigger,
+    refreshTrigger: localRefreshTrigger,
     showAllMissions,
     filterStatus: status,
     limit,
-    forceAdminView // Transmettre explicitement le flag admin
+    forceAdminView
   });
 
   // Ajouter des logs détaillés pour le débogage
@@ -37,6 +47,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       - showAllMissions: ${showAllMissions}
       - forceAdminView: ${forceAdminView}
       - refreshTrigger: ${refreshTrigger}
+      - localRefreshTrigger: ${localRefreshTrigger}
       - missions.length: ${missions.length}
       - error: ${error ? 'Oui' : 'Non'}
       - loading: ${loading ? 'Oui' : 'Non'}
@@ -49,17 +60,35 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       console.log("Client ID de la première mission:", missions[0].client_id);
       console.log("Admin ID de la première mission:", missions[0].admin_id);
     }
-  }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger]);
+  }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger, localRefreshTrigger]);
 
-  // Rafraîchissement périodique plus fréquent
+  // Actualiser quand le refreshTrigger externe change
   useEffect(() => {
+    setLocalRefreshTrigger(refreshTrigger);
+  }, [refreshTrigger]);
+
+  // Rafraîchissement périodique - 90 secondes pour clients et chauffeurs, 5 secondes pour admins
+  useEffect(() => {
+    // Déterminer l'intervalle de rafraîchissement basé sur le rôle
+    const refreshInterval = role === 'admin' ? 5000 : 90000; // 5 secondes pour admin, 90 secondes pour autres
+    
     const intervalId = setInterval(() => {
-      console.log("Rafraîchissement forcé de MissionsByStatusTable", new Date().toISOString());
-      refetch();
-    }, 5000); // Refetch every 5 seconds
+      console.log(`Rafraîchissement automatique de MissionsByStatusTable [${role}]`, new Date().toISOString());
+      setLocalRefreshTrigger(prev => prev + 1);
+      setLastRefreshTime(new Date());
+    }, refreshInterval);
     
     return () => clearInterval(intervalId);
-  }, [refetch]);
+  }, [role]);
+
+  const handleManualRefresh = () => {
+    // Déclencher un rafraîchissement manuel
+    const newValue = localRefreshTrigger + 1;
+    setLocalRefreshTrigger(newValue);
+    setLastRefreshTime(new Date());
+    console.log("Rafraîchissement manuel, nouvelle valeur:", newValue);
+    toast.success("Tableau de missions rafraîchi");
+  };
 
   const handleMissionCancelled = () => {
     // Déclencher un rafraîchissement lorsqu'une mission est annulée
@@ -84,8 +113,29 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
     );
   }
 
+  // Formater l'heure de dernière actualisation
+  const formattedRefreshTime = lastRefreshTime.toLocaleTimeString();
+
   return (
     <>
+      {/* Bouton de rafraîchissement manuel - visible uniquement pour clients et chauffeurs ou si spécifié */}
+      {showRefreshButton && (role === 'client' || role === 'chauffeur' || !role) && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="text-sm text-gray-500">
+            Dernière actualisation: {formattedRefreshTime}
+          </div>
+          <Button 
+            onClick={handleManualRefresh}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Actualiser
+          </Button>
+        </div>
+      )}
+
       {loading ? (
         <MissionsTableSkeleton message="Chargement des missions en cours..." />
       ) : missions.length > 0 ? (
