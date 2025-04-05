@@ -3,9 +3,27 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Types for the hook
+type UploadProgressMap = { [key: string]: number };
+
+interface AttachmentUploadResult {
+  success: boolean;
+  filePath?: string;
+  error?: Error;
+}
+
+interface DeleteAttachmentResult {
+  success: boolean;
+  error?: Error;
+}
+
+/**
+ * Hook that provides functionality to upload and manage attachments
+ */
 export const useAttachmentUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgressMap>({});
 
   /**
    * Obtient le numéro de mission à partir de l'ID
@@ -66,13 +84,19 @@ export const useAttachmentUpload = () => {
   /**
    * Télécharge un fichier directement via l'API Supabase Storage
    */
-  const uploadViaStorage = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
+  const uploadViaStorage = async (
+    missionId: string, 
+    missionNumber: string, 
+    file: File, 
+    userId: string, 
+    fileIndex: number
+  ): Promise<AttachmentUploadResult> => {
     try {
       // Vérifier le type de fichier
       if (!isFileTypeAllowed(file.type)) {
         console.error(`Type de fichier non autorisé: ${file.type}`);
         toast.error(`Le type de fichier "${file.type}" n'est pas autorisé`);
-        return false;
+        return { success: false, error: new Error(`Type de fichier non autorisé: ${file.type}`) };
       }
       
       // Générer un nom de fichier unique
@@ -120,27 +144,32 @@ export const useAttachmentUpload = () => {
       
       if (dbError) {
         console.error("Erreur lors de la création de l'enregistrement:", dbError);
-        // On ne supprime pas le fichier car il pourrait être référencé ailleurs
         throw dbError;
       }
       
-      return true;
+      return { success: true, filePath };
     } catch (error) {
       console.error("Erreur de téléchargement direct:", error);
-      return false;
+      return { success: false, error: error as Error };
     }
   };
 
   /**
    * Télécharge un fichier en utilisant Edge Function
    */
-  const uploadViaEdgeFunction = async (missionId: string, missionNumber: string, file: File, userId: string, fileIndex: number): Promise<boolean> => {
+  const uploadViaEdgeFunction = async (
+    missionId: string, 
+    missionNumber: string, 
+    file: File, 
+    userId: string, 
+    fileIndex: number
+  ): Promise<AttachmentUploadResult> => {
     try {
       // Vérifier le type de fichier
       if (!isFileTypeAllowed(file.type)) {
         console.error(`Type de fichier non autorisé: ${file.type}`);
         toast.error(`Le type de fichier "${file.type}" n'est pas autorisé`);
-        return false;
+        return { success: false, error: new Error(`Type de fichier non autorisé: ${file.type}`) };
       }
       
       // Convertir le fichier en base64
@@ -175,10 +204,10 @@ export const useAttachmentUpload = () => {
         throw error;
       }
       
-      return true;
+      return { success: true, filePath: data?.filePath };
     } catch (error) {
       console.error("Erreur Edge Function:", error);
-      return false;
+      return { success: false, error: error as Error };
     }
   };
 
@@ -204,9 +233,60 @@ export const useAttachmentUpload = () => {
   };
 
   /**
+   * Supprime un fichier joint à une mission
+   */
+  const deleteAttachment = async (attachmentId: string, filePath: string): Promise<DeleteAttachmentResult> => {
+    setIsDeleting(true);
+    
+    try {
+      console.log("Suppression du fichier avec ID:", attachmentId, "et chemin:", filePath);
+      
+      // Supprimer l'enregistrement de la base de données en premier
+      const { error: dbError } = await supabase
+        .from('mission_attachments')
+        .delete()
+        .eq('id', attachmentId);
+        
+      if (dbError) {
+        console.error("Erreur lors de la suppression de l'enregistrement:", dbError);
+        throw dbError;
+      }
+      
+      console.log("Enregistrement supprimé de la base de données, suppression du fichier de storage...");
+      
+      // Ensuite supprimer le fichier du storage
+      const { error: storageError } = await supabase.storage
+        .from('mission-attachments')
+        .remove([filePath]);
+      
+      if (storageError) {
+        console.error("Erreur lors de la suppression du fichier de storage:", storageError);
+        // On continue même si la suppression du storage échoue, l'enregistrement a été supprimé
+        toast.warning("Le fichier a été supprimé de la base de données mais pas du stockage");
+        return { success: true };
+      }
+      
+      console.log("Fichier supprimé avec succès du storage");
+      toast.success("Fichier supprimé avec succès");
+      return { success: true };
+    } catch (error) {
+      console.error("Erreur complète lors de la suppression:", error);
+      toast.error("Erreur lors de la suppression du fichier");
+      return { success: false, error: error as Error };
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  /**
    * Télécharge des fichiers pour une mission
    */
-  const uploadAttachments = async (missionId: string, files: File[], userId: string, maxRetries = 2): Promise<boolean> => {
+  const uploadAttachments = async (
+    missionId: string, 
+    files: File[], 
+    userId: string, 
+    maxRetries = 2
+  ): Promise<boolean> => {
     if (!files.length) return true;
     if (!missionId) {
       toast.error("ID de mission manquant");
@@ -230,7 +310,7 @@ export const useAttachmentUpload = () => {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileIndex = i + 1; // Index du fichier (1-based)
-        let success = false;
+        let uploadResult: AttachmentUploadResult = { success: false };
         let retries = 0;
         
         setUploadProgress(prev => ({ ...prev, [file.name]: 10 }));
@@ -238,11 +318,11 @@ export const useAttachmentUpload = () => {
         console.log(`Tentative de téléchargement du fichier "${file.name}" (index: ${fileIndex}) pour la mission ${missionNumber}`);
         
         // Essayer la méthode Storage directe avec quelques tentatives
-        while (!success && retries <= maxRetries) {
+        while (!uploadResult.success && retries <= maxRetries) {
           setUploadProgress(prev => ({ ...prev, [file.name]: 30 + (retries * 10) }));
-          success = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
+          uploadResult = await uploadViaStorage(missionId, missionNumber, file, userId, fileIndex);
           
-          if (success) {
+          if (uploadResult.success) {
             console.log(`Fichier ${file.name} téléchargé avec succès vers Supabase Storage`);
             setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
             toast.success(`Fichier ${file.name} téléchargé avec succès`);
@@ -257,12 +337,12 @@ export const useAttachmentUpload = () => {
         }
         
         // Si toutes les tentatives directes ont échoué, essayer via Edge Function
-        if (!success) {
+        if (!uploadResult.success) {
           console.log("Toutes les tentatives Storage directes ont échoué, tentative via Edge Function");
           setUploadProgress(prev => ({ ...prev, [file.name]: 70 }));
-          success = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
+          uploadResult = await uploadViaEdgeFunction(missionId, missionNumber, file, userId, fileIndex);
           
-          if (success) {
+          if (uploadResult.success) {
             console.log(`Fichier ${file.name} téléchargé avec succès via Edge Function`);
             setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
             toast.success(`Fichier ${file.name} téléchargé avec succès`);
@@ -294,7 +374,9 @@ export const useAttachmentUpload = () => {
   return {
     uploadAttachments,
     getFileDownloadUrl,
+    deleteAttachment,
     isUploading,
+    isDeleting,
     uploadProgress
   };
 };
