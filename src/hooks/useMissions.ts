@@ -138,9 +138,11 @@ export function useMissions({
     queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit],
     queryFn: fetchMissions,
     staleTime: 3 * 60 * 1000, // 3 minutes
-    onError: (err: any) => {
-      console.error('Error in useMissions hook:', err);
-      toast.error("Erreur lors de la récupération des missions");
+    meta: {
+      onError: (err: any) => {
+        console.error('Error in useMissions hook:', err);
+        toast.error("Erreur lors de la récupération des missions");
+      }
     }
   });
 
