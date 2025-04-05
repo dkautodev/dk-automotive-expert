@@ -12,16 +12,21 @@ const corsHeaders = {
 
 /**
  * Nettoie et sanitize un nom de fichier pour le stockage
- * Supprime les caractères spéciaux et les espaces
+ * Version plus stricte pour éviter tous les problèmes avec Supabase Storage
  */
 const sanitizeFileName = (fileName: string): string => {
-  // Remplacer les apostrophes et autres caractères problématiques par des underscores
-  return fileName
+  console.log("Sanitizing file name for edge function:", fileName);
+  
+  // Sanitization plus stricte - ne conserver que les caractères alphanumériques, points, tirets et underscores
+  const sanitized = fileName
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
     .replace(/[''"]/g, '') // Supprimer les apostrophes et guillemets
-    .replace(/[&\/\\#,+()$~%.'":*?<>{}\s]/g, '_') // Remplacer autres caractères spéciaux et espaces par _
+    .replace(/[^a-zA-Z0-9._-]/g, '_') // Remplacer tous les autres caractères spéciaux par des underscores
     .replace(/__+/g, '_'); // Éviter les underscores multiples
+  
+  console.log("Sanitized to:", sanitized);
+  return sanitized;
 };
 
 async function handleUpload(req: Request) {
@@ -67,8 +72,7 @@ async function handleUpload(req: Request) {
     // Initialisation du client Supabase avec la clé de service pour les autorisations complètes
     const supabase = createClient(supabaseUrl, supabaseKey)
     
-    // Construction du chemin de fichier avec des conventions de nommage sécurisées
-    // S'assurer que le nom du fichier est bien sanitizé
+    // S'assurer que le nom du fichier est bien sanitizé avec la nouvelle méthode plus stricte
     const sanitizedFileName = sanitizeFileName(fileName);
     
     const uniqueId = Date.now().toString();
