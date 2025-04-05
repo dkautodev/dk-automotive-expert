@@ -3,7 +3,7 @@ import React from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
 import { EmptyMissionsState } from "./EmptyMissionsState";
-import { useMissions } from "../../../hooks/useMissions";
+import { useMissions } from "@/hooks/useMissions";
 
 interface MissionsByStatusTableProps {
   refreshTrigger?: number;
@@ -18,7 +18,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   showAllMissions = false,
   emptyMessage = "Aucune mission disponible"
 }) => {
-  const { missions, loading } = useMissions({ 
+  const { missions, loading, refetch } = useMissions({ 
     refreshTrigger,
     showAllMissions,
     filterStatus: status
@@ -27,8 +27,9 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
   console.log(`MissionsByStatusTable: status=${status}, showAllMissions=${showAllMissions}, missions.length=${missions.length}`);
 
   const handleMissionCancelled = () => {
-    // This will be handled by the refreshTrigger from the parent component
-    console.log("Mission cancelled, parent will handle refresh");
+    // Trigger a refresh when a mission is cancelled
+    refetch();
+    console.log("Mission cancelled, refreshing data");
   };
 
   return (
