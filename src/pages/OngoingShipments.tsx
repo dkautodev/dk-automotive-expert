@@ -70,7 +70,7 @@ const OngoingShipments = () => {
   const confirmCancel = (mission: MissionRow, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click event
     setSelectedMission(mission);
-    handleCancelMission(mission.id);
+    handleCancelMission(mission);
   };
 
   if (loading) {
