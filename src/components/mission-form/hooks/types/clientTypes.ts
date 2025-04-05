@@ -21,6 +21,9 @@ export interface NewClientData {
   email: string;
   phone?: string;
   company?: string;
+  first_name?: string; // Adding first_name
+  last_name?: string;  // Adding last_name
+  address?: string;    // Adding address
 }
 
 /**

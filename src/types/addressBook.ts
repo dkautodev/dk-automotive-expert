@@ -5,6 +5,7 @@ export interface ContactEntry {
   lastName: string;
   email: string;
   phone: string;
+  company?: string; // Adding the company property
 }
 
 export interface AddressBookState {
