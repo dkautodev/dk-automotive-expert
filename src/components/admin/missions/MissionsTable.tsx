@@ -15,7 +15,6 @@ import { fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { 
   Eye, 
-  X, 
   UserCheck, 
   Settings
 } from "lucide-react";
@@ -192,20 +191,6 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
                         <UserCheck className="h-4 w-4" />
                       </Button>
                     )}
-                    
-                    {/* Bouton pour annuler - disponible pour la plupart des statuts */}
-                    {mission.status !== 'termine' && mission.status !== 'annule' && mission.status !== 'annulé' && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                        onClick={() => handleCancelMission(mission)}
-                        disabled={isLoading}
-                        title="Annuler"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -256,3 +241,4 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
     </>
   );
 };
+
