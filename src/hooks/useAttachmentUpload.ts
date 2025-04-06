@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 import { isFileTypeAllowed, generateUniqueFileName, formatFileSize } from "@/utils/fileUtils";
-import { getMissionNumber } from "@/services/missionService";
+import { getMissionNumber, missionService } from "@/services/missionService";
+import { UserRole } from "@/hooks/auth/types";
 
 // Types for the hook
 type UploadProgressMap = { [key: string]: number };
@@ -189,14 +191,14 @@ export const useAttachmentUpload = () => {
       console.log("Suppression du fichier avec ID:", attachmentId, "et chemin:", filePath);
 
       // Vérifier si l'utilisateur est un chauffeur (driver)
-      if (role === 'driver') {
+      if (role === 'driver' as UserRole) {
         console.error("Les chauffeurs n'ont pas le droit de supprimer des fichiers");
         toast.error("Vous n'avez pas l'autorisation de supprimer des fichiers");
         return { success: false, error: new Error("Accès refusé - chauffeurs non autorisés à supprimer des fichiers") };
       }
       
       // Vérifier si le fichier appartient à l'utilisateur (si ce n'est pas un admin)
-      if (role !== 'admin') {
+      if (role !== 'admin' as UserRole) {
         const { data: attachmentData, error: fetchError } = await supabase
           .from('mission_attachments')
           .select('uploaded_by')
