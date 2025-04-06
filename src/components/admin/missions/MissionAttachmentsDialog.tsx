@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { missionService } from "@/services/missionService";
 import { formatFileSize } from "@/utils/fileUtils";
+import { UserRole } from "@/hooks/auth/types";
 
 interface Attachment {
   id: string;
@@ -212,7 +212,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   };
 
   // Déterminer si l'utilisateur peut supprimer des fichiers
-  const canDeleteFiles = role !== 'driver';
+  const canDeleteFiles = role !== ('driver' as UserRole);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
