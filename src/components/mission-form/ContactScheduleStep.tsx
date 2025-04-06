@@ -5,15 +5,28 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { MissionFormValues } from "./missionFormSchema";
 import DatePickerField from "./DatePickerField";
-import { Button } from "../ui/button";
 import ContactSelector from "@/components/client/address-book/ContactSelector";
 import { ContactEntry } from "@/types/addressBook";
+import { Checkbox } from "../ui/checkbox";
+import { Link } from "react-router-dom";
 
 interface ContactScheduleStepProps {
   form: UseFormReturn<MissionFormValues>;
+  onSubmit?: () => void;
+  onPrevious?: () => void;
+  isSubmitting?: boolean;
+  termsAccepted?: boolean;
+  onTermsChange?: (value: boolean) => void;
 }
 
-const ContactScheduleStep = ({ form }: ContactScheduleStepProps) => {
+const ContactScheduleStep = ({ 
+  form, 
+  onSubmit, 
+  onPrevious, 
+  isSubmitting, 
+  termsAccepted, 
+  onTermsChange 
+}: ContactScheduleStepProps) => {
   // Fonction pour gérer la sélection d'un contact pour le pickup
   const handlePickupContactSelect = (contact: ContactEntry) => {
     form.setValue('pickup_first_name', contact.firstName, { shouldValidate: true });
@@ -232,6 +245,44 @@ const ContactScheduleStep = ({ form }: ContactScheduleStepProps) => {
           )}
         />
       </div>
+
+      {onTermsChange && (
+        <div className="flex items-start space-x-2 mt-4">
+          <Checkbox 
+            id="terms" 
+            checked={termsAccepted} 
+            onCheckedChange={(checked) => onTermsChange(checked === true)}
+            className="mt-1"
+          />
+          <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
+            En cliquant sur "Créer la mission", vous reconnaissez avoir lu et accepté les{" "}
+            <Link to="/cgv" target="_blank" className="text-blue-500 hover:underline">
+              Conditions Générales de Vente
+            </Link>
+          </label>
+        </div>
+      )}
+
+      {onSubmit && onPrevious && (
+        <div className="flex justify-between pt-4">
+          <button
+            type="button"
+            onClick={onPrevious}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            disabled={isSubmitting}
+          >
+            Précédent
+          </button>
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            disabled={isSubmitting || (onTermsChange && !termsAccepted)}
+          >
+            {isSubmitting ? "Traitement en cours..." : "Créer la mission"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

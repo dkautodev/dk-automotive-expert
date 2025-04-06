@@ -2,7 +2,7 @@
 import React from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { Control } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import {
   FormControl,
@@ -21,15 +21,15 @@ import { Calendar } from "@/components/ui/calendar";
 import { MissionFormValues } from "./missionFormSchema";
 
 interface DatePickerFieldProps {
-  form: UseFormReturn<MissionFormValues>;
+  control: Control<MissionFormValues>;
   name: "pickup_date" | "delivery_date"; // Restrict to valid date fields
   label: string;
 }
 
-const DatePickerField = ({ form, name, label }: DatePickerFieldProps) => {
+const DatePickerField = ({ control, name, label }: DatePickerFieldProps) => {
   return (
     <FormField
-      control={form.control}
+      control={control}
       name={name}
       render={({ field }) => (
         <FormItem className="flex-1">
