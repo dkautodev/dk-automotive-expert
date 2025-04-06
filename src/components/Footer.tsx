@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
 const Footer = () => {
-  return <footer className="text-white py-12 bg-[#1e3c96]">
+  return <footer className="text-white py-12 bg-[#051e83]">
       <div className="container mx-auto px-4">
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
