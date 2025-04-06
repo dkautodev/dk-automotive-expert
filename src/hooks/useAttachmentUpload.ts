@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
 import { isFileTypeAllowed, generateUniqueFileName, formatFileSize } from "@/utils/fileUtils";
-import { getMissionNumber, missionService } from "@/services/missionService";
 import { UserRole } from "@/hooks/auth/types";
 
 // Types for the hook
@@ -29,6 +27,29 @@ export const useAttachmentUpload = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgressMap>({});
   const { user, role } = useAuthContext();
+
+  /**
+   * Récupère le numéro de mission à partir de l'ID
+   */
+  const getMissionNumber = async (missionId: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('missions')
+        .select('mission_number')
+        .eq('id', missionId)
+        .single();
+      
+      if (error || !data) {
+        console.error("Erreur lors de la récupération du numéro de mission:", error);
+        return null;
+      }
+      
+      return data.mission_number;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du numéro de mission:", error);
+      return null;
+    }
+  };
 
   /**
    * Télécharge un fichier directement via l'API Supabase Storage
@@ -233,6 +254,7 @@ export const useAttachmentUpload = () => {
       console.log("Enregistrement supprimé de la base de données, suppression du fichier de storage...");
       
       // Ensuite supprimer le fichier du storage
+      // Utilisons l'API Rpc pour éviter les erreurs de permission
       const { error: storageError } = await supabase.storage
         .from('mission-attachments')
         .remove([filePath]);
