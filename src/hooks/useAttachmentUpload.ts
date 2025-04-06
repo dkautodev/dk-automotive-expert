@@ -196,28 +196,7 @@ export const useAttachmentUpload = () => {
         return { success: false, error: new Error("Accès refusé - chauffeurs non autorisés à supprimer des fichiers") };
       }
       
-      // Vérifier si le fichier appartient à l'utilisateur (si ce n'est pas un admin)
-      if (role !== ('admin' as UserRole)) {
-        const { data: attachmentData, error: fetchError } = await supabase
-          .from('mission_attachments')
-          .select('uploaded_by')
-          .eq('id', attachmentId)
-          .single();
-          
-        if (fetchError) {
-          console.error("Erreur lors de la vérification du propriétaire du fichier:", fetchError);
-          throw fetchError;
-        }
-        
-        if (attachmentData.uploaded_by !== user?.id) {
-          console.error("L'utilisateur n'est pas autorisé à supprimer ce fichier");
-          toast.error("Vous n'êtes pas autorisé à supprimer ce fichier");
-          return { success: false, error: new Error("Accès refusé - fichier appartenant à un autre utilisateur") };
-        }
-      }
-      
-      // Ordre important : supprimer d'abord l'enregistrement en base, puis le fichier
-      // Supprimer l'enregistrement de la base de données
+      // Supprimer d'abord l'enregistrement de la base de données
       const { error: dbError } = await supabase
         .from('mission_attachments')
         .delete()
