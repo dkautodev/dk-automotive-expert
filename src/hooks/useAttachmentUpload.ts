@@ -190,15 +190,15 @@ export const useAttachmentUpload = () => {
     try {
       console.log("Suppression du fichier avec ID:", attachmentId, "et chemin:", filePath);
 
-      // Vérifier si l'utilisateur est un chauffeur (driver)
-      if (role === 'driver' as UserRole) {
+      // Vérifier si l'utilisateur est un chauffeur (driver ou chauffeur)
+      if (role === ('driver' as UserRole) || role === ('chauffeur' as UserRole)) {
         console.error("Les chauffeurs n'ont pas le droit de supprimer des fichiers");
         toast.error("Vous n'avez pas l'autorisation de supprimer des fichiers");
         return { success: false, error: new Error("Accès refusé - chauffeurs non autorisés à supprimer des fichiers") };
       }
       
       // Vérifier si le fichier appartient à l'utilisateur (si ce n'est pas un admin)
-      if (role !== 'admin' as UserRole) {
+      if (role !== ('admin' as UserRole)) {
         const { data: attachmentData, error: fetchError } = await supabase
           .from('mission_attachments')
           .select('uploaded_by')

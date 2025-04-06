@@ -1,5 +1,5 @@
 
-export type UserRole = 'client' | 'admin' | 'chauffeur';
+export type UserRole = 'client' | 'admin' | 'driver' | 'chauffeur';
 
 export interface AuthState {
   user: any | null;
