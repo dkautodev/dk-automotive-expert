@@ -133,7 +133,7 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
             control={form.control}
             name="pickupDate"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex-1">
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -173,14 +173,14 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
             control={form.control}
             name="pickupTime"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex-1">
                 <FormControl>
                   <div className="relative">
                     <Input 
                       type="time"
                       placeholder="Choisir une heure" 
                       {...field} 
-                      className="bg-[#EEF1FF] pl-10" 
+                      className="bg-[#EEF1FF] pl-10 w-full" 
                     />
                     <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
                   </div>

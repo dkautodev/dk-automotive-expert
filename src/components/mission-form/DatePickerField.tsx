@@ -32,7 +32,7 @@ const DatePickerField = ({ form, name, label }: DatePickerFieldProps) => {
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col">
+        <FormItem className="flex-1">
           <FormLabel>{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>

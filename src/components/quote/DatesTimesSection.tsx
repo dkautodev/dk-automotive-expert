@@ -35,23 +35,27 @@ export const DatesTimesSection = ({
         <div className="space-y-4">
           <h3 className="font-semibold">Planning prise en charge</h3>
           <div className="grid grid-cols-2 gap-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !orderDetails.pickupDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {orderDetails.pickupDate ? format(orderDetails.pickupDate, "PPP", {
-                  locale: fr
-                  }) : <span>Sélectionner une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={orderDetails.pickupDate} onSelect={onPickupDateSelect} disabled={date => date < new Date()} initialFocus locale={fr} className={cn("p-3 pointer-events-auto")} />
-              </PopoverContent>
-            </Popover>
+            <div className="flex-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !orderDetails.pickupDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {orderDetails.pickupDate ? format(orderDetails.pickupDate, "PPP", {
+                    locale: fr
+                    }) : <span>Sélectionner une date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={orderDetails.pickupDate} onSelect={onPickupDateSelect} disabled={date => date < new Date()} initialFocus locale={fr} className={cn("p-3 pointer-events-auto")} />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-            <div className="relative">
-              <Input type="time" className="pl-10 w-full" value={pickupTime} onChange={onPickupTimeChange} />
-              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+            <div className="flex-1">
+              <div className="relative">
+                <Input type="time" className="pl-10 w-full" value={pickupTime} onChange={onPickupTimeChange} />
+                <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              </div>
             </div>
           </div>
         </div>
@@ -60,23 +64,27 @@ export const DatesTimesSection = ({
         <div className="space-y-4">
           <h3 className="font-semibold">Planning livraison</h3>
           <div className="grid grid-cols-2 gap-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !orderDetails.deliveryDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {orderDetails.deliveryDate ? format(orderDetails.deliveryDate, "PPP", {
-                  locale: fr
-                  }) : <span>Sélectionner une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={orderDetails.deliveryDate} onSelect={onDeliveryDateSelect} disabled={date => date < (orderDetails.pickupDate || new Date())} initialFocus locale={fr} className={cn("p-3 pointer-events-auto")} />
-              </PopoverContent>
-            </Popover>
+            <div className="flex-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !orderDetails.deliveryDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {orderDetails.deliveryDate ? format(orderDetails.deliveryDate, "PPP", {
+                    locale: fr
+                    }) : <span>Sélectionner une date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={orderDetails.deliveryDate} onSelect={onDeliveryDateSelect} disabled={date => date < (orderDetails.pickupDate || new Date())} initialFocus locale={fr} className={cn("p-3 pointer-events-auto")} />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-            <div className="relative">
-              <Input type="time" className="pl-10 w-full" value={deliveryTime} onChange={onDeliveryTimeChange} />
-              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+            <div className="flex-1">
+              <div className="relative">
+                <Input type="time" className="pl-10 w-full" value={deliveryTime} onChange={onDeliveryTimeChange} />
+                <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              </div>
             </div>
           </div>
         </div>
