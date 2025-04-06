@@ -11,6 +11,8 @@ import {
 import { Plus } from "lucide-react";
 import CreateMissionForm from "@/components/mission-form/CreateMissionForm";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CreateMissionButtonProps {
   onMissionCreated?: () => void;
@@ -18,6 +20,7 @@ interface CreateMissionButtonProps {
 
 const CreateMissionButton = ({ onMissionCreated }: CreateMissionButtonProps) => {
   const [open, setOpen] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleSuccess = () => {
     setOpen(false);
@@ -25,6 +28,7 @@ const CreateMissionButton = ({ onMissionCreated }: CreateMissionButtonProps) => 
       onMissionCreated();
     }
     toast.success("Demande de devis envoyée avec succès");
+    setAcceptedTerms(false); // Réinitialiser l'état pour la prochaine ouverture
   };
 
   return (
@@ -39,7 +43,12 @@ const CreateMissionButton = ({ onMissionCreated }: CreateMissionButtonProps) => 
         <DialogHeader>
           <DialogTitle>Demander un devis pour une mission de convoyage</DialogTitle>
         </DialogHeader>
-        <CreateMissionForm onSuccess={handleSuccess} clientDefaultStatus="en_attente" />
+        <CreateMissionForm 
+          onSuccess={handleSuccess} 
+          clientDefaultStatus="en_attente"
+          termsAccepted={acceptedTerms}
+          onTermsChange={setAcceptedTerms}
+        />
       </DialogContent>
     </Dialog>
   );

@@ -16,12 +16,20 @@ import { extractAddressComponents } from "@/utils/addressUtils";
 interface CreateMissionFormProps {
   onSuccess: () => void;
   clientDefaultStatus?: "en_attente" | "confirmé";
+  termsAccepted?: boolean;
+  onTermsChange?: (value: boolean) => void;
 }
 
-const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: CreateMissionFormProps) => {
+const CreateMissionForm = ({ 
+  onSuccess, 
+  clientDefaultStatus = "en_attente",
+  termsAccepted = false,
+  onTermsChange
+}: CreateMissionFormProps) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, role } = useAuthContext();
+  const [internalTermsAccepted, setInternalTermsAccepted] = useState(termsAccepted);
 
   const form = useForm<MissionFormValues>({
     resolver: zodResolver(missionFormSchema),
@@ -48,6 +56,7 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       delivery_time: "",
       additional_info: "",
       attachments: [],
+      termsAccepted: termsAccepted
     },
   });
 
@@ -56,6 +65,19 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       form.setValue('client_id', user.id);
     }
   }, [role, user, form]);
+
+  useEffect(() => {
+    setInternalTermsAccepted(termsAccepted);
+    form.setValue('termsAccepted', termsAccepted);
+  }, [termsAccepted, form]);
+
+  const handleTermsChange = (value: boolean) => {
+    setInternalTermsAccepted(value);
+    form.setValue('termsAccepted', value);
+    if (onTermsChange) {
+      onTermsChange(value);
+    }
+  };
 
   const nextStep = () => {
     if (step === 1) {
@@ -149,6 +171,11 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
     const isValid = await form.trigger();
     if (!isValid) {
       toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+
+    if (role === 'client' && !internalTermsAccepted) {
+      toast.error("Vous devez accepter les conditions générales de vente");
       return;
     }
 
@@ -278,7 +305,16 @@ const CreateMissionForm = ({ onSuccess, clientDefaultStatus = "en_attente" }: Cr
       case 3:
         return <VehicleInfoStep form={form} onNext={nextStep} onPrevious={previousStep} />;
       case 4:
-        return <ContactScheduleStep form={form} onSubmit={onSubmit} onPrevious={previousStep} isSubmitting={isSubmitting} />;
+        return (
+          <ContactScheduleStep 
+            form={form} 
+            onSubmit={onSubmit} 
+            onPrevious={previousStep} 
+            isSubmitting={isSubmitting}
+            termsAccepted={internalTermsAccepted}
+            onTermsChange={handleTermsChange}
+          />
+        );
       default:
         return null;
     }
