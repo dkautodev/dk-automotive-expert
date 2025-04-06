@@ -126,81 +126,77 @@ const PickupDetailsSection = ({ form, addressInputRef }: PickupDetailsSectionPro
         )}
       />
 
-      {/* Champ de date d'enlèvement */}
-      <FormField
-        control={form.control}
-        name="pickupDate"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-dk-navy font-semibold">
-              DATE D'ENLÈVEMENT <span className="text-blue-500">*</span>
-            </FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
+      <div className="space-y-4">
+        <h3 className="text-dk-navy font-semibold">DATE D'ENLÈVEMENT <span className="text-blue-500">*</span></h3>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="pickupDate"
+            render={({ field }) => (
+              <FormItem>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal bg-[#EEF1FF]",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Choisir une date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="pickupTime"
+            render={({ field }) => (
+              <FormItem>
                 <FormControl>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full pl-3 text-left font-normal bg-[#EEF1FF]",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "PPP")
-                    ) : (
-                      <span>Choisir une date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
+                  <div className="relative">
+                    <Input 
+                      type="time"
+                      placeholder="Choisir une heure" 
+                      {...field} 
+                      className="bg-[#EEF1FF] pl-10" 
+                    />
+                    <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+                  </div>
                 </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </div>
 
-      {/* Champ d'heure d'enlèvement */}
-      <FormField
-        control={form.control}
-        name="pickupTime"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-dk-navy font-semibold">
-              HEURE D'ENLÈVEMENT <span className="text-blue-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <div className="relative">
-                <Input 
-                  type="time"
-                  placeholder="Choisir une heure" 
-                  {...field} 
-                  className="bg-[#EEF1FF] pl-10" 
-                />
-                <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Champ de message complémentaire */}
       <FormField
         control={form.control}
         name="additionalMessage"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="md:col-span-2">
             <FormLabel className="text-dk-navy font-semibold">
               MESSAGE COMPLÉMENTAIRE
             </FormLabel>
