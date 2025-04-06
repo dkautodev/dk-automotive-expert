@@ -181,53 +181,18 @@ export const useAttachmentUpload = () => {
   };
 
   /**
-   * Supprime un fichier joint à une mission
+   * Suppression désactivée - Retourne une erreur
    */
   const deleteAttachment = async (attachmentId: string, filePath: string): Promise<DeleteAttachmentResult> => {
     setIsDeleting(true);
     
     try {
-      console.log("Suppression du fichier avec ID:", attachmentId, "et chemin:", filePath);
-
-      // Vérifier si l'utilisateur est un chauffeur (driver ou chauffeur)
-      if (role === ('driver' as UserRole) || role === ('chauffeur' as UserRole)) {
-        console.error("Les chauffeurs n'ont pas le droit de supprimer des fichiers");
-        toast.error("Vous n'avez pas l'autorisation de supprimer des fichiers");
-        return { success: false, error: new Error("Accès refusé - chauffeurs non autorisés à supprimer des fichiers") };
-      }
-      
-      // Supprimer d'abord l'enregistrement de la base de données
-      const { error: dbError } = await supabase
-        .from('mission_attachments')
-        .delete()
-        .eq('id', attachmentId);
-        
-      if (dbError) {
-        console.error("Erreur lors de la suppression de l'enregistrement:", dbError);
-        toast.error(`Erreur lors de la suppression: ${dbError.message}`);
-        throw dbError;
-      }
-      
-      console.log("Enregistrement supprimé de la base de données, suppression du fichier de storage...");
-      
-      // Ensuite supprimer le fichier du storage
-      const { error: storageError } = await supabase.storage
-        .from('mission-attachments')
-        .remove([filePath]);
-      
-      if (storageError) {
-        console.error("Erreur lors de la suppression du fichier de storage:", storageError);
-        // Afficher plus de détails sur l'erreur de storage
-        console.error("Détails de l'erreur storage:", JSON.stringify(storageError));
-        
-        // On continue même si la suppression du storage échoue, l'enregistrement a été supprimé
-        toast.warning("Le fichier a été supprimé de la base de données mais pas du stockage");
-        return { success: true };
-      }
-      
-      console.log("Fichier supprimé avec succès du storage");
-      toast.success("Fichier supprimé avec succès");
-      return { success: true };
+      console.log("Tentative de suppression du fichier avec ID:", attachmentId, "et chemin:", filePath);
+      toast.error("La suppression des documents n'est pas autorisée");
+      return { 
+        success: false, 
+        error: new Error("La suppression des documents n'est pas autorisée") 
+      };
     } catch (error: any) {
       console.error("Erreur complète lors de la suppression:", error);
       console.error("Détails de l'erreur:", JSON.stringify(error, null, 2));
