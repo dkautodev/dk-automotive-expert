@@ -80,7 +80,6 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  // Load attachments when dialog opens
   useEffect(() => {
     if (isOpen && missionId) {
       loadAttachments();
@@ -127,7 +126,6 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     try {
       console.log("Téléchargement depuis Supabase Storage:", attachment.file_path);
       
-      // Vérifier si le fichier existe avant de le télécharger
       const { data: existsData, error: existsError } = await supabase.storage
         .from('mission-attachments')
         .list(attachment.file_path.split('/').slice(0, -1).join('/'), {
@@ -153,17 +151,14 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
         throw error;
       }
 
-      // Create URL for the file
       const url = URL.createObjectURL(data);
       
-      // Create a temporary anchor element to trigger download
       const a = document.createElement('a');
       a.href = url;
       a.download = attachment.file_name;
       document.body.appendChild(a);
       a.click();
       
-      // Cleanup
       URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error: any) {
@@ -185,7 +180,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
       
       if (result.success) {
         toast.success("Fichier supprimé avec succès");
-        loadAttachments(); // Recharger la liste des pièces jointes
+        loadAttachments();
       } else {
         throw result.error || new Error("Échec de la suppression du fichier");
       }
@@ -211,8 +206,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  // Déterminer si l'utilisateur peut supprimer des fichiers
-  const canDeleteFiles = role !== ('driver' as UserRole);
+  const canDeleteFiles = role !== ('driver' as UserRole) && role !== ('chauffeur' as UserRole);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
