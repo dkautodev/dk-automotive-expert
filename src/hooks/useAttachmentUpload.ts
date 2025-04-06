@@ -1,7 +1,9 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuthContext } from "@/context/AuthContext";
+import { isFileTypeAllowed, generateUniqueFileName, formatFileSize } from "@/utils/fileUtils";
+import { getMissionNumber } from "@/services/missionService";
 
 // Types for the hook
 type UploadProgressMap = { [key: string]: number };
@@ -24,62 +26,7 @@ export const useAttachmentUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgressMap>({});
-
-  /**
-   * Obtient le numéro de mission à partir de l'ID
-   */
-  const getMissionNumber = async (missionId: string): Promise<string | null> => {
-    try {
-      const { data, error } = await supabase
-        .from('missions')
-        .select('mission_number')
-        .eq('id', missionId)
-        .single();
-      
-      if (error || !data) {
-        console.error("Erreur lors de la récupération du numéro de mission:", error);
-        return null;
-      }
-      
-      return data.mission_number;
-    } catch (error) {
-      console.error("Erreur lors de la récupération du numéro de mission:", error);
-      return null;
-    }
-  };
-
-  /**
-   * Vérifie si le type de fichier est autorisé
-   */
-  const isFileTypeAllowed = (fileType: string): boolean => {
-    // Liste des types MIME autorisés
-    const allowedTypes = [
-      // Images
-      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-      // Documents
-      'application/pdf', 
-      'application/msword', // .doc
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-      'application/vnd.ms-excel', // .xls
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'text/plain', // .txt
-      'text/csv' // .csv
-    ];
-    
-    return allowedTypes.includes(fileType);
-  };
-
-  /**
-   * Génère un nom de fichier unique
-   */
-  const generateUniqueFileName = (fileIndex: number, originalName: string): string => {
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 8);
-    const extension = originalName.split('.').pop() || '';
-    const paddedIndex = fileIndex.toString().padStart(2, '0');
-    
-    return `fichier${paddedIndex}_${timestamp}_${randomString}${extension ? `.${extension}` : ''}`;
-  };
+  const { user, role } = useAuthContext();
 
   /**
    * Télécharge un fichier directement via l'API Supabase Storage
@@ -240,8 +187,36 @@ export const useAttachmentUpload = () => {
     
     try {
       console.log("Suppression du fichier avec ID:", attachmentId, "et chemin:", filePath);
+
+      // Vérifier si l'utilisateur est un chauffeur (driver)
+      if (role === 'driver') {
+        console.error("Les chauffeurs n'ont pas le droit de supprimer des fichiers");
+        toast.error("Vous n'avez pas l'autorisation de supprimer des fichiers");
+        return { success: false, error: new Error("Accès refusé - chauffeurs non autorisés à supprimer des fichiers") };
+      }
       
-      // Supprimer l'enregistrement de la base de données en premier
+      // Vérifier si le fichier appartient à l'utilisateur (si ce n'est pas un admin)
+      if (role !== 'admin') {
+        const { data: attachmentData, error: fetchError } = await supabase
+          .from('mission_attachments')
+          .select('uploaded_by')
+          .eq('id', attachmentId)
+          .single();
+          
+        if (fetchError) {
+          console.error("Erreur lors de la vérification du propriétaire du fichier:", fetchError);
+          throw fetchError;
+        }
+        
+        if (attachmentData.uploaded_by !== user?.id) {
+          console.error("L'utilisateur n'est pas autorisé à supprimer ce fichier");
+          toast.error("Vous n'êtes pas autorisé à supprimer ce fichier");
+          return { success: false, error: new Error("Accès refusé - fichier appartenant à un autre utilisateur") };
+        }
+      }
+      
+      // Ordre important : supprimer d'abord l'enregistrement en base, puis le fichier
+      // Supprimer l'enregistrement de la base de données
       const { error: dbError } = await supabase
         .from('mission_attachments')
         .delete()
@@ -249,6 +224,7 @@ export const useAttachmentUpload = () => {
         
       if (dbError) {
         console.error("Erreur lors de la suppression de l'enregistrement:", dbError);
+        toast.error(`Erreur lors de la suppression: ${dbError.message}`);
         throw dbError;
       }
       
@@ -261,6 +237,9 @@ export const useAttachmentUpload = () => {
       
       if (storageError) {
         console.error("Erreur lors de la suppression du fichier de storage:", storageError);
+        // Afficher plus de détails sur l'erreur de storage
+        console.error("Détails de l'erreur storage:", JSON.stringify(storageError));
+        
         // On continue même si la suppression du storage échoue, l'enregistrement a été supprimé
         toast.warning("Le fichier a été supprimé de la base de données mais pas du stockage");
         return { success: true };
@@ -269,9 +248,10 @@ export const useAttachmentUpload = () => {
       console.log("Fichier supprimé avec succès du storage");
       toast.success("Fichier supprimé avec succès");
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur complète lors de la suppression:", error);
-      toast.error("Erreur lors de la suppression du fichier");
+      console.error("Détails de l'erreur:", JSON.stringify(error, null, 2));
+      toast.error(`Erreur lors de la suppression: ${error.message || "Erreur inconnue"}`);
       return { success: false, error: error as Error };
     } finally {
       setIsDeleting(false);

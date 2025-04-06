@@ -33,18 +33,50 @@ export const missionService = {
    */
   getMissionAttachments: async (missionId: string) => {
     try {
+      console.log("Récupération des pièces jointes pour la mission:", missionId);
+      
       const { data, error } = await supabase
         .from('mission_attachments')
         .select('*')
         .eq('mission_id', missionId)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur lors de la récupération des pièces jointes:", error);
+        throw error;
+      }
       
       return { data, error: null };
     } catch (error) {
       console.error("Erreur lors de la récupération des pièces jointes:", error);
       return { data: null, error };
+    }
+  },
+  
+  /**
+   * Vérifie si un fichier existe dans le stockage Supabase
+   */
+  checkFileExists: async (filePath: string): Promise<boolean> => {
+    try {
+      const pathParts = filePath.split('/');
+      const fileName = pathParts.pop() || '';
+      const dirPath = pathParts.join('/');
+      
+      const { data, error } = await supabase.storage
+        .from('mission-attachments')
+        .list(dirPath, {
+          search: fileName
+        });
+        
+      if (error) {
+        console.error("Erreur lors de la vérification de l'existence du fichier:", error);
+        return false;
+      }
+      
+      return data && data.length > 0;
+    } catch (error) {
+      console.error("Erreur lors de la vérification de l'existence du fichier:", error);
+      return false;
     }
   }
 };

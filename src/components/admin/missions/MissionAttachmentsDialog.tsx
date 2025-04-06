@@ -11,6 +11,8 @@ import { Paperclip, Trash2, Download, FileText, File, Image, FileSpreadsheet, Al
 import { useAuthContext } from "@/context/AuthContext";
 import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { missionService } from "@/services/missionService";
+import { formatFileSize } from "@/utils/fileUtils";
 
 interface Attachment {
   id: string;
@@ -36,7 +38,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   missionId,
   missionNumber
 }) => {
-  const { user } = useAuthContext();
+  const { user, role } = useAuthContext();
   const { 
     uploadAttachments, 
     isUploading, 
@@ -49,6 +51,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   const [isFetching, setIsFetching] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [acceptedFileTypes, setAcceptedFileTypes] = useState(
     ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
   );
@@ -60,14 +63,10 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     try {
       console.log("Chargement des pièces jointes pour la mission:", missionId);
       
-      const { data, error } = await supabase
-        .from('mission_attachments')
-        .select('*')
-        .eq('mission_id', missionId)
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await missionService.getMissionAttachments(missionId);
+      
       if (error) {
-        console.error("Erreur SQL lors de la récupération des pièces jointes:", error);
+        console.error("Erreur lors de la récupération des pièces jointes:", error);
         throw error;
       }
       
@@ -128,6 +127,23 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     try {
       console.log("Téléchargement depuis Supabase Storage:", attachment.file_path);
       
+      // Vérifier si le fichier existe avant de le télécharger
+      const { data: existsData, error: existsError } = await supabase.storage
+        .from('mission-attachments')
+        .list(attachment.file_path.split('/').slice(0, -1).join('/'), {
+          search: attachment.file_path.split('/').pop() || ''
+        });
+      
+      if (existsError) {
+        console.error("Erreur lors de la vérification de l'existence du fichier:", existsError);
+      }
+      
+      if (existsData && existsData.length === 0) {
+        console.error("Le fichier n'existe pas dans le stockage");
+        toast.error("Le fichier n'existe pas dans le stockage");
+        return;
+      }
+      
       const { data, error } = await supabase.storage
         .from('mission-attachments')
         .download(attachment.file_path);
@@ -162,18 +178,22 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
     
     try {
+      setDeletingId(attachment.id);
       console.log("Suppression de la pièce jointe:", attachment);
       
       const result = await deleteAttachment(attachment.id, attachment.file_path);
       
       if (result.success) {
+        toast.success("Fichier supprimé avec succès");
         loadAttachments(); // Recharger la liste des pièces jointes
       } else {
         throw result.error || new Error("Échec de la suppression du fichier");
       }
     } catch (error: any) {
       console.error("Erreur lors de la suppression de la pièce jointe:", error.message);
-      toast.error("Erreur lors de la suppression du fichier");
+      toast.error(`Erreur lors de la suppression: ${error.message || "Erreur inconnue"}`);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -191,11 +211,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    else return (bytes / 1048576).toFixed(1) + " MB";
-  };
+  // Déterminer si l'utilisateur peut supprimer des fichiers
+  const canDeleteFiles = role !== 'driver';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -206,64 +223,66 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
         
         <div className="py-4">
           <div className="space-y-4">
-            <div className="border rounded-lg p-4">
-              <Label htmlFor="file-upload" className="block mb-2">Ajouter des fichiers</Label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <Input
-                    id="file-upload"
-                    type="file"
-                    onChange={handleFileChange}
-                    accept={acceptedFileTypes}
-                    multiple
-                    className="block w-full"
-                  />
+            {canDeleteFiles && (
+              <div className="border rounded-lg p-4">
+                <Label htmlFor="file-upload" className="block mb-2">Ajouter des fichiers</Label>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <Input
+                      id="file-upload"
+                      type="file"
+                      onChange={handleFileChange}
+                      accept={acceptedFileTypes}
+                      multiple
+                      className="block w-full"
+                    />
+                  </div>
+                  <Button onClick={handleUpload} disabled={isUploading || files.length === 0}>
+                    {isUploading ? <Loader className="mr-2 h-4 w-4" /> : <Paperclip className="mr-2 h-4 w-4" />}
+                    Télécharger
+                  </Button>
                 </div>
-                <Button onClick={handleUpload} disabled={isUploading || files.length === 0}>
-                  {isUploading ? <Loader className="mr-2 h-4 w-4" /> : <Paperclip className="mr-2 h-4 w-4" />}
-                  Télécharger
-                </Button>
-              </div>
-              
-              {uploadError && (
-                <Alert variant="destructive" className="mt-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    {uploadError}
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              {files.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm text-muted-foreground">
-                    {files.length} fichier(s) sélectionné(s)
-                  </p>
-                  {Object.keys(uploadProgress).length > 0 && (
-                    <div className="mt-1 space-y-1">
-                      {Object.entries(uploadProgress).map(([fileName, progress]) => (
-                        <div key={fileName} className="text-xs flex items-center gap-2">
-                          <div className="w-32 truncate">{fileName}</div>
-                          <div className="w-full bg-secondary rounded-full h-1.5">
-                            <div
-                              className="bg-primary h-1.5 rounded-full"
-                              style={{ width: `${progress}%` }}
-                            ></div>
+                
+                {uploadError && (
+                  <Alert variant="destructive" className="mt-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      {uploadError}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {files.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm text-muted-foreground">
+                      {files.length} fichier(s) sélectionné(s)
+                    </p>
+                    {Object.keys(uploadProgress).length > 0 && (
+                      <div className="mt-1 space-y-1">
+                        {Object.entries(uploadProgress).map(([fileName, progress]) => (
+                          <div key={fileName} className="text-xs flex items-center gap-2">
+                            <div className="w-32 truncate">{fileName}</div>
+                            <div className="w-full bg-secondary rounded-full h-1.5">
+                              <div
+                                className="bg-primary h-1.5 rounded-full"
+                                style={{ width: `${progress}%` }}
+                              ></div>
+                            </div>
+                            <div className="w-8 text-right">{progress}%</div>
                           </div>
-                          <div className="w-8 text-right">{progress}%</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <div className="mt-2">
+                  <p className="text-xs text-muted-foreground">
+                    Formats acceptés: images (jpg, png, gif), documents (pdf, doc, docx), tableurs (xls, xlsx), texte (txt, csv)
+                  </p>
                 </div>
-              )}
-              
-              <div className="mt-2">
-                <p className="text-xs text-muted-foreground">
-                  Formats acceptés: images (jpg, png, gif), documents (pdf, doc, docx), tableurs (xls, xlsx), texte (txt, csv)
-                </p>
               </div>
-            </div>
+            )}
             
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-muted p-2 font-medium text-sm">Fichiers attachés</div>
@@ -303,16 +322,18 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                         >
                           <Download className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(attachment)}
-                          title="Supprimer"
-                          disabled={isDeleting}
-                          className="text-destructive hover:text-destructive/80"
-                        >
-                          {isDeleting ? <Loader className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-                        </Button>
+                        {canDeleteFiles && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(attachment)}
+                            title="Supprimer"
+                            disabled={isDeleting || deletingId === attachment.id}
+                            className="text-destructive hover:text-destructive/80"
+                          >
+                            {deletingId === attachment.id ? <Loader className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                          </Button>
+                        )}
                       </div>
                     </li>
                   ))}
