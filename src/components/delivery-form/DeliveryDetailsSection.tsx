@@ -80,7 +80,7 @@ const DeliveryDetailsSection = ({ form, addressInputRef }: DeliveryDetailsSectio
             control={form.control}
             name="deliveryDate"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex-1">
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -122,14 +122,14 @@ const DeliveryDetailsSection = ({ form, addressInputRef }: DeliveryDetailsSectio
             control={form.control}
             name="deliveryTime"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex-1">
                 <FormControl>
                   <div className="relative">
                     <Input 
                       type="time"
                       placeholder="Choisir une heure" 
                       {...field} 
-                      className="bg-[#EEF1FF] pl-10" 
+                      className="bg-[#EEF1FF] pl-10 w-full" 
                     />
                     <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
                   </div>

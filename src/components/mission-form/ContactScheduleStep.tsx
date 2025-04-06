@@ -151,11 +151,11 @@ const ContactScheduleStep = ({
               control={form.control}
               name="pickup_time"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Heure</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input type="time" className="pl-10" {...field} />
+                      <Input type="time" className="pl-10 w-full" {...field} />
                       <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     </div>
                   </FormControl>
@@ -174,11 +174,11 @@ const ContactScheduleStep = ({
               control={form.control}
               name="delivery_time"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Heure</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input type="time" className="pl-10" {...field} />
+                      <Input type="time" className="pl-10 w-full" {...field} />
                       <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     </div>
                   </FormControl>
