@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import DriverDashboard from "./pages/DriverDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import { UserProfileDetail } from "./components/admin/clients/UserProfileDetail";
+import CGV from "./pages/CGV";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,36 +32,45 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/devis" element={<Devis />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin-auth" element={<AdminAuth />} />
-            <Route path="/driver-auth" element={<DriverAuth />} />
-            <Route path="/dashboard/driver/*" element={<DriverDashboard />} />
-            <Route path="/dashboard/client/*" element={<ClientDashboard />} />
-            <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
-            <Route path="/dashboard/admin/profile/:userId" element={<UserProfileDetail />} />
-            <Route path="/mentions-legales" element={<MentionsLegales />} />
-            <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
+              {/* Routes publiques */}
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/devis" element={<Devis />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route path="/mentions-legales" element={<MentionsLegales />} />
+              <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+              <Route path="/cgv" element={<CGV />} />
+              
+              {/* Routes d'authentification */}
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/admin/auth" element={<AdminAuth />} />
+              <Route path="/driver/auth" element={<DriverAuth />} />
+              
+              {/* Routes protégées */}
+              <Route path="/dashboard/driver/*" element={<DriverDashboard />} />
+              <Route path="/dashboard/client/*" element={<ClientDashboard />} />
+              <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
+              <Route path="/dashboard/admin/profile/:userId" element={<UserProfileDetail />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
