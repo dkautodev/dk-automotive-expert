@@ -81,5 +81,5 @@ export const missionService = {
   }
 };
 
-// Export the individual functions for direct import
+// Export individual functions for direct import
 export const { getMissionNumber, getMissionAttachments, checkFileExists } = missionService;
