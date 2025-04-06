@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 // Schéma pour les types de mission
-const missionTypeSchema = z.enum(["livraison", "transfert", "autre"]);
+const missionTypeSchema = z.enum(["livraison", "transfert", "autre", "restitution"]);
 
 // Schéma pour les valeurs du formulaire de mission
 export const missionFormSchema = z.object({
