@@ -1,3 +1,4 @@
+
 import { CalendarIcon, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -7,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+
 interface DatesTimesSectionProps {
   orderDetails: OrderState;
   pickupTime: string;
@@ -16,6 +18,7 @@ interface DatesTimesSectionProps {
   onPickupTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onDeliveryTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
 export const DatesTimesSection = ({
   orderDetails,
   pickupTime,
@@ -25,19 +28,20 @@ export const DatesTimesSection = ({
   onPickupTimeChange,
   onDeliveryTimeChange
 }: DatesTimesSectionProps) => {
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Prise en charge section */}
         <div className="space-y-4">
-          <h3 className="font-semibold">Modifier prise en charge</h3>
-          <div className="flex gap-4 items-start">
+          <h3 className="font-semibold">Planning prise en charge</h3>
+          <div className="grid grid-cols-2 gap-4">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant={"outline"} className={cn("w-[240px] justify-start text-left font-normal", !orderDetails.pickupDate && "text-muted-foreground")}>
+                <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !orderDetails.pickupDate && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {orderDetails.pickupDate ? format(orderDetails.pickupDate, "PPP", {
                   locale: fr
-                }) : <span>Sélectionner une date</span>}
+                  }) : <span>Sélectionner une date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -46,23 +50,23 @@ export const DatesTimesSection = ({
             </Popover>
 
             <div className="relative">
-              <Input type="time" className="pl-10 w-[150px]" value={pickupTime} onChange={onPickupTimeChange} />
-              
+              <Input type="time" className="pl-10 w-full" value={pickupTime} onChange={onPickupTimeChange} />
+              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
             </div>
           </div>
         </div>
 
         {/* Livraison section */}
         <div className="space-y-4">
-          <h3 className="font-semibold">Date et heure de livraison</h3>
-          <div className="flex gap-4 items-start">
+          <h3 className="font-semibold">Planning livraison</h3>
+          <div className="grid grid-cols-2 gap-4">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant={"outline"} className={cn("w-[240px] justify-start text-left font-normal", !orderDetails.deliveryDate && "text-muted-foreground")}>
+                <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !orderDetails.deliveryDate && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {orderDetails.deliveryDate ? format(orderDetails.deliveryDate, "PPP", {
                   locale: fr
-                }) : <span>Sélectionner une date</span>}
+                  }) : <span>Sélectionner une date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -71,11 +75,12 @@ export const DatesTimesSection = ({
             </Popover>
 
             <div className="relative">
-              <Input type="time" className="pl-10 w-[150px]" value={deliveryTime} onChange={onDeliveryTimeChange} />
-              
+              <Input type="time" className="pl-10 w-full" value={deliveryTime} onChange={onDeliveryTimeChange} />
+              <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
             </div>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };

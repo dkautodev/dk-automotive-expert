@@ -5,7 +5,7 @@ import { MissionFormValues } from "./missionFormSchema";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader } from "lucide-react";
+import { Loader, Clock } from "lucide-react";
 import DatePickerField from "./DatePickerField";
 import AttachmentsField from "./AttachmentsField";
 
@@ -145,7 +145,7 @@ const ContactScheduleStep = ({
 
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Planning prise en charge</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <DatePickerField form={form} name="pickup_date" label="Date" />
             <FormField
               control={form.control}
@@ -154,7 +154,10 @@ const ContactScheduleStep = ({
                 <FormItem>
                   <FormLabel>Heure</FormLabel>
                   <FormControl>
-                    <Input type="time" {...field} />
+                    <div className="relative">
+                      <Input type="time" className="pl-10" {...field} />
+                      <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,7 +168,7 @@ const ContactScheduleStep = ({
 
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Planning livraison</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <DatePickerField form={form} name="delivery_date" label="Date" />
             <FormField
               control={form.control}
@@ -174,7 +177,10 @@ const ContactScheduleStep = ({
                 <FormItem>
                   <FormLabel>Heure</FormLabel>
                   <FormControl>
-                    <Input type="time" {...field} />
+                    <div className="relative">
+                      <Input type="time" className="pl-10" {...field} />
+                      <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

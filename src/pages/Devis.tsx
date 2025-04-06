@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import QuoteForm from '@/components/QuoteForm';
+
 const Devis = () => {
-  return <div className="min-h-screen bg-white">
+  return (
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="animate-fadeIn">
         <div className="container mx-auto px-4 py-16">
@@ -25,6 +28,8 @@ const Devis = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Devis;
