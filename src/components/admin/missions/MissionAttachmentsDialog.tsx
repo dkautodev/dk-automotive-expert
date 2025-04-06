@@ -168,28 +168,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   };
 
   const handleDelete = async (attachment: Attachment) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce fichier ?")) {
-      return;
-    }
-    
-    try {
-      setDeletingId(attachment.id);
-      console.log("Suppression de la pièce jointe:", attachment);
-      
-      const result = await deleteAttachment(attachment.id, attachment.file_path);
-      
-      if (result.success) {
-        toast.success("Fichier supprimé avec succès");
-        loadAttachments();
-      } else {
-        throw result.error || new Error("Échec de la suppression du fichier");
-      }
-    } catch (error: any) {
-      console.error("Erreur lors de la suppression de la pièce jointe:", error.message);
-      toast.error(`Erreur lors de la suppression: ${error.message || "Erreur inconnue"}`);
-    } finally {
-      setDeletingId(null);
-    }
+    toast.error("La suppression des documents n'est pas autorisée");
   };
 
   const getFileIcon = (fileType: string) => {
@@ -206,7 +185,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
   };
 
-  const canDeleteFiles = role !== ('driver' as UserRole) && role !== ('chauffeur' as UserRole);
+  const canDeleteFiles = false;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -316,18 +295,6 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
                         >
                           <Download className="h-4 w-4" />
                         </Button>
-                        {canDeleteFiles && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(attachment)}
-                            title="Supprimer"
-                            disabled={isDeleting || deletingId === attachment.id}
-                            className="text-destructive hover:text-destructive/80"
-                          >
-                            {deletingId === attachment.id ? <Loader className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-                          </Button>
-                        )}
                       </div>
                     </li>
                   ))}
