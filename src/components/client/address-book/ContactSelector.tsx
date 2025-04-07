@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useAddressBook } from "@/hooks/useAddressBook";
 
 interface ContactSelectorProps {
   contacts?: ContactEntry[];
@@ -23,19 +24,28 @@ interface ContactSelectorProps {
 }
 
 const ContactSelector: React.FC<ContactSelectorProps> = ({
-  contacts = [],
+  contacts: providedContacts,
   selectedContactId = null,
   onContactSelect,
   onSelectContact,
-  isLoading = false,
+  isLoading: providedIsLoading,
   buttonClassName = ""
 }) => {
   const [open, setOpen] = useState(false);
   const [localContacts, setLocalContacts] = useState<ContactEntry[]>([]);
   
-  // Use provided contacts or fetch them via hook if not provided
-  React.useEffect(() => {
-    if (contacts.length > 0) {
+  // Use the addressBook hook if no contacts are provided
+  const addressBook = useAddressBook();
+  const fetchedContacts = addressBook.contacts || [];
+  const fetchedIsLoading = addressBook.isLoading;
+  
+  // Use provided contacts/loading or fetch them via hook
+  const contacts = providedContacts || fetchedContacts;
+  const isLoading = providedIsLoading !== undefined ? providedIsLoading : fetchedIsLoading;
+  
+  // Update local contacts when contacts change
+  useEffect(() => {
+    if (contacts && contacts.length > 0) {
       setLocalContacts(contacts);
     }
   }, [contacts]);
@@ -60,7 +70,10 @@ const ContactSelector: React.FC<ContactSelectorProps> = ({
       );
     }
 
-    if (localContacts.length === 0) {
+    // Safely check if localContacts exists and has a length
+    const hasContacts = localContacts && localContacts.length > 0;
+
+    if (!hasContacts) {
       return (
         <div className="flex flex-col items-center gap-2 text-muted-foreground p-6">
           <User className="h-12 w-12 opacity-20" />
