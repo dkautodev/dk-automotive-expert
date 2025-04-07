@@ -1,82 +1,126 @@
 
-// Mise à jour du composant ContactSelector en supprimant "Sélectionner un contact"
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Contact } from "@/types/addressBook";
+import { ContactEntry } from "@/types/addressBook";
 import { Check, User } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ContactSelectorProps {
-  contacts: Contact[];
-  selectedContactId: string | null;
-  onContactSelect: (contactId: string) => void;
+  contacts?: ContactEntry[];
+  selectedContactId?: string | null;
+  onContactSelect?: (contactId: string) => void;
+  onSelectContact?: (contact: ContactEntry) => void;
   isLoading?: boolean;
+  buttonClassName?: string;
 }
 
 const ContactSelector: React.FC<ContactSelectorProps> = ({
-  contacts,
-  selectedContactId,
+  contacts = [],
+  selectedContactId = null,
   onContactSelect,
-  isLoading = false
+  onSelectContact,
+  isLoading = false,
+  buttonClassName = ""
 }) => {
-  if (isLoading) {
-    return (
-      <Card className="h-[400px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+  const [open, setOpen] = useState(false);
+  const [localContacts, setLocalContacts] = useState<ContactEntry[]>([]);
+  
+  // Use provided contacts or fetch them via hook if not provided
+  React.useEffect(() => {
+    if (contacts.length > 0) {
+      setLocalContacts(contacts);
+    }
+  }, [contacts]);
+  
+  const handleContactClick = (contact: ContactEntry) => {
+    if (onSelectContact) {
+      onSelectContact(contact);
+    }
+    if (onContactSelect && contact.id) {
+      onContactSelect(contact.id);
+    }
+    setOpen(false);
+  };
+
+  const renderContactsList = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center gap-2 text-muted-foreground p-6">
           <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full"></div>
           <p>Chargement des contacts...</p>
         </div>
-      </Card>
-    );
-  }
+      );
+    }
 
-  if (contacts.length === 0) {
-    return (
-      <Card className="h-[400px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+    if (localContacts.length === 0) {
+      return (
+        <div className="flex flex-col items-center gap-2 text-muted-foreground p-6">
           <User className="h-12 w-12 opacity-20" />
           <p>Aucun contact disponible</p>
           <p className="text-sm">Créez d'abord un contact</p>
         </div>
-      </Card>
+      );
+    }
+
+    return (
+      <div className="p-4 space-y-2">
+        {localContacts.map((contact) => (
+          <Button
+            key={contact.id}
+            variant={selectedContactId === contact.id ? "default" : "outline"}
+            className="w-full justify-start h-auto py-3 overflow-hidden"
+            onClick={() => handleContactClick(contact)}
+          >
+            <div className="flex items-center gap-3 w-full overflow-hidden">
+              <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
+                <User className="h-4 w-4" />
+              </div>
+              <div className="flex-grow overflow-hidden">
+                <div className="font-medium truncate">
+                  {contact.firstName} {contact.lastName}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {contact.email}
+                </div>
+              </div>
+              {selectedContactId === contact.id && (
+                <Check className="h-4 w-4 flex-shrink-0" />
+              )}
+            </div>
+          </Button>
+        ))}
+      </div>
     );
-  }
+  };
 
   return (
-    <Card className="h-[400px]">
-      <CardContent className="p-0">
-        <ScrollArea className="h-[400px] w-full">
-          <div className="p-4 space-y-2">
-            {contacts.map((contact) => (
-              <Button
-                key={contact.id}
-                variant={selectedContactId === contact.id ? "default" : "outline"}
-                className="w-full justify-start h-auto py-3 overflow-hidden"
-                onClick={() => onContactSelect(contact.id)}
-              >
-                <div className="flex items-center gap-3 w-full overflow-hidden">
-                  <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <div className="flex-grow overflow-hidden">
-                    <div className="font-medium truncate">
-                      {contact.firstName} {contact.lastName}
-                    </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {contact.email}
-                    </div>
-                  </div>
-                  {selectedContactId === contact.id && (
-                    <Check className="h-4 w-4 flex-shrink-0" />
-                  )}
-                </div>
-              </Button>
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className={buttonClassName}>
+          Choisir un contact
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle>Sélectionner un contact</DialogTitle>
+        </DialogHeader>
+        <Card className="h-[400px]">
+          <CardContent className="p-0">
+            <ScrollArea className="h-[400px] w-full">
+              {renderContactsList()}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </DialogContent>
+    </Dialog>
   );
 };
 
