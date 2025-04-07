@@ -10,6 +10,7 @@ import { ContactEntry } from "@/types/addressBook";
 import { Checkbox } from "../ui/checkbox";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "@/context/AuthContext";
+import AttachmentsField from "./AttachmentsField";
 
 interface ContactScheduleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -247,6 +248,13 @@ const ContactScheduleStep = ({
               <FormMessage />
             </FormItem>
           )}
+        />
+        
+        {/* Champ pour ajouter des pièces jointes */}
+        <AttachmentsField
+          control={form.control}
+          name="attachments"
+          label="Pièces jointes"
         />
       </div>
 

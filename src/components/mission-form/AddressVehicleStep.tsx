@@ -9,8 +9,6 @@ import CalculateButton from "./CalculateButton";
 import DistancePriceCard from "./DistancePriceCard";
 import ClientStateDisplay from "./ClientStateDisplay";
 import { useAddressVehicleStep } from "./hooks/useAddressVehicleStep";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -34,8 +32,7 @@ const AddressVehicleStep = ({
     calculateDistanceAndPrice,
     pickupAddress,
     deliveryAddress,
-    vehicleType,
-    additionalInfo
+    vehicleType
   } = useAddressVehicleStep(form, onNext, onPrevious);
 
   return <div className="space-y-6">
@@ -56,26 +53,6 @@ const AddressVehicleStep = ({
       </div>
 
       <DistancePriceCard distance={distance} priceHT={priceHT} priceTTC={priceTTC} />
-      
-      {/* Ajout du champ compléments d'information */}
-      <FormField 
-        control={form.control} 
-        name="additional_info" 
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Compléments d'information</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Précisions ou instructions..." 
-                rows={3}
-                className="resize-none"
-                {...field}
-                value={field.value || ""}
-              />
-            </FormControl>
-          </FormItem>
-        )} 
-      />
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onPrevious}>
