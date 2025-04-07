@@ -4,6 +4,7 @@ import { Loader2, ArrowLeft, ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface FormWizardActionsProps {
   currentStep: number;
@@ -36,9 +37,12 @@ const FormWizardActions = ({
   onTermsChange,
   showTerms = true
 }: FormWizardActionsProps) => {
+  const { role } = useAuthContext();
+  const isClient = role === 'client';
+  
   return (
     <div className="space-y-4 w-full">
-      {currentStep === totalSteps - 1 && showTerms && (
+      {currentStep === totalSteps - 1 && showTerms && isClient && (
         <div className="flex items-start space-x-2 my-4">
           <Checkbox 
             id="terms" 
@@ -95,7 +99,7 @@ const FormWizardActions = ({
               <Button 
                 type="button" 
                 onClick={onFinalSubmit}
-                disabled={isSubmitting || (showTerms && !termsAccepted)}
+                disabled={isSubmitting || (isClient && showTerms && !termsAccepted)}
                 className="bg-dk-navy hover:bg-dk-blue"
               >
                 {isSubmitting ? (

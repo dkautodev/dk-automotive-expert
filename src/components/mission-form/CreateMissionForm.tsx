@@ -30,6 +30,7 @@ const CreateMissionForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, role } = useAuthContext();
   const [internalTermsAccepted, setInternalTermsAccepted] = useState(termsAccepted);
+  const isClient = role === 'client';
 
   const form = useForm<MissionFormValues>({
     resolver: zodResolver(missionFormSchema),
@@ -174,7 +175,7 @@ const CreateMissionForm = ({
       return;
     }
 
-    if (role === 'client' && !internalTermsAccepted) {
+    if (isClient && !internalTermsAccepted) {
       toast.error("Vous devez accepter les conditions générales de vente");
       return;
     }
