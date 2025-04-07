@@ -1,102 +1,82 @@
 
-import { useState } from 'react';
-import { useAddressBook } from '@/hooks/useAddressBook';
-import { ContactEntry } from '@/types/addressBook';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { SearchIcon, BookOpen } from 'lucide-react';
-import ContactList from './ContactList';
+// Mise à jour du composant ContactSelector en supprimant "Sélectionner un contact"
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@/components/ui/card";
+import { Contact } from "@/types/addressBook";
+import { Check, User } from "lucide-react";
 
 interface ContactSelectorProps {
-  contactType?: 'pickup' | 'delivery'; // Keep for backward compatibility but ignore
-  onSelectContact: (contact: ContactEntry) => void;
-  buttonClassName?: string;
+  contacts: Contact[];
+  selectedContactId: string | null;
+  onContactSelect: (contactId: string) => void;
+  isLoading?: boolean;
 }
 
-const ContactSelector = ({ 
-  onSelectContact,
-  buttonClassName = '',
-}: ContactSelectorProps) => {
-  const [open, setOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const { contacts, isLoading } = useAddressBook();
+const ContactSelector: React.FC<ContactSelectorProps> = ({
+  contacts,
+  selectedContactId,
+  onContactSelect,
+  isLoading = false
+}) => {
+  if (isLoading) {
+    return (
+      <Card className="h-[400px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+          <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full"></div>
+          <p>Chargement des contacts...</p>
+        </div>
+      </Card>
+    );
+  }
 
-  // Format d'affichage: NOM-PRENOM-SOCIÉTÉ
-  const formatContactDisplay = (contact: ContactEntry) => {
-    const parts = [];
-    if (contact.lastName) parts.push(contact.lastName.toUpperCase());
-    if (contact.firstName) parts.push(contact.firstName);
-    if (contact.company) parts.push(contact.company);
-    return parts.join('-') || contact.email;
-  };
-
-  const filteredContacts = contacts.filter(contact => {
-    const displayFormat = formatContactDisplay(contact).toLowerCase();
-    return searchTerm === '' || 
-      displayFormat.includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  const handleSelectContact = (contact: ContactEntry) => {
-    onSelectContact(contact);
-    setOpen(false);
-  };
+  if (contacts.length === 0) {
+    return (
+      <Card className="h-[400px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+          <User className="h-12 w-12 opacity-20" />
+          <p>Aucun contact disponible</p>
+          <p className="text-sm">Créez d'abord un contact</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          type="button" 
-          variant="outline" 
-          className={`flex items-center gap-2 ${buttonClassName}`}
-        >
-          <BookOpen className="h-4 w-4" />
-          <span>Sélectionner un contact</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Carnet d'adresses</DialogTitle>
-          <DialogDescription>
-            Sélectionnez un contact pour remplir automatiquement les informations
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="relative mb-4">
-          <SearchIcon className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-          <Input 
-            placeholder="Rechercher un contact..." 
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        {isLoading ? (
-          <div className="text-center py-4">Chargement...</div>
-        ) : filteredContacts.length === 0 ? (
-          <div className="text-center py-6">
-            <p className="text-gray-500">Aucun contact trouvé</p>
+    <Card className="h-[400px]">
+      <CardContent className="p-0">
+        <ScrollArea className="h-[400px] w-full">
+          <div className="p-4 space-y-2">
+            {contacts.map((contact) => (
+              <Button
+                key={contact.id}
+                variant={selectedContactId === contact.id ? "default" : "outline"}
+                className="w-full justify-start h-auto py-3 overflow-hidden"
+                onClick={() => onContactSelect(contact.id)}
+              >
+                <div className="flex items-center gap-3 w-full overflow-hidden">
+                  <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <div className="flex-grow overflow-hidden">
+                    <div className="font-medium truncate">
+                      {contact.firstName} {contact.lastName}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {contact.email}
+                    </div>
+                  </div>
+                  {selectedContactId === contact.id && (
+                    <Check className="h-4 w-4 flex-shrink-0" />
+                  )}
+                </div>
+              </Button>
+            ))}
           </div>
-        ) : (
-          <ContactList 
-            contacts={filteredContacts} 
-            onEdit={() => {}} 
-            onDelete={() => {}}
-            onFillForm={handleSelectContact}
-            formatContactDisplay={formatContactDisplay}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 };
 
