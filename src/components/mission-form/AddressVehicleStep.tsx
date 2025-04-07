@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { MissionFormValues } from "./missionFormSchema";
@@ -11,7 +10,6 @@ import ClientStateDisplay from "./ClientStateDisplay";
 import { useAddressVehicleStep } from "./hooks/useAddressVehicleStep";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
   onNext: () => void;
@@ -58,14 +56,7 @@ const AddressVehicleStep = ({
       {/* Ajout du champ compléments d'information */}
       <FormField control={form.control} name="additional_info" render={({
       field
-    }) => (
-        <FormItem>
-          <FormLabel>Compléments d'information</FormLabel>
-          <FormControl>
-            <Textarea placeholder="Précisez vos éventuelles demandes particulières..." className="resize-none min-h-24" {...field} />
-          </FormControl>
-        </FormItem>
-      )} />
+    }) => {}} />
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onPrevious}>
