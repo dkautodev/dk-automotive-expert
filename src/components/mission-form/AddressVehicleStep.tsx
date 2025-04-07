@@ -1,3 +1,4 @@
+
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { MissionFormValues } from "./missionFormSchema";
@@ -10,11 +11,13 @@ import ClientStateDisplay from "./ClientStateDisplay";
 import { useAddressVehicleStep } from "./hooks/useAddressVehicleStep";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+
 interface AddressVehicleStepProps {
   form: UseFormReturn<MissionFormValues>;
   onNext: () => void;
   onPrevious: () => void;
 }
+
 const AddressVehicleStep = ({
   form,
   onNext,
@@ -34,6 +37,7 @@ const AddressVehicleStep = ({
     vehicleType,
     additionalInfo
   } = useAddressVehicleStep(form, onNext, onPrevious);
+
   return <div className="space-y-6">
       <div className="text-2xl font-semibold">Adresses et type de véhicule</div>
       <p className="text-red-600">Veuillez saisir les adresses de prise en charge et de livraison, ainsi que le type de véhicule. Utilisez les flèches ⬆️ ⬇️ pour ensuite sélectionner votre adresse finale. </p>
@@ -54,9 +58,24 @@ const AddressVehicleStep = ({
       <DistancePriceCard distance={distance} priceHT={priceHT} priceTTC={priceTTC} />
       
       {/* Ajout du champ compléments d'information */}
-      <FormField control={form.control} name="additional_info" render={({
-      field
-    }) => {}} />
+      <FormField 
+        control={form.control} 
+        name="additional_info" 
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Compléments d'information</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Précisions ou instructions..." 
+                rows={3}
+                className="resize-none"
+                {...field}
+                value={field.value || ""}
+              />
+            </FormControl>
+          </FormItem>
+        )} 
+      />
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onPrevious}>
@@ -68,4 +87,5 @@ const AddressVehicleStep = ({
       </div>
     </div>;
 };
+
 export default AddressVehicleStep;

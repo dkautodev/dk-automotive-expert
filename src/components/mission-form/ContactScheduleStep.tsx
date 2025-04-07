@@ -1,3 +1,4 @@
+
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
@@ -8,6 +9,7 @@ import ContactSelector from "@/components/client/address-book/ContactSelector";
 import { ContactEntry } from "@/types/addressBook";
 import { Checkbox } from "../ui/checkbox";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface ContactScheduleStepProps {
   form: UseFormReturn<MissionFormValues>;
@@ -26,6 +28,9 @@ const ContactScheduleStep = ({
   termsAccepted, 
   onTermsChange 
 }: ContactScheduleStepProps) => {
+  const { role } = useAuthContext();
+  const isClient = role === 'client';
+  
   // Fonction pour gérer la sélection d'un contact pour le pickup
   const handlePickupContactSelect = (contact: ContactEntry) => {
     form.setValue('pickup_first_name', contact.firstName, { shouldValidate: true });
@@ -245,7 +250,8 @@ const ContactScheduleStep = ({
         />
       </div>
 
-      {onTermsChange && (
+      {/* N'affiche les CGV que pour les clients */}
+      {isClient && onTermsChange && (
         <div className="flex items-start space-x-2 mt-4">
           <Checkbox 
             id="terms" 
@@ -276,7 +282,7 @@ const ContactScheduleStep = ({
             type="button"
             onClick={onSubmit}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            disabled={isSubmitting || (onTermsChange && !termsAccepted)}
+            disabled={isSubmitting || (isClient && onTermsChange && !termsAccepted)}
           >
             {isSubmitting ? "Traitement en cours..." : "Créer la mission"}
           </button>
