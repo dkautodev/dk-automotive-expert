@@ -1,61 +1,55 @@
 
 import { z } from "zod";
 
-// Schéma pour les types de mission
-const missionTypeSchema = z.enum(["livraison", "transfert", "autre", "restitution"]);
-
-// Schéma pour les valeurs du formulaire de mission
+// Schéma de validation pour le formulaire de mission avec Zod
 export const missionFormSchema = z.object({
-  mission_type: missionTypeSchema,
+  mission_type: z.enum(["livraison", "restitution", "transfert", "autre"]).default("livraison"),
   client_id: z.string().optional(),
-
-  // Adresses
-  pickup_address: z.string().min(1, { message: "L'adresse de départ est requise" }),
-  delivery_address: z.string().min(1, { message: "L'adresse de destination est requise" }),
   
-  // Distance et prix calculés
-  distance: z.any().optional(),
-  price_ht: z.string().optional(),
-  price_ttc: z.string().optional(),
+  // Étape 2: Adresses et véhicule
+  pickup_address: z.string().min(1, "L'adresse de prise en charge est requise"),
+  delivery_address: z.string().min(1, "L'adresse de livraison est requise"),
+  vehicle_type: z.string().min(1, "Le type de véhicule est requis"),
+  distance: z.any().optional(), // Calculé
+  price_ht: z.string().optional(), // Calculé
+  price_ttc: z.string().optional(), // Calculé
   
-  // Informations sur le véhicule
-  vehicle_type: z.string().min(1, { message: "Le type de véhicule est requis" }),
-  brand: z.string().min(1, { message: "La marque est requise" }),
-  model: z.string().min(1, { message: "Le modèle est requis" }),
-  year: z.string().min(1, { message: "L'année est requise" }),
-  fuel: z.string().min(1, { message: "Le type de carburant est requis" }),
-  licensePlate: z.string().min(1, { message: "L'immatriculation est requise" }),
-
-  // Contact pour la prise en charge
-  pickup_first_name: z.string().min(1, { message: "Le prénom est requis" }),
-  pickup_last_name: z.string().min(1, { message: "Le nom est requis" }),
-  pickup_email: z.string().email({ message: "L'email doit être valide" }),
-  pickup_phone: z.string().min(10, { message: "Le téléphone doit avoir au moins 10 chiffres" }),
-
-  // Contact pour la livraison
-  delivery_first_name: z.string().min(1, { message: "Le prénom est requis" }),
-  delivery_last_name: z.string().min(1, { message: "Le nom est requis" }),
-  delivery_email: z.string().email({ message: "L'email doit être valide" }),
-  delivery_phone: z.string().min(10, { message: "Le téléphone doit avoir au moins 10 chiffres" }),
-
-  // Dates et heures
+  // Étape 3: Informations du véhicule
+  brand: z.string().min(1, "La marque est requise"),
+  model: z.string().min(1, "Le modèle est requis"),
+  year: z.string().min(1, "L'année est requise"),
+  fuel: z.string().min(1, "Le carburant est requis"),
+  licensePlate: z.string().min(1, "La plaque d'immatriculation est requise"),
+  
+  // Étape 4: Contacts et horaires
+  pickup_first_name: z.string().min(1, "Le prénom du contact de prise en charge est requis"),
+  pickup_last_name: z.string().min(1, "Le nom du contact de prise en charge est requis"),
+  pickup_email: z.string().email("Email invalide").min(1, "L'email du contact de prise en charge est requis"),
+  pickup_phone: z.string().min(1, "Le téléphone du contact de prise en charge est requis"),
+  
   pickup_date: z.date({
-    required_error: "La date de prise en charge est requise"
+    required_error: "La date de prise en charge est requise",
   }),
-  pickup_time: z.string().min(1, { message: "L'heure de prise en charge est requise" }),
+  pickup_time: z.string().min(1, "L'heure de prise en charge est requise"),
+  
+  delivery_first_name: z.string().min(1, "Le prénom du contact de livraison est requis"),
+  delivery_last_name: z.string().min(1, "Le nom du contact de livraison est requis"),
+  delivery_email: z.string().email("Email invalide").min(1, "L'email du contact de livraison est requis"),
+  delivery_phone: z.string().min(1, "Le téléphone du contact de livraison est requis"),
+  
   delivery_date: z.date({
-    required_error: "La date de livraison est requise"
+    required_error: "La date de livraison est requise",
   }),
-  delivery_time: z.string().min(1, { message: "L'heure de livraison est requise" }),
-
-  // Informations supplémentaires
+  delivery_time: z.string().min(1, "L'heure de livraison est requise"),
+  
   additional_info: z.string().optional(),
   
   // Pièces jointes
-  attachments: z.any().optional(),
+  attachments: z.array(z.instanceof(File)).optional(),
   
-  // Acceptation des CGV
-  termsAccepted: z.boolean().optional(),
+  // Conditions générales
+  termsAccepted: z.boolean().optional()
 });
 
+// Type dérivé du schéma
 export type MissionFormValues = z.infer<typeof missionFormSchema>;

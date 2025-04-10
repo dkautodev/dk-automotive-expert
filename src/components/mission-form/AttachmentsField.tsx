@@ -9,7 +9,7 @@ import { MissionFormValues } from "./missionFormSchema";
 
 interface AttachmentsFieldProps {
   form: UseFormReturn<MissionFormValues>;
-  name: "attachments"; // Fixed: Restrict to only the valid field name
+  name: "attachments"; // Restreint au nom de champ valide uniquement
   label: string;
 }
 
@@ -41,10 +41,11 @@ const AttachmentsField = ({ form, name, label }: AttachmentsFieldProps) => {
 
     // Ajout des fichiers tels quels sans modification des noms
     // Le nommage sera géré au moment de l'upload sur le serveur
-    setAttachments(prev => [...prev, ...validFiles]);
+    const newAttachments = [...attachments, ...validFiles];
+    setAttachments(newAttachments);
     
-    // Update form value
-    form.setValue(name, [...attachments, ...validFiles]);
+    // Update form value - important: cast to "attachments" explicitly
+    form.setValue(name, newAttachments);
   };
   
   const removeAttachment = (index: number) => {
