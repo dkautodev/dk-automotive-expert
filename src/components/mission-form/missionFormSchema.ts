@@ -44,7 +44,7 @@ export const missionFormSchema = z.object({
   
   additional_info: z.string().optional(),
   
-  // Pièces jointes
+  // Pièces jointes - Explicitement typé comme File[] pour éviter les erreurs TypeScript
   attachments: z.array(z.instanceof(File)).optional(),
   
   // Conditions générales
