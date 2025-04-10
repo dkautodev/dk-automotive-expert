@@ -44,7 +44,7 @@ const AttachmentsField = ({ form, name, label }: AttachmentsFieldProps) => {
     const newAttachments = [...attachments, ...validFiles];
     setAttachments(newAttachments);
     
-    // Update form value - important: cast to "attachments" explicitly
+    // Update form value - using the name prop which is typed as "attachments"
     form.setValue(name, newAttachments);
   };
   
