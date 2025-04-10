@@ -7,6 +7,7 @@ import VehicleInfoStep from "./VehicleInfoStep";
 import ContactScheduleStep from "./ContactScheduleStep";
 import { useMissionSubmit } from "./hooks/useMissionSubmit";
 import StepIndicator from "./StepIndicator";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface CreateMissionFormProps {
   onSuccess: () => void;
@@ -37,12 +38,13 @@ const CreateMissionForm = ({
     onTermsChange,
   });
 
+  const { user, role } = useAuthContext();
+  
   useEffect(() => {
-    const { user, role } = require("@/context/AuthContext").useAuthContext();
     if (role === "client" && user?.id) {
       form.setValue("client_id", user.id);
     }
-  }, [form]);
+  }, [form, role, user]);
 
   const renderStep = () => {
     switch (step) {
