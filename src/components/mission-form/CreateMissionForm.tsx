@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { Form } from "@/components/ui/form";
-import { MissionTypeStep } from "./MissionTypeStep";
+import MissionTypeStep from "./MissionTypeStep";
 import AddressVehicleStep from "./AddressVehicleStep";
 import VehicleInfoStep from "./VehicleInfoStep";
 import ContactScheduleStep from "./ContactScheduleStep";
