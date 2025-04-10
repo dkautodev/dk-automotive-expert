@@ -7,7 +7,6 @@ import { MapPin } from "lucide-react";
 import { MissionFormValues } from "./missionFormSchema";
 import { GOOGLE_MAPS_API_KEY } from "@/lib/constants";
 import { toast } from "sonner";
-import ContactSelector from "@/components/client/address-book/ContactSelector";
 import { ContactEntry } from "@/types/addressBook";
 
 interface AddressFieldsProps {
@@ -107,25 +106,8 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
     }
   };
 
-  // Fonction pour gérer la sélection d'un contact pour l'adresse de prise en charge
-  const handlePickupContactSelect = (contact: ContactEntry) => {
-    form.setValue('pickup_address', `${contact.firstName} ${contact.lastName}, ${contact.company || ''}`, 
-      { shouldValidate: true });
-    form.setValue('pickup_first_name', contact.firstName, { shouldValidate: true });
-    form.setValue('pickup_last_name', contact.lastName, { shouldValidate: true });
-    form.setValue('pickup_email', contact.email, { shouldValidate: true });
-    form.setValue('pickup_phone', contact.phone, { shouldValidate: true });
-  };
-
-  // Fonction pour gérer la sélection d'un contact pour l'adresse de livraison
-  const handleDeliveryContactSelect = (contact: ContactEntry) => {
-    form.setValue('delivery_address', `${contact.firstName} ${contact.lastName}, ${contact.company || ''}`, 
-      { shouldValidate: true });
-    form.setValue('delivery_first_name', contact.firstName, { shouldValidate: true });
-    form.setValue('delivery_last_name', contact.lastName, { shouldValidate: true });
-    form.setValue('delivery_email', contact.email, { shouldValidate: true });
-    form.setValue('delivery_phone', contact.phone, { shouldValidate: true });
-  };
+  // Les fonctions pour gérer la sélection d'un contact sont maintenant supprimées car nous avons
+  // retiré les boutons "Choisir un contact"
 
   return (
     <>
@@ -134,13 +116,7 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
         name="pickup_address"
         render={({ field }) => (
           <FormItem>
-            <div className="flex justify-between items-center">
-              <FormLabel>Adresse de prise en charge</FormLabel>
-              <ContactSelector 
-                onSelectContact={handlePickupContactSelect}
-                buttonClassName="h-8 text-xs px-2"
-              />
-            </div>
+            <FormLabel>Adresse de prise en charge</FormLabel>
             <FormControl>
               <div className="relative">
                 <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -168,13 +144,7 @@ const AddressFields = ({ form }: AddressFieldsProps) => {
         name="delivery_address"
         render={({ field }) => (
           <FormItem>
-            <div className="flex justify-between items-center">
-              <FormLabel>Adresse de livraison</FormLabel>
-              <ContactSelector 
-                onSelectContact={handleDeliveryContactSelect}
-                buttonClassName="h-8 text-xs px-2"
-              />
-            </div>
+            <FormLabel>Adresse de livraison</FormLabel>
             <FormControl>
               <div className="relative">
                 <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
