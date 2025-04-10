@@ -9,7 +9,7 @@ import { MissionFormValues } from "./missionFormSchema";
 
 interface AttachmentsFieldProps {
   form: UseFormReturn<MissionFormValues>;
-  name: string;
+  name: "attachments"; // Fixed: Restrict to only the valid field name
   label: string;
 }
 
