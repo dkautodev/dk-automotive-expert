@@ -9,9 +9,11 @@ import { MissionFormValues } from "./missionFormSchema";
 
 interface AttachmentsFieldProps {
   form: UseFormReturn<MissionFormValues>;
+  name: string;
+  label: string;
 }
 
-const AttachmentsField = ({ form }: AttachmentsFieldProps) => {
+const AttachmentsField = ({ form, name, label }: AttachmentsFieldProps) => {
   const [attachments, setAttachments] = useState<File[]>([]);
   
   const handleAttachmentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,14 +44,14 @@ const AttachmentsField = ({ form }: AttachmentsFieldProps) => {
     setAttachments(prev => [...prev, ...validFiles]);
     
     // Update form value
-    form.setValue("attachments", [...attachments, ...validFiles]);
+    form.setValue(name, [...attachments, ...validFiles]);
   };
   
   const removeAttachment = (index: number) => {
     const newAttachments = [...attachments];
     newAttachments.splice(index, 1);
     setAttachments(newAttachments);
-    form.setValue("attachments", newAttachments);
+    form.setValue(name, newAttachments);
   };
   
   const formatFileSize = (bytes: number) => {
@@ -71,10 +73,10 @@ const AttachmentsField = ({ form }: AttachmentsFieldProps) => {
   return (
     <FormField
       control={form.control}
-      name="attachments"
+      name={name}
       render={({ field }) => (
         <FormItem className="space-y-2">
-          <FormLabel>Pièces jointes (10 Mo max)</FormLabel>
+          <FormLabel>{label} (10 Mo max)</FormLabel>
           <FormControl>
             <div className="space-y-2">
               <div className="flex items-center gap-2">

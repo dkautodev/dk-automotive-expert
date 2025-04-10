@@ -252,7 +252,7 @@ const ContactScheduleStep = ({
         
         {/* Champ pour ajouter des pièces jointes */}
         <AttachmentsField
-          control={form.control}
+          form={form}
           name="attachments"
           label="Pièces jointes"
         />
