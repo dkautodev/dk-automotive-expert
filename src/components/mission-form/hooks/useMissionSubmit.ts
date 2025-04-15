@@ -92,14 +92,19 @@ export const useMissionSubmit = ({
       const { streetNumber, postalCode, city, country } = extractAddressComponents(address);
       
       return {
-        street_number: streetNumber,
-        postal_code: postalCode,
-        city: city,
-        country: country
+        street_number: streetNumber || '',
+        postal_code: postalCode || '',
+        city: city || '',
+        country: country || 'France'
       };
     } catch (error) {
       console.error("Erreur lors de l'extraction de l'adresse:", error);
-      return null;
+      return {
+        street_number: '',
+        postal_code: '',
+        city: '',
+        country: 'France'
+      };
     }
   };
 
@@ -127,6 +132,8 @@ export const useMissionSubmit = ({
       }
 
       console.log(`Création de mission avec statut: ${statusToUse}`);
+      console.log("Adresse de prise en charge:", values.pickup_address);
+      console.log("Adresse de livraison:", values.delivery_address);
 
       let admin_id = null;
       if (role === 'admin' && user?.id) {
@@ -143,10 +150,10 @@ export const useMissionSubmit = ({
         distance: values.distance?.toString(),
         price_ht: parseFloat(values.price_ht || "0"),
         price_ttc: parseFloat(values.price_ttc || "0"),
-        street_number: pickupAddressComponents?.street_number || '',
-        postal_code: pickupAddressComponents?.postal_code || '',
-        city: pickupAddressComponents?.city || '',
-        country: pickupAddressComponents?.country || 'France',
+        street_number: pickupAddressComponents.street_number,
+        postal_code: pickupAddressComponents.postal_code,
+        city: pickupAddressComponents.city,
+        country: pickupAddressComponents.country,
         vehicle_info: {
           brand: values.brand,
           model: values.model,
@@ -206,7 +213,14 @@ export const useMissionSubmit = ({
         
         if (values.attachments && values.attachments.length > 0) {
           console.log(`Téléchargement de ${values.attachments.length} pièces jointes pour la mission ${createdMission.id}`);
-          await uploadAttachments(createdMission.id, values.attachments as File[]);
+          
+          try {
+            await uploadAttachments(createdMission.id, values.attachments as File[]);
+            console.log("Pièces jointes téléchargées avec succès");
+          } catch (attachmentError) {
+            console.error("Erreur lors du téléchargement des pièces jointes:", attachmentError);
+            toast.error("La mission a été créée mais certaines pièces jointes n'ont pas pu être téléchargées");
+          }
         }
         
         if (statusToUse === "en_attente") {
