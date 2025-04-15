@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
@@ -88,7 +89,15 @@ const Footer = () => {
         
         
         <div className="mt-12 text-center">
-          <p>&copy; {new Date().getFullYear()} DK AUTOMOTIVE. Tous droits réservés.</p>
+          <p>
+            &copy; {new Date().getFullYear()} DK AUTOMOTIVE. 
+            <Link 
+              to="/admin/auth" 
+              className="ml-1 underline hover:text-gray-300 transition"
+            >
+              Tous droits réservés
+            </Link>
+          </p>
         </div>
       </div>
     </footer>;
