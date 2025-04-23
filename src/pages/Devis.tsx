@@ -1,15 +1,14 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import QuoteForm from '@/components/QuoteForm';
+import { SimpleQuoteForm } from '@/components/quote/SimpleQuoteForm';
 
 const Devis = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-      <main className="animate-fadeIn">
+      <main className="flex-1 animate-fadeIn">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
@@ -18,12 +17,8 @@ const Devis = () => {
                 Veuillez renseigner les champs ci-dessous
               </p>
             </div>
-
-            <Card>
-              <CardContent className="p-6">
-                <QuoteForm />
-              </CardContent>
-            </Card>
+            
+            <SimpleQuoteForm />
           </div>
         </div>
       </main>
