@@ -34,6 +34,8 @@ serve(async (req) => {
   try {
     const data: QuoteRequest = await req.json();
     
+    console.log("Received quote request data:", data);
+    
     // Email pour DK Automotive
     const emailToDK = {
       sender: { name: "DK Automotive", email: "noreply@dkautomotive.fr" },
@@ -88,30 +90,52 @@ serve(async (req) => {
       `
     };
 
-    // Envoi des emails via Brevo
-    const [dkResponse, clientResponse] = await Promise.all([
-      fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "api-key": Deno.env.get("BREVO_API_KEY")!
-        },
-        body: JSON.stringify(emailToDK)
-      }),
-      fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "api-key": Deno.env.get("BREVO_API_KEY")!
-        },
-        body: JSON.stringify(emailToClient)
-      })
-    ]);
+    try {
+      // Envoi des emails via Brevo
+      console.log("Sending emails via Brevo...");
+      
+      const [dkResponse, clientResponse] = await Promise.all([
+        fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "api-key": Deno.env.get("BREVO_API_KEY")!
+          },
+          body: JSON.stringify(emailToDK)
+        }),
+        fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "api-key": Deno.env.get("BREVO_API_KEY")!
+          },
+          body: JSON.stringify(emailToClient)
+        })
+      ]);
 
-    if (!dkResponse.ok || !clientResponse.ok) {
-      throw new Error("Failed to send one or more emails");
+      console.log("DK email response status:", dkResponse.status);
+      console.log("Client email response status:", clientResponse.status);
+      
+      if (!dkResponse.ok) {
+        const dkErrorData = await dkResponse.text();
+        console.error("Error sending email to DK:", dkErrorData);
+      }
+      
+      if (!clientResponse.ok) {
+        const clientErrorData = await clientResponse.text();
+        console.error("Error sending email to client:", clientErrorData);
+      }
+
+      if (!dkResponse.ok || !clientResponse.ok) {
+        throw new Error("Failed to send one or more emails");
+      }
+      
+      console.log("Emails sent successfully");
+    } catch (emailError) {
+      console.error("Error during email sending:", emailError);
+      throw new Error(`Failed to send emails: ${emailError.message}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {

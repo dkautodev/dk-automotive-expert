@@ -50,6 +50,11 @@ const QuoteForm = () => {
           onSubmit={onSubmit}
           onPrevious={prevStep}
           loading={loading}
+          priceInfo={{
+            distance: distance ? `${distance} km` : "Non calculée",
+            priceHT: priceHT || "Non calculé",
+            priceTTC: priceTTC || "Non calculé"
+          }}
         />;
       default:
         return null;

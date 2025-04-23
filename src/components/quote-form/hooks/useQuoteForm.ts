@@ -63,6 +63,7 @@ export const useQuoteForm = () => {
           data.pickup_address!,
           data.delivery_address!
         );
+        
         setDistance(calculatedDistance);
         
         // Calculer le prix
@@ -71,6 +72,11 @@ export const useQuoteForm = () => {
         
         setPriceHT(calculatedPriceHT);
         setPriceTTC(calculatedPriceTTC);
+        
+        // Mettre à jour le formulaire avec ces valeurs
+        form.setValue('distance', calculatedDistance.toString());
+        form.setValue('price_ht', calculatedPriceHT);
+        form.setValue('price_ttc', calculatedPriceTTC);
       } catch (error) {
         console.error('Erreur lors du calcul:', error);
         toast.error("Erreur lors du calcul de la distance et du prix");
@@ -87,26 +93,37 @@ export const useQuoteForm = () => {
 
   const onSubmit = async (data: QuoteFormValues) => {
     setLoading(true);
+    
     try {
+      console.log("Envoi de la demande de devis:", {
+        ...data,
+        distance,
+        priceHT,
+        priceTTC
+      });
+      
       const { error } = await supabase.functions.invoke('send-quote-request', {
         body: {
           ...data,
-          distance,
+          distance: distance ? `${distance}` : "",
           priceHT,
           priceTTC
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur lors de l'appel de la fonction:", error);
+        throw error;
+      }
 
       toast.success(
         "Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h."
       );
       form.reset();
       setStep(1);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de l\'envoi du devis:', error);
-      toast.error("Une erreur est survenue lors de l'envoi de votre demande");
+      toast.error("Une erreur est survenue lors de l'envoi de votre demande: " + (error.message || "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
