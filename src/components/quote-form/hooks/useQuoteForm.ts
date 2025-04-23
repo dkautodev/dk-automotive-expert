@@ -1,22 +1,24 @@
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { quoteFormSchema, type QuoteFormValues } from '../quoteFormSchema';
-import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
-import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuoteFormState } from './useQuoteFormState';
+import { useQuoteCalculations } from './useQuoteCalculations';
+import { useQuoteSubmission } from './useQuoteSubmission';
 
 export const useQuoteForm = () => {
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [distance, setDistance] = useState<number | null>(null);
-  const [priceHT, setPriceHT] = useState<string | null>(null);
-  const [priceTTC, setPriceTTC] = useState<string | null>(null);
-  
-  const { calculateDistance } = useDistanceCalculation();
-  const { calculatePrice } = usePriceCalculation();
+  const {
+    step,
+    setStep,
+    loading,
+    setLoading,
+    distance,
+    setDistance,
+    priceHT,
+    setPriceHT,
+    priceTTC,
+    setPriceTTC
+  } = useQuoteFormState();
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
@@ -35,8 +37,6 @@ export const useQuoteForm = () => {
       email: '',
       phone: '',
       company: '',
-      
-      // Initialize address fields
       pickupStreetNumber: '',
       pickupStreetType: 'Rue',
       pickupStreetName: '',
@@ -44,7 +44,6 @@ export const useQuoteForm = () => {
       pickupPostalCode: '',
       pickupCity: '',
       pickupCountry: 'France',
-      
       deliveryStreetNumber: '',
       deliveryStreetType: 'Rue',
       deliveryStreetName: '',
@@ -55,85 +54,19 @@ export const useQuoteForm = () => {
     }
   });
 
+  const { calculateQuote } = useQuoteCalculations(form, setDistance, setPriceHT, setPriceTTC);
+  const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC);
+
   const nextStep = async (data: Partial<QuoteFormValues>) => {
     if (step === 2) {
-      try {
-        // Calculer la distance
-        const calculatedDistance = await calculateDistance(
-          data.pickup_address!,
-          data.delivery_address!
-        );
-        
-        setDistance(calculatedDistance);
-        
-        // Calculer le prix
-        const { priceHT: calculatedPriceHT, priceTTC: calculatedPriceTTC } = 
-          await calculatePrice(data.vehicle_type!, calculatedDistance);
-        
-        setPriceHT(calculatedPriceHT);
-        setPriceTTC(calculatedPriceTTC);
-        
-        // Mettre à jour le formulaire avec ces valeurs
-        form.setValue('distance', calculatedDistance.toString());
-        form.setValue('price_ht', calculatedPriceHT);
-        form.setValue('price_ttc', calculatedPriceTTC);
-      } catch (error) {
-        console.error('Erreur lors du calcul:', error);
-        toast.error("Erreur lors du calcul de la distance et du prix");
-        return;
-      }
+      const success = await calculateQuote(data);
+      if (!success) return;
     }
-    
     setStep(step + 1);
   };
 
   const prevStep = () => {
     setStep(step - 1);
-  };
-
-  const onSubmit = async (data: QuoteFormValues) => {
-    console.log("Starting form submission with data:", data);
-    setLoading(true);
-    
-    try {
-      const formData = {
-        ...data,
-        distance: distance ? `${distance}` : "",
-        priceHT,
-        priceTTC
-      };
-      
-      console.log("Sending quote request with data:", formData);
-      
-      // Vérifier que toutes les données requises sont présentes
-      if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
-        throw new Error("Informations de contact manquantes");
-      }
-      
-      // Enregistrer en détail l'état de la requête
-      console.log("Envoi de la requête à la fonction Supabase...");
-      
-      const { data: responseData, error } = await supabase.functions.invoke('send-quote-request', {
-        body: formData
-      });
-
-      if (error) {
-        console.error("Error from function invocation:", error);
-        throw new Error(`Erreur lors de l'appel de la fonction: ${error.message}`);
-      }
-
-      console.log("Quote request sent successfully, response:", responseData);
-      toast.success(
-        "Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h."
-      );
-      form.reset();
-      setStep(1);
-    } catch (error: any) {
-      console.error('Erreur lors de l\'envoi du devis:', error);
-      toast.error(`Une erreur est survenue lors de l'envoi de votre demande: ${error.message || "Erreur inconnue"}`);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return {
