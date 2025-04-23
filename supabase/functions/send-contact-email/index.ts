@@ -1,9 +1,10 @@
 
-// Edge Function to send contact form submissions to contact@dkautomotive.fr
+// Edge Function pour envoyer les submissions du formulaire contact via Brevo (ex-Sendinblue)
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+// Utilise la clé d'API Brevo depuis les secrets Supabase
+const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,6 +22,7 @@ interface ContactFormData {
 }
 
 serve(async (req: Request) => {
+  // Gérer le preflight CORS
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -28,7 +30,7 @@ serve(async (req: Request) => {
   try {
     const data: ContactFormData = await req.json();
 
-    const html = `
+    const htmlContent = `
       <h2>Nouveau message de contact du site DK Automotive</h2>
       <p><strong>Nom&nbsp;:</strong> ${data.lastName}</p>
       <p><strong>Prénom&nbsp;:</strong> ${data.firstName}</p>
@@ -41,27 +43,48 @@ serve(async (req: Request) => {
       <pre style="font-family: inherit; font-size: 1rem;">${data.message}</pre>
     `;
 
-    const send = await resend.emails.send({
-      from: "DK Automotive Contact <onboarding@resend.dev>",
-      to: ["contact@dkautomotive.fr"],
-      subject: `[DK Automotive] ${data.subject}`,
-      html,
-      reply_to: data.email,
+    // Prépare l'appel à l'API Brevo
+    const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY ?? "",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "DK Automotive Contact",
+          email: "contact@dkautomotive.fr" // doit être validé dans Brevo
+        },
+        to: [
+          {
+            email: "contact@dkautomotive.fr",
+            name: "Contact DK Automotive"
+          }
+        ],
+        replyTo: {
+          email: data.email,
+          name: `${data.firstName} ${data.lastName}`,
+        },
+        subject: `[DK Automotive] ${data.subject}`,
+        htmlContent,
+      }),
     });
 
-    if (send.error) {
-      console.error("Resend error", send.error);
+    const brevoResult = await brevoResponse.json();
+
+    if (!brevoResponse.ok) {
+      console.error("Brevo API error", brevoResult);
       return new Response(
-        JSON.stringify({ error: send.error.message }),
+        JSON.stringify({ error: brevoResult?.message || brevoResult }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, ...brevoResult }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
     console.error("Error in send-contact-email:", error);
     return new Response(
@@ -70,3 +93,4 @@ serve(async (req: Request) => {
     );
   }
 });
+
