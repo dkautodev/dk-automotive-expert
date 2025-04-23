@@ -92,30 +92,29 @@ export const useQuoteForm = () => {
   };
 
   const onSubmit = async (data: QuoteFormValues) => {
+    console.log("Starting form submission with data:", data);
     setLoading(true);
     
     try {
-      console.log("Envoi de la demande de devis:", {
+      const formData = {
         ...data,
-        distance,
+        distance: distance ? `${distance}` : "",
         priceHT,
         priceTTC
-      });
+      };
+      
+      console.log("Sending quote request with data:", formData);
       
       const { error } = await supabase.functions.invoke('send-quote-request', {
-        body: {
-          ...data,
-          distance: distance ? `${distance}` : "",
-          priceHT,
-          priceTTC
-        }
+        body: formData
       });
 
       if (error) {
-        console.error("Erreur lors de l'appel de la fonction:", error);
-        throw error;
+        console.error("Error from function invocation:", error);
+        throw new Error(`Erreur lors de l'appel de la fonction: ${error.message}`);
       }
 
+      console.log("Quote request sent successfully");
       toast.success(
         "Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h."
       );
@@ -123,7 +122,7 @@ export const useQuoteForm = () => {
       setStep(1);
     } catch (error: any) {
       console.error('Erreur lors de l\'envoi du devis:', error);
-      toast.error("Une erreur est survenue lors de l'envoi de votre demande: " + (error.message || "Erreur inconnue"));
+      toast.error(`Une erreur est survenue lors de l'envoi de votre demande: ${error.message || "Erreur inconnue"}`);
     } finally {
       setLoading(false);
     }

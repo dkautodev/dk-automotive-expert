@@ -25,12 +25,18 @@ const QuoteForm = () => {
       case 1:
         return <MissionTypeStep 
           form={form} 
-          onNext={nextStep} 
+          onNext={(data) => {
+            console.log("Mission type selected:", data);
+            nextStep(data);
+          }} 
         />;
       case 2:
         return <AddressVehicleStep 
           form={form}
-          onNext={nextStep}
+          onNext={(data) => {
+            console.log("Address and vehicle data:", data);
+            nextStep(data);
+          }}
           onPrevious={prevStep}
           priceInfo={{
             distance: distance ? `${distance} km` : null,
@@ -41,13 +47,19 @@ const QuoteForm = () => {
       case 3:
         return <VehicleDetailsStep 
           form={form}
-          onNext={nextStep}
+          onNext={(data) => {
+            console.log("Vehicle details:", data);
+            nextStep(data);
+          }}
           onPrevious={prevStep}
         />;
       case 4:
         return <ContactStep 
           form={form}
-          onSubmit={onSubmit}
+          onSubmit={(data) => {
+            console.log("Contact info and submission:", data);
+            onSubmit(data);
+          }}
           onPrevious={prevStep}
           loading={loading}
           priceInfo={{
