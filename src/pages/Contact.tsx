@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Mail, Phone, Building } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -17,6 +18,7 @@ const formSchema = z.object({
   email: z.string().email("Adresse email invalide"),
   phone: z.string().regex(/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/, "Numéro de téléphone invalide"),
   companyName: z.string().min(2, "Le nom de la société doit contenir au moins 2 caractères"),
+  subject: z.string().min(2, "L'objet doit contenir au moins 2 caractères"),
   message: z.string().min(10, "Le message doit contenir au moins 10 caractères")
 });
 
@@ -29,12 +31,13 @@ const Contact = () => {
       email: "",
       phone: "",
       companyName: "",
+      subject: "",
       message: ""
     }
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const mailtoLink = `mailto:dkautomotive70@gmail.com?subject=Nouveau message de contact&body=${encodeURIComponent(`Nom: ${values.lastName}\nPrénom: ${values.firstName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nMessage:\n${values.message}`)}`;
+    const mailtoLink = `mailto:contact@dkautomotive.fr?subject=${encodeURIComponent(values.subject)}&body=${encodeURIComponent(`Nom: ${values.lastName}\nPrénom: ${values.firstName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nObjet: ${values.subject}\n\nMessage:\n${values.message}`)}`;
     window.location.href = mailtoLink;
     toast.success("Message envoyé avec succès!");
   };
@@ -118,6 +121,16 @@ const Contact = () => {
                           </FormItem>} />
                     </div>
 
+                    <FormField control={form.control} name="subject" render={({
+                    field
+                  }) => <FormItem>
+                          <FormLabel>Objet</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Objet de votre message" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>} />
+
                     <FormField control={form.control} name="message" render={({
                     field
                   }) => <FormItem>
@@ -144,3 +157,4 @@ const Contact = () => {
 };
 
 export default Contact;
+
