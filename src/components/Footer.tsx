@@ -1,17 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="text-white py-12 bg-[#051e83]">
+  return <footer className="text-white py-12 bg-[#051e83]">
       <div className="container mx-auto px-4">
         <div className="flex justify-center mb-8">
-          <img 
-            src="/dk-automotive-logo.png" 
-            alt="DK Automotive Logo" 
-            className="w-48 h-auto filter invert grayscale" 
-          />
+          <img alt="DK Automotive Logo" className="w-48 h-auto filter invert grayscale" src="/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
@@ -97,17 +91,12 @@ const Footer = () => {
         <div className="mt-12 text-center text-sm">
           <p>
             &copy; {new Date().getFullYear()} DK AUTOMOTIVE. 
-            <Link 
-              to="/admin/auth" 
-              className="ml-1 underline hover:text-gray-300 transition"
-            >
+            <Link to="/admin/auth" className="ml-1 underline hover:text-gray-300 transition">
               Tous droits réservés
             </Link>
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
