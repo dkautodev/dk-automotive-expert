@@ -28,7 +28,7 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
     };
     
     fetchPickupCommunes();
-  }, [form.watch('pickupPostalCode')]);
+  }, [form, form.watch('pickupPostalCode')]);
 
   useEffect(() => {
     const postalCode = form.watch('deliveryPostalCode');
@@ -48,7 +48,7 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
     };
     
     fetchDeliveryCommunes();
-  }, [form.watch('deliveryPostalCode')]);
+  }, [form, form.watch('deliveryPostalCode')]);
 
   const handleNext = () => {
     const pickupComplement = form.getValues('pickupComplement') ? `, ${form.getValues('pickupComplement')}` : '';
