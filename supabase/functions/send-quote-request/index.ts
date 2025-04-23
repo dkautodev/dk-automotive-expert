@@ -1,8 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,11 +35,11 @@ serve(async (req) => {
     const data: QuoteRequest = await req.json();
     
     // Email pour DK Automotive
-    await resend.emails.send({
-      from: "DK Automotive <noreply@dkautomotive.fr>",
-      to: "contact@dkautomotive.fr",
+    const emailToDK = {
+      sender: { name: "DK Automotive", email: "noreply@dkautomotive.fr" },
+      to: [{ email: "contact@dkautomotive.fr" }],
       subject: `Nouvelle demande de devis - ${data.firstName} ${data.lastName} (${data.company})`,
-      html: `
+      htmlContent: `
         <h2>Nouvelle demande de devis</h2>
         <h3>Type de mission</h3>
         <p>${data.mission_type === 'livraison' ? 'Livraison' : 'Restitution'}</p>
@@ -69,15 +66,15 @@ serve(async (req) => {
         <p><strong>Prénom :</strong> ${data.firstName}</p>
         <p><strong>Email :</strong> ${data.email}</p>
         <p><strong>Téléphone :</strong> ${data.phone}</p>
-      `,
-    });
-    
+      `
+    };
+
     // Email de confirmation pour le client
-    await resend.emails.send({
-      from: "DK Automotive <noreply@dkautomotive.fr>",
-      to: data.email,
+    const emailToClient = {
+      sender: { name: "DK Automotive", email: "noreply@dkautomotive.fr" },
+      to: [{ email: data.email }],
       subject: "Confirmation de votre demande de devis - DK Automotive",
-      html: `
+      htmlContent: `
         <h2>Merci pour votre demande de devis</h2>
         <p>Cher(e) ${data.firstName} ${data.lastName},</p>
         <p>Nous avons bien reçu votre demande de devis pour le transport de votre véhicule.</p>
@@ -88,8 +85,34 @@ serve(async (req) => {
         <p><strong>Arrivée :</strong> ${data.delivery_address}</p>
         ${data.distance ? `<p><strong>Distance estimée :</strong> ${data.distance} km</p>` : ''}
         <p>Cordialement,<br>L'équipe DK Automotive</p>
-      `,
-    });
+      `
+    };
+
+    // Envoi des emails via Brevo
+    const [dkResponse, clientResponse] = await Promise.all([
+      fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "api-key": Deno.env.get("BREVO_API_KEY")!
+        },
+        body: JSON.stringify(emailToDK)
+      }),
+      fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "api-key": Deno.env.get("BREVO_API_KEY")!
+        },
+        body: JSON.stringify(emailToClient)
+      })
+    ]);
+
+    if (!dkResponse.ok || !clientResponse.ok) {
+      throw new Error("Failed to send one or more emails");
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
