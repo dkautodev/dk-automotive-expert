@@ -2,11 +2,18 @@
 import { useState } from 'react';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { toast } from 'sonner';
+import { useGoogleMapsApi } from './useGoogleMapsApi';
 
 export const useDistanceCalculation = () => {
   const [isCalculating, setIsCalculating] = useState(false);
+  const { isLoaded } = useGoogleMapsApi({ libraries: ['places'] });
   
   const calculateDistance = async (originAddress: string, destinationAddress: string): Promise<number> => {
+    if (!isLoaded) {
+      toast.error("Google Maps API n'est pas encore chargée");
+      throw new Error("Google Maps API not loaded");
+    }
+    
     try {
       setIsCalculating(true);
       console.log(`Calcul de distance entre ${originAddress} et ${destinationAddress}`);
@@ -51,6 +58,7 @@ export const useDistanceCalculation = () => {
   
   return {
     calculateDistance,
-    isCalculating
+    isCalculating,
+    isLoaded
   };
 };
