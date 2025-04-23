@@ -21,19 +21,11 @@ interface QuoteRequest {
   vehicle_type: string;
   brand: string;
   model: string;
-  year: string;
-  fuel: string;
-  licensePlate: string;
+  licensePlate?: string;
   
   // Adresses
   pickup_address: string;
   delivery_address: string;
-  
-  // Dates et heures
-  pickup_date: string;
-  pickup_time: string;
-  delivery_date: string;
-  delivery_time: string;
   
   // Contacts
   pickup_contact: {
@@ -49,7 +41,7 @@ interface QuoteRequest {
     phone: string;
   };
   
-  additional_info?: string;
+  additionalInfo?: string;
 }
 
 serve(async (req: Request) => {
@@ -82,19 +74,11 @@ serve(async (req: Request) => {
       <h3>Informations du véhicule</h3>
       <p><strong>Marque :</strong> ${data.brand}</p>
       <p><strong>Modèle :</strong> ${data.model}</p>
-      <p><strong>Année :</strong> ${data.year}</p>
-      <p><strong>Carburant :</strong> ${data.fuel}</p>
-      <p><strong>Immatriculation :</strong> ${data.licensePlate}</p>
+      <p><strong>Immatriculation :</strong> ${data.licensePlate || 'Non précisée'}</p>
       
       <h3>Adresses</h3>
       <p><strong>Adresse de prise en charge :</strong> ${data.pickup_address}</p>
       <p><strong>Adresse de livraison :</strong> ${data.delivery_address}</p>
-      
-      <h3>Dates et heures</h3>
-      <p><strong>Date de prise en charge :</strong> ${data.pickup_date}</p>
-      <p><strong>Heure de prise en charge :</strong> ${data.pickup_time}</p>
-      <p><strong>Date de livraison :</strong> ${data.delivery_date}</p>
-      <p><strong>Heure de livraison :</strong> ${data.delivery_time}</p>
       
       <h3>Contact prise en charge</h3>
       <p><strong>Nom :</strong> ${data.pickup_contact.lastName}</p>
@@ -108,9 +92,9 @@ serve(async (req: Request) => {
       <p><strong>Email :</strong> ${data.delivery_contact.email}</p>
       <p><strong>Téléphone :</strong> ${data.delivery_contact.phone}</p>
       
-      ${data.additional_info ? `
+      ${data.additionalInfo ? `
         <h3>Informations complémentaires</h3>
-        <p>${data.additional_info}</p>
+        <p>${data.additionalInfo}</p>
       ` : ''}
     `;
 
