@@ -32,9 +32,31 @@ serve(async (req) => {
   }
 
   try {
-    const data: QuoteRequest = await req.json();
+    // Log the raw request for debugging
+    console.log("Received request:", req.method, req.url);
     
-    console.log("Received quote request data:", data);
+    const contentType = req.headers.get("content-type") || "";
+    console.log("Content-Type:", contentType);
+    
+    let data: QuoteRequest;
+    
+    try {
+      data = await req.json();
+      console.log("Successfully parsed request body:", data);
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError);
+      const rawBody = await req.text();
+      console.log("Raw body:", rawBody);
+      throw new Error(`Invalid request body: ${parseError.message}`);
+    }
+    
+    if (!data.firstName || !data.lastName || !data.email || !data.phone) {
+      throw new Error("Missing required contact information");
+    }
+    
+    if (!data.pickup_address || !data.delivery_address) {
+      throw new Error("Missing required address information");
+    }
     
     // Email pour DK Automotive
     const emailToDK = {
@@ -92,7 +114,14 @@ serve(async (req) => {
 
     try {
       // Envoi des emails via Brevo
-      console.log("Sending emails via Brevo...");
+      console.log("Preparing to send emails via Brevo API");
+      
+      // Vérifier si l'API key est disponible
+      const apiKey = Deno.env.get("BREVO_API_KEY");
+      if (!apiKey) {
+        throw new Error("BREVO_API_KEY n'est pas configurée");
+      }
+      console.log("API key is available");
       
       const [dkResponse, clientResponse] = await Promise.all([
         fetch("https://api.brevo.com/v3/smtp/email", {
@@ -100,7 +129,7 @@ serve(async (req) => {
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "api-key": Deno.env.get("BREVO_API_KEY")!
+            "api-key": apiKey
           },
           body: JSON.stringify(emailToDK)
         }),
@@ -109,7 +138,7 @@ serve(async (req) => {
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "api-key": Deno.env.get("BREVO_API_KEY")!
+            "api-key": apiKey
           },
           body: JSON.stringify(emailToClient)
         })
@@ -143,9 +172,9 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error in send-quote-request function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Unknown error" }),
       { 
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" }

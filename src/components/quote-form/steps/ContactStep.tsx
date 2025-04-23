@@ -28,7 +28,10 @@ interface ContactStepProps {
 
 const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: ContactStepProps) => {
   const handleSubmit = () => {
-    form.handleSubmit(onSubmit)();
+    form.handleSubmit((data) => {
+      console.log("Form data validated, submitting:", data);
+      onSubmit(data);
+    })();
   };
 
   return (
