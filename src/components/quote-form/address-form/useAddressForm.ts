@@ -57,12 +57,10 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
     const pickupAddress = `${form.getValues('pickupStreetNumber')} ${form.getValues('pickupStreetType')} ${form.getValues('pickupStreetName')}${pickupComplement}, ${form.getValues('pickupPostalCode')} ${form.getValues('pickupCity')}, ${form.getValues('pickupCountry')}`;
     const deliveryAddress = `${form.getValues('deliveryStreetNumber')} ${form.getValues('deliveryStreetType')} ${form.getValues('deliveryStreetName')}${deliveryComplement}, ${form.getValues('deliveryPostalCode')} ${form.getValues('deliveryCity')}, ${form.getValues('deliveryCountry')}`;
 
-    form.setValue('pickupAddress', pickupAddress);
-    form.setValue('deliveryAddress', deliveryAddress);
+    form.setValue('pickup_address', pickupAddress);
+    form.setValue('delivery_address', deliveryAddress);
     
     return {
-      pickupAddress,
-      deliveryAddress,
       formData: {
         pickupStreetNumber: form.getValues('pickupStreetNumber'),
         pickupStreetType: form.getValues('pickupStreetType'),
@@ -78,8 +76,8 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
         deliveryPostalCode: form.getValues('deliveryPostalCode'),
         deliveryCity: form.getValues('deliveryCity'),
         deliveryCountry: form.getValues('deliveryCountry'),
-        pickupAddress,
-        deliveryAddress
+        pickup_address: pickupAddress,
+        delivery_address: deliveryAddress
       }
     };
   };

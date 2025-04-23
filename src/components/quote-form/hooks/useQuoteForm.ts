@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
 import { calculateTTC } from '@/utils/priceCalculations';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
-import { useAuthContext } from '@/context/AuthContext';
 
 export const useQuoteForm = () => {
   const [step, setStep] = useState(1);
@@ -19,23 +18,23 @@ export const useQuoteForm = () => {
   const [priceTTC, setPriceTTC] = useState<string | null>(null);
   
   const { calculateDistance } = useDistanceCalculation();
-  const { user } = useAuthContext();
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      vehicleType: '',
+      mission_type: 'livraison',
+      vehicle_type: '',
       brand: '',
       model: '',
       year: '',
+      fuel: '',
       licensePlate: '',
-      fuelType: '',
       
       // Champs pour l'adresse de prise en charge
       pickupStreetNumber: '',
       pickupStreetType: 'Rue',
       pickupStreetName: '',
-      pickupComplement: 'aucun',
+      pickupComplement: '',
       pickupPostalCode: '',
       pickupCity: '',
       pickupCountry: 'France',
@@ -44,14 +43,14 @@ export const useQuoteForm = () => {
       deliveryStreetNumber: '',
       deliveryStreetType: 'Rue',
       deliveryStreetName: '',
-      deliveryComplement: 'aucun',
+      deliveryComplement: '',
       deliveryPostalCode: '',
       deliveryCity: '',
       deliveryCountry: 'France',
       
       // Champs d'adresse complète pour compatibilité
-      pickupAddress: '',
-      deliveryAddress: '',
+      pickup_address: '',
+      delivery_address: '',
       
       // Contact
       company: '',
@@ -69,8 +68,8 @@ export const useQuoteForm = () => {
     if (step === 2) {
       try {
         // Construire les adresses complètes
-        const pickupAddress = `${data.pickupStreetNumber || formData.pickupStreetNumber} ${data.pickupStreetType || formData.pickupStreetType} ${data.pickupStreetName || formData.pickupStreetName}, ${data.pickupPostalCode || formData.pickupPostalCode} ${data.pickupCity || formData.pickupCity}, ${data.pickupCountry || formData.pickupCountry}`;
-        const deliveryAddress = `${data.deliveryStreetNumber || formData.deliveryStreetNumber} ${data.deliveryStreetType || formData.deliveryStreetType} ${data.deliveryStreetName || formData.deliveryStreetName}, ${data.deliveryPostalCode || formData.deliveryPostalCode} ${data.deliveryCity || formData.deliveryCity}, ${data.deliveryCountry || formData.deliveryCountry}`;
+        const pickupAddress = data.pickup_address || formData.pickup_address || '';
+        const deliveryAddress = data.delivery_address || formData.delivery_address || '';
         
         // Calculer la distance
         setLoading(true);
@@ -78,7 +77,7 @@ export const useQuoteForm = () => {
         setDistance(distanceResult);
         
         // Calculer le prix si le type de véhicule est défini
-        const vehicleType = formData.vehicleType;
+        const vehicleType = formData.vehicle_type;
         if (vehicleType && distanceResult) {
           const price = await getPriceForVehicleAndDistance(vehicleType, distanceResult);
           setPriceHT(price.priceHT.toString());
@@ -103,86 +102,6 @@ export const useQuoteForm = () => {
     setStep(step - 1);
   };
 
-  const handleSubmit = async (data: QuoteFormValues) => {
-    setLoading(true);
-    try {
-      const completeData = { ...formData, ...data };
-      setFormData(completeData);
-      
-      // Mise à jour des champs d'adresse complète avant l'envoi
-      completeData.pickupAddress = `${completeData.pickupStreetNumber} ${completeData.pickupStreetType} ${completeData.pickupStreetName}, ${completeData.pickupPostalCode} ${completeData.pickupCity}, ${completeData.pickupCountry}`;
-      completeData.deliveryAddress = `${completeData.deliveryStreetNumber} ${completeData.deliveryStreetType} ${completeData.deliveryStreetName}, ${completeData.deliveryPostalCode} ${completeData.deliveryCity}, ${completeData.deliveryCountry}`;
-      
-      if (!user) {
-        throw new Error("Vous devez être connecté pour créer une mission");
-      }
-      
-      // Créer une mission directement au lieu d'un devis
-      const missionData = {
-        client_id: user.id,
-        status: 'en_attente',
-        mission_type: 'livraison',
-        pickup_address: completeData.pickupAddress,
-        delivery_address: completeData.deliveryAddress,
-        distance: distance ? `${distance} km` : null,
-        price_ht: priceHT ? parseFloat(priceHT) : null,
-        price_ttc: priceTTC ? parseFloat(priceTTC) : null,
-        vehicle_info: {
-          brand: completeData.brand,
-          model: completeData.model,
-          year: completeData.year,
-          fuel: completeData.fuelType,
-          licensePlate: completeData.licensePlate
-        },
-        pickup_contact: {
-          firstName: completeData.firstName,
-          lastName: completeData.lastName,
-          email: completeData.email,
-          phone: completeData.phone,
-          company: completeData.company
-        },
-        delivery_contact: {
-          firstName: completeData.firstName,
-          lastName: completeData.lastName,
-          email: completeData.email,
-          phone: completeData.phone,
-          company: completeData.company
-        }
-      };
-      
-      // Insérer la mission dans Supabase
-      const { data: missionResult, error } = await supabase
-        .from('missions')
-        .insert(missionData)
-        .select('mission_number')
-        .single();
-        
-      if (error) throw error;
-      
-      toast({
-        title: "Demande envoyée",
-        description: `Votre demande de mission a été envoyée avec succès. Numéro de mission: ${missionResult.mission_number}`,
-      });
-      
-      // Réinitialiser le formulaire
-      form.reset();
-      setFormData({});
-      setStep(1);
-      setDistance(null);
-      setPriceHT(null);
-      setPriceTTC(null);
-    } catch (error) {
-      console.error("Erreur lors de l'envoi du formulaire:", error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error instanceof Error ? error.message : "Une erreur est survenue lors de l'envoi de votre demande.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return {
     form,
     step,
@@ -191,7 +110,6 @@ export const useQuoteForm = () => {
     priceHT,
     priceTTC,
     nextStep,
-    prevStep,
-    handleSubmit
+    prevStep
   };
 };
