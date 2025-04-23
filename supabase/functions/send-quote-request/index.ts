@@ -39,36 +39,32 @@ interface QuoteRequest {
   deliveryPostalCode?: string;
   deliveryCity?: string;
   deliveryCountry?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  company?: string;
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Log request info
+    // Log request information for debugging
     console.log("Received request:", req.method, req.url);
+    console.log("Headers:", Object.fromEntries(req.headers.entries()));
     
-    const contentType = req.headers.get("content-type") || "";
-    console.log("Content-Type:", contentType);
-    
+    // Parse request body
     let data: QuoteRequest;
     try {
       data = await req.json();
-      console.log("Parsed request body:", data);
-    } catch (parseError) {
-      console.error("Failed to parse request body:", parseError);
+      console.log("Request body successfully parsed:", data);
+    } catch (error) {
+      console.error("Failed to parse request body:", error);
       const rawBody = await req.text();
-      console.log("Raw body:", rawBody);
-      throw new Error(`Invalid request body: ${parseError.message}`);
+      console.log("Raw request body:", rawBody);
+      throw new Error(`Failed to parse request body: ${error.message}`);
     }
     
+    // Validate essential fields
     if (!data.firstName || !data.lastName || !data.email || !data.phone) {
       throw new Error("Missing required contact information");
     }
@@ -76,7 +72,7 @@ serve(async (req) => {
       throw new Error("Missing required address information");
     }
 
-    // Prepare full HTML email content using all available fields, displayed clearly
+    // Prepare HTML email content
     const createDetailRow = (label: string, value?: string) =>
       value ? `<p><strong>${label}:</strong> ${value}</p>` : "";
     
