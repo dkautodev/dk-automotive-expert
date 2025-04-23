@@ -5,7 +5,7 @@ const Footer = () => {
   return <footer className="text-white py-12 bg-[#051e83]">
       <div className="container mx-auto px-4">
         <div className="flex justify-center mb-8">
-          <img alt="DK Automotive Logo" className="w-48 h-auto filter invert grayscale" src="/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" />
+          <img alt="DK Automotive Logo" src="/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" className="w-24 h-auto filter invert grayscale object-fill" />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
