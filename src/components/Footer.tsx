@@ -1,15 +1,22 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
+
 const Footer = () => {
-  return <footer className="text-white py-12 bg-[#051e83]">
+  return (
+    <footer className="text-white py-12 bg-[#051e83]">
       <div className="container mx-auto px-4">
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/dk-automotive-logo.png" 
+            alt="DK Automotive Logo" 
+            className="w-48 h-auto filter invert grayscale" 
+          />
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
-          
           <div>
-            <h3 className="text-xl font-semibold mb-4">Contactez-nous</h3>
+            <h3 className="text-xl font-semibold mb-4 font-playfair">Contactez-nous</h3>
             <ul className="space-y-2">
               <li className="flex items-center">
                 <Mail className="mr-2 h-5 w-5" />
@@ -29,7 +36,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4">À propos</h3>
+            <h3 className="text-xl font-semibold mb-4 font-playfair">À propos</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/about" className="hover:text-gray-300 transition">
@@ -50,7 +57,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4">Nos services</h3>
+            <h3 className="text-xl font-semibold mb-4 font-playfair">Nos services</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/devis" className="hover:text-gray-300 transition">
@@ -61,7 +68,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4">Mentions légales</h3>
+            <h3 className="text-xl font-semibold mb-4 font-playfair">Mentions légales</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/mentions-legales" className="hover:text-gray-300 transition">
@@ -87,8 +94,7 @@ const Footer = () => {
           </div>
         </div>
         
-        
-        <div className="mt-12 text-center">
+        <div className="mt-12 text-center font-playfair">
           <p>
             &copy; {new Date().getFullYear()} DK AUTOMOTIVE. 
             <Link 
@@ -100,6 +106,8 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };
+
 export default Footer;

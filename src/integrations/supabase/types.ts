@@ -485,11 +485,11 @@ export type Database = {
         }[]
       }
       generate_mission_number: {
-        Args: { mission_type_param: string }
+        Args: Record<PropertyKey, never> | { mission_type_param: string }
         Returns: string
       }
       is_admin: {
-        Args: { user_id: string }
+        Args: Record<PropertyKey, never> | { user_id: string }
         Returns: boolean
       }
       register_user: {
