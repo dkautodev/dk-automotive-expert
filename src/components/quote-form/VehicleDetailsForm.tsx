@@ -22,7 +22,7 @@ const VehicleDetailsForm = ({ form, onNext }: VehicleDetailsFormProps) => {
     if (isValid) {
       onNext(vehicleData);
     } else {
-      form.trigger(['vehicleType', 'brand', 'model', 'year', 'licensePlate', 'fuelType']);
+      form.trigger(['vehicle_type', 'brand', 'model', 'year', 'licensePlate', 'fuel']);
     }
   };
 

@@ -14,7 +14,7 @@ const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({ form }) => {
   return (
     <FormField
       control={form.control}
-      name="vehicleType"
+      name="vehicle_type"
       render={({ field }) => (
         <FormItem>
           <FormLabel className="text-dk-navy font-semibold">

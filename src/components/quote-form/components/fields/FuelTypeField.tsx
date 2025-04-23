@@ -25,7 +25,7 @@ const FuelTypeField: React.FC<FuelTypeFieldProps> = ({ form }) => {
   return (
     <FormField
       control={form.control}
-      name="fuelType"
+      name="fuel"
       render={({ field }) => (
         <FormItem>
           <FormLabel className="text-dk-navy font-semibold">

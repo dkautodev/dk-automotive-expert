@@ -9,17 +9,17 @@ export const sendQuoteEmail = async (quoteData: QuoteFormValues) => {
     const formattedData = {
       // Informations du véhicule
       vehicleInfo: {
-        type: quoteData.vehicleType,
+        type: quoteData.vehicle_type,
         brand: quoteData.brand,
         model: quoteData.model,
         year: quoteData.year,
         licensePlate: quoteData.licensePlate,
-        fuelType: quoteData.fuelType
+        fuelType: quoteData.fuel
       },
       // Adresse de prise en charge
-      pickupAddress: quoteData.pickupAddress,
+      pickupAddress: quoteData.pickup_address,
       // Adresse de livraison
-      deliveryAddress: quoteData.deliveryAddress,
+      deliveryAddress: quoteData.delivery_address,
       // Contact
       contact: {
         company: quoteData.company,
@@ -46,15 +46,15 @@ export const sendQuoteEmail = async (quoteData: QuoteFormValues) => {
           mission_number: missionNumber,
           status: 'en_attente',
           mission_type: 'livraison',
-          pickup_address: quoteData.pickupAddress,
-          delivery_address: quoteData.deliveryAddress,
+          pickup_address: quoteData.pickup_address,
+          delivery_address: quoteData.delivery_address,
           vehicles: {
-            type: quoteData.vehicleType,
+            type: quoteData.vehicle_type,
             brand: quoteData.brand,
             model: quoteData.model,
             year: quoteData.year,
             license_plate: quoteData.licensePlate,
-            fuel_type: quoteData.fuelType
+            fuel_type: quoteData.fuel
           },
           price_ht: 0, // Sera calculé par l'admin
           price_ttc: 0, // Sera calculé par l'admin
