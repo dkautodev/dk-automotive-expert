@@ -1,5 +1,5 @@
 
 project_id = "lqjwvaqqhqgmkjsriijw"
 
-[functions.upload_mission_attachments]
-verify_jwt = true
+[functions.send-contact-email]
+verify_jwt = false
