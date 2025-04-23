@@ -29,11 +29,9 @@ interface VehicleInfoStepProps {
 const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => {
   const selectedBrand = form.watch("brand");
   const [models, setModels] = useState<string[]>([]);
-  const [customBrand, setCustomBrand] = useState("");
-  const [customModel, setCustomModel] = useState("");
 
   useEffect(() => {
-    if (selectedBrand && selectedBrand !== "AUTRE") {
+    if (selectedBrand) {
       setModels(getModelsByBrand(selectedBrand));
     } else {
       setModels([]);
@@ -42,32 +40,13 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
 
   const handleBrandChange = (value: string) => {
     form.setValue("brand", value);
-    if (value !== "AUTRE") {
-      setCustomBrand("");
-    }
-    // Réinitialiser le modèle quand on change de marque
+    // Réinitialiser le modèle lorsqu'on change de marque
     form.setValue("model", "");
   };
 
   const handleModelChange = (value: string) => {
     form.setValue("model", value);
-    if (value !== "AUTRE") {
-      setCustomModel("");
-    }
   };
-
-  const handleCustomBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomBrand(e.target.value);
-    form.setValue("brand", e.target.value);
-  };
-
-  const handleCustomModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomModel(e.target.value);
-    form.setValue("model", e.target.value);
-  };
-
-  // Ajout de la marque "AUTRE" à la liste des marques
-  const brandsWithOther = [...carBrands, "AUTRE"];
 
   return (
     <div className="space-y-6">
@@ -86,7 +65,7 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
                 <FormLabel>Marque</FormLabel>
                 <Select 
                   onValueChange={handleBrandChange} 
-                  value={brandsWithOther.includes(field.value) ? field.value : "AUTRE"}
+                  value={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -94,7 +73,7 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {brandsWithOther.map((brand) => (
+                    {carBrands.map((brand) => (
                       <SelectItem key={brand} value={brand}>
                         {brand}
                       </SelectItem>
@@ -105,20 +84,6 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
               </FormItem>
             )}
           />
-
-          {selectedBrand === "AUTRE" && (
-            <FormItem>
-              <FormLabel>Marque personnalisée</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Saisir la marque"
-                  value={customBrand}
-                  onChange={handleCustomBrandChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
         </div>
 
         <div className="space-y-4">
@@ -144,27 +109,12 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
                         {model}
                       </SelectItem>
                     ))}
-                    <SelectItem value="AUTRE">AUTRE</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          {form.watch("model") === "AUTRE" && (
-            <FormItem>
-              <FormLabel>Modèle personnalisé</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Saisir le modèle"
-                  value={customModel}
-                  onChange={handleCustomModelChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
         </div>
 
         <FormField
@@ -256,3 +206,4 @@ const VehicleInfoStep = ({ form, onNext, onPrevious }: VehicleInfoStepProps) => 
 };
 
 export default VehicleInfoStep;
+
