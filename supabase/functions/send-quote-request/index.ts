@@ -48,28 +48,51 @@ serve(async (req) => {
   }
 
   try {
-    // Log request information for debugging
-    console.log("Received request:", req.method, req.url);
+    // Detailed logging for debugging
+    console.log("==== New quote request received ====");
+    console.log("Request method:", req.method);
+    console.log("Request URL:", req.url);
     console.log("Headers:", Object.fromEntries(req.headers.entries()));
     
-    // Parse request body
+    // Parse request body with detailed error handling
     let data: QuoteRequest;
+    let rawBody = "";
+    
     try {
-      data = await req.json();
+      rawBody = await req.text();
+      console.log("Raw request body:", rawBody);
+      
+      if (!rawBody || rawBody.trim() === "") {
+        throw new Error("Empty request body");
+      }
+      
+      try {
+        data = JSON.parse(rawBody);
+      } catch (jsonError) {
+        console.error("Failed to parse JSON:", jsonError);
+        throw new Error(`Invalid JSON in request body: ${jsonError.message}`);
+      }
+      
       console.log("Request body successfully parsed:", data);
     } catch (error) {
-      console.error("Failed to parse request body:", error);
-      const rawBody = await req.text();
-      console.log("Raw request body:", rawBody);
-      throw new Error(`Failed to parse request body: ${error.message}`);
+      console.error("Error handling request body:", error);
+      throw new Error(`Failed to process request body: ${error.message}`);
     }
     
-    // Validate essential fields
-    if (!data.firstName || !data.lastName || !data.email || !data.phone) {
-      throw new Error("Missing required contact information");
-    }
-    if (!data.pickup_address || !data.delivery_address) {
-      throw new Error("Missing required address information");
+    // Validate essential fields with detailed error messages
+    const missingFields = [];
+    
+    if (!data.firstName) missingFields.push("firstName");
+    if (!data.lastName) missingFields.push("lastName");
+    if (!data.email) missingFields.push("email");
+    if (!data.phone) missingFields.push("phone");
+    if (!data.pickup_address) missingFields.push("pickup_address");
+    if (!data.delivery_address) missingFields.push("delivery_address");
+    
+    if (missingFields.length > 0) {
+      const errorMessage = `Missing required fields: ${missingFields.join(", ")}`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     // Prepare HTML email content
@@ -185,6 +208,12 @@ serve(async (req) => {
         throw new Error("BREVO_API_KEY n'est pas configurée");
       }
 
+      console.log("Preparing API requests to Brevo...");
+      
+      // Détails de la requête pour déboguer
+      console.log("Email to DK:", JSON.stringify(emailToDK, null, 2));
+      console.log("Email to client:", JSON.stringify(emailToClient, null, 2));
+
       const [dkResponse, clientResponse] = await Promise.all([
         fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
@@ -209,34 +238,53 @@ serve(async (req) => {
       console.log("DK email response status:", dkResponse.status);
       console.log("Client email response status:", clientResponse.status);
 
-      if (!dkResponse.ok) {
-        const dkErrorData = await dkResponse.text();
-        console.error("Error sending email to DK:", dkErrorData);
+      // Logging de la réponse détaillée
+      let dkResponseText = "N/A";
+      let clientResponseText = "N/A";
+      
+      try {
+        dkResponseText = await dkResponse.text();
+        console.log("DK email full response:", dkResponseText);
+      } catch (err) {
+        console.error("Could not read DK response body:", err);
       }
-      if (!clientResponse.ok) {
-        const clientErrorData = await clientResponse.text();
-        console.error("Error sending email to client:", clientErrorData);
+      
+      try {
+        clientResponseText = await clientResponse.text();
+        console.log("Client email full response:", clientResponseText);
+      } catch (err) {
+        console.error("Could not read client response body:", err);
       }
 
-      if (!dkResponse.ok || !clientResponse.ok) {
-        throw new Error("Failed to send one or more emails");
+      if (!dkResponse.ok) {
+        throw new Error(`Error sending email to DK: ${dkResponse.status} - ${dkResponseText}`);
+      }
+      if (!clientResponse.ok) {
+        throw new Error(`Error sending email to client: ${clientResponse.status} - ${clientResponseText}`);
       }
 
       console.log("Emails sent successfully");
+      
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: "Emails sent successfully"
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+      
     } catch (emailError) {
       console.error("Error during email sending:", emailError);
       throw new Error(`Failed to send emails: ${emailError.message}`);
     }
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-
   } catch (error) {
     console.error("Error in send-quote-request function:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Unknown error" }),
+      JSON.stringify({ 
+        error: error.message || "Unknown error",
+        success: false
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" }

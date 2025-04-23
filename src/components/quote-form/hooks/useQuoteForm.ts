@@ -105,6 +105,14 @@ export const useQuoteForm = () => {
       
       console.log("Sending quote request with data:", formData);
       
+      // Vérifier que toutes les données requises sont présentes
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
+        throw new Error("Informations de contact manquantes");
+      }
+      
+      // Enregistrer en détail l'état de la requête
+      console.log("Envoi de la requête à la fonction Supabase...");
+      
       const { data: responseData, error } = await supabase.functions.invoke('send-quote-request', {
         body: formData
       });
