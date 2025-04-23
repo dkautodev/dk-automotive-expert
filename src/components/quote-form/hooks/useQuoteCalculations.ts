@@ -5,6 +5,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { toast } from 'sonner';
+import { formatPrice } from '@/utils/priceCalculations';
 
 export const useQuoteCalculations = (
   form: UseFormReturn<QuoteFormValues>,
@@ -29,13 +30,17 @@ export const useQuoteCalculations = (
       const { priceHT: calculatedPriceHT, priceTTC: calculatedPriceTTC } = 
         await calculatePrice(data.vehicle_type!, calculatedDistance);
       
-      setPriceHT(calculatedPriceHT);
-      setPriceTTC(calculatedPriceTTC);
+      // Formater les prix avec 2 décimales
+      const formattedPriceHT = formatPrice(calculatedPriceHT);
+      const formattedPriceTTC = formatPrice(calculatedPriceTTC);
+      
+      setPriceHT(formattedPriceHT);
+      setPriceTTC(formattedPriceTTC);
       
       // Mettre à jour le formulaire avec ces valeurs
       form.setValue('distance', calculatedDistance.toString());
-      form.setValue('price_ht', calculatedPriceHT);
-      form.setValue('price_ttc', calculatedPriceTTC);
+      form.setValue('price_ht', formattedPriceHT);
+      form.setValue('price_ttc', formattedPriceTTC);
 
       return true;
     } catch (error) {

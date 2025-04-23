@@ -37,31 +37,47 @@ const MissionTypeStep = ({ form, onNext }: MissionTypeStepProps) => {
                 defaultValue={field.value}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                <FormItem className="flex flex-col items-center space-y-3 p-4 border rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer transition-colors">
-                  <FormControl>
-                    <RadioGroupItem value="livraison" className="sr-only" />
-                  </FormControl>
+                <div 
+                  className={`flex flex-col items-center space-y-3 p-6 border-2 rounded-lg shadow-sm cursor-pointer transition-colors ${
+                    field.value === 'livraison' 
+                      ? 'border-blue-600 bg-blue-50' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+                  onClick={() => {
+                    field.onChange('livraison');
+                    console.log("Livraison selected");
+                  }}
+                >
+                  <RadioGroupItem value="livraison" id="livraison" className="sr-only" />
                   <div className={`flex flex-col items-center space-y-2 ${field.value === 'livraison' ? 'text-dk-navy' : 'text-gray-500'}`}>
                     <Truck className="h-12 w-12" />
-                    <FormLabel className="text-lg font-medium cursor-pointer text-center">
+                    <FormLabel htmlFor="livraison" className="text-lg font-medium cursor-pointer text-center">
                       Livraison de véhicule
                     </FormLabel>
                     <p className="text-sm text-center">Transport de votre véhicule vers sa destination</p>
                   </div>
-                </FormItem>
+                </div>
                 
-                <FormItem className="flex flex-col items-center space-y-3 p-4 border rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer transition-colors">
-                  <FormControl>
-                    <RadioGroupItem value="restitution" className="sr-only" />
-                  </FormControl>
+                <div 
+                  className={`flex flex-col items-center space-y-3 p-6 border-2 rounded-lg shadow-sm cursor-pointer transition-colors ${
+                    field.value === 'restitution' 
+                      ? 'border-blue-600 bg-blue-50' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+                  onClick={() => {
+                    field.onChange('restitution');
+                    console.log("Restitution selected");
+                  }}
+                >
+                  <RadioGroupItem value="restitution" id="restitution" className="sr-only" />
                   <div className={`flex flex-col items-center space-y-2 ${field.value === 'restitution' ? 'text-dk-navy' : 'text-gray-500'}`}>
                     <RotateCcw className="h-12 w-12" />
-                    <FormLabel className="text-lg font-medium cursor-pointer text-center">
+                    <FormLabel htmlFor="restitution" className="text-lg font-medium cursor-pointer text-center">
                       Restitution de véhicule
                     </FormLabel>
                     <p className="text-sm text-center">Retour de votre véhicule à son point d'origine</p>
                   </div>
-                </FormItem>
+                </div>
               </RadioGroup>
             </FormControl>
             <FormMessage />
@@ -70,7 +86,12 @@ const MissionTypeStep = ({ form, onNext }: MissionTypeStepProps) => {
       />
 
       <div className="flex justify-end mt-6">
-        <Button type="button" onClick={handleNext} className="bg-[#1a237e] hover:bg-[#3f51b5]">
+        <Button 
+          type="button" 
+          onClick={handleNext} 
+          className="bg-[#1a237e] hover:bg-[#3f51b5]"
+          disabled={!form.getValues('mission_type')}
+        >
           SUIVANT
         </Button>
       </div>

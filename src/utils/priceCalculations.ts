@@ -13,3 +13,9 @@ export const calculateHT = (priceTTC: string): string => {
   const ttc = parseFloat(priceTTC);
   return (ttc / (1 + VAT_RATE)).toFixed(2);
 };
+
+// Format price to always have 2 decimal places
+export const formatPrice = (price: number | string): string => {
+  const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+  return numericPrice.toFixed(2);
+};
