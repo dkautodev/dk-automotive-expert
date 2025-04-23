@@ -105,7 +105,7 @@ export const useQuoteForm = () => {
       
       console.log("Sending quote request with data:", formData);
       
-      const { error } = await supabase.functions.invoke('send-quote-request', {
+      const { data: responseData, error } = await supabase.functions.invoke('send-quote-request', {
         body: formData
       });
 
@@ -114,7 +114,7 @@ export const useQuoteForm = () => {
         throw new Error(`Erreur lors de l'appel de la fonction: ${error.message}`);
       }
 
-      console.log("Quote request sent successfully");
+      console.log("Quote request sent successfully, response:", responseData);
       toast.success(
         "Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h."
       );
