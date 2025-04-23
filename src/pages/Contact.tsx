@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, Phone, Building } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -37,9 +36,31 @@ const Contact = () => {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const mailtoLink = `mailto:contact@dkautomotive.fr?subject=${encodeURIComponent(values.subject)}&body=${encodeURIComponent(`Nom: ${values.lastName}\nPrénom: ${values.firstName}\nSociété: ${values.companyName}\nEmail: ${values.email}\nTéléphone: ${values.phone}\n\nObjet: ${values.subject}\n\nMessage:\n${values.message}`)}`;
-    window.location.href = mailtoLink;
-    toast.success("Message envoyé avec succès!");
+    try {
+      const response = await fetch(
+        "https://lqjwvaqqhqgmkjsriijw.functions.supabase.co/send-contact-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(values)
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err?.error || "Erreur lors de l'envoi du message");
+      }
+
+      toast.success("Message envoyé avec succès !");
+      form.reset();
+    } catch (error: any) {
+      toast.error(
+        error?.message ||
+          "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer plus tard."
+      );
+    }
   };
 
   return <div className="min-h-screen bg-white">
@@ -157,4 +178,3 @@ const Contact = () => {
 };
 
 export default Contact;
-
