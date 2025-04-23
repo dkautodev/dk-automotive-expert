@@ -16,8 +16,8 @@ const Footer = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
           <div>
-            <h3 className="text-xl font-semibold mb-4 font-playfair">Contactez-nous</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold mb-4">Contactez-nous</h3>
+            <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <Mail className="mr-2 h-5 w-5" />
                 <a href="mailto:contact@dkautomotive.fr" className="hover:text-gray-300 transition">contact@dkautomotive.fr</a>
@@ -36,8 +36,8 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4 font-playfair">À propos</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold mb-4">À propos</h3>
+            <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/about" className="hover:text-gray-300 transition">
                   Qui sommes-nous ?
@@ -57,8 +57,8 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4 font-playfair">Nos services</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold mb-4">Nos services</h3>
+            <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/devis" className="hover:text-gray-300 transition">
                   Demander un devis
@@ -68,8 +68,8 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4 font-playfair">Mentions légales</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold mb-4">Mentions légales</h3>
+            <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/mentions-legales" className="hover:text-gray-300 transition">
                   Mentions légales
@@ -94,7 +94,7 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="mt-12 text-center font-playfair">
+        <div className="mt-12 text-center text-sm">
           <p>
             &copy; {new Date().getFullYear()} DK AUTOMOTIVE. 
             <Link 
