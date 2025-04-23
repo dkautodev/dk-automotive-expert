@@ -27,10 +27,17 @@ interface ContactStepProps {
 }
 
 const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: ContactStepProps) => {
+  // Fonction explicite pour le débogage
   const handleSubmit = () => {
+    console.log("Submit button clicked");
+    console.log("Form values before validation:", form.getValues());
+    console.log("Form errors:", form.formState.errors);
+    
     form.handleSubmit((data) => {
-      console.log("Form data validated, submitting:", data);
+      console.log("Form validated successfully, data:", data);
       onSubmit(data);
+    }, (errors) => {
+      console.error("Form validation failed with errors:", errors);
     })();
   };
 
