@@ -30,13 +30,20 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
   const deliveryInputRef = useRef<HTMLInputElement>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
-  const { calculateDistance } = useDistanceCalculation();
+  const { calculateDistance, isLoaded: isDistanceApiLoaded } = useDistanceCalculation();
   const { calculatePrice } = usePriceCalculation();
   
-  useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
-  useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
+  const { isLoaded: isPickupAutocompleteLoaded } = useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
+  const { isLoaded: isDeliveryAutocompleteLoaded } = useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
+
+  const isGoogleApiReady = isDistanceApiLoaded && isPickupAutocompleteLoaded && isDeliveryAutocompleteLoaded;
 
   const handleCalculate = async () => {
+    if (!isGoogleApiReady) {
+      toast.error("Les API Google Maps sont en cours de chargement. Veuillez patienter.");
+      return;
+    }
+
     const pickupAddress = form.getValues('pickup_address');
     const deliveryAddress = form.getValues('delivery_address');
     const vehicleType = form.getValues('vehicle_type');
@@ -88,6 +95,13 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Adresse et véhicule</h2>
       
+      {!isGoogleApiReady && (
+        <div className="p-4 bg-blue-50 text-blue-700 rounded-md flex items-center space-x-2">
+          <Loader className="h-4 w-4"/>
+          <p>Chargement des services Google Maps...</p>
+        </div>
+      )}
+      
       <div className="space-y-4">
         <VehicleTypeSelector form={form} />
         
@@ -105,6 +119,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   className="bg-[#EEF1FF]"
                   {...field}
                   ref={pickupInputRef}
+                  disabled={!isPickupAutocompleteLoaded}
                 />
               </FormControl>
               <FormMessage />
@@ -126,6 +141,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   className="bg-[#EEF1FF]"
                   {...field}
                   ref={deliveryInputRef}
+                  disabled={!isDeliveryAutocompleteLoaded}
                 />
               </FormControl>
               <FormMessage />
@@ -137,7 +153,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
           <Button 
             type="button" 
             onClick={handleCalculate}
-            disabled={isCalculating}
+            disabled={isCalculating || !isGoogleApiReady}
             variant="outline"
             className="w-full md:w-auto"
           >
