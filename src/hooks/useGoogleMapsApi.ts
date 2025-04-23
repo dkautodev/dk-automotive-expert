@@ -51,6 +51,5 @@ export const useGoogleMapsApi = (options: UseGoogleMapsApiOptions = {}) => {
 declare global {
   interface Window {
     [key: string]: any;
-    google: typeof google;
   }
 }
