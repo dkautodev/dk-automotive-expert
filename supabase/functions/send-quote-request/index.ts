@@ -1,7 +1,8 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "npm:resend@2.0.0";
 
-const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,142 +10,99 @@ const corsHeaders = {
 };
 
 interface QuoteRequest {
-  // Informations de contact
+  mission_type: string;
+  vehicle_type: string;
+  brand?: string;
+  model?: string;
+  year?: string;
+  fuel?: string;
+  licensePlate?: string;
+  pickup_address: string;
+  delivery_address: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   company: string;
-  
-  // Informations du véhicule
-  mission_type: string;
-  vehicle_type: string;
-  brand: string;
-  model: string;
-  licensePlate?: string;
-  
-  // Adresses
-  pickup_address: string;
-  delivery_address: string;
-  
-  // Contacts
-  pickup_contact: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  };
-  delivery_contact: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  };
-  
-  additionalInfo?: string;
+  distance?: string;
+  priceHT?: string;
+  priceTTC?: string;
 }
 
-serve(async (req: Request) => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    if (!BREVO_API_KEY) {
-      throw new Error("BREVO_API_KEY is not set");
-    }
-
     const data: QuoteRequest = await req.json();
-    console.log("Données du devis reçues:", JSON.stringify(data));
-
-    const htmlContent = `
-      <h2>Nouvelle demande de devis</h2>
-      
-      <h3>Informations du demandeur</h3>
-      <p><strong>Nom :</strong> ${data.lastName}</p>
-      <p><strong>Prénom :</strong> ${data.firstName}</p>
-      <p><strong>Société :</strong> ${data.company}</p>
-      <p><strong>Email :</strong> ${data.email}</p>
-      <p><strong>Téléphone :</strong> ${data.phone}</p>
-      
-      <h3>Détails de la mission</h3>
-      <p><strong>Type de mission :</strong> ${data.mission_type}</p>
-      <p><strong>Type de véhicule :</strong> ${data.vehicle_type}</p>
-      
-      <h3>Informations du véhicule</h3>
-      <p><strong>Marque :</strong> ${data.brand}</p>
-      <p><strong>Modèle :</strong> ${data.model}</p>
-      <p><strong>Immatriculation :</strong> ${data.licensePlate || 'Non précisée'}</p>
-      
-      <h3>Adresses</h3>
-      <p><strong>Adresse de prise en charge :</strong> ${data.pickup_address}</p>
-      <p><strong>Adresse de livraison :</strong> ${data.delivery_address}</p>
-      
-      <h3>Contact prise en charge</h3>
-      <p><strong>Nom :</strong> ${data.pickup_contact.lastName}</p>
-      <p><strong>Prénom :</strong> ${data.pickup_contact.firstName}</p>
-      <p><strong>Email :</strong> ${data.pickup_contact.email}</p>
-      <p><strong>Téléphone :</strong> ${data.pickup_contact.phone}</p>
-      
-      <h3>Contact livraison</h3>
-      <p><strong>Nom :</strong> ${data.delivery_contact.lastName}</p>
-      <p><strong>Prénom :</strong> ${data.delivery_contact.firstName}</p>
-      <p><strong>Email :</strong> ${data.delivery_contact.email}</p>
-      <p><strong>Téléphone :</strong> ${data.delivery_contact.phone}</p>
-      
-      ${data.additionalInfo ? `
-        <h3>Informations complémentaires</h3>
-        <p>${data.additionalInfo}</p>
-      ` : ''}
-    `;
-
-    const requestBody = {
-      sender: {
-        name: "DK Automotive Devis",
-        email: "contact@dkautomotive.fr"
-      },
-      to: [
-        {
-          email: "contact@dkautomotive.fr",
-          name: "Contact DK Automotive"
-        }
-      ],
-      replyTo: {
-        email: data.email,
-        name: `${data.firstName} ${data.lastName}`,
-      },
-      subject: `[DK Automotive] Nouvelle demande de devis de ${data.firstName} ${data.lastName} - ${data.company}`,
-      htmlContent,
-    };
-
-    console.log("Envoi à Brevo avec les données:", JSON.stringify(requestBody));
-
-    const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "api-key": BREVO_API_KEY,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: JSON.stringify(requestBody),
+    
+    // Email pour DK Automotive
+    await resend.emails.send({
+      from: "DK Automotive <noreply@dkautomotive.fr>",
+      to: "contact@dkautomotive.fr",
+      subject: `Nouvelle demande de devis - ${data.firstName} ${data.lastName} (${data.company})`,
+      html: `
+        <h2>Nouvelle demande de devis</h2>
+        <h3>Type de mission</h3>
+        <p>${data.mission_type === 'livraison' ? 'Livraison' : 'Restitution'}</p>
+        
+        <h3>Adresses</h3>
+        <p><strong>Départ :</strong> ${data.pickup_address}</p>
+        <p><strong>Arrivée :</strong> ${data.delivery_address}</p>
+        
+        ${data.distance ? `<p><strong>Distance :</strong> ${data.distance} km</p>` : ''}
+        ${data.priceHT ? `<p><strong>Prix HT :</strong> ${data.priceHT} €</p>` : ''}
+        ${data.priceTTC ? `<p><strong>Prix TTC :</strong> ${data.priceTTC} €</p>` : ''}
+        
+        <h3>Véhicule</h3>
+        <p><strong>Type :</strong> ${data.vehicle_type}</p>
+        ${data.brand ? `<p><strong>Marque :</strong> ${data.brand}</p>` : ''}
+        ${data.model ? `<p><strong>Modèle :</strong> ${data.model}</p>` : ''}
+        ${data.year ? `<p><strong>Année :</strong> ${data.year}</p>` : ''}
+        ${data.fuel ? `<p><strong>Carburant :</strong> ${data.fuel}</p>` : ''}
+        ${data.licensePlate ? `<p><strong>Immatriculation :</strong> ${data.licensePlate}</p>` : ''}
+        
+        <h3>Contact</h3>
+        <p><strong>Société :</strong> ${data.company}</p>
+        <p><strong>Nom :</strong> ${data.lastName}</p>
+        <p><strong>Prénom :</strong> ${data.firstName}</p>
+        <p><strong>Email :</strong> ${data.email}</p>
+        <p><strong>Téléphone :</strong> ${data.phone}</p>
+      `,
     });
-
-    const brevoResult = await brevoResponse.json();
-    console.log(`Réponse Brevo (${brevoResponse.status}):`, JSON.stringify(brevoResult));
-
-    if (!brevoResponse.ok) {
-      throw new Error(brevoResult?.message || JSON.stringify(brevoResult));
-    }
+    
+    // Email de confirmation pour le client
+    await resend.emails.send({
+      from: "DK Automotive <noreply@dkautomotive.fr>",
+      to: data.email,
+      subject: "Confirmation de votre demande de devis - DK Automotive",
+      html: `
+        <h2>Merci pour votre demande de devis</h2>
+        <p>Cher(e) ${data.firstName} ${data.lastName},</p>
+        <p>Nous avons bien reçu votre demande de devis pour le transport de votre véhicule.</p>
+        <p>Notre équipe étudiera votre demande et vous répondra dans les 24 heures ouvrées.</p>
+        <h3>Récapitulatif de votre demande</h3>
+        <p><strong>Type de mission :</strong> ${data.mission_type === 'livraison' ? 'Livraison' : 'Restitution'}</p>
+        <p><strong>Départ :</strong> ${data.pickup_address}</p>
+        <p><strong>Arrivée :</strong> ${data.delivery_address}</p>
+        ${data.distance ? `<p><strong>Distance estimée :</strong> ${data.distance} km</p>` : ''}
+        <p>Cordialement,<br>L'équipe DK Automotive</p>
+      `,
+    });
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error in send-quote-request:", error);
+    console.error("Error:", error);
     return new Response(
-      JSON.stringify({ error: error?.message || "Erreur interne" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      }
     );
   }
 });
