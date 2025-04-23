@@ -1,38 +1,71 @@
 
 import { UseFormReturn } from 'react-hook-form';
-import { QuoteFormValues } from '../quoteFormSchema';
-import { Button } from '@/components/ui/button';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { QuoteFormValues } from '../quoteFormSchema';
 import { Loader } from '@/components/ui/loader';
+
+interface PriceInfo {
+  distance: string;
+  priceHT: string;
+  priceTTC: string;
+}
 
 interface ContactStepProps {
   form: UseFormReturn<QuoteFormValues>;
   onSubmit: (data: QuoteFormValues) => void;
   onPrevious: () => void;
   loading: boolean;
+  priceInfo?: PriceInfo;
 }
 
-const ContactStep = ({ form, onSubmit, onPrevious, loading }: ContactStepProps) => {
+const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: ContactStepProps) => {
   const handleSubmit = () => {
     form.handleSubmit(onSubmit)();
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-dk-navy">Vos coordonnées</h2>
+      <h2 className="text-2xl font-bold text-dk-navy mb-4">Vos coordonnées</h2>
       
-      <div className="grid gap-4 md:grid-cols-2">
+      {priceInfo && (
+        <div className="bg-gray-100 p-4 rounded-md mb-6">
+          <h3 className="text-lg font-semibold mb-2">Résumé de votre demande</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium">Distance estimée:</p>
+              <p className="text-lg">{priceInfo.distance}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Prix estimé:</p>
+              <p className="text-lg">HT: {priceInfo.priceHT} €</p>
+              <p className="text-lg">TTC: {priceInfo.priceTTC} €</p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            * Ces tarifs sont donnés à titre indicatif et seront confirmés par notre équipe.
+          </p>
+        </div>
+      )}
+      
+      <div className="grid gap-6 md:grid-cols-2">
         <FormField
           control={form.control}
           name="company"
           render={({ field }) => (
-            <FormItem className="md:col-span-2">
+            <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
                 SOCIÉTÉ / ORGANISATION <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre entreprise" className="bg-[#EEF1FF]" {...field} />
+                <Input placeholder="Votre entreprise" {...field} className="bg-[#EEF1FF]" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -48,7 +81,7 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading }: ContactStepProps) 
                 PRÉNOM <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre prénom" className="bg-[#EEF1FF]" {...field} />
+                <Input placeholder="Votre prénom" {...field} className="bg-[#EEF1FF]" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -64,7 +97,7 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading }: ContactStepProps) 
                 NOM <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre nom" className="bg-[#EEF1FF]" {...field} />
+                <Input placeholder="Votre nom" {...field} className="bg-[#EEF1FF]" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,12 +113,7 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading }: ContactStepProps) 
                 EMAIL <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input 
-                  type="email"
-                  placeholder="votre@email.com" 
-                  className="bg-[#EEF1FF]" 
-                  {...field} 
-                />
+                <Input placeholder="votre@email.com" {...field} className="bg-[#EEF1FF]" type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -101,7 +129,7 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading }: ContactStepProps) 
                 TÉLÉPHONE <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre numéro de téléphone" className="bg-[#EEF1FF]" {...field} />
+                <Input placeholder="Votre numéro de téléphone" {...field} className="bg-[#EEF1FF]" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,10 +156,10 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading }: ContactStepProps) 
           {loading ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" />
-              ENVOI EN COURS...
+              TRAITEMENT...
             </>
           ) : (
-            'ENVOYER MA DEMANDE'
+            'ENVOYER VOTRE DEMANDE'
           )}
         </Button>
       </div>
