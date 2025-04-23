@@ -35,6 +35,23 @@ export const useQuoteForm = () => {
       email: '',
       phone: '',
       company: '',
+      
+      // Initialize address fields
+      pickupStreetNumber: '',
+      pickupStreetType: 'Rue',
+      pickupStreetName: '',
+      pickupComplement: '',
+      pickupPostalCode: '',
+      pickupCity: '',
+      pickupCountry: 'France',
+      
+      deliveryStreetNumber: '',
+      deliveryStreetType: 'Rue',
+      deliveryStreetName: '',
+      deliveryComplement: '',
+      deliveryPostalCode: '',
+      deliveryCity: '',
+      deliveryCountry: 'France',
     }
   });
 

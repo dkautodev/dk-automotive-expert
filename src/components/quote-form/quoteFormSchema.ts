@@ -17,6 +17,23 @@ export const quoteFormSchema = z.object({
   pickup_address: z.string().min(1, "L'adresse de prise en charge est requise"),
   delivery_address: z.string().min(1, "L'adresse de livraison est requise"),
   
+  // Fields for structured address entry
+  pickupStreetNumber: z.string().min(1, "Le numéro de rue est requis"),
+  pickupStreetType: z.string().min(1, "Le type de voie est requis"),
+  pickupStreetName: z.string().min(1, "Le nom de la voie est requis"),
+  pickupComplement: z.string().optional(),
+  pickupPostalCode: z.string().min(1, "Le code postal est requis"),
+  pickupCity: z.string().min(1, "La ville est requise"),
+  pickupCountry: z.string().default("France"),
+  
+  deliveryStreetNumber: z.string().min(1, "Le numéro de rue est requis"),
+  deliveryStreetType: z.string().min(1, "Le type de voie est requis"),
+  deliveryStreetName: z.string().min(1, "Le nom de la voie est requis"),
+  deliveryComplement: z.string().optional(),
+  deliveryPostalCode: z.string().min(1, "Le code postal est requis"),
+  deliveryCity: z.string().min(1, "La ville est requise"),
+  deliveryCountry: z.string().default("France"),
+  
   // Contact
   firstName: z.string().min(1, "Le prénom est requis"),
   lastName: z.string().min(1, "Le nom est requis"),
