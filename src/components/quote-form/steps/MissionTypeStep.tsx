@@ -2,8 +2,8 @@
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Truck, RotateCcw } from 'lucide-react';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface MissionTypeStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -11,44 +11,58 @@ interface MissionTypeStepProps {
 }
 
 const MissionTypeStep = ({ form, onNext }: MissionTypeStepProps) => {
-  const handleSelect = (type: 'livraison' | 'restitution') => {
-    form.setValue('mission_type', type);
-    onNext({ mission_type: type });
+  const handleNext = () => {
+    const data = {
+      mission_type: form.getValues('mission_type')
+    };
+    onNext(data);
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Type de mission</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card
-          className={`cursor-pointer transition-all hover:scale-105 ${
-            form.watch('mission_type') === 'livraison' ? 'border-primary ring-2 ring-primary' : ''
-          }`}
-          onClick={() => handleSelect('livraison')}
-        >
-          <CardContent className="flex flex-col items-center p-6 text-center">
-            <Truck className="w-12 h-12 mb-4 text-primary" />
-            <h3 className="text-xl font-semibold mb-2">Livraison</h3>
-            <p className="text-muted-foreground">
-              Transport de votre véhicule vers une destination
-            </p>
-          </CardContent>
-        </Card>
+      
+      <FormField
+        control={form.control}
+        name="mission_type"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel className="text-dk-navy font-semibold">
+              Choisissez le type de service souhaité <span className="text-red-500">*</span>
+            </FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                className="flex flex-col space-y-1"
+              >
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="livraison" />
+                  </FormControl>
+                  <FormLabel className="font-normal cursor-pointer">
+                    Livraison de véhicule
+                  </FormLabel>
+                </FormItem>
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="restitution" />
+                  </FormControl>
+                  <FormLabel className="font-normal cursor-pointer">
+                    Restitution de véhicule
+                  </FormLabel>
+                </FormItem>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <Card
-          className={`cursor-pointer transition-all hover:scale-105 ${
-            form.watch('mission_type') === 'restitution' ? 'border-primary ring-2 ring-primary' : ''
-          }`}
-          onClick={() => handleSelect('restitution')}
-        >
-          <CardContent className="flex flex-col items-center p-6 text-center">
-            <RotateCcw className="w-12 h-12 mb-4 text-primary" />
-            <h3 className="text-xl font-semibold mb-2">Restitution</h3>
-            <p className="text-muted-foreground">
-              Retour de votre véhicule à son point d'origine
-            </p>
-          </CardContent>
-        </Card>
+      <div className="flex justify-end mt-6">
+        <Button type="button" onClick={handleNext} className="bg-[#1a237e] hover:bg-[#3f51b5]">
+          SUIVANT
+        </Button>
       </div>
     </div>
   );
