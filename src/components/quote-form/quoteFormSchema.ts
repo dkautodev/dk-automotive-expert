@@ -13,9 +13,26 @@ export const quoteFormSchema = z.object({
   fuel: z.string().min(1, "Le type de carburant est requis"),
   licensePlate: z.string().min(1, "La plaque d'immatriculation est requise"),
   
-  // Adresses
+  // Adresses complètes
   pickup_address: z.string().min(1, "L'adresse de prise en charge est requise"),
   delivery_address: z.string().min(1, "L'adresse de livraison est requise"),
+  
+  // Adresses décomposées
+  pickupStreetNumber: z.string().min(1, "Le numéro de rue est requis"),
+  pickupStreetType: z.string().min(1, "Le type de voie est requis"),
+  pickupStreetName: z.string().min(1, "Le nom de la voie est requis"),
+  pickupComplement: z.string().optional(),
+  pickupPostalCode: z.string().min(1, "Le code postal est requis"),
+  pickupCity: z.string().min(1, "La ville est requise"),
+  pickupCountry: z.string().min(1, "Le pays est requis"),
+  
+  deliveryStreetNumber: z.string().min(1, "Le numéro de rue est requis"),
+  deliveryStreetType: z.string().min(1, "Le type de voie est requis"),
+  deliveryStreetName: z.string().min(1, "Le nom de la voie est requis"),
+  deliveryComplement: z.string().optional(),
+  deliveryPostalCode: z.string().min(1, "Le code postal est requis"),
+  deliveryCity: z.string().min(1, "La ville est requise"),
+  deliveryCountry: z.string().min(1, "Le pays est requis"),
   
   // Dates et heures
   pickup_date: z.date({

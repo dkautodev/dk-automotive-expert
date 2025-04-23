@@ -6,6 +6,8 @@ import AddressForm from './quote-form/address-form';
 import ContactForm from './quote-form/ContactForm';
 import QuoteFormProgress from './quote-form/QuoteFormProgress';
 import { useQuoteForm } from './quote-form/hooks/useQuoteForm';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const QuoteForm = () => {
   const {
@@ -77,11 +79,19 @@ const QuoteForm = () => {
 
       if (error) throw error;
 
-      toast.success('Votre demande de devis a été envoyée avec succès');
+      toast({
+        title: "Succès",
+        description: "Votre demande de devis a été envoyée avec succès",
+        variant: "default"
+      });
       form.reset();
     } catch (error: any) {
       console.error('Erreur lors de l\'envoi du devis:', error);
-      toast.error(error.message || 'Une erreur est survenue lors de l\'envoi de votre demande');
+      toast({
+        title: "Erreur",
+        description: error.message || 'Une erreur est survenue lors de l\'envoi de votre demande',
+        variant: "destructive"
+      });
     }
   };
 
