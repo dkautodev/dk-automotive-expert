@@ -4,7 +4,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import VehicleTypeSelector from '../VehicleTypeSelector';
 import { Loader } from '@/components/ui/loader';
 import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
@@ -29,6 +29,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [localPriceInfo, setLocalPriceInfo] = useState<PriceInfo | null>(null);
 
   const { calculateDistance, isLoaded: isDistanceApiLoaded } = useDistanceCalculation();
   const { calculatePrice } = usePriceCalculation();
@@ -37,6 +38,16 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
   const { isLoaded: isDeliveryAutocompleteLoaded } = useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
 
   const isGoogleApiReady = isDistanceApiLoaded && isPickupAutocompleteLoaded && isDeliveryAutocompleteLoaded;
+
+  // Utiliser priceInfo des props s'il existe, sinon utiliser le state local
+  const displayPriceInfo = priceInfo?.distance ? priceInfo : localPriceInfo;
+
+  // Mettre à jour le state local quand priceInfo des props change
+  useEffect(() => {
+    if (priceInfo?.distance) {
+      setLocalPriceInfo(priceInfo);
+    }
+  }, [priceInfo]);
 
   const handleCalculate = async () => {
     if (!isGoogleApiReady) {
@@ -66,6 +77,13 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
       form.setValue('distance', distance.toString());
       form.setValue('price_ht', priceHT);
       form.setValue('price_ttc', priceTTC);
+      
+      // Stocker les résultats localement pour garantir l'affichage
+      setLocalPriceInfo({
+        distance: `${distance} km`,
+        priceHT,
+        priceTTC
+      });
       
       toast.success("Calcul effectué avec succès");
     } catch (error) {
@@ -168,21 +186,21 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
           </Button>
         </div>
         
-        {priceInfo?.distance && (
+        {displayPriceInfo && displayPriceInfo.distance && (
           <div className="bg-gray-100 p-4 rounded-md mt-6">
             <h3 className="text-lg font-semibold mb-2">Résultat du calcul</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm font-medium">Distance:</p>
-                <p className="text-lg">{priceInfo.distance}</p>
+                <p className="text-lg">{displayPriceInfo.distance}</p>
               </div>
               <div>
                 <p className="text-sm font-medium">Prix HT:</p>
-                <p className="text-lg">{priceInfo.priceHT} €</p>
+                <p className="text-lg">{displayPriceInfo.priceHT} €</p>
               </div>
               <div>
                 <p className="text-sm font-medium">Prix TTC:</p>
-                <p className="text-lg">{priceInfo.priceTTC} €</p>
+                <p className="text-lg">{displayPriceInfo.priceTTC} €</p>
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-2">

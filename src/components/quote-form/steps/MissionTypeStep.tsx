@@ -4,6 +4,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Truck, RotateCcw } from 'lucide-react';
 
 interface MissionTypeStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -34,23 +35,29 @@ const MissionTypeStep = ({ form, onNext }: MissionTypeStepProps) => {
               <RadioGroup
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                className="flex flex-col space-y-1"
+                className="flex flex-col space-y-3"
               >
                 <FormItem className="flex items-center space-x-3 space-y-0">
                   <FormControl>
                     <RadioGroupItem value="livraison" />
                   </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
-                    Livraison de véhicule
-                  </FormLabel>
+                  <div className="flex items-center space-x-2">
+                    <Truck className="h-5 w-5 text-dk-navy" />
+                    <FormLabel className="font-normal cursor-pointer">
+                      Livraison de véhicule
+                    </FormLabel>
+                  </div>
                 </FormItem>
                 <FormItem className="flex items-center space-x-3 space-y-0">
                   <FormControl>
                     <RadioGroupItem value="restitution" />
                   </FormControl>
-                  <FormLabel className="font-normal cursor-pointer">
-                    Restitution de véhicule
-                  </FormLabel>
+                  <div className="flex items-center space-x-2">
+                    <RotateCcw className="h-5 w-5 text-dk-navy" />
+                    <FormLabel className="font-normal cursor-pointer">
+                      Restitution de véhicule
+                    </FormLabel>
+                  </div>
                 </FormItem>
               </RadioGroup>
             </FormControl>
