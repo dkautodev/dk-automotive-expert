@@ -14,7 +14,7 @@ interface QuoteRequest {
   lastName: string;
   email: string;
   phone: string;
-  companyName: string;
+  company: string;
   
   // Informations du véhicule
   mission_type: string;
@@ -71,7 +71,7 @@ serve(async (req: Request) => {
       <h3>Informations du demandeur</h3>
       <p><strong>Nom :</strong> ${data.lastName}</p>
       <p><strong>Prénom :</strong> ${data.firstName}</p>
-      <p><strong>Société :</strong> ${data.companyName}</p>
+      <p><strong>Société :</strong> ${data.company}</p>
       <p><strong>Email :</strong> ${data.email}</p>
       <p><strong>Téléphone :</strong> ${data.phone}</p>
       
@@ -129,7 +129,7 @@ serve(async (req: Request) => {
         email: data.email,
         name: `${data.firstName} ${data.lastName}`,
       },
-      subject: `[DK Automotive] Nouvelle demande de devis de ${data.firstName} ${data.lastName} - ${data.companyName}`,
+      subject: `[DK Automotive] Nouvelle demande de devis de ${data.firstName} ${data.lastName} - ${data.company}`,
       htmlContent,
     };
 

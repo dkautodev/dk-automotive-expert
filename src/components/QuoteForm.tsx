@@ -1,13 +1,13 @@
 
 import { Form } from '@/components/ui/form';
+import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { QuoteFormValues } from './quote-form/quoteFormSchema';
 import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
 import AddressForm from './quote-form/address-form';
 import ContactForm from './quote-form/ContactForm';
 import QuoteFormProgress from './quote-form/QuoteFormProgress';
 import { useQuoteForm } from './quote-form/hooks/useQuoteForm';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
 
 const QuoteForm = () => {
   const {
