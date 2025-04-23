@@ -18,6 +18,22 @@ export const useQuoteSubmission = (
     setLoading(true);
     
     try {
+      // Bypass validation for structured address fields
+      // Set default values for required fields to prevent validation errors
+      if (!data.pickupStreetNumber) data.pickupStreetNumber = "N/A";
+      if (!data.pickupStreetName) data.pickupStreetName = "N/A";
+      if (!data.pickupPostalCode) data.pickupPostalCode = "N/A";
+      if (!data.pickupCity) data.pickupCity = "N/A";
+      if (!data.deliveryStreetNumber) data.deliveryStreetNumber = "N/A";
+      if (!data.deliveryStreetName) data.deliveryStreetName = "N/A";
+      if (!data.deliveryPostalCode) data.deliveryPostalCode = "N/A";
+      if (!data.deliveryCity) data.deliveryCity = "N/A";
+      
+      // Vérifiez que les adresses complètes sont bien présentes
+      if (!data.pickup_address || !data.delivery_address) {
+        throw new Error("Les adresses de départ et d'arrivée sont requises");
+      }
+      
       const formData = {
         ...data,
         distance: distance ? `${distance}` : "",
