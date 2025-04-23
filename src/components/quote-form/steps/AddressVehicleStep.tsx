@@ -1,12 +1,12 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import VehicleTypeSelector from '../VehicleTypeSelector';
 import { Loader } from '@/components/ui/loader';
+import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
 
 interface PriceInfo {
   distance: string | null;
@@ -22,7 +22,11 @@ interface AddressVehicleStepProps {
 }
 
 const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehicleStepProps) => {
-  const [isCalculating, setIsCalculating] = useState(false);
+  const pickupInputRef = useRef<HTMLInputElement>(null);
+  const deliveryInputRef = useRef<HTMLInputElement>(null);
+  
+  useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
+  useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
 
   const handleNext = () => {
     const data = {
@@ -37,30 +41,6 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
     }
 
     onNext(data);
-  };
-
-  const handleCalculate = async () => {
-    setIsCalculating(true);
-    
-    try {
-      // Trigger validation of required fields
-      const isValid = await form.trigger(['pickup_address', 'delivery_address', 'vehicle_type']);
-      
-      if (!isValid) {
-        return;
-      }
-      
-      // Form is valid, calculation will be handled in useQuoteForm hook
-      // This is just to indicate the calculation is being performed
-      setTimeout(() => {
-        setIsCalculating(false);
-      }, 1500);
-      
-    } catch (error) {
-      console.error('Error during calculation:', error);
-    } finally {
-      setIsCalculating(false);
-    }
   };
 
   return (
@@ -83,6 +63,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   placeholder="Ex: 123 Rue de Paris, 75001 Paris"
                   className="bg-[#EEF1FF]"
                   {...field}
+                  ref={pickupInputRef}
                 />
               </FormControl>
               <FormMessage />
@@ -103,6 +84,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   placeholder="Ex: 456 Avenue des Champs-Élysées, 75008 Paris"
                   className="bg-[#EEF1FF]"
                   {...field}
+                  ref={deliveryInputRef}
                 />
               </FormControl>
               <FormMessage />
