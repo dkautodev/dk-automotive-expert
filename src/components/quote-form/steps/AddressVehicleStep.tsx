@@ -1,12 +1,16 @@
+
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import VehicleTypeSelector from '../VehicleTypeSelector';
 import { Loader } from '@/components/ui/loader';
 import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
+import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
+import { usePriceCalculation } from '@/hooks/usePriceCalculation';
+import { toast } from 'sonner';
 
 interface PriceInfo {
   distance: string | null;
@@ -24,9 +28,46 @@ interface AddressVehicleStepProps {
 const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehicleStepProps) => {
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  const { calculateDistance } = useDistanceCalculation();
+  const { calculatePrice } = usePriceCalculation();
   
   useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
   useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
+
+  const handleCalculate = async () => {
+    const pickupAddress = form.getValues('pickup_address');
+    const deliveryAddress = form.getValues('delivery_address');
+    const vehicleType = form.getValues('vehicle_type');
+
+    if (!pickupAddress || !deliveryAddress || !vehicleType) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+
+    setIsCalculating(true);
+    
+    try {
+      // Calcul de la distance
+      const distance = await calculateDistance(pickupAddress, deliveryAddress);
+      
+      // Calcul du prix
+      const { priceHT, priceTTC } = await calculatePrice(vehicleType, distance);
+      
+      // Mise à jour du formulaire
+      form.setValue('distance', distance.toString());
+      form.setValue('price_ht', priceHT);
+      form.setValue('price_ttc', priceTTC);
+      
+      toast.success("Calcul effectué avec succès");
+    } catch (error) {
+      console.error('Erreur lors du calcul:', error);
+      toast.error("Erreur lors du calcul de la distance et du prix");
+    } finally {
+      setIsCalculating(false);
+    }
+  };
 
   const handleNext = () => {
     const data = {
