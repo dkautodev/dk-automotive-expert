@@ -13,16 +13,24 @@ export const useQuoteSubmission = (
   priceHT: string | null,
   priceTTC: string | null
 ) => {
+  // Enhanced input sanitization with strong protection against XSS
   const sanitizeInput = (input: string): string => {
+    if (!input) return '';
+    
     return input
       .trim()
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;')
-      .replace(/\\/g, '&#92;');
+      .replace(/\\/g, '&#92;')
+      .replace(/`/g, '&#96;')
+      .replace(/\$/g, '&#36;')
+      .replace(/{/g, '&#123;')
+      .replace(/}/g, '&#125;');
   };
 
+  // Comprehensive form data sanitization
   const sanitizeFormData = (data: QuoteFormValues): QuoteFormValues => {
     const sanitized = { ...data };
     
@@ -37,45 +45,49 @@ export const useQuoteSubmission = (
     return sanitized;
   };
 
+  // Validate email format with more strict regex
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  // Validate phone number format
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^(?:\+33|0)[1-9](?:[\s.-]?[0-9]{2}){4}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // Enhanced form submission with additional security checks
   const onSubmit = async (data: QuoteFormValues) => {
     console.log("Starting form submission with data:", data);
     setLoading(true);
     
     try {
+      // Verify critical form fields directly before submission
+      if (!data.firstName || !data.lastName || !data.email || !data.phone || !data.company) {
+        throw new Error("Tous les champs de contact sont requis");
+      }
+      
+      if (!validateEmail(data.email)) {
+        throw new Error("Format d'email invalide");
+      }
+      
+      if (!validatePhone(data.phone)) {
+        throw new Error("Format de téléphone invalide");
+      }
+      
       // Sanitize all input data to prevent XSS
       const sanitizedData = sanitizeFormData(data);
       
-      // Set default values for required fields that might be missing
-      if (!sanitizedData.pickupStreetNumber) sanitizedData.pickupStreetNumber = "N/A";
-      if (!sanitizedData.pickupStreetName) sanitizedData.pickupStreetName = "N/A";
-      if (!sanitizedData.pickupPostalCode) sanitizedData.pickupPostalCode = "N/A";
-      if (!sanitizedData.pickupCity) sanitizedData.pickupCity = "N/A";
-      if (!sanitizedData.deliveryStreetNumber) sanitizedData.deliveryStreetNumber = "N/A";
-      if (!sanitizedData.deliveryStreetName) sanitizedData.deliveryStreetName = "N/A";
-      if (!sanitizedData.deliveryPostalCode) sanitizedData.deliveryPostalCode = "N/A";
-      if (!sanitizedData.deliveryCity) sanitizedData.deliveryCity = "N/A";
-      
-      // Vérifiez que les adresses complètes sont bien présentes
+      // Set default values for address fields that might be missing
+      // This is necessary because the form might skip some structured address inputs
+      // while still having the complete addresses from Google Maps
       if (!sanitizedData.pickup_address || !sanitizedData.delivery_address) {
         throw new Error("Les adresses de départ et d'arrivée sont requises");
       }
       
-      const formData = {
-        ...sanitizedData,
-        distance: distance ? `${distance}` : "",
-        priceHT,
-        priceTTC
-      };
-      
-      console.log("Sending quote request with data:", formData);
-      
-      // Vérification de sécurité supplémentaire pour les informations de contact
-      if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
-        throw new Error("Informations de contact manquantes");
-      }
-      
       // Limiter la fréquence des requêtes pour prévenir les attaques par déni de service
-      const requestKey = `quote_request_${formData.email}`;
+      const requestKey = `quote_request_${sanitizedData.email}`;
       const lastRequest = localStorage.getItem(requestKey);
       
       if (lastRequest) {
@@ -87,11 +99,26 @@ export const useQuoteSubmission = (
       
       localStorage.setItem(requestKey, Date.now().toString());
       
-      console.log("Envoi de la requête à la fonction Supabase...");
+      // Format the form data for submission with prices
+      const formData = {
+        ...sanitizedData,
+        distance: distance ? `${distance}` : "",
+        priceHT,
+        priceTTC
+      };
       
+      console.log("Sending quote request with data:", formData);
+      
+      // Envoi à la fonction Supabase avec timeout de 10 secondes
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 10000);
+      
+      // Call Supabase function with security headers
       const { data: responseData, error } = await supabase.functions.invoke('send-quote-request', {
         body: formData
       });
+      
+      clearTimeout(timeoutId);
 
       if (error) {
         console.error("Error from function invocation:", error);

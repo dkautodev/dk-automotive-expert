@@ -24,12 +24,23 @@ export const quoteFormSchema = z.object({
   // Type de mission (livraison ou restitution)
   mission_type: missionTypeEnum,
   
-  // Informations du véhicule
+  // Informations du véhicule avec validation renforcée
   vehicle_type: z.string().trim().min(1, "Le type de véhicule est requis"),
-  brand: z.string().trim().optional(),
-  model: z.string().trim().optional(),
-  year: z.string().trim().optional(),
-  fuel: z.string().trim().optional(),
+  brand: z.string().trim()
+    .min(2, "La marque doit comporter au moins 2 caractères")
+    .max(50, "La marque ne peut pas dépasser 50 caractères")
+    .optional(),
+  model: z.string().trim()
+    .min(2, "Le modèle doit comporter au moins 2 caractères")
+    .max(50, "Le modèle ne peut pas dépasser 50 caractères")
+    .optional(),
+  year: z.string().trim()
+    .regex(/^(19|20)\d{2}$/, "L'année doit être au format YYYY")
+    .optional(),
+  fuel: z.string().trim()
+    .min(2, "Le type de carburant doit comporter au moins 2 caractères")
+    .max(20, "Le type de carburant ne peut pas dépasser 20 caractères")
+    .optional(),
   licensePlate: z.string().trim()
     .regex(LICENSE_PLATE_REGEX, "Format d'immatriculation invalide")
     .optional(),
@@ -55,12 +66,25 @@ export const quoteFormSchema = z.object({
   deliveryCity: z.string().trim().optional(),
   deliveryCountry: z.string().trim().default("France"),
   
-  // Contact
-  firstName: z.string().trim().min(2, "Le prénom est requis (min. 2 caractères)"),
-  lastName: z.string().trim().min(2, "Le nom est requis (min. 2 caractères)"),
-  email: z.string().trim().email("Format d'email invalide").regex(EMAIL_REGEX, "Format d'email invalide"),
-  phone: z.string().trim().min(10, "Le téléphone est requis").regex(PHONE_REGEX, "Format de téléphone invalide"),
-  company: z.string().trim().min(2, "La société est requise (min. 2 caractères)"),
+  // Contact avec validation renforcée
+  firstName: z.string().trim()
+    .min(2, "Le prénom est requis (min. 2 caractères)")
+    .max(50, "Le prénom ne peut pas dépasser 50 caractères")
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Le prénom ne doit contenir que des lettres, espaces, apostrophes et tirets"),
+  lastName: z.string().trim()
+    .min(2, "Le nom est requis (min. 2 caractères)")
+    .max(50, "Le nom ne peut pas dépasser 50 caractères")
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Le nom ne doit contenir que des lettres, espaces, apostrophes et tirets"),
+  email: z.string().trim()
+    .email("Format d'email invalide")
+    .regex(EMAIL_REGEX, "Format d'email invalide")
+    .max(100, "L'email ne peut pas dépasser 100 caractères"),
+  phone: z.string().trim()
+    .min(10, "Le téléphone est requis")
+    .regex(PHONE_REGEX, "Format de téléphone invalide"),
+  company: z.string().trim()
+    .min(2, "La société est requise (min. 2 caractères)")
+    .max(100, "Le nom de société ne peut pas dépasser 100 caractères"),
   
   // Champs calculés (en lecture seule)
   distance: z.string().optional(),
