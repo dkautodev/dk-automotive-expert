@@ -2,22 +2,21 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { quoteFormSchema, type QuoteFormValues } from '../quoteFormSchema';
-import { supabase } from '@/integrations/supabase/client';
-import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
-import { calculateTTC } from '@/utils/priceCalculations';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
+import { usePriceCalculation } from '@/hooks/usePriceCalculation';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useQuoteForm = () => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<Partial<QuoteFormValues>>({});
   const [loading, setLoading] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
   const [priceHT, setPriceHT] = useState<string | null>(null);
   const [priceTTC, setPriceTTC] = useState<string | null>(null);
   
   const { calculateDistance } = useDistanceCalculation();
+  const { calculatePrice } = usePriceCalculation();
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
@@ -29,69 +28,36 @@ export const useQuoteForm = () => {
       year: '',
       fuel: '',
       licensePlate: '',
-      
-      // Champs pour l'adresse de prise en charge
-      pickupStreetNumber: '',
-      pickupStreetType: 'Rue',
-      pickupStreetName: '',
-      pickupComplement: '',
-      pickupPostalCode: '',
-      pickupCity: '',
-      pickupCountry: 'France',
-      
-      // Champs pour l'adresse de livraison
-      deliveryStreetNumber: '',
-      deliveryStreetType: 'Rue',
-      deliveryStreetName: '',
-      deliveryComplement: '',
-      deliveryPostalCode: '',
-      deliveryCity: '',
-      deliveryCountry: 'France',
-      
-      // Champs d'adresse complète pour compatibilité
       pickup_address: '',
       delivery_address: '',
-      
-      // Contact
-      company: '',
       firstName: '',
       lastName: '',
       email: '',
       phone: '',
-    },
+      company: '',
+    }
   });
 
   const nextStep = async (data: Partial<QuoteFormValues>) => {
-    setFormData({ ...formData, ...data });
-    
-    // Si nous passons de l'étape 2 (adresses) à l'étape 3 (contact), calculer la distance et le prix
     if (step === 2) {
       try {
-        // Construire les adresses complètes
-        const pickupAddress = data.pickup_address || formData.pickup_address || '';
-        const deliveryAddress = data.delivery_address || formData.delivery_address || '';
-        
         // Calculer la distance
-        setLoading(true);
-        const distanceResult = await calculateDistance(pickupAddress, deliveryAddress);
-        setDistance(distanceResult);
+        const calculatedDistance = await calculateDistance(
+          data.pickup_address!,
+          data.delivery_address!
+        );
+        setDistance(calculatedDistance);
         
-        // Calculer le prix si le type de véhicule est défini
-        const vehicleType = formData.vehicle_type;
-        if (vehicleType && distanceResult) {
-          const price = await getPriceForVehicleAndDistance(vehicleType, distanceResult);
-          setPriceHT(price.priceHT.toString());
-          setPriceTTC(calculateTTC(price.priceHT.toString()));
-        }
-        setLoading(false);
+        // Calculer le prix
+        const { priceHT: calculatedPriceHT, priceTTC: calculatedPriceTTC } = 
+          await calculatePrice(data.vehicle_type!, calculatedDistance);
+        
+        setPriceHT(calculatedPriceHT);
+        setPriceTTC(calculatedPriceTTC);
       } catch (error) {
-        console.error("Erreur lors du calcul de la distance ou du prix:", error);
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: "Une erreur est survenue lors du calcul de la distance ou du prix.",
-        });
-        setLoading(false);
+        console.error('Erreur lors du calcul:', error);
+        toast.error("Erreur lors du calcul de la distance et du prix");
+        return;
       }
     }
     
@@ -102,6 +68,33 @@ export const useQuoteForm = () => {
     setStep(step - 1);
   };
 
+  const onSubmit = async (data: QuoteFormValues) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-quote-request', {
+        body: {
+          ...data,
+          distance,
+          priceHT,
+          priceTTC
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success(
+        "Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h."
+      );
+      form.reset();
+      setStep(1);
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du devis:', error);
+      toast.error("Une erreur est survenue lors de l'envoi de votre demande");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     form,
     step,
@@ -110,6 +103,7 @@ export const useQuoteForm = () => {
     priceHT,
     priceTTC,
     nextStep,
-    prevStep
+    prevStep,
+    onSubmit
   };
 };
