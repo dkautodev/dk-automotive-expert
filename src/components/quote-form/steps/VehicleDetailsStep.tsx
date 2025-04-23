@@ -1,27 +1,38 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
 interface VehicleDetailsStepProps {
   form: UseFormReturn<QuoteFormValues>;
   onNext: (data: Partial<QuoteFormValues>) => void;
   onPrevious: () => void;
 }
-
-const fuelTypes = [
-  { id: "essence", label: "Essence" },
-  { id: "diesel", label: "Diesel" },
-  { id: "hybride", label: "Hybride" },
-  { id: "electrique", label: "Électrique" },
-  { id: "gpl", label: "GPL" },
-  { id: "gnv", label: "GNV" }
-];
-
-const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProps) => {
+const fuelTypes = [{
+  id: "essence",
+  label: "Essence"
+}, {
+  id: "diesel",
+  label: "Diesel"
+}, {
+  id: "hybride",
+  label: "Hybride"
+}, {
+  id: "electrique",
+  label: "Électrique"
+}, {
+  id: "gpl",
+  label: "GPL"
+}, {
+  id: "gnv",
+  label: "GNV"
+}];
+const VehicleDetailsStep = ({
+  form,
+  onNext,
+  onPrevious
+}: VehicleDetailsStepProps) => {
   const handleNext = () => {
     const data = {
       brand: form.getValues('brand'),
@@ -30,23 +41,16 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
       fuel: form.getValues('fuel'),
       licensePlate: form.getValues('licensePlate')
     };
-    
     onNext(data);
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Détails du véhicule</h2>
-      <p className="text-gray-500 mb-4">
-        Cette étape est facultative mais nous aidera à mieux préparer notre offre.
-      </p>
+      <p className="text-gray-500 mb-4">Facultatif mais cette étape est facultative mais nous aidera à mieux connaître vos besoins.</p>
       
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField
-          control={form.control}
-          name="brand"
-          render={({ field }) => (
-            <FormItem>
+        <FormField control={form.control} name="brand" render={({
+        field
+      }) => <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
                 MARQUE
               </FormLabel>
@@ -54,15 +58,11 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
                 <Input placeholder="Ex: Renault" className="bg-[#EEF1FF]" {...field} />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
 
-        <FormField
-          control={form.control}
-          name="model"
-          render={({ field }) => (
-            <FormItem>
+        <FormField control={form.control} name="model" render={({
+        field
+      }) => <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
                 MODÈLE
               </FormLabel>
@@ -70,15 +70,11 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
                 <Input placeholder="Ex: Clio" className="bg-[#EEF1FF]" {...field} />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
 
-        <FormField
-          control={form.control}
-          name="year"
-          render={({ field }) => (
-            <FormItem>
+        <FormField control={form.control} name="year" render={({
+        field
+      }) => <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
                 ANNÉE
               </FormLabel>
@@ -86,15 +82,11 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
                 <Input placeholder="Ex: 2023" className="bg-[#EEF1FF]" {...field} />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
 
-        <FormField
-          control={form.control}
-          name="fuel"
-          render={({ field }) => (
-            <FormItem>
+        <FormField control={form.control} name="fuel" render={({
+        field
+      }) => <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
                 CARBURANT
               </FormLabel>
@@ -105,23 +97,17 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {fuelTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
+                  {fuelTypes.map(type => <SelectItem key={type.id} value={type.id}>
                       {type.label}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
 
-        <FormField
-          control={form.control}
-          name="licensePlate"
-          render={({ field }) => (
-            <FormItem className="md:col-span-2">
+        <FormField control={form.control} name="licensePlate" render={({
+        field
+      }) => <FormItem className="md:col-span-2">
               <FormLabel className="text-dk-navy font-semibold">
                 IMMATRICULATION
               </FormLabel>
@@ -129,9 +115,7 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
                 <Input placeholder="Ex: AB-123-CD" className="bg-[#EEF1FF]" {...field} />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
       </div>
 
       <div className="flex justify-between mt-6">
@@ -142,8 +126,6 @@ const VehicleDetailsStep = ({ form, onNext, onPrevious }: VehicleDetailsStepProp
           SUIVANT
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default VehicleDetailsStep;
