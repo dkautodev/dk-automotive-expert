@@ -1,3 +1,4 @@
+
 import { UseFormReturn } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -86,7 +87,7 @@ const AddressForm = ({
     };
     
     fetchPickupCommunes();
-  }, [form.watch('pickupPostalCode')]);
+  }, [form, form.watch('pickupPostalCode')]);
 
   useEffect(() => {
     const postalCode = form.watch('deliveryPostalCode');
@@ -106,7 +107,7 @@ const AddressForm = ({
     };
     
     fetchDeliveryCommunes();
-  }, [form.watch('deliveryPostalCode')]);
+  }, [form, form.watch('deliveryPostalCode')]);
 
   const handleNext = () => {
     const pickupComplement = form.getValues('pickupComplement') ? `, ${form.getValues('pickupComplement')}` : '';
@@ -114,8 +115,8 @@ const AddressForm = ({
     const pickupAddress = `${form.getValues('pickupStreetNumber')} ${form.getValues('pickupStreetType')} ${form.getValues('pickupStreetName')}${pickupComplement}, ${form.getValues('pickupPostalCode')} ${form.getValues('pickupCity')}, ${form.getValues('pickupCountry')}`;
     const deliveryAddress = `${form.getValues('deliveryStreetNumber')} ${form.getValues('deliveryStreetType')} ${form.getValues('deliveryStreetName')}${deliveryComplement}, ${form.getValues('deliveryPostalCode')} ${form.getValues('deliveryCity')}, ${form.getValues('deliveryCountry')}`;
 
-    form.setValue('pickupAddress', pickupAddress);
-    form.setValue('deliveryAddress', deliveryAddress);
+    form.setValue('pickup_address', pickupAddress);
+    form.setValue('delivery_address', deliveryAddress);
     const addressData = {
       pickupStreetNumber: form.getValues('pickupStreetNumber'),
       pickupStreetType: form.getValues('pickupStreetType'),
@@ -131,8 +132,8 @@ const AddressForm = ({
       deliveryPostalCode: form.getValues('deliveryPostalCode'),
       deliveryCity: form.getValues('deliveryCity'),
       deliveryCountry: form.getValues('deliveryCountry'),
-      pickupAddress,
-      deliveryAddress
+      pickup_address: pickupAddress,
+      delivery_address: deliveryAddress
     };
     const pickupFieldsValid = !form.formState.errors.pickupStreetNumber && !form.formState.errors.pickupStreetType && !form.formState.errors.pickupStreetName && !form.formState.errors.pickupPostalCode && !form.formState.errors.pickupCity;
     const deliveryFieldsValid = !form.formState.errors.deliveryStreetNumber && !form.formState.errors.deliveryStreetType && !form.formState.errors.deliveryStreetName && !form.formState.errors.deliveryPostalCode && !form.formState.errors.deliveryCity;
@@ -435,3 +436,4 @@ const AddressForm = ({
     </div>;
 };
 export default AddressForm;
+
