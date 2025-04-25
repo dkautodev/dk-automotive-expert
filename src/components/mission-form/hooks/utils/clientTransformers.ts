@@ -1,40 +1,23 @@
 
 import { ClientData, ClientDisplay } from "../types/clientTypes";
+import { formatClientName } from "@/utils/clientFormatter";
 
 /**
  * Transforms a ClientData object into a ClientDisplay object
  * with standardized code formatting
  */
 export const transformToClientDisplay = (client: ClientData): ClientDisplay => {
-  // Si le client a un client_code généré, l'utiliser en priorité
-  if (client.client_code) {
-    return {
-      id: client.id,
-      name: client.client_code
-    };
-  }
-  
-  // Ensuite, donner la priorité au nom de la société s'il existe
-  if (client.company) {
-    return {
-      id: client.id,
-      name: client.company
-    };
-  }
-  
-  // Sinon, utiliser le format nom/prénom
-  const nameParts = [];
-  
-  if (client.last_name) nameParts.push(client.last_name.toUpperCase());
-  if (client.first_name) nameParts.push(client.first_name);
-  
-  const displayName = nameParts.length > 0 
-    ? nameParts.join(' ') 
-    : client.email || 'Client sans nom';
+  // Adapter le client au format attendu par la fonction formatClientName
+  const profileFormat = {
+    client_code: client.client_code,
+    company_name: client.company,
+    first_name: client.first_name,
+    last_name: client.last_name
+  };
   
   return {
     id: client.id,
-    name: displayName
+    name: formatClientName(profileFormat as any, client.email || 'Client sans nom')
   };
 };
 
