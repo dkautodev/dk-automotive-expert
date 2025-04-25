@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,6 +7,7 @@ import { fr } from "date-fns/locale";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
+import { formatMissionClientName } from "@/utils/clientFormatter";
 
 export interface CompletedMissionsTableProps {
   missions?: MissionRow[];
@@ -22,7 +22,6 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
     const fetchCompletedMissions = async () => {
       setLoading(true);
       try {
-        // First, fetch the basic mission data
         const { data, error } = await extendedSupabase
           .from('missions')
           .select('*')
@@ -32,17 +31,14 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
         
         if (error) throw error;
         
-        // Check if we have data
         if (!data || data.length === 0) {
           setMissions([]);
           setLoading(false);
           return;
         }
 
-        // Now fetch client profiles separately to avoid type mismatch
         const missionData = data as unknown as MissionRow[];
         
-        // Fetch client profiles for display
         const clientIds = missionData.map(mission => mission.client_id);
         const { data: clientProfiles, error: clientError } = await extendedSupabase
           .from('user_profiles')
@@ -51,7 +47,6 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
         
         if (clientError) throw clientError;
         
-        // Map client names to missions
         const missionsWithClientInfo = missionData.map(mission => {
           mission.clientProfile = clientProfiles?.find(profile => 
             profile.user_id === mission.client_id
@@ -71,27 +66,6 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
 
     fetchCompletedMissions();
   }, [refreshTrigger]);
-
-  const getClientName = (mission: MissionRow) => {
-    const profile = mission.clientProfile;
-    if (!profile) return 'Client inconnu';
-    
-    // Priorité au code client s'il existe
-    if (profile.client_code && profile.client_code.trim() !== "") {
-      return profile.client_code;
-    }
-    
-    // Ensuite, priorité au nom de la société
-    if (profile.company_name && profile.company_name.trim() !== "") {
-      return profile.company_name;
-    }
-    
-    // En dernier recours, utiliser le nom et prénom
-    if (profile.first_name || profile.last_name) 
-      return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
-    
-    return 'Client inconnu';
-  };
 
   return (
     <Card>
@@ -118,7 +92,7 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
                 missions.map((mission) => (
                   <TableRow key={mission.id}>
                     <TableCell>{mission.mission_number}</TableCell>
-                    <TableCell>{getClientName(mission)}</TableCell>
+                    <TableCell>{formatMissionClientName(mission)}</TableCell>
                     <TableCell>{mission.delivery_date ? 
                       format(new Date(mission.delivery_date), "dd/MM/yyyy", { locale: fr }) : 
                       'N/A'}

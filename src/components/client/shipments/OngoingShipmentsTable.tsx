@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { MissionRow } from "@/types/database";
 import { MissionStatusBadge } from "@/components/client/MissionStatusBadge";
@@ -16,6 +17,7 @@ import { MissionDetailsDialog } from "@/components/client/MissionDetailsDialog";
 import { useMissionCancellation } from "@/hooks/useMissionCancellation";
 import { CancelMissionDialog } from "@/components/missions/CancelMissionDialog";
 import { Card } from "@/components/ui/card";
+import { formatMissionClientName } from "@/utils/clientFormatter";
 
 interface OngoingShipmentsTableProps {
   missions: MissionRow[];
