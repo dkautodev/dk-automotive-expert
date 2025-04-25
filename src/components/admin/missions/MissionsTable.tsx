@@ -109,13 +109,13 @@ export const MissionsTable: React.FC<MissionsTableProps> = ({
       return client.client_code;
     }
     
-    // Si pas de code client, utiliser le nom de la société
+    // Ensuite, priorité au nom de la société
     if (client.company_name && client.company_name.trim() !== "") {
       return client.company_name;
     }
     
-    // En dernier recours, utiliser le nom complet
-    const fullName = `${client.first_name} ${client.last_name}`.trim();
+    // En dernier recours, utiliser le nom et prénom
+    const fullName = `${client.first_name || ''} ${client.last_name || ''}`.trim();
     return fullName || "Non spécifié";
   };
 

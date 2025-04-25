@@ -14,15 +14,22 @@ export const transformToClientDisplay = (client: ClientData): ClientDisplay => {
     };
   }
   
-  // Sinon, utiliser le format précédent comme fallback
+  // Ensuite, donner la priorité au nom de la société s'il existe
+  if (client.company) {
+    return {
+      id: client.id,
+      name: client.company
+    };
+  }
+  
+  // Sinon, utiliser le format nom/prénom
   const nameParts = [];
   
   if (client.last_name) nameParts.push(client.last_name.toUpperCase());
   if (client.first_name) nameParts.push(client.first_name);
-  if (client.company) nameParts.push(client.company);
   
   const displayName = nameParts.length > 0 
-    ? nameParts.join('-') 
+    ? nameParts.join(' ') 
     : client.email || 'Client sans nom';
   
   return {

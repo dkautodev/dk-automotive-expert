@@ -74,16 +74,22 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
 
   const getClientName = (mission: MissionRow) => {
     const profile = mission.clientProfile;
-    if (profile) {
-      // Priorité au code client s'il existe
-      if (profile.client_code && profile.client_code.trim() !== "") {
-        return profile.client_code;
-      }
-      
-      if (profile.company_name) return profile.company_name;
-      if (profile.first_name || profile.last_name) 
-        return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    if (!profile) return 'Client inconnu';
+    
+    // Priorité au code client s'il existe
+    if (profile.client_code && profile.client_code.trim() !== "") {
+      return profile.client_code;
     }
+    
+    // Ensuite, priorité au nom de la société
+    if (profile.company_name && profile.company_name.trim() !== "") {
+      return profile.company_name;
+    }
+    
+    // En dernier recours, utiliser le nom et prénom
+    if (profile.first_name || profile.last_name) 
+      return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    
     return 'Client inconnu';
   };
 
