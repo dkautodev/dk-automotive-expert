@@ -1,100 +1,79 @@
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader } from "@/components/ui/loader";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
-import { ProfileRow } from "@/types/database";
 import { useAuthContext } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 
+// Simple mock types for demonstration
+type MockProfile = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string | null;
+  company_name: string | null;
+  avatar_url: string | null;
+};
+
 const ClientManagement = () => {
   const { role } = useAuthContext();
-  const [clients, setClients] = useState<ProfileRow[]>([]);
-  const [drivers, setDrivers] = useState<ProfileRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [clients] = useState<MockProfile[]>([]);
+  const [drivers] = useState<MockProfile[]>([]);
+  const [loading] = useState(false);
 
   // Only admin can access this page
   if (role !== 'admin') {
     return <Navigate to="/dashboard" />;
   }
 
-  useEffect(() => {
-    const fetchProfiles = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await extendedSupabase
-          .from('profiles')
-          .select('*');
-          
-        if (error) throw error;
-        
-        const profileData = data as ProfileRow[];
-        const clientProfiles = profileData.filter(p => p.role === 'client');
-        const driverProfiles = profileData.filter(p => p.role === 'driver');
-        
-        setClients(clientProfiles);
-        setDrivers(driverProfiles);
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchProfiles();
-  }, []);
-
-  const renderUsersList = (users: ProfileRow[], userType: string) => (
+  const renderUsersList = (users: MockProfile[], userType: string) => (
     <Card>
       <CardHeader>
         <CardTitle>{userType === 'client' ? 'Clients' : 'Chauffeurs'}</CardTitle>
+        <CardDescription>
+          Cette fonctionnalité est en cours de développement
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="flex justify-center p-4">
-            <Loader className="w-6 h-6" />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Téléphone</TableHead>
-                <TableHead>Société</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.length > 0 ? (
-                users.map(user => (
-                  <TableRow key={user.id}>
-                    <TableCell className="flex items-center space-x-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatar_url || ''} />
-                        <AvatarFallback>
-                          {(user.first_name?.charAt(0) || '') + (user.last_name?.charAt(0) || '')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{user.first_name} {user.last_name}</span>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone || '-'}</TableCell>
-                    <TableCell>{user.company_name || '-'}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-4 text-gray-500">
-                    Aucun {userType === 'client' ? 'client' : 'chauffeur'} trouvé
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Utilisateur</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Téléphone</TableHead>
+              <TableHead>Société</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.length > 0 ? (
+              users.map(user => (
+                <TableRow key={user.id}>
+                  <TableCell className="flex items-center space-x-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.avatar_url || ''} />
+                      <AvatarFallback>
+                        {(user.first_name?.charAt(0) || '') + (user.last_name?.charAt(0) || '')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{user.first_name} {user.last_name}</span>
                   </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.phone || '-'}</TableCell>
+                  <TableCell>{user.company_name || '-'}</TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-4 text-gray-500">
+                  Base de données en cours de restructuration
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
