@@ -10,7 +10,7 @@ export const addressBookService = {
         .select('*')
         .order('last_name', { ascending: true });
       
-      return safeArrayData<ContactEntry>(response, []).map(contact => ({
+      return safeArrayData<any>(response, []).map(contact => ({
         id: contact.id,
         firstName: contact.first_name || '',
         lastName: contact.last_name || '',
