@@ -12,10 +12,10 @@ export const addressBookService = {
       
       return safeArrayData<ContactEntry>(response, []).map(contact => ({
         id: contact.id,
-        firstName: contact.first_name,
-        lastName: contact.last_name,
-        email: contact.email,
-        phone: contact.phone,
+        firstName: contact.first_name || '',
+        lastName: contact.last_name || '',
+        email: contact.email || '',
+        phone: contact.phone || '',
         type: contact.type || 'general',
         notes: contact.notes || '',
         company: contact.company || '',
@@ -30,10 +30,10 @@ export const addressBookService = {
     try {
       const response = await safeTable('contacts')
         .insert({
-          first_name: contact.firstName,
-          last_name: contact.lastName,
-          email: contact.email,
-          phone: contact.phone,
+          first_name: contact.firstName || '',
+          last_name: contact.lastName || '',
+          email: contact.email || '',
+          phone: contact.phone || '',
           type: contact.type || 'general',
           notes: contact.notes || '',
           company: contact.company || '',
@@ -49,11 +49,11 @@ export const addressBookService = {
       
       return {
         id: newContact.id,
-        firstName: newContact.first_name,
-        lastName: newContact.last_name,
-        email: newContact.email,
-        phone: newContact.phone,
-        type: newContact.type,
+        firstName: newContact.first_name || '',
+        lastName: newContact.last_name || '',
+        email: newContact.email || '',
+        phone: newContact.phone || '',
+        type: newContact.type || '',
         notes: newContact.notes || '',
         company: newContact.company || '',
       };
@@ -87,11 +87,11 @@ export const addressBookService = {
       
       return {
         id: updatedContact.id,
-        firstName: updatedContact.first_name,
-        lastName: updatedContact.last_name,
-        email: updatedContact.email,
-        phone: updatedContact.phone,
-        type: updatedContact.type,
+        firstName: updatedContact.first_name || '',
+        lastName: updatedContact.last_name || '',
+        email: updatedContact.email || '',
+        phone: updatedContact.phone || '',
+        type: updatedContact.type || '',
         notes: updatedContact.notes || '',
         company: updatedContact.company || '',
       };

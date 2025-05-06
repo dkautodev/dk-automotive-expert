@@ -2,16 +2,26 @@
 import { Database } from "@/integrations/supabase/types";
 
 // Extend the Database type with our new tables
-export interface ExtendedDatabase extends Database {
+export interface ExtendedDatabase {
   public: {
     Tables: {
       // Include all existing tables from Database type
+      clients: Database['public']['Tables']['clients'];
+      contacts: Database['public']['Tables']['contacts'];
       documents: Database['public']['Tables']['documents'];
-      users: Database['public']['Tables']['users'];
+      google_maps_settings: Database['public']['Tables']['google_maps_settings'];
+      invoices: Database['public']['Tables']['invoices'];
+      mission_attachments: Database['public']['Tables']['mission_attachments'];
       mission_documents: Database['public']['Tables']['mission_documents'];
       missions: Database['public']['Tables']['missions'];
+      missions_status_history: Database['public']['Tables']['missions_status_history'];
+      notifications: Database['public']['Tables']['notifications'];
       price_grids: Database['public']['Tables']['price_grids'];
+      price_grids_history: Database['public']['Tables']['price_grids_history'];
       user_profiles: Database['public']['Tables']['user_profiles'];
+      users: Database['public']['Tables']['users'];
+      vat_settings: Database['public']['Tables']['vat_settings'];
+      vehicles: Database['public']['Tables']['vehicles'];
       
       // Add our new unified tables with the correct schema
       unified_users: {
@@ -359,6 +369,7 @@ export interface ExtendedDatabase extends Database {
           notes: string | null;
           created_at: string;
           updated_at: string;
+          company: string | null;
         };
         Insert: {
           id?: string;
@@ -371,6 +382,7 @@ export interface ExtendedDatabase extends Database {
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
+          company?: string | null;
         };
         Update: {
           id?: string;
@@ -383,6 +395,7 @@ export interface ExtendedDatabase extends Database {
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
+          company?: string | null;
         };
         Relationships: [
           {
@@ -443,185 +456,6 @@ export interface ExtendedDatabase extends Database {
           }
         ];
       };
-      
-      // Add our contacts table
-      contacts: {
-        Row: {
-          id: string;
-          user_id: string;
-          first_name: string;
-          last_name: string;
-          email: string;
-          phone: string;
-          type: string;
-          notes: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          first_name: string;
-          last_name: string;
-          email: string;
-          phone: string;
-          type: string;
-          notes?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          first_name?: string;
-          last_name?: string;
-          email?: string;
-          phone?: string;
-          type?: string;
-          notes?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      
-      // Add our mission_attachments table
-      mission_attachments: {
-        Row: {
-          id: string;
-          mission_id: string | null;
-          file_name: string;
-          file_path: string;
-          file_type: string | null;
-          file_size: number | null;
-          uploaded_by: string;
-          created_at: string;
-          updated_at: string;
-          storage_provider: string | null;
-        };
-        Insert: {
-          id?: string;
-          mission_id?: string | null;
-          file_name: string;
-          file_path: string;
-          file_type?: string | null;
-          file_size?: number | null;
-          uploaded_by: string;
-          created_at?: string;
-          updated_at?: string;
-          storage_provider?: string | null;
-        };
-        Update: {
-          id?: string;
-          mission_id?: string | null;
-          file_name?: string;
-          file_path?: string;
-          file_type?: string | null;
-          file_size?: number | null;
-          uploaded_by?: string;
-          created_at?: string;
-          updated_at?: string;
-          storage_provider?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "mission_attachments_mission_id_fkey";
-            columns: ["mission_id"];
-            isOneToOne: false;
-            referencedRelation: "missions";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
-      
-      // Add our notifications table
-      notifications: {
-        Row: {
-          id: string;
-          user_id: string;
-          message: string;
-          type: string;
-          mission_id: string | null;
-          read: boolean | null;
-          created_at: string | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          message: string;
-          type: string;
-          mission_id?: string | null;
-          read?: boolean | null;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          message?: string;
-          type?: string;
-          mission_id?: string | null;
-          read?: boolean | null;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "notifications_mission_id_fkey";
-            columns: ["mission_id"];
-            isOneToOne: false;
-            referencedRelation: "missions";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
-      
-      // Add our invoices table
-      invoices: {
-        Row: {
-          id: string;
-          mission_id: string;
-          client_id: string;
-          invoice_number: string;
-          price_ht: number;
-          price_ttc: number;
-          created_at: string | null;
-          paid: boolean | null;
-          issued_date: string | null;
-        };
-        Insert: {
-          id?: string;
-          mission_id: string;
-          client_id: string;
-          invoice_number: string;
-          price_ht: number;
-          price_ttc: number;
-          created_at?: string | null;
-          paid?: boolean | null;
-          issued_date?: string | null;
-        };
-        Update: {
-          id?: string;
-          mission_id?: string;
-          client_id?: string;
-          invoice_number?: string;
-          price_ht?: number;
-          price_ttc?: number;
-          created_at?: string | null;
-          paid?: boolean | null;
-          issued_date?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "invoices_mission_id_fkey";
-            columns: ["mission_id"];
-            isOneToOne: false;
-            referencedRelation: "missions";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
     };
     Views: Database['public']['Views'];
     Functions: Database['public']['Functions'];
@@ -630,18 +464,14 @@ export interface ExtendedDatabase extends Database {
   };
 }
 
-// Create an extended supabase client type
-export type ExtendedSupabaseClient = ReturnType<typeof createExtendedClient>;
+// Cast the existing supabase client to our extended type
+// This is a workaround until we can regenerate the proper types
+export const extendedSupabase = supabase as unknown as ReturnType<typeof createExtendedClient>;
 
-// Helper function to create a properly typed client
+// Helper function to create a properly typed client (not used directly, just for type inference)
 import { createClient } from '@supabase/supabase-js';
-export const createExtendedClient = () => {
-  const supabaseUrl = process.env.SUPABASE_URL as string;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY as string;
+function createExtendedClient() {
+  const supabaseUrl = "https://example.com"; // Dummy values, just used for typing
+  const supabaseKey = "dummy";
   return createClient<ExtendedDatabase>(supabaseUrl, supabaseKey);
-};
-
-// Type-safe way to handle Supabase responses
-export type DbResult<T> = T extends PromiseLike<infer U> ? U : never;
-export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never;
-export type DbResultErr = { error: Error };
+}
