@@ -1,4 +1,3 @@
-
 import html2pdf from 'html2pdf.js';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -210,7 +209,15 @@ export const missionToInvoiceData = (mission: MissionRow, invoiceNumber: string)
   const vehicleInfo = mission.vehicle_info as any || {};
   const pickupContact = mission.pickup_contact as any || {};
   const deliveryContact = mission.delivery_contact as any || {};
-  const clientProfile = mission.clientProfile || {};
+  const clientProfile = mission.clientProfile || {
+    company_name: '',
+    first_name: '',
+    last_name: '',
+    billing_address: '',
+    phone: '',
+    vat_number: '',
+    siret_number: '',
+  };
   
   // Date de création de la facture (aujourd'hui)
   const issueDate = new Date().toISOString();
