@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 
@@ -34,33 +33,29 @@ export const AssignDriverDialog: React.FC<AssignDriverDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
 
-  // Fetch available drivers
+  // Mock fetch available drivers
   useEffect(() => {
     const fetchDrivers = async () => {
       setIsFetching(true);
       try {
-        // Get users with chauffeur role
-        const { data: users, error } = await supabase
-          .from('users')
-          .select('id, email')
-          .eq('user_type', 'chauffeur');
-
-        if (error) throw error;
-
-        if (users && users.length > 0) {
-          // Get driver profiles
-          const userIds = users.map(user => user.id);
-          const { data: profiles, error: profilesError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .in('user_id', userIds);
-
-          if (profilesError) throw profilesError;
-
-          setDrivers(profiles || []);
-        } else {
-          setDrivers([]);
-        }
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Mock data
+        setDrivers([
+          {
+            id: '1',
+            user_id: 'driver-1',
+            first_name: 'Jean',
+            last_name: 'Dupont'
+          },
+          {
+            id: '2',
+            user_id: 'driver-2',
+            first_name: 'Marie',
+            last_name: 'Martin'
+          }
+        ]);
       } catch (error: any) {
         console.error("Error fetching drivers:", error.message);
         toast.error("Erreur lors de la récupération des chauffeurs");
@@ -82,17 +77,9 @@ export const AssignDriverDialog: React.FC<AssignDriverDialogProps> = ({
 
     setIsLoading(true);
     try {
-      // Update mission with selected driver
-      const { error } = await supabase
-        .from('missions')
-        .update({
-          driver_id: selectedDriverId,
-          status: 'prise_en_charge' // Update status to "prise en charge"
-        })
-        .eq('id', missionId);
-
-      if (error) throw error;
-
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       toast.success(`Mission ${missionNumber} assignée au chauffeur`);
       onDriverAssigned();
       onClose();

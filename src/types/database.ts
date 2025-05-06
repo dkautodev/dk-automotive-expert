@@ -35,14 +35,13 @@ export interface DocumentItem {
   file_type: string;
   file_size: number;
   created_at: string;
+  document_type: string;
+  document_url: string;
+  uploaded_at: string;
   [key: string]: any;
 }
 
-export interface DocumentType {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
+export type DocumentType = string;
 
 // Add these placeholder types to prevent errors in existing components
 // These will be properly implemented later when we rebuild these features
@@ -54,6 +53,19 @@ export interface MissionRow {
   status?: string;
   delivery_date?: string;
   clientProfile?: UserProfileRow;
+  pickup_address?: string;
+  delivery_address?: string;
+  mission_type?: "livraison" | "restitution";
+  pickup_date?: string | null;
+  pickup_time?: string | null;
+  delivery_time?: string | null;
+  additional_info?: string | null;
+  driver_id?: string | null;
+  vehicle_info?: any;
+  pickup_contact?: any;
+  delivery_contact?: any;
+  city?: string;
+  postal_code?: string;
   [key: string]: any;
 }
 
