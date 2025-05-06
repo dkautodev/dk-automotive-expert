@@ -1,189 +1,94 @@
+
 import { supabase } from "@/integrations/supabase/client";
-import { safeTable } from "@/utils/supabase-helper";
-import { NewClientData } from "../../types/clientTypes";
+import { NewClientData, ClientData } from "../../types/clientTypes";
 import { toast } from "sonner";
+import { safeDataAccess, safeFirstItem } from "@/utils/supabase-helper";
 
 /**
- * Client creation module
+ * Service for creating and managing clients
  */
 export const clientCreationService = {
   /**
-   * Creates a user in auth and profile tables using the unified model
+   * Create a new client in the database
+   * @param clientData The data for the new client
+   * @returns The created client data or null if creation failed
    */
-  createUserWithUnifiedProfile: async (newClientData: NewClientData): Promise<string | null> => {
-    // Generate a random password
-    const tempPassword = Math.random().toString(36).slice(-8);
-    
-    // Create user in auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: newClientData.email,
-      password: tempPassword,
-      email_confirm: true
-    });
-    
-    if (authError) {
-      console.error("Erreur lors de la création de l'utilisateur:", authError);
-      throw authError;
-    }
-    
-    if (authData?.user) {
-      // Create unified user
-      const userResult = await safeTable("unified_users")
-        .insert({
-          id: authData.user.id,
-          email: newClientData.email,
-          role: 'client',
-          first_name: newClientData.first_name || '',
-          last_name: newClientData.last_name || '',
-          phone: newClientData.phone,
-          company_name: newClientData.company,
-          billing_address: newClientData.address || ''
-        })
-        .select();
-      
-      if (userResult.error) {
-        console.error("Erreur lors de l'ajout de l'utilisateur unifié:", userResult.error);
-        throw userResult.error;
-      }
-      
-      if (!userResult.data || userResult.data.length === 0) {
-        throw new Error("No data returned after creating unified user");
-      }
-      
-      console.log("Utilisateur unifié créé avec succès");
-      return authData.user.id;
-    }
-    
-    return null;
-  },
-
-  /**
-   * Creates a unified user profile without auth user
-   */
-  createUnifiedProfileOnly: async (newClientData: NewClientData): Promise<string | null> => {
-    const userResult = await safeTable("unified_users")
-      .insert({
-        email: newClientData.email || 'client-' + Date.now() + '@example.com',
-        role: 'client',
-        first_name: newClientData.first_name || '',
-        last_name: newClientData.last_name || '',
-        phone: newClientData.phone,
-        company_name: newClientData.company,
-        billing_address: newClientData.address || ''
-      })
-      .select();
-    
-    if (userResult.error) {
-      console.error("Erreur lors de l'ajout de l'utilisateur unifié:", userResult.error);
-      throw userResult.error;
-    }
-    
-    if (!userResult.data || userResult.data.length === 0) {
-      throw new Error("No data returned from inserting unified user");
-    }
-    
-    console.log("Profil utilisateur unifié créé avec succès:", userResult.data);
-    return userResult.data[0].id;
-  },
-
-  /**
-   * Creates a user in auth and profile tables (legacy method)
-   */
-  createUserWithProfile: async (newClientData: NewClientData): Promise<string | null> => {
-    // Generate a random password
-    const tempPassword = Math.random().toString(36).slice(-8);
-    
-    // Create user in auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: newClientData.email,
-      password: tempPassword,
-      email_confirm: true
-    });
-    
-    if (authError) {
-      console.error("Erreur lors de la création de l'utilisateur:", authError);
-      throw authError;
-    }
-    
-    if (authData?.user) {
-      // Create profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          user_id: authData.user.id,
-          first_name: newClientData.first_name || '',
-          last_name: newClientData.last_name || '',
-          phone: newClientData.phone,
-          company_name: newClientData.company,
-          billing_address: newClientData.address || '',
-          user_type: 'client'
-        })
-        .select();
-      
-      if (profileError) {
-        console.error("Erreur lors de l'ajout du profil:", profileError);
-        throw profileError;
-      }
-      
-      console.log("Utilisateur et profil client créés avec succès");
-      return authData.user.id;
-    }
-    
-    return null;
-  },
-
-  /**
-   * Creates a profile without auth user (legacy method)
-   */
-  createProfileOnly: async (newClientData: NewClientData): Promise<string | null> => {
-    const { data: profileData, error: profileError } = await supabase
-      .from('user_profiles')
-      .insert({
-        first_name: newClientData.first_name || '',
-        last_name: newClientData.last_name || '',
-        phone: newClientData.phone,
-        company_name: newClientData.company,
-        billing_address: newClientData.address || '',
-        user_type: 'client'
-      })
-      .select();
-    
-    if (profileError) {
-      console.error("Erreur lors de l'ajout du profil:", profileError);
-      throw profileError;
-    }
-    
-    console.log("Profil client créé avec succès:", profileData);
-    return profileData[0].id;
-  },
-
-  /**
-   * Adds a new client to the system
-   */
-  addClient: async (newClientData: NewClientData): Promise<string | null> => {
+  createClient: async (clientData: NewClientData): Promise<ClientData | null> => {
     try {
-      console.log("Tentative d'ajout d'un nouveau client:", newClientData);
+      console.log("Creating new client with data:", clientData);
       
-      // Try to use the unified table first
-      try {
-        if (newClientData.email) {
-          return await clientCreationService.createUserWithUnifiedProfile(newClientData);
-        } else {
-          return await clientCreationService.createUnifiedProfileOnly(newClientData);
-        }
-      } catch (unifiedError) {
-        console.error("Erreur avec la méthode unifiée, fallback sur méthode legacy:", unifiedError);
-        
-        // Fallback to legacy method
-        if (newClientData.email) {
-          return await clientCreationService.createUserWithProfile(newClientData);
-        } else {
-          return await clientCreationService.createProfileOnly(newClientData);
-        }
+      // Validate required fields
+      if (!clientData.email) {
+        throw new Error("Email is required");
       }
+      
+      // Check if the client already exists with this email
+      const existingUserResult = await supabase
+        .from("unified_users")
+        .select("*")
+        .eq("email", clientData.email)
+        .eq("role", "client");
+
+      const existingUser = safeFirstItem(existingUserResult, null);
+      
+      if (existingUser) {
+        console.log("Client already exists:", existingUser);
+        
+        // Return the existing client
+        return {
+          id: existingUser.id,
+          name: `${existingUser.first_name || ''} ${existingUser.last_name || ''}`.trim() || existingUser.email,
+          email: existingUser.email,
+          phone: existingUser.phone || undefined,
+          company: existingUser.company_name || undefined,
+          first_name: existingUser.first_name || undefined,
+          last_name: existingUser.last_name || undefined
+        };
+      }
+      
+      // Get the current user (to set as the creator)
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("Authentication required to create a client");
+      }
+      
+      // Create the new client
+      const insertResult = await supabase
+        .from("unified_users")
+        .insert({
+          email: clientData.email,
+          role: "client",
+          first_name: clientData.first_name || '',
+          last_name: clientData.last_name || '',
+          company_name: clientData.company || '',
+          phone: clientData.phone || '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select("*");
+        
+      const newUser = safeFirstItem(insertResult, null);
+      
+      if (!newUser) {
+        throw new Error("Failed to create client");
+      }
+
+      console.log("New client created:", newUser);
+      toast.success("Client créé avec succès");
+      
+      return {
+        id: newUser.id,
+        name: `${newUser.first_name || ''} ${newUser.last_name || ''}`.trim() || newUser.email,
+        email: newUser.email,
+        phone: newUser.phone || undefined,
+        company: newUser.company_name || undefined,
+        first_name: newUser.first_name || undefined,
+        last_name: newUser.last_name || undefined
+      };
     } catch (error: any) {
-      console.error('Erreur lors de l\'ajout du client:', error);
-      toast.error(error.message || 'Erreur lors de l\'ajout du client');
+      console.error("Error creating client:", error);
+      toast.error(`Erreur lors de la création du client: ${error.message}`);
       return null;
     }
   }

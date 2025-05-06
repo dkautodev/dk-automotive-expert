@@ -40,10 +40,10 @@ export const useAddressBook = () => {
     }
   }, [user]);
 
-  const addContact = async (contact: Omit<ContactEntry, 'id'>) => {
+  const addContact = async (contactData: Omit<ContactEntry, 'id'>) => {
     setState(prev => ({ ...prev, isLoading: true }));
     try {
-      const newContact = await addressBookService.addContact(contact);
+      const newContact = await addressBookService.addContact(contactData);
       if (newContact) {
         setState(prev => ({
           ...prev,

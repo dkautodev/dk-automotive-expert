@@ -5,7 +5,7 @@ export interface ContactEntry {
   lastName: string;
   email: string;
   phone: string;
-  type?: string;
+  type: string;
   notes?: string;
   company?: string;
 }

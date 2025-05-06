@@ -1,18 +1,16 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { ContactEntry } from "@/types/addressBook";
-import { safeTable } from "@/utils/supabase-helper";
+import { safeTable, safeDataAccess, safeFirstItem } from "@/utils/supabase-helper";
 
 export const addressBookService = {
   async getContacts() {
     try {
-      const { data, error } = await safeTable('contacts')
+      const response = await safeTable('contacts')
         .select('*')
         .order('last_name', { ascending: true });
-
-      if (error) throw error;
       
-      const contacts = data || [];
+      const contacts = safeDataAccess(response, []);
       
       // Map the database column names to our frontend model
       return contacts.map(contact => ({
@@ -21,7 +19,7 @@ export const addressBookService = {
         lastName: contact.last_name,
         email: contact.email,
         phone: contact.phone,
-        type: contact.type,
+        type: contact.type || 'general',
         notes: contact.notes || ''
       }));
     } catch (error) {
@@ -32,7 +30,7 @@ export const addressBookService = {
 
   async addContact(contact: Omit<ContactEntry, "id">) {
     try {
-      const { data, error } = await safeTable('contacts')
+      const response = await safeTable('contacts')
         .insert({
           first_name: contact.firstName,
           last_name: contact.lastName,
@@ -44,20 +42,20 @@ export const addressBookService = {
         })
         .select();
 
-      if (error) throw error;
+      const newContact = safeFirstItem(response, null);
       
-      if (!data || data.length === 0) {
+      if (!newContact) {
         throw new Error("No data returned from insert");
       }
       
       return {
-        id: data[0].id,
-        firstName: data[0].first_name,
-        lastName: data[0].last_name,
-        email: data[0].email,
-        phone: data[0].phone,
-        type: data[0].type,
-        notes: data[0].notes || ''
+        id: newContact.id,
+        firstName: newContact.first_name,
+        lastName: newContact.last_name,
+        email: newContact.email,
+        phone: newContact.phone,
+        type: newContact.type,
+        notes: newContact.notes || ''
       };
     } catch (error) {
       console.error("Error adding contact:", error);
@@ -75,25 +73,25 @@ export const addressBookService = {
       if (updates.type !== undefined) updateData.type = updates.type;
       if (updates.notes !== undefined) updateData.notes = updates.notes;
 
-      const { data, error } = await safeTable('contacts')
+      const response = await safeTable('contacts')
         .update(updateData)
         .eq('id', id)
         .select();
 
-      if (error) throw error;
+      const updatedContact = safeFirstItem(response, null);
       
-      if (!data || data.length === 0) {
+      if (!updatedContact) {
         throw new Error("No data returned from update");
       }
       
       return {
-        id: data[0].id,
-        firstName: data[0].first_name,
-        lastName: data[0].last_name,
-        email: data[0].email,
-        phone: data[0].phone,
-        type: data[0].type,
-        notes: data[0].notes || ''
+        id: updatedContact.id,
+        firstName: updatedContact.first_name,
+        lastName: updatedContact.last_name,
+        email: updatedContact.email,
+        phone: updatedContact.phone,
+        type: updatedContact.type,
+        notes: updatedContact.notes || ''
       };
     } catch (error) {
       console.error("Error updating contact:", error);

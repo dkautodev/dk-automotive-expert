@@ -8,7 +8,8 @@ import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
 import { formatMissionClientName } from "@/utils/clientFormatter";
-import { safeTable } from "@/utils/supabase-helper";
+import { safeTable, safeDataAccess } from "@/utils/supabase-helper";
+import { UserProfileRow } from '@/types/database';
 
 export interface CompletedMissionsTableProps {
   missions?: MissionRow[];
@@ -30,39 +31,40 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
           .order('delivery_date', { ascending: false })
           .limit(5);
         
-        if (missionResult.error) throw missionResult.error;
+        const missionData = safeDataAccess(missionResult, []) as MissionRow[];
         
-        if (!missionResult.data || missionResult.data.length === 0) {
+        if (missionData.length === 0) {
           setMissions([]);
           setLoading(false);
           return;
         }
 
-        // Explicit casting to MissionRow[]
-        const missionData = missionResult.data as any[] as MissionRow[];
+        const clientIds = missionData.map(mission => mission.client_id).filter(Boolean);
         
-        const clientIds = missionData.map(mission => mission.client_id);
+        if (clientIds.length === 0) {
+          setMissions(missionData);
+          setLoading(false);
+          return;
+        }
         
         // Use safeTable helper for unified_users
         const clientResult = await safeTable('unified_users')
           .select('*')
           .in('id', clientIds);
           
-        if (clientResult.error) throw clientResult.error;
-        
-        const clientProfiles = clientResult.data;
+        const clientProfiles = safeDataAccess(clientResult, []);
         
         const missionsWithClientInfo = missionData.map(mission => {
           // Find the corresponding client profile
-          const clientProfile = clientProfiles?.find((profile: any) => 
+          const clientProfile = clientProfiles.find((profile: any) => 
             profile.id === mission.client_id
           );
           
           if (clientProfile) {
             // Create an object that conforms to UserProfileRow interface
-            mission.clientProfile = {
-              id: clientProfile.id,
-              user_id: clientProfile.id, // Use id as user_id for compatibility
+            const profileData: UserProfileRow = {
+              id: clientProfile.id || '',
+              user_id: clientProfile.id || '', // Use id as user_id for compatibility
               first_name: clientProfile.first_name || '',
               last_name: clientProfile.last_name || '',
               company_name: clientProfile.company_name || '',
@@ -73,6 +75,8 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
               vat_number: clientProfile.vat_number || '',
               billing_address: clientProfile.billing_address || ''
             };
+            
+            mission.clientProfile = profileData;
           }
           
           return mission;
