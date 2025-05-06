@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ProfileData } from "../types";
 import { toast } from "sonner";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { mockProfileService } from "@/services/profile/mockProfileService";
 
 export const useFieldLocking = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -19,31 +19,10 @@ export const useFieldLocking = (userId: string | undefined, profile: ProfileData
     if (!fieldToLock || !userId) return;
     
     try {
-      // Mapping between form fields and database columns
-      const fieldMapping: Record<string, string> = {
-        siret: 'siret_number',
-        vat_number: 'vat_number'
-      };
-      
-      // Use the extendedSupabase client which mocks database operations
-      const { error } = await extendedSupabase
-        .from('user_profiles')
-        .update({
-          [fieldMapping[fieldToLock]]: tempValue,
-          [`${fieldMapping[fieldToLock]}_locked`]: true
-        })
-        .eq('id', userId);
-        
-      if (error) throw error;
+      const updatedProfile = await mockProfileService.lockField(userId, fieldToLock, tempValue);
       
       // Update local profile
-      if (profile) {
-        setProfile({
-          ...profile,
-          [fieldToLock]: tempValue,
-          [`${fieldToLock}_locked`]: true
-        });
-      }
+      setProfile(updatedProfile);
       
       toast.success("Le champ a été mis à jour et verrouillé.");
       setShowConfirmDialog(false);

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { mockProfileService } from "@/services/profile/mockProfileService";
 
 export const usePasswordChange = (userEmail: string | undefined) => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -14,38 +14,18 @@ export const usePasswordChange = (userEmail: string | undefined) => {
 
     try {
       setIsChangingPassword(true);
-
-      // Verify the current password by trying to sign in
-      const { error: signInError } = await extendedSupabase.auth.signInWithPassword({
-        email: userEmail,
-        password: currentPassword,
-      });
-
-      if (signInError) {
-        toast.error("Le mot de passe actuel est incorrect");
-        return false;
+      
+      const success = await mockProfileService.changePassword(userEmail, currentPassword, newPassword);
+      
+      if (success) {
+        toast.success("Mot de passe mis à jour avec succès");
       }
-
-      // Update the password
-      const { error: updateError } = await extendedSupabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      toast.success("Mot de passe mis à jour avec succès");
-      return true;
+      
+      return success;
     } catch (error: any) {
       console.error("Error changing password:", error.message);
       
-      let errorMessage = "Une erreur est survenue lors du changement de mot de passe";
-      if (error.message.includes("Password should be")) {
-        errorMessage = "Le nouveau mot de passe doit contenir au moins 6 caractères";
-      }
-      
-      toast.error(errorMessage);
+      toast.error("Une erreur est survenue lors du changement de mot de passe");
       return false;
     } finally {
       setIsChangingPassword(false);
