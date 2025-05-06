@@ -6,6 +6,7 @@ import { AuthState, UserProfile } from '@/hooks/auth/types';
 interface AuthContextValue extends AuthState {
   profile: UserProfile | null;
   signOut: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   role?: string;
 }
 
@@ -15,7 +16,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuth();
   
   return (
-    <AuthContext.Provider value={{...auth, signOut: auth.signOut, role: auth.profile?.role}}>
+    <AuthContext.Provider value={{
+      ...auth, 
+      signOut: auth.signOut, 
+      signIn: auth.signIn, 
+      role: auth.profile?.role
+    }}>
       {children}
     </AuthContext.Provider>
   );

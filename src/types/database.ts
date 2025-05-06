@@ -43,6 +43,25 @@ export interface DocumentItem {
 
 export type DocumentType = string;
 
+// Mission status type
+export type MissionStatus = 'en_attente' | 'confirme' | 'confirmé' | 'prise_en_charge' | 'livre' | 'incident' | 'annule' | 'annulé' | 'termine' | string;
+
+// Invoice type
+export interface InvoiceRow {
+  id: string;
+  invoice_number: string;
+  client_id: string;
+  mission_id?: string;
+  price_ht: number;
+  price_ttc: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  payment_due_date?: string;
+  payment_date?: string;
+  [key: string]: any;
+}
+
 // Add these placeholder types to prevent errors in existing components
 // These will be properly implemented later when we rebuild these features
 export interface MissionRow {
@@ -50,7 +69,7 @@ export interface MissionRow {
   mission_number?: string;
   client_id?: string;
   price_ttc?: number;
-  status?: string;
+  status?: MissionStatus;
   delivery_date?: string;
   clientProfile?: UserProfileRow;
   pickup_address?: string;
@@ -66,6 +85,7 @@ export interface MissionRow {
   delivery_contact?: any;
   city?: string;
   postal_code?: string;
+  admin_id?: string; // Added admin_id field
   [key: string]: any;
 }
 

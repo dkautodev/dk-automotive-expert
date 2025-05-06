@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { MissionsTable } from "./MissionsTable";
 import { MissionsTableSkeleton } from "./MissionsTableSkeleton";
@@ -59,7 +60,7 @@ const MissionsByStatusTable: React.FC<MissionsByStatusTableProps> = ({
       console.log("Premier numéro de mission:", missions[0].mission_number);
       console.log("Premier statut de mission:", missions[0].status);
       console.log("Client ID de la première mission:", missions[0].client_id);
-      console.log("Admin ID de la première mission:", missions[0].admin_id);
+      // Remove the reference to admin_id which doesn't exist in all mission objects
     }
   }, [status, showAllMissions, forceAdminView, missions, error, loading, refreshTrigger, localRefreshTrigger, displayType]);
 
