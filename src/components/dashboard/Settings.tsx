@@ -25,7 +25,8 @@ const Settings = () => {
             <Info className="h-4 w-4" />
             <AlertTitle>Information</AlertTitle>
             <AlertDescription>
-              Cette section est en cours de développement. Les paramètres de l'application seront bientôt disponibles.
+              La base de données a été restructurée pour améliorer les performances et la maintenance.
+              Les anciennes tables ont été supprimées et une nouvelle structure simplifiée a été mise en place.
             </AlertDescription>
           </Alert>
         </CardContent>
