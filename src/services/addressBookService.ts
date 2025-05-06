@@ -1,22 +1,24 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { ContactEntry } from "@/types/addressBook";
-import { safeTable, safeArrayData, safeFirstItem } from "@/utils/supabase-helper";
 
 export const addressBookService = {
   async getContacts() {
     try {
-      const response = await safeTable('contacts')
+      const { data, error } = await supabase
+        .from('contacts')
         .select('*')
         .order('last_name', { ascending: true });
       
-      return safeArrayData<any>(response, []).map(contact => ({
+      if (error) throw error;
+      
+      return (data || []).map(contact => ({
         id: contact.id,
-        firstName: contact.first_name || '',
-        lastName: contact.last_name || '',
-        email: contact.email || '',
-        phone: contact.phone || '',
-        type: contact.type || 'general',
+        firstName: contact.first_name,
+        lastName: contact.last_name,
+        email: contact.email,
+        phone: contact.phone,
+        type: contact.type,
         notes: contact.notes || '',
         company: contact.company || '',
       }));
@@ -28,32 +30,34 @@ export const addressBookService = {
 
   async addContact(contact: Omit<ContactEntry, "id">) {
     try {
-      const response = await safeTable('contacts')
+      const { data, error } = await supabase
+        .from('contacts')
         .insert({
-          first_name: contact.firstName || '',
-          last_name: contact.lastName || '',
-          email: contact.email || '',
-          phone: contact.phone || '',
-          type: contact.type || 'general',
+          first_name: contact.firstName,
+          last_name: contact.lastName,
+          email: contact.email,
+          phone: contact.phone,
+          type: contact.type,
           notes: contact.notes || '',
           company: contact.company || '',
-          user_id: (await supabase.auth.getUser()).data.user?.id || ''
+          user_id: (await supabase.auth.getUser()).data.user?.id
         })
         .select();
 
-      const newContact = safeFirstItem(response, null);
+      if (error) throw error;
       
-      if (!newContact) {
+      if (!data || data.length === 0) {
         throw new Error("No data returned from insert");
       }
       
+      const newContact = data[0];
       return {
         id: newContact.id,
-        firstName: newContact.first_name || '',
-        lastName: newContact.last_name || '',
-        email: newContact.email || '',
-        phone: newContact.phone || '',
-        type: newContact.type || '',
+        firstName: newContact.first_name,
+        lastName: newContact.last_name,
+        email: newContact.email,
+        phone: newContact.phone,
+        type: newContact.type,
         notes: newContact.notes || '',
         company: newContact.company || '',
       };
@@ -74,24 +78,26 @@ export const addressBookService = {
       if (updates.notes !== undefined) updateData.notes = updates.notes;
       if (updates.company !== undefined) updateData.company = updates.company;
 
-      const response = await safeTable('contacts')
+      const { data, error } = await supabase
+        .from('contacts')
         .update(updateData)
         .eq('id', id)
         .select();
 
-      const updatedContact = safeFirstItem(response, null);
+      if (error) throw error;
       
-      if (!updatedContact) {
+      if (!data || data.length === 0) {
         throw new Error("No data returned from update");
       }
       
+      const updatedContact = data[0];
       return {
         id: updatedContact.id,
-        firstName: updatedContact.first_name || '',
-        lastName: updatedContact.last_name || '',
-        email: updatedContact.email || '',
-        phone: updatedContact.phone || '',
-        type: updatedContact.type || '',
+        firstName: updatedContact.first_name,
+        lastName: updatedContact.last_name,
+        email: updatedContact.email,
+        phone: updatedContact.phone,
+        type: updatedContact.type,
         notes: updatedContact.notes || '',
         company: updatedContact.company || '',
       };
@@ -103,7 +109,8 @@ export const addressBookService = {
 
   async deleteContact(id: string) {
     try {
-      const { error } = await safeTable('contacts')
+      const { error } = await supabase
+        .from('contacts')
         .delete()
         .eq('id', id);
 

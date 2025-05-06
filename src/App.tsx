@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,17 +12,17 @@ import Devis from "./pages/Devis";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import Auth from "./pages/Auth";
-import AdminAuth from "./pages/AdminAuth";
-import DriverAuth from "./pages/DriverAuth";
 import NotFound from "./pages/NotFound";
 import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import Cookies from "./pages/Cookies";
-import DriverDashboard from "./pages/DriverDashboard";
-import ClientDashboard from "./pages/ClientDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import { UserProfileDetail } from "./components/admin/clients/UserProfileDetail";
 import CGV from "./pages/CGV";
+import Dashboard from "./pages/Dashboard";
+import AddressBook from "./pages/AddressBook";
+import Profile from "./components/dashboard/Profile";
+import DashboardHome from "./components/dashboard/DashboardHome";
+import UserManagement from "./components/dashboard/UserManagement";
+import Settings from "./components/dashboard/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,16 +54,17 @@ const App = () => {
               <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
               <Route path="/cgv" element={<CGV />} />
               
-              {/* Routes d'authentification */}
+              {/* Route d'authentification */}
               <Route path="/auth" element={<Auth />} />
-              <Route path="/admin/auth" element={<AdminAuth />} />
-              <Route path="/driver/auth" element={<DriverAuth />} />
               
-              {/* Routes protégées */}
-              <Route path="/dashboard/driver/*" element={<DriverDashboard />} />
-              <Route path="/dashboard/client/*" element={<ClientDashboard />} />
-              <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
-              <Route path="/dashboard/admin/profile/:userId" element={<UserProfileDetail />} />
+              {/* Routes du tableau de bord unifié */}
+              <Route path="/dashboard" element={<Dashboard />}>
+                <Route index element={<DashboardHome />} />
+                <Route path="contacts" element={<AddressBook />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="users" element={<UserManagement />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
               
               <Route path="*" element={<NotFound />} />
             </Routes>
