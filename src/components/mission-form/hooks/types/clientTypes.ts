@@ -54,3 +54,13 @@ export interface UnifiedUserData {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * Type guard to check if an object is a UnifiedUserData
+ */
+export function isUnifiedUserData(obj: any): obj is UnifiedUserData {
+  return obj && 
+    typeof obj.id === 'string' && 
+    typeof obj.email === 'string' && 
+    typeof obj.role === 'string';
+}
