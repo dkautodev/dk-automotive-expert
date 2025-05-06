@@ -52,19 +52,19 @@ export type UserProfileRow = {
 // Updated MissionStatus to ensure both 'annule' and 'annulé' are valid values for cancellation
 export type MissionStatus = "termine" | "prise_en_charge" | "en_attente" | "confirme" | "confirmé" | "livre" | "incident" | "annule" | "annulé";
 
-export type DocumentType = "kbis" | "driving_license" | "id_card" | "vigilance_certificate";
+export type DocumentType = "kbis" | "driving_license" | "id_card" | "vigilance_certificate" | "identity" | "license" | "insurance" | "invoice" | "contract" | "quote" | "damage_report" | "vehicle_photo" | "delivery_note";
 
-export type NotificationType = "mission_status" | "document_update" | "invoice_generated" | "general";
+export type NotificationType = "mission_status" | "document_update" | "invoice_generated" | "general" | "invoice" | "alert";
 
 export type NotificationRow = {
   id: string;
   user_id: string;
   message: string;
   type: NotificationType;
-  mission_id?: string;
-  read: boolean;
-  created_at: string;
-  updated_at: string;
+  mission_id?: string | null;
+  read: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type InvoiceRow = {
@@ -80,3 +80,14 @@ export type InvoiceRow = {
 };
 
 export type Tables = Database['public']['Tables'];
+
+// Document item type for the DocumentManager component
+export interface DocumentItem {
+  id: string;
+  document_type: string;
+  document_url: string;
+  uploaded_at: string;
+  file_name?: string;
+  file_size?: number;
+  file_type?: string;
+}

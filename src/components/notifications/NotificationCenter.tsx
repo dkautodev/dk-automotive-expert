@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/AuthContext";
 import { extendedSupabase } from "@/integrations/supabase/extended-client";
-import { NotificationRow } from "@/types/database";
+import { NotificationRow, NotificationType } from "@/types/database";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
@@ -51,8 +51,8 @@ export const NotificationCenter = ({ variant = "default" }: NotificationCenterPr
         
         if (data) {
           const formattedNotifications = data.map(notification => ({
-            ...notification,
-            formattedDate: format(new Date(notification.created_at), "PPp", { locale: fr })
+            ...notification as NotificationRow,
+            formattedDate: format(new Date(notification.created_at || new Date()), "PPp", { locale: fr })
           }));
           
           setNotifications(formattedNotifications);
@@ -75,8 +75,8 @@ export const NotificationCenter = ({ variant = "default" }: NotificationCenterPr
         filter: `user_id=eq.${user.id}` 
       }, payload => {
         const newNotification = {
-          ...(payload.new as Notification),
-          formattedDate: format(new Date((payload.new as Notification).created_at), "PPp", { locale: fr })
+          ...(payload.new as NotificationRow),
+          formattedDate: format(new Date((payload.new as any).created_at || new Date()), "PPp", { locale: fr })
         };
         
         setNotifications(prev => [newNotification, ...prev]);

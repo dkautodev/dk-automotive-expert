@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { safeTable } from "@/utils/supabase-helper";
 import { NewClientData } from "../../types/clientTypes";
@@ -29,7 +28,7 @@ export const clientCreationService = {
     
     if (authData?.user) {
       // Create unified user
-      const { data: userData, error: userError } = await safeTable("unified_users")
+      const userResult = await safeTable("unified_users")
         .insert({
           id: authData.user.id,
           email: newClientData.email,
@@ -42,9 +41,13 @@ export const clientCreationService = {
         })
         .select();
       
-      if (userError) {
-        console.error("Erreur lors de l'ajout de l'utilisateur unifié:", userError);
-        throw userError;
+      if (userResult.error) {
+        console.error("Erreur lors de l'ajout de l'utilisateur unifié:", userResult.error);
+        throw userResult.error;
+      }
+      
+      if (!userResult.data || userResult.data.length === 0) {
+        throw new Error("No data returned after creating unified user");
       }
       
       console.log("Utilisateur unifié créé avec succès");
@@ -58,7 +61,7 @@ export const clientCreationService = {
    * Creates a unified user profile without auth user
    */
   createUnifiedProfileOnly: async (newClientData: NewClientData): Promise<string | null> => {
-    const { data: userData, error: userError } = await safeTable("unified_users")
+    const userResult = await safeTable("unified_users")
       .insert({
         email: newClientData.email || 'client-' + Date.now() + '@example.com',
         role: 'client',
@@ -70,13 +73,17 @@ export const clientCreationService = {
       })
       .select();
     
-    if (userError) {
-      console.error("Erreur lors de l'ajout de l'utilisateur unifié:", userError);
-      throw userError;
+    if (userResult.error) {
+      console.error("Erreur lors de l'ajout de l'utilisateur unifié:", userResult.error);
+      throw userResult.error;
     }
     
-    console.log("Profil utilisateur unifié créé avec succès:", userData);
-    return userData[0].id;
+    if (!userResult.data || userResult.data.length === 0) {
+      throw new Error("No data returned from inserting unified user");
+    }
+    
+    console.log("Profil utilisateur unifié créé avec succès:", userResult.data);
+    return userResult.data[0].id;
   },
 
   /**

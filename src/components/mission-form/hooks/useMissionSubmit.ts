@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +5,7 @@ import { MissionFormValues, missionFormSchema } from "../missionFormSchema";
 import { useAuthContext } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { extractAddressComponents } from "@/utils/addressUtils";
+import { extractAddressParts } from "@/utils/addressUtils";
 import { MissionRow } from "@/types/database";
 import { useAttachmentUpload } from "./useAttachmentUpload";
 
@@ -89,7 +88,7 @@ export const useMissionSubmit = ({
 
   const handleCalculateAddress = async (address: string) => {
     try {
-      const { streetNumber, postalCode, city, country } = extractAddressComponents(address);
+      const { streetNumber, postalCode, city, country } = extractAddressParts(address);
       
       return {
         street_number: streetNumber || '',

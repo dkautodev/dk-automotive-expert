@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -44,10 +43,17 @@ type ClientRevenueData = {
 
 type DateRangeType = 'thisMonth' | 'lastMonth' | 'thisQuarter' | 'lastQuarter' | 'thisYear' | 'lastYear' | 'custom';
 
+// Define our own DateRange type that matches what the Calendar component expects
 interface DateRange {
   from: Date | undefined;
   to: Date | undefined;
 }
+
+// Use this type in the component state and elsewhere
+const [dateRange, setDateRange] = useState<DateRange>({
+  from: startOfMonth(new Date()),
+  to: endOfMonth(new Date())
+});
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 const STATUS_COLORS = {
@@ -70,10 +76,6 @@ const RevenueReportingDashboard = () => {
   const [clientsData, setClientsData] = useState<ClientRevenueData[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateRangeType, setDateRangeType] = useState<DateRangeType>('thisMonth');
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date())
-  });
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -510,11 +512,14 @@ const RevenueReportingDashboard = () => {
                   <div>
                     <Calendar
                       mode="range"
-                      selected={dateRange}
+                      selected={{
+                        from: dateRange.from,
+                        to: dateRange.to
+                      }}
                       onSelect={(range) => {
                         if (range) {
                           setDateRangeType('custom');
-                          handleDateRangeChange(range);
+                          handleDateRangeChange(range as DateRange);
                         }
                       }}
                       className="rounded-md border"

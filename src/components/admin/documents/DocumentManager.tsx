@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,21 +16,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { DocumentItem, DocumentType } from "@/types/database";
 
 interface DocumentManagerProps {
   entityId?: string;
   entityType: 'user' | 'mission' | 'invoice';
   documentTypes?: string[];
-}
-
-interface DocumentItem {
-  id: string;
-  document_type: string;
-  document_url: string;
-  uploaded_at: string;
-  file_name?: string;
-  file_size?: number;
-  file_type?: string;
 }
 
 const fileTypeIcons: Record<string, React.ReactNode> = {
@@ -84,34 +74,35 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
   const fetchDocuments = async () => {
     setLoading(true);
     try {
-      let table = '';
-      let filter = {};
+      let tableName = '';
+      let filter: Record<string, any> = {};
       
       // Déterminer quelle table utiliser et quel filtre appliquer
       if (entityType === 'user') {
-        table = 'documents';
+        tableName = 'documents';
         filter = { user_id: effectiveEntityId };
       } else if (entityType === 'mission') {
-        table = 'mission_documents';
+        tableName = 'mission_documents';
         filter = { mission_id: effectiveEntityId };
       } else if (entityType === 'invoice') {
-        table = 'documents'; // Ou une table dédiée aux documents de facture
+        tableName = 'documents'; // Ou une table dédiée aux documents de facture
         filter = { invoice_id: effectiveEntityId };
       }
       
-      if (!table) {
+      if (!tableName) {
         throw new Error('Type d\'entité non supporté');
       }
       
       const { data, error } = await extendedSupabase
-        .from(table)
+        .from(tableName)
         .select('*')
         .match(filter)
         .order('uploaded_at', { ascending: false });
         
       if (error) throw error;
       
-      setDocuments(data || []);
+      // Cast to the correct type and set state
+      setDocuments((data || []) as DocumentItem[]);
     } catch (error) {
       console.error('Erreur lors du chargement des documents:', error);
       toast.error('Erreur lors du chargement des documents');
@@ -178,21 +169,21 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       const publicUrl = urlData.publicUrl;
       
       // 3. Créer l'entrée de document dans la base de données
-      let table = '';
-      let documentData = {};
+      let tableName = '';
+      let documentData: Record<string, any> = {};
       
       if (entityType === 'user') {
-        table = 'documents';
+        tableName = 'documents';
         documentData = {
           user_id: effectiveEntityId,
-          document_type: selectedDocumentType,
+          document_type: selectedDocumentType as DocumentType,
           document_url: publicUrl,
           file_name: selectedFile.name,
           file_size: selectedFile.size,
           file_type: selectedFile.type
         };
       } else if (entityType === 'mission') {
-        table = 'mission_documents';
+        tableName = 'mission_documents';
         documentData = {
           mission_id: effectiveEntityId,
           document_type: selectedDocumentType,
@@ -202,10 +193,10 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
           file_type: selectedFile.type
         };
       } else if (entityType === 'invoice') {
-        table = 'documents'; // Ou une table dédiée
+        tableName = 'documents'; // Ou une table dédiée
         documentData = {
           invoice_id: effectiveEntityId,
-          document_type: selectedDocumentType,
+          document_type: selectedDocumentType as DocumentType,
           document_url: publicUrl,
           file_name: selectedFile.name,
           file_size: selectedFile.size,
@@ -214,7 +205,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       }
       
       const { error: dbError } = await extendedSupabase
-        .from(table)
+        .from(tableName)
         .insert(documentData);
         
       if (dbError) throw dbError;
