@@ -9,51 +9,471 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          address: string
+          city: string
+          country: string
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          postal_code: string
+          siret: string | null
+          updated_at: string | null
+          vat_number: string | null
+        }
+        Insert: {
+          address: string
+          city: string
+          country?: string
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          postal_code: string
+          siret?: string | null
+          updated_at?: string | null
+          vat_number?: string | null
+        }
+        Update: {
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          postal_code?: string
+          siret?: string | null
+          updated_at?: string | null
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          client_id: string | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          first_name: string
+          id: number
+          is_primary: boolean | null
+          last_name: string
+          phone: string | null
+          position: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          first_name: string
+          id?: number
+          is_primary?: boolean | null
+          last_name: string
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          first_name?: string
+          id?: number
+          is_primary?: boolean | null
+          last_name?: string
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: number
+          mission_id: string | null
+          number: string | null
+          storage_path: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          mission_id?: string | null
+          number?: string | null
+          storage_path?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          mission_id?: string | null
+          number?: string | null
+          storage_path?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_maps_settings: {
+        Row: {
+          api_key: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          api_key: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          api_key?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          chauffeur_id: string | null
+          client_id: string | null
+          contact_a_id: number | null
+          contact_b_id: number | null
+          created_at: string | null
+          created_by: string | null
+          date_delivery: string | null
+          date_pickup: string | null
+          date_requested: string | null
+          delivery_address: string
+          delivery_city: string
+          delivery_country: string
+          delivery_postal_code: string
+          distance_km: number | null
+          id: string
+          notes: string | null
+          pickup_address: string
+          pickup_city: string
+          pickup_country: string
+          pickup_postal_code: string
+          price_ht: number | null
+          price_ttc: number | null
+          status: string
+          time_delivery: string | null
+          time_pickup: string | null
+          time_requested: string | null
+          updated_at: string | null
+          vehicle_id: number | null
+        }
+        Insert: {
+          chauffeur_id?: string | null
+          client_id?: string | null
+          contact_a_id?: number | null
+          contact_b_id?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          date_delivery?: string | null
+          date_pickup?: string | null
+          date_requested?: string | null
+          delivery_address: string
+          delivery_city: string
+          delivery_country?: string
+          delivery_postal_code: string
+          distance_km?: number | null
+          id: string
+          notes?: string | null
+          pickup_address: string
+          pickup_city: string
+          pickup_country?: string
+          pickup_postal_code: string
+          price_ht?: number | null
+          price_ttc?: number | null
+          status?: string
+          time_delivery?: string | null
+          time_pickup?: string | null
+          time_requested?: string | null
+          updated_at?: string | null
+          vehicle_id?: number | null
+        }
+        Update: {
+          chauffeur_id?: string | null
+          client_id?: string | null
+          contact_a_id?: number | null
+          contact_b_id?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          date_delivery?: string | null
+          date_pickup?: string | null
+          date_requested?: string | null
+          delivery_address?: string
+          delivery_city?: string
+          delivery_country?: string
+          delivery_postal_code?: string
+          distance_km?: number | null
+          id?: string
+          notes?: string | null
+          pickup_address?: string
+          pickup_city?: string
+          pickup_country?: string
+          pickup_postal_code?: string
+          price_ht?: number | null
+          price_ttc?: number | null
+          status?: string
+          time_delivery?: string | null
+          time_pickup?: string | null
+          time_requested?: string | null
+          updated_at?: string | null
+          vehicle_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_chauffeur_id_fkey"
+            columns: ["chauffeur_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_contact_a_id_fkey"
+            columns: ["contact_a_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_contact_b_id_fkey"
+            columns: ["contact_b_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      missions_status_history: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          id: number
+          mission_id: string | null
+          new_status: string
+          old_status: string | null
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: number
+          mission_id?: string | null
+          new_status: string
+          old_status?: string | null
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: number
+          mission_id?: string | null
+          new_status?: string
+          old_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_status_history_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pricing_grids: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          created_by: string | null
+          id: number
+          max_km: number | null
+          min_km: number
+          price_ht: number
+          price_ttc: number
+          type_tarif: string
+          updated_at: string | null
+          vehicle_category: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          max_km?: number | null
+          min_km: number
+          price_ht: number
+          price_ttc: number
+          type_tarif: string
+          updated_at?: string | null
+          vehicle_category: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          max_km?: number | null
+          min_km?: number
+          price_ht?: number
+          price_ttc?: number
+          type_tarif?: string
+          updated_at?: string | null
+          vehicle_category?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          role?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vat_settings: {
+        Row: {
+          created_at: string | null
+          effective_date: string
+          id: number
+          modified_by: string | null
+          rate: number
+        }
+        Insert: {
+          created_at?: string | null
+          effective_date: string
+          id?: number
+          modified_by?: string | null
+          rate: number
+        }
+        Update: {
+          created_at?: string | null
+          effective_date?: string
+          id?: number
+          modified_by?: string | null
+          rate?: number
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          brand: string
+          category: string
+          color: string | null
+          created_at: string | null
+          created_by: string | null
+          id: number
+          model: string
+          registration_number: string
+          updated_at: string | null
+          year: number | null
+        }
+        Insert: {
+          brand: string
+          category: string
+          color?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          model: string
+          registration_number: string
+          updated_at?: string | null
+          year?: number | null
+        }
+        Update: {
+          brand?: string
+          category?: string
+          color?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          model?: string
+          registration_number?: string
+          updated_at?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      add_vigilance_certificate_enum: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      calculate_price_from_distance: {
-        Args: { p_vehicle_type_id: string; p_distance: number }
-        Returns: {
-          price_ht: number
-          is_per_km: boolean
-        }[]
-      }
-      calculate_price_ttc: {
-        Args: { price_ht: number; vat_rate?: number }
-        Returns: number
-      }
-      create_contact_mapping_fields: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      generate_mission_number: {
-        Args: Record<PropertyKey, never> | { mission_type_param: string }
-        Returns: string
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never> | { user_id: string }
-        Returns: boolean
-      }
-      register_user: {
-        Args: {
-          email: string
-          password: string
-          user_type: string
-          profile: Json
-        }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "admin" | "client" | "driver"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -168,8 +588,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["admin", "client", "driver"],
-    },
+    Enums: {},
   },
 } as const
