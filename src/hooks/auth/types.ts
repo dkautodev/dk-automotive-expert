@@ -1,5 +1,5 @@
 
-export type UserRole = 'client' | 'admin' | 'chauffeur';
+export type UserRole = 'admin' | 'client' | 'driver';
 
 export interface AuthState {
   user: any | null;
@@ -12,33 +12,27 @@ export interface AuthState {
 
 export interface UserProfile {
   id: string;
-  first_name: string | null;
-  last_name: string | null;
+  firstName: string | null;
+  lastName: string | null;
   email: string;
   phone: string | null;
   company: string | null;
-  profile_picture: string | null;
-  siret: string | null;
-  vat_number: string | null;
-  siret_locked: boolean;
-  vat_number_locked: boolean;
-  billing_address: string | null;
+  avatarUrl: string | null;
+  role: UserRole;
 }
 
-// Ces types client seront utilisés pour l'affichage et la création de nouveaux clients sans références circulaires
-export interface ClientData {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  address?: string;
-}
-
-export interface NewClientData {
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  address?: string;
-}
+// Helper function to map database fields to frontend fields
+export const mapDatabaseProfileToUserProfile = (profileData: any): UserProfile | null => {
+  if (!profileData) return null;
+  
+  return {
+    id: profileData.id,
+    firstName: profileData.first_name || '',
+    lastName: profileData.last_name || '',
+    email: profileData.email || '',
+    phone: profileData.phone || '',
+    company: profileData.company_name || '',
+    avatarUrl: profileData.avatar_url || '',
+    role: profileData.role || 'client',
+  };
+};
