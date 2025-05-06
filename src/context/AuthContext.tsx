@@ -5,6 +5,7 @@ import { AuthState, UserProfile } from '@/hooks/auth/types';
 
 interface AuthContextValue extends AuthState {
   profile: UserProfile | null;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuth();
   
   return (
-    <AuthContext.Provider value={auth}>
+    <AuthContext.Provider value={{...auth, signOut: auth.signOut}}>
       {children}
     </AuthContext.Provider>
   );

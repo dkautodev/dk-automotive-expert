@@ -1,50 +1,42 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 /**
- * User deletion module
+ * Service for handling user deletion operations.
+ * Currently mocked since we're removing dashboard components.
  */
-export const userDeletionService = {
+export class UserDeletionService {
   /**
-   * Attempts to delete a user via edge function
+   * Deletes a user by their ID.
+   * @param userId The ID of the user to delete.
+   * @returns A promise that resolves when the user is deleted.
    */
-  deleteUserViaEdgeFunction: async (userId: string): Promise<boolean> => {
+  static async deleteUser(userId: string): Promise<void> {
     try {
-      const { error } = await supabase.functions.invoke('admin_delete_user', {
-        body: { userId }
-      });
-      
-      if (error) {
-        console.warn("Erreur avec l'edge function pour la suppression:", error);
-        return false;
-      }
-      
-      return true;
+      console.log("Mock deletion of user with ID:", userId);
+      // In a real implementation, this would call the Supabase API
+      return Promise.resolve();
     } catch (error) {
-      console.warn("Erreur lors de l'appel à l'edge function de suppression:", error);
-      return false;
-    }
-  },
-
-  /**
-   * Attempts to delete a user directly from database
-   */
-  deleteUserFromDatabase: async (userId: string): Promise<boolean> => {
-    try {
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', userId);
-
-      if (error) {
-        console.error("Erreur lors de la suppression directe de l'utilisateur:", error);
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      console.error("Erreur lors de la suppression directe de l'utilisateur:", error);
-      return false;
+      console.error("Error deleting user:", error);
+      toast.error("Erreur lors de la suppression de l'utilisateur");
+      throw error;
     }
   }
-};
+
+  /**
+   * Marks a user as inactive rather than deleting them.
+   * @param userId The ID of the user to mark as inactive.
+   * @returns A promise that resolves when the user is marked as inactive.
+   */
+  static async markUserAsInactive(userId: string): Promise<void> {
+    try {
+      console.log("Mock marking user as inactive with ID:", userId);
+      // In a real implementation, this would update the user's status
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error marking user as inactive:", error);
+      toast.error("Erreur lors de la désactivation de l'utilisateur");
+      throw error;
+    }
+  }
+}

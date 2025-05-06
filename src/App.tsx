@@ -17,12 +17,6 @@ import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import Cookies from "./pages/Cookies";
 import CGV from "./pages/CGV";
-import Dashboard from "./pages/Dashboard";
-import AddressBook from "./pages/AddressBook";
-import Profile from "./components/dashboard/Profile";
-import DashboardHome from "./components/dashboard/DashboardHome";
-import Settings from "./components/dashboard/Settings";
-import AdminHome from "./components/admin/AdminHome";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,15 +50,6 @@ const App = () => {
               
               {/* Route d'authentification */}
               <Route path="/auth" element={<Auth />} />
-              
-              {/* Routes du tableau de bord simplifié */}
-              <Route path="/dashboard" element={<Dashboard />}>
-                <Route index element={<DashboardHome />} />
-                <Route path="contacts" element={<AddressBook />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="admin" element={<AdminHome />} />
-              </Route>
               
               <Route path="*" element={<NotFound />} />
             </Routes>

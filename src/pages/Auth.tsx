@@ -8,21 +8,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "@/context/AuthContext";
 
 const Auth = () => {
-  const { isAuthenticated, role } = useAuthContext();
+  const { isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
   const [showResetPassword, setShowResetPassword] = useState(false);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est authentifié
-    if (isAuthenticated) {
-      if (role === 'admin') {
-        navigate('/dashboard/admin');
-      } else {
-        navigate('/dashboard/client');
-      }
-    }
-
+    // Only check if the user is authenticated, but don't redirect to dashboard
+    // Because we removed all dashboard pages
+    
     // Vérifier si c'est une demande de réinitialisation de mot de passe
     const queryParams = new URLSearchParams(location.search);
     const type = queryParams.get('type');
@@ -31,7 +25,7 @@ const Auth = () => {
     if (type === 'recovery' || resetRequested) {
       setShowResetPassword(true);
     }
-  }, [isAuthenticated, navigate, role, location]);
+  }, [isAuthenticated, navigate, location]);
 
   return (
     <div className="min-h-screen flex flex-col">

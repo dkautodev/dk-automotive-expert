@@ -27,6 +27,23 @@ export interface ContactRow {
   updated_at: string;
 }
 
+// Document type definitions
+export interface DocumentItem {
+  id: string;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  file_size: number;
+  created_at: string;
+  [key: string]: any;
+}
+
+export interface DocumentType {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
 // Add these placeholder types to prevent errors in existing components
 // These will be properly implemented later when we rebuild these features
 export interface MissionRow {
@@ -52,22 +69,5 @@ export interface UserProfileRow {
   siret_number?: string | null;
   vat_number?: string | null;
   client_code?: string | null;
-  [key: string]: any;
-}
-
-// Document type definitions to prevent errors
-export interface DocumentItem {
-  id: string;
-  file_name: string;
-  file_path: string;
-  file_type: string;
-  file_size: number;
-  created_at: string;
-  [key: string]: any;
-}
-
-export interface DocumentType {
-  id: string;
-  name: string;
   [key: string]: any;
 }
