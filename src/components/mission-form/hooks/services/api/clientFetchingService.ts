@@ -9,6 +9,49 @@ import { clientMappingService } from "../mappers/clientMappingService";
  */
 export const clientFetchingService = {
   /**
+   * Fetch clients via the new unified_users table
+   */
+  fetchClientsViaUnifiedTable: async () => {
+    try {
+      // Récupérer les utilisateurs depuis la table unifiée
+      const { data: users, error: usersError } = await supabase
+        .from("unified_users")
+        .select("*")
+        .eq("role", "client");
+
+      if (usersError) {
+        console.error("Erreur lors de la récupération des utilisateurs unifiés:", usersError);
+        return { success: false, clients: [] };
+      }
+
+      console.log("Utilisateurs unifiés récupérés:", users?.length || 0);
+
+      // Si pas d'utilisateurs, retourner un tableau vide
+      if (!users || users.length === 0) {
+        return { success: true, clients: [] };
+      }
+
+      // Transformation des utilisateurs en format client
+      const clients: ClientData[] = users.map((user) => {
+        return {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          company: user.company_name,
+          client_code: user.client_code,
+          phone: user.phone
+        };
+      });
+
+      return { success: true, clients };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des clients via table unifiée:", error);
+      return { success: false, clients: [] };
+    }
+  },
+
+  /**
    * Fetch clients via user profiles table
    */
   fetchClientsViaProfiles: async () => {

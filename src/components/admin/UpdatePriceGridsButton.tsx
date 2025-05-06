@@ -13,6 +13,7 @@ const UpdatePriceGridsButton = () => {
     
     setIsUpdating(true);
     try {
+      // Remplacez cette fonction pour utiliser la nouvelle table unified_price_grids
       const result = await updatePricingGridsFromTables();
       
       if (result.success) {

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -22,8 +23,9 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
     const fetchCompletedMissions = async () => {
       setLoading(true);
       try {
+        // Utilisez la nouvelle table unified_missions
         const { data, error } = await extendedSupabase
-          .from('missions')
+          .from('unified_missions')
           .select('*')
           .eq('status', 'livre')
           .order('delivery_date', { ascending: false })
@@ -40,16 +42,17 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
         const missionData = data as unknown as MissionRow[];
         
         const clientIds = missionData.map(mission => mission.client_id);
+        // Utilisez la nouvelle table unified_users
         const { data: clientProfiles, error: clientError } = await extendedSupabase
-          .from('user_profiles')
+          .from('unified_users')
           .select('*')
-          .in('user_id', clientIds);
+          .in('id', clientIds);
         
         if (clientError) throw clientError;
         
         const missionsWithClientInfo = missionData.map(mission => {
           mission.clientProfile = clientProfiles?.find(profile => 
-            profile.user_id === mission.client_id
+            profile.id === mission.client_id
           ) || null;
           
           return mission;

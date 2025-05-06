@@ -17,7 +17,7 @@ export const transformToClientDisplay = (client: ClientData): ClientDisplay => {
   
   return {
     id: client.id,
-    name: formatClientName(profileFormat as any, client.email || 'Client sans nom')
+    name: formatClientName(profileFormat, client.email || 'Client sans nom')
   };
 };
 

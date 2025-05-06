@@ -52,25 +52,6 @@ export const OngoingShipmentsTable: React.FC<OngoingShipmentsTableProps> = ({
     handleCancelMission(mission);
   };
 
-  // Get client identifier with improved logic
-  const getClientIdentifier = (mission: MissionRow) => {
-    if (!mission.clientProfile) return "Client";
-    
-    // Priorité au code client s'il existe
-    if (mission.clientProfile.client_code && mission.clientProfile.client_code.trim() !== "") {
-      return mission.clientProfile.client_code;
-    }
-    
-    // Ensuite, priorité au nom de la société
-    if (mission.clientProfile.company_name && mission.clientProfile.company_name.trim() !== "") {
-      return mission.clientProfile.company_name;
-    }
-    
-    // En dernier recours, utiliser le nom et prénom
-    const fullName = `${mission.clientProfile.first_name || ''} ${mission.clientProfile.last_name || ''}`.trim();
-    return fullName || "Client";
-  };
-
   return (
     <>
       <Card className="rounded-lg border">
