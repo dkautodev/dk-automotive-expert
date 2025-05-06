@@ -21,9 +21,7 @@ import Dashboard from "./pages/Dashboard";
 import AddressBook from "./pages/AddressBook";
 import Profile from "./components/dashboard/Profile";
 import DashboardHome from "./components/dashboard/DashboardHome";
-import UserManagement from "./components/dashboard/UserManagement";
 import Settings from "./components/dashboard/Settings";
-import ClientManagement from "./components/admin/ClientManagement";
 import AdminHome from "./components/admin/AdminHome";
 
 const queryClient = new QueryClient({
@@ -59,15 +57,13 @@ const App = () => {
               {/* Route d'authentification */}
               <Route path="/auth" element={<Auth />} />
               
-              {/* Routes du tableau de bord unifié */}
+              {/* Routes du tableau de bord simplifié */}
               <Route path="/dashboard" element={<Dashboard />}>
                 <Route index element={<DashboardHome />} />
                 <Route path="contacts" element={<AddressBook />} />
                 <Route path="profile" element={<Profile />} />
-                <Route path="users" element={<UserManagement />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="admin" element={<AdminHome />} />
-                <Route path="admin/users" element={<ClientManagement />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />
