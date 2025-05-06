@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { safeTable } from "@/utils/supabase-helper";
 import { MissionRow } from "@/types/database";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
@@ -12,14 +12,27 @@ const PendingInvoices = () => {
   useEffect(() => {
     const fetchMissions = async () => {
       // Utilisation de la table unifiée
-      const { data, error } = await extendedSupabase
-        .from('unified_missions')
+      const { data, error } = await safeTable('unified_missions')
         .select('*')
         .eq('status', 'confirmé')
         .order('created_at', { ascending: false });
 
       if (!error && data) {
-        setMissions(data as MissionRow[]);
+        // Conversion explicite pour assurer la compatibilité des types
+        const missionsData = data.map((mission: any) => {
+          const missionRow: MissionRow = {
+            ...mission,
+            // Ajout des propriétés requises qui pourraient manquer
+            quote_id: mission.quote_id || null,
+            quote_number: mission.quote_number || null,
+            pickup_time: mission.pickup_time || null,
+            delivery_time: mission.delivery_time || null,
+            vehicles: mission.vehicles || null
+          };
+          return missionRow;
+        });
+        
+        setMissions(missionsData);
       }
     };
 
