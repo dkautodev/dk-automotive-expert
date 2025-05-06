@@ -3,16 +3,19 @@ import { Home, CreditCard, Settings, CircleDollarSign, Users, List, LogOut } fro
 import { NavLink, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { useAuthContext } from "@/context/AuthContext";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const AdminSidebar = () => {
+  const { signOut } = useAuthContext();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
+      await signOut();
       // Navigate to auth page directly since we're removing dashboard
       navigate("/auth");
       toast.success("Déconnexion réussie");
@@ -38,8 +41,7 @@ const AdminSidebar = () => {
         <div className="px-3">
           <div className="space-y-1">
             <NavLink 
-              to="/dashboard/admin" 
-              end
+              to="/" 
               className={({ isActive }) => 
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
                   isActive ? 'bg-secondary' : 'hover:bg-secondary/80'
@@ -47,26 +49,6 @@ const AdminSidebar = () => {
               }
             >
               <Home className="h-4 w-4" /> Accueil
-            </NavLink>
-            <NavLink 
-              to="/dashboard/admin/pricing-grids" 
-              className={({ isActive }) => 
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
-                  isActive ? 'bg-secondary' : 'hover:bg-secondary/80'
-                }`
-              }
-            >
-              <CreditCard className="h-4 w-4" /> Grilles tarifaires
-            </NavLink>
-            <NavLink 
-              to="/dashboard/admin/pending-invoices" 
-              className={({ isActive }) => 
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
-                  isActive ? 'bg-secondary' : 'hover:bg-secondary/80'
-                }`
-              }
-            >
-              <CircleDollarSign className="h-4 w-4" /> Factures en attente
             </NavLink>
           </div>
         </div>

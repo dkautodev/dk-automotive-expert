@@ -3,6 +3,7 @@ import { UserData } from '../types';
 
 /**
  * Fetches users with their profiles from the database
+ * This is a mock service since we're removing dashboard components
  */
 export const fetchUsersWithProfiles = async (): Promise<{
   clients: UserData[];
@@ -19,6 +20,7 @@ export const fetchUsersWithProfiles = async (): Promise<{
 
 /**
  * Delete a user
+ * This is a mock service since we're removing dashboard components
  */
 export const deleteUser = async (userId: string): Promise<void> => {
   // Mock function since we're removing these components
