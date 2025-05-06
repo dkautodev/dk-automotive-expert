@@ -23,6 +23,8 @@ import Profile from "./components/dashboard/Profile";
 import DashboardHome from "./components/dashboard/DashboardHome";
 import UserManagement from "./components/dashboard/UserManagement";
 import Settings from "./components/dashboard/Settings";
+import ClientManagement from "./components/admin/ClientManagement";
+import AdminHome from "./components/admin/AdminHome";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +66,8 @@ const App = () => {
                 <Route path="profile" element={<Profile />} />
                 <Route path="users" element={<UserManagement />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="admin" element={<AdminHome />} />
+                <Route path="admin/users" element={<ClientManagement />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />
