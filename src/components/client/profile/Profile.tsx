@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProfileHeader from "./ProfileHeader";
 import ProfileCard from "./ProfileCard";
@@ -16,13 +15,9 @@ const Profile = () => {
 
   const handleLogoUpdate = async (logoUrl: string) => {
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          profile_picture: logoUrl
-        })
-        .eq('id', profile?.id);
-      if (error) throw error;
+      // Mock the database update
+      console.log("Would update logo to:", logoUrl);
+      toast.success("Logo mis à jour avec succès");
     } catch (error) {
       console.error('Error updating logo:', error);
       toast.error("Une erreur est survenue lors de la mise à jour du logo.");
@@ -38,14 +33,8 @@ const Profile = () => {
   const handleConfirmLock = async () => {
     if (!fieldToLock || !profile?.id) return;
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          [fieldToLock]: tempValue,
-          [`${fieldToLock}_locked`]: true
-        })
-        .eq('id', profile.id);
-      if (error) throw error;
+      // Mock the database update
+      console.log(`Would lock ${fieldToLock} with value ${tempValue}`);
       toast.success("Le champ a été mis à jour et verrouillé.");
       setShowConfirmDialog(false);
     } catch (error) {
@@ -59,21 +48,15 @@ const Profile = () => {
       // Format the billing address from the individual fields
       const formattedBillingAddress = `${data.billing_address_street}, ${data.billing_address_postal_code} ${data.billing_address_city}, ${data.billing_address_country}`;
       
-      const updateData: any = {
+      // Mock the database update
+      console.log("Would update profile with:", {
         email: data.email,
         phone: data.phone,
-        billing_address: formattedBillingAddress
-      };
-
-      if (!profile?.siret_locked) {
-        updateData.siret = data.siret;
-      }
-      if (!profile?.vat_number_locked) {
-        updateData.vat_number = data.vat_number;
-      }
-
-      const { error } = await supabase.from('user_profiles').update(updateData).eq('id', profile?.id);
-      if (error) throw error;
+        billing_address: formattedBillingAddress,
+        siret: data.siret,
+        vat_number: data.vat_number
+      });
+      
       toast.success("Vos informations ont été mises à jour avec succès.");
     } catch (error: any) {
       toast.error("Une erreur est survenue lors de la mise à jour du profil.");

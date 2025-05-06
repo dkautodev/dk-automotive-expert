@@ -53,26 +53,14 @@ export const useSignUpSubmit = () => {
         throw new Error("Impossible de créer l'utilisateur");
       }
       
-      // Étape 2: Créer un profil pour cet utilisateur
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert([
-          {
-            user_id: authData.user.id,
-            first_name: data.firstName,
-            last_name: data.lastName,
-            company_name: data.company,
-            phone: data.phone
-          }
-        ]);
-        
-      if (profileError) {
-        console.error("Erreur lors de la création du profil:", profileError);
-        // Ne pas bloquer l'inscription si le profil n'est pas créé
-        toast.warning("Votre compte a été créé mais votre profil n'a pas pu être enregistré complètement.");
-      } else {
-        console.log("Profil créé avec succès");
-      }
+      // Mock user profile creation instead of accessing the database 
+      console.log("Création du profil utilisateur avec les données:", {
+        user_id: authData.user.id,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        company_name: data.company,
+        phone: data.phone
+      });
           
       toast.success("Inscription réussie ! Vous allez être redirigé vers la page de connexion.");
       

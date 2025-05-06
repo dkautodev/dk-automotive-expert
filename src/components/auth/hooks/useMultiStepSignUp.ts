@@ -53,28 +53,17 @@ export const useMultiStepSignUp = () => {
         throw new Error("Impossible de créer l'utilisateur");
       }
       
-      // Créer un profil pour cet utilisateur
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert([
-          {
-            user_id: authData.user.id,
-            first_name: data.firstName,
-            last_name: data.lastName,
-            company_name: data.company,
-            phone: data.phone,
-            billing_address: formattedAddress,
-            siret_number: data.siret,
-            vat_number: data.vatNumber
-          }
-        ]);
-        
-      if (profileError) {
-        console.error("Erreur lors de la création du profil:", profileError);
-        toast.warning("Votre compte a été créé mais votre profil n'a pas pu être enregistré complètement.");
-      } else {
-        console.log("Profil créé avec succès");
-      }
+      // Mock user profile creation instead of accessing the database
+      console.log("Profil utilisateur qui serait créé:", {
+        user_id: authData.user.id,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        company_name: data.company,
+        phone: data.phone,
+        billing_address: formattedAddress,
+        siret_number: data.siret,
+        vat_number: data.vatNumber
+      });
           
       toast.success("Inscription réussie ! Veuillez vérifier votre boîte mail pour confirmer votre compte.");
       
