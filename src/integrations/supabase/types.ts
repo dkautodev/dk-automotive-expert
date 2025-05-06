@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      clients: {
+        Row: {
+          business_type: string | null
+          company_name: string | null
+          created_at: string
+          credit_limit: number | null
+          id: string
+          is_active: boolean | null
+          payment_terms: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_type?: string | null
+          company_name?: string | null
+          created_at?: string
+          credit_limit?: number | null
+          id?: string
+          is_active?: boolean | null
+          payment_terms?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_type?: string | null
+          company_name?: string | null
+          created_at?: string
+          credit_limit?: number | null
+          id?: string
+          is_active?: boolean | null
+          payment_terms?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contacts: {
         Row: {
           created_at: string
@@ -79,6 +115,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      google_maps_settings: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          distance_matrix_enabled: boolean | null
+          enabled: boolean | null
+          id: string
+          rate_limit_per_day: number | null
+          rate_limit_per_second: number | null
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          distance_matrix_enabled?: boolean | null
+          enabled?: boolean | null
+          id?: string
+          rate_limit_per_day?: number | null
+          rate_limit_per_second?: number | null
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          distance_matrix_enabled?: boolean | null
+          enabled?: boolean | null
+          id?: string
+          rate_limit_per_day?: number | null
+          rate_limit_per_second?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       invoices: {
         Row: {
@@ -282,6 +351,44 @@ export type Database = {
         }
         Relationships: []
       }
+      missions_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          id: string
+          mission_id: string
+          new_status: string
+          notes: string | null
+          old_status: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          mission_id: string
+          new_status: string
+          notes?: string | null
+          old_status?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          mission_id?: string
+          new_status?: string
+          notes?: string | null
+          old_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_status_history_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -358,6 +465,44 @@ export type Database = {
           vehicle_type_name?: string
         }
         Relationships: []
+      }
+      price_grids_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          id: string
+          new_price_ht: number
+          notes: string | null
+          old_price_ht: number | null
+          price_grid_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_price_ht: number
+          notes?: string | null
+          old_price_ht?: number | null
+          price_grid_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_price_ht?: number
+          notes?: string | null
+          old_price_ht?: number | null
+          price_grid_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_grids_history_price_grid_id_fkey"
+            columns: ["price_grid_id"]
+            isOneToOne: false
+            referencedRelation: "price_grids"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -436,6 +581,84 @@ export type Database = {
         }
         Relationships: []
       }
+      vat_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          effective_from: string
+          effective_to: string | null
+          id: string
+          is_current: boolean | null
+          rate: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          is_current?: boolean | null
+          rate?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          is_current?: boolean | null
+          rate?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          brand: string
+          client_id: string | null
+          created_at: string
+          id: string
+          license_plate: string | null
+          model: string
+          notes: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+          vehicle_type: string
+          year: number | null
+        }
+        Insert: {
+          brand: string
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          license_plate?: string | null
+          model: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type: string
+          year?: number | null
+        }
+        Update: {
+          brand?: string
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          license_plate?: string | null
+          model?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -451,6 +674,14 @@ export type Database = {
           price_ht: number
           is_per_km: boolean
         }[]
+      }
+      calculate_price_ttc: {
+        Args: { price_ht: number; vat_rate?: number }
+        Returns: number
+      }
+      create_contact_mapping_fields: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       create_mission: {
         Args: { mission_data: Json; mission_type_value: string }
