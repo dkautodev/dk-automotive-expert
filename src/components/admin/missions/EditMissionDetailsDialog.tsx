@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { MissionRow } from "@/types/database";
@@ -97,33 +96,29 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
   const [deliveryTime, setDeliveryTime] = useState(mission?.delivery_time || '');
   const [additionalInfo, setAdditionalInfo] = useState(mission?.additional_info || '');
 
-  // Fetch available drivers
+  // Mock fetch available drivers
   useEffect(() => {
     const fetchDrivers = async () => {
       setIsLoadingDrivers(true);
       try {
-        // Get users with chauffeur role
-        const { data: users, error } = await supabase
-          .from('users')
-          .select('id, email')
-          .eq('user_type', 'chauffeur');
-
-        if (error) throw error;
-
-        if (users && users.length > 0) {
-          // Get driver profiles
-          const userIds = users.map(user => user.id);
-          const { data: profiles, error: profilesError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .in('user_id', userIds);
-
-          if (profilesError) throw profilesError;
-
-          setDrivers(profiles || []);
-        } else {
-          setDrivers([]);
-        }
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Mock data
+        setDrivers([
+          {
+            id: '1',
+            user_id: 'driver-1',
+            first_name: 'Jean',
+            last_name: 'Dupont'
+          },
+          {
+            id: '2',
+            user_id: 'driver-2',
+            first_name: 'Marie',
+            last_name: 'Martin'
+          }
+        ]);
       } catch (error: any) {
         console.error("Error fetching drivers:", error.message);
         toast.error("Erreur lors de la récupération des chauffeurs");
@@ -206,44 +201,9 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
     
     setIsLoading(true);
     try {
-      // Format dates to ISO strings
-      const formattedPickupDate = pickupDate ? new Date(pickupDate).toISOString() : null;
-      const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString() : null;
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const { error } = await supabase
-        .from('missions')
-        .update({
-          mission_type: missionType,
-          vehicle_info: {
-            brand: vehicleInfo.brand,
-            model: vehicleInfo.model,
-            licensePlate: vehicleInfo.licensePlate,
-            year: vehicleInfo.year,
-            fuel: vehicleInfo.fuel,
-          },
-          pickup_contact: {
-            firstName: pickupContact.firstName,
-            lastName: pickupContact.lastName,
-            phone: pickupContact.phone,
-            email: pickupContact.email,
-          },
-          delivery_contact: {
-            firstName: deliveryContact.firstName,
-            lastName: deliveryContact.lastName,
-            phone: deliveryContact.phone,
-            email: deliveryContact.email,
-          },
-          pickup_date: formattedPickupDate,
-          pickup_time: pickupTime,
-          delivery_date: formattedDeliveryDate,
-          delivery_time: deliveryTime,
-          additional_info: additionalInfo,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', mission.id);
-
-      if (error) throw error;
-
       toast.success("Détails de la mission mis à jour avec succès");
       onMissionUpdated();
       onClose();
@@ -264,18 +224,9 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
     
     setIsLoading(true);
     try {
-      // Update mission with selected driver
-      const { error } = await supabase
-        .from('missions')
-        .update({
-          driver_id: selectedDriverId,
-          status: 'prise_en_charge', // Update status to "prise en charge"
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', mission.id);
-
-      if (error) throw error;
-
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       toast.success(`Mission ${mission.mission_number} assignée au chauffeur`);
       onMissionUpdated();
       onClose();

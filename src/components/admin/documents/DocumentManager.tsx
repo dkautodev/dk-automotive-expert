@@ -17,8 +17,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DocumentItem, DocumentType } from "@/types/database";
-import { safeTable } from "@/utils/supabase-helper";
-import { supabase } from "@/integrations/supabase/client";
 
 interface DocumentManagerProps {
   entityId?: string;
@@ -70,47 +68,13 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       return;
     }
     
-    fetchDocuments();
-  }, [effectiveEntityId, entityType]);
-  
-  const fetchDocuments = async () => {
+    // Mock fetch documents - no actual API call since we're removing dashboard
     setLoading(true);
-    try {
-      let tableName = '';
-      let filter: Record<string, any> = {};
-      
-      // Determine which table to use and which filter to apply
-      if (entityType === 'user') {
-        tableName = 'documents';
-        filter = { user_id: effectiveEntityId };
-      } else if (entityType === 'mission') {
-        tableName = 'mission_documents';
-        filter = { mission_id: effectiveEntityId };
-      } else if (entityType === 'invoice') {
-        tableName = 'documents'; // Or a dedicated table for invoice documents
-        filter = { invoice_id: effectiveEntityId };
-      }
-      
-      if (!tableName) {
-        throw new Error('Unsupported entity type');
-      }
-      
-      const { data, error } = await safeTable(tableName)
-        .select('*')
-        .match(filter)
-        .order('uploaded_at', { ascending: false });
-        
-      if (error) throw error;
-      
-      // Cast to the correct type and set state
-      setDocuments((data || []) as any[] as DocumentItem[]);
-    } catch (error) {
-      console.error('Error loading documents:', error);
-      toast.error('Error loading documents');
-    } finally {
+    setTimeout(() => {
+      setDocuments([]);
       setLoading(false);
-    }
-  };
+    }, 500);
+  }, [effectiveEntityId, entityType]);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,11 +101,6 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
     setUploadProgress(0);
     
     try {
-      // 1. Upload file to storage bucket
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${entityType}_${effectiveEntityId}_${selectedDocumentType}_${Date.now()}.${fileExt}`;
-      const filePath = `${entityType}s/${effectiveEntityId}/${fileName}`;
-      
       // Simulate upload progress
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
@@ -153,70 +112,32 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
         });
       }, 100);
       
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, selectedFile);
-        
-      if (uploadError) throw uploadError;
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       clearInterval(progressInterval);
       setUploadProgress(100);
       
-      // 2. Get public URL for the file
-      const { data: urlData } = supabase.storage
-        .from('documents')
-        .getPublicUrl(filePath);
-        
-      const publicUrl = urlData.publicUrl;
-      
-      // 3. Create document entry in database
-      let tableName = '';
-      let documentData: Record<string, any> = {};
-      
-      if (entityType === 'user') {
-        tableName = 'documents';
-        documentData = {
-          user_id: effectiveEntityId,
-          document_type: selectedDocumentType as DocumentType,
-          document_url: publicUrl,
-          file_name: selectedFile.name,
-          file_size: selectedFile.size,
-          file_type: selectedFile.type
-        };
-      } else if (entityType === 'mission') {
-        tableName = 'mission_documents';
-        documentData = {
-          mission_id: effectiveEntityId,
-          document_type: selectedDocumentType,
-          document_url: publicUrl,
-          file_name: selectedFile.name,
-          file_size: selectedFile.size,
-          file_type: selectedFile.type
-        };
-      } else if (entityType === 'invoice') {
-        tableName = 'documents'; // Or a dedicated table
-        documentData = {
-          invoice_id: effectiveEntityId,
-          document_type: selectedDocumentType as DocumentType,
-          document_url: publicUrl,
-          file_name: selectedFile.name,
-          file_size: selectedFile.size,
-          file_type: selectedFile.type
-        };
-      }
-      
-      const { error: dbError } = await safeTable(tableName)
-        .insert(documentData);
-        
-      if (dbError) throw dbError;
+      // Mock document creation
+      const newDocument: DocumentItem = {
+        id: `doc-${Date.now()}`,
+        file_name: selectedFile.name,
+        file_path: 'mocked-path',
+        file_type: selectedFile.type,
+        file_size: selectedFile.size,
+        created_at: new Date().toISOString(),
+        document_type: selectedDocumentType,
+        document_url: previewUrl || '',
+        uploaded_at: new Date().toISOString()
+      };
       
       toast.success('Document uploaded successfully');
       setSelectedFile(null);
       setPreviewUrl(null);
       setSelectedDocumentType('');
       
-      // Refresh documents list
-      fetchDocuments();
+      // Update local state
+      setDocuments(prev => [newDocument, ...prev]);
       
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -231,26 +152,9 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
     if (!confirm('Are you sure you want to delete this document?')) return;
     
     try {
-      let table = '';
-      
-      if (entityType === 'user') {
-        table = 'documents';
-      } else if (entityType === 'mission') {
-        table = 'mission_documents';
-      } else if (entityType === 'invoice') {
-        table = 'documents'; // Or dedicated table
-      }
-      
-      const { error } = await safeTable(table)
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      // Update local list
+      // Mock delete operation
       setDocuments(prev => prev.filter(doc => doc.id !== id));
       toast.success('Document deleted');
-      
     } catch (error) {
       console.error('Delete error:', error);
       toast.error('Error deleting document');
