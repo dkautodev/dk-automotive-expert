@@ -50,8 +50,16 @@ const ContactForm = ({ contact, onCancel, onSubmit }: ContactFormProps) => {
   });
 
   const handleSubmit = (values: ContactFormValues) => {
-    // All required fields are now included in values
-    onSubmit(values);
+    // Ensure all required fields are included
+    onSubmit({
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phone: values.phone,
+      type: values.type,
+      notes: values.notes,
+      company: values.company,
+    });
   };
 
   return (
