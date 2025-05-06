@@ -11,8 +11,9 @@ const PendingInvoices = () => {
 
   useEffect(() => {
     const fetchMissions = async () => {
+      // Utilisation de la table unifiée
       const { data, error } = await extendedSupabase
-        .from('missions')
+        .from('unified_missions')
         .select('*')
         .eq('status', 'confirmé')
         .order('created_at', { ascending: false });

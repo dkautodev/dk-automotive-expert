@@ -74,7 +74,7 @@ export const useClients = (form?: any) => {
 
   return { 
     clients, 
-    clientDisplayList,  // Ajout de la liste formatée
+    clientDisplayList,
     isLoading, 
     error, 
     fetchClients

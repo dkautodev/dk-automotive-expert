@@ -1,5 +1,5 @@
 
-import { MissionRow, UserProfileRow } from "@/types/database";
+import { MissionRow } from "@/types/database";
 
 /**
  * Fonction utilitaire qui standardise l'affichage du nom du client
@@ -9,7 +9,7 @@ import { MissionRow, UserProfileRow } from "@/types/database";
  * 3. Prénom et nom
  * 4. Valeur par défaut
  */
-export function formatClientName(profile: UserProfileRow | null, defaultValue: string = 'Client inconnu'): string {
+export function formatClientName(profile: any | null, defaultValue: string = 'Client inconnu'): string {
   if (!profile) return defaultValue;
   
   // Priorité 1: Code client

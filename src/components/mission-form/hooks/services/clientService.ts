@@ -17,14 +17,21 @@ export const clientService = {
     try {
       console.log("Début de la récupération des clients depuis Supabase");
       
-      // First try: Get user profiles and map them to clients
-      const profileResult = await clientFetchingService.fetchClientsViaProfiles();
+      // First try: Get users from the new unified_users table
+      const profileResult = await clientFetchingService.fetchClientsViaUnifiedTable();
       
       if (profileResult.success && profileResult.clients.length > 0) {
         return { clients: profileResult.clients, error: null };
       }
 
-      // Fallback: Try to get users directly (without profiles)
+      // Fallback: Try legacy methods
+      const legacyProfileResult = await clientFetchingService.fetchClientsViaProfiles();
+      
+      if (legacyProfileResult.success && legacyProfileResult.clients.length > 0) {
+        return { clients: legacyProfileResult.clients, error: null };
+      }
+
+      // Last resort: Try to get users via Edge Function
       const edgeFunctionResult = await clientFetchingService.fetchClientsViaEdgeFunction();
       
       if (edgeFunctionResult.success) {
