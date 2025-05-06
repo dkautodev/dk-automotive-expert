@@ -11,7 +11,7 @@ import { PostgrestError } from "@supabase/supabase-js";
  */
 export function safeTable(tableName: string) {
   // Use type assertion to bypass TypeScript's type checking for unknown tables
-  return supabase.from(tableName);
+  return supabase.from(tableName as any);
 }
 
 /**

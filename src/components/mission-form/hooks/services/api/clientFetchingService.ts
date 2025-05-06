@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { safeTable } from "@/utils/supabase-helper";
 import { ClientData, UnifiedUserData } from "../../types/clientTypes";
@@ -13,39 +12,39 @@ export const clientFetchingService = {
    */
   fetchClientsViaUnifiedTable: async () => {
     try {
-      // Récupérer les utilisateurs depuis la table unifiée avec cast de type explicite
+      // Get users from the unified table with explicit type casting
       const { data: usersData, error: usersError } = await safeTable("unified_users")
         .select("*")
         .eq("role", "client");
 
       if (usersError) {
-        console.error("Erreur lors de la récupération des utilisateurs unifiés:", usersError);
+        console.error("Error fetching unified users:", usersError);
         return { success: false, clients: [] };
       }
 
-      // Vérifier que usersData est un tableau
+      // Check if usersData is an array
       if (!Array.isArray(usersData)) {
-        console.error("Données non valides reçues de la table unified_users");
+        console.error("Invalid data received from unified_users table");
         return { success: false, clients: [] };
       }
 
-      // Cast explicite vers le type UnifiedUserData[]
-      const users = (usersData as any[]).filter(user => 
+      // Safe casting to UnifiedUserData[]
+      const users = usersData.filter((user: any) => 
         user && typeof user.id === 'string' && typeof user.email === 'string'
       ) as UnifiedUserData[];
       
-      console.log("Utilisateurs unifiés récupérés:", users?.length || 0);
+      console.log("Unified users retrieved:", users?.length || 0);
 
-      // Si pas d'utilisateurs, retourner un tableau vide
+      // If no users, return empty array
       if (!users || users.length === 0) {
         return { success: true, clients: [] };
       }
 
-      // Transformation des utilisateurs en format client
+      // Transform users to client format
       const clients: ClientData[] = users.map((user) => {
         return {
           id: user.id,
-          name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Client sans nom',
+          name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Unnamed client',
           email: user.email,
           first_name: user.first_name || undefined,
           last_name: user.last_name || undefined,
@@ -57,7 +56,7 @@ export const clientFetchingService = {
 
       return { success: true, clients };
     } catch (error) {
-      console.error("Erreur lors de la récupération des clients via table unifiée:", error);
+      console.error("Error fetching clients via unified table:", error);
       return { success: false, clients: [] };
     }
   },
@@ -67,31 +66,31 @@ export const clientFetchingService = {
    */
   fetchClientsViaProfiles: async () => {
     try {
-      // Récupérer les profils utilisateurs
+      // Get user profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("user_profiles")
         .select("*");
 
       if (profilesError) {
-        console.error("Erreur lors de la récupération des profils:", profilesError);
+        console.error("Error fetching profiles:", profilesError);
         return { success: false, clients: [] };
       }
 
-      console.log("Profils récupérés:", profiles?.length || 0);
+      console.log("Profiles retrieved:", profiles?.length || 0);
 
-      // Si pas de profils, retourner un tableau vide
+      // If no profiles, return empty array
       if (!profiles || profiles.length === 0) {
         return { success: true, clients: [] };
       }
 
-      // Transformation des profils en format client
+      // Transform profiles to client format
       const clients: ClientData[] = profiles.map((profile) => {
         return clientMappingService.mapProfileToClient(profile, { email: "" });
       });
 
       return { success: true, clients };
     } catch (error) {
-      console.error("Erreur lors de la récupération des clients via profils:", error);
+      console.error("Error fetching clients via profiles:", error);
       return { success: false, clients: [] };
     }
   },
@@ -104,23 +103,23 @@ export const clientFetchingService = {
       const { data, error } = await supabase.functions.invoke("get_users_with_profiles");
 
       if (error) {
-        console.error("Erreur Edge Function:", error);
+        console.error("Edge Function Error:", error);
         return { success: false, clients: [] };
       }
 
-      console.log("Données de l'Edge Function:", data?.length || 0);
+      console.log("Edge Function Data:", data?.length || 0);
 
-      // Filtrer pour ne garder que les clients
+      // Filter to keep only clients
       const clientUsers = Array.isArray(data)
         ? data.filter((user) => user.user_type === "client")
         : [];
 
-      // Transformer les données en format ClientData
+      // Transform data to ClientData format
       const clients: ClientData[] = clientUsers.map(clientMappingService.mapUserToClient);
 
       return { success: true, clients };
     } catch (error) {
-      console.error("Erreur lors de la récupération des clients via Edge Function:", error);
+      console.error("Error fetching clients via Edge Function:", error);
       return { success: false, clients: [] };
     }
   }

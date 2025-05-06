@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,7 +24,7 @@ export function useMissions({
 }: UseMissionsProps = {}) {
   const { user, role } = useAuthContext();
   
-  // Amélioration de la détection des administrateurs
+  // Improved admin detection
   const adminEmail = 'dkautomotive70@gmail.com';
   const isAdmin = Boolean(forceAdminView || role === 'admin' || (user?.email === adminEmail));
   
@@ -40,13 +41,13 @@ export function useMissions({
     `);
     
     try {
-      // Construction de la requête pour récupérer les missions
+      // Build query to get missions
       let query = supabase
         .from('missions')
         .select('*')
         .order('created_at', { ascending: false });
       
-      // Application du filtre de statut si showAllMissions est false et filterStatus est fourni
+      // Apply status filter if showAllMissions is false and filterStatus is provided
       if (!showAllMissions && filterStatus) {
         if (Array.isArray(filterStatus)) {
           console.log(`Filtering by multiple statuses: ${filterStatus.join(', ')}`);
@@ -57,16 +58,16 @@ export function useMissions({
         }
       }
       
-      // CORRECTION: Vérification stricte si l'utilisateur n'est PAS un admin
+      // CORRECTION: Strict check if user is NOT an admin
       if (!isAdmin && user?.id) {
-        console.log(`Mode client: Filtering by client_id: ${user.id}`);
+        console.log(`Client mode: Filtering by client_id: ${user.id}`);
         query = query.eq('client_id', user.id);
       } else {
-        console.log(`Mode admin: Affichage de toutes les missions sans filtre client_id. isAdmin=${isAdmin}`);
-        // Pour les admins, nous n'appliquons pas de filtre client_id
+        console.log(`Admin mode: Showing all missions without client_id filter. isAdmin=${isAdmin}`);
+        // For admins, we don't apply client_id filter
       }
 
-      // Application de la limite si fournie
+      // Apply limit if provided
       if (limit) {
         query = query.limit(limit);
       }
@@ -78,23 +79,23 @@ export function useMissions({
         throw error;
       }
       
-      console.log(`Missions récupérées: ${data?.length || 0} à ${timestamp}`);
+      console.log(`Missions retrieved: ${data?.length || 0} at ${timestamp}`);
       
       if (!data || data.length === 0) {
-        console.log("Aucune mission trouvée dans la base de données");
+        console.log("No missions found in database");
         return [];
       }
       
-      // Transformation des missions pour inclure des objets correctement typés
+      // Transform missions to include properly typed objects
       const transformedMissions = data.map(mission => {
         const vehicleInfo = mission.vehicle_info as any || {};
         
-        // Cast explicite de mission_type au type correct
+        // Explicit cast of mission_type to the correct type
         const missionType = mission.mission_type === 'livraison' || mission.mission_type === 'restitution' 
           ? mission.mission_type as "livraison" | "restitution"
-          : "livraison"; // Valeur par défaut si ce n'est pas un type valide
+          : "livraison"; // Default value if not a valid type
         
-        // Validation et cast du statut au type MissionStatus
+        // Validate and cast status to MissionStatus type
         const validateStatus = (status: string): MissionStatus => {
           const validStatuses: MissionStatus[] = [
             "termine", "prise_en_charge", "en_attente", "confirme", 
@@ -103,34 +104,34 @@ export function useMissions({
           
           return validStatuses.includes(status as MissionStatus) 
             ? status as MissionStatus 
-            : "en_attente"; // Par défaut "en_attente" si statut invalide
+            : "en_attente"; // Default "en_attente" if invalid status
         };
         
-        // S'assurer que les données d'adresse structurée sont disponibles
-        // Vérifier si les propriétés existent dans l'objet mission
+        // Make sure structured address data is available
+        // Check if properties exist in the mission object
         const missAny = mission as any;
         const hasCityData = missAny.city !== undefined;
         const hasPickupAddress = missAny.pickup_address !== undefined;
         
-        // Création d'un objet mission correctement typé (sans clientProfile pour l'instant)
+        // Create a properly typed mission object (without clientProfile for now)
         const typedMission: MissionRow = {
           ...mission,
           mission_type: missionType,
           status: validateStatus(missAny.status),
-          pickup_address: hasPickupAddress ? missAny.pickup_address : (vehicleInfo?.pickup_address || 'Non spécifié'),
-          delivery_address: missAny.delivery_address || vehicleInfo?.delivery_address || 'Non spécifié',
-          clientProfile: null, // Sera rempli plus tard
-          admin_id: missAny.admin_id || null, // S'assurer que admin_id est correctement copié
-          // Ajouter les propriétés d'adresse structurée
+          pickup_address: hasPickupAddress ? missAny.pickup_address : (vehicleInfo?.pickup_address || 'Not specified'),
+          delivery_address: missAny.delivery_address || vehicleInfo?.delivery_address || 'Not specified',
+          clientProfile: null, // Will be filled later
+          admin_id: missAny.admin_id || null, // Make sure admin_id is properly copied
+          // Add structured address properties
           street_number: missAny.street_number || null,
           postal_code: missAny.postal_code || null,
           city: missAny.city || null,
           country: missAny.country || 'France'
         };
         
-        // Si les colonnes city et postal_code sont vides, mais qu'il y a une adresse de pickup,
-        // essayer d'extraire les composantes de l'adresse
-        if (!typedMission.city && typedMission.pickup_address && typedMission.pickup_address !== 'Non spécifié') {
+        // If city and postal_code columns are empty but there's a pickup address,
+        // try to extract address components
+        if (!typedMission.city && typedMission.pickup_address && typedMission.pickup_address !== 'Not specified') {
           const addressComponents = extractAddressParts(typedMission.pickup_address);
           typedMission.street_number = typedMission.street_number || addressComponents.streetNumber;
           typedMission.postal_code = typedMission.postal_code || addressComponents.postalCode;
@@ -141,9 +142,9 @@ export function useMissions({
         return typedMission;
       });
       
-      // Récupération de tous les profils clients en une seule requête
+      // Get all client profiles in a single query
       if (transformedMissions.length > 0) {
-        // Extraction des ID clients uniques
+        // Extract unique client IDs
         const clientIds = [...new Set(transformedMissions.map(m => m.client_id))].filter(Boolean);
         
         if (clientIds.length > 0) {
@@ -154,9 +155,9 @@ export function useMissions({
             
           if (profilesError) {
             console.error("Error fetching client profiles:", profilesError);
-            // Continuer sans profils plutôt que d'échouer complètement
+            // Continue without profiles rather than failing completely
           } else if (profiles) {
-            // Attachement des profils aux missions respectives
+            // Attach profiles to respective missions
             const missionsWithProfiles = transformedMissions.map(mission => {
               const clientProfile = profiles.find(
                 profile => profile.user_id === mission.client_id
@@ -168,13 +169,13 @@ export function useMissions({
               };
             });
             
-            console.log(`Requête terminée avec succès: ${missionsWithProfiles.length} missions avec profiles`);
+            console.log(`Query completed successfully: ${missionsWithProfiles.length} missions with profiles`);
             return missionsWithProfiles;
           }
         }
       }
       
-      console.log(`Requête terminée avec succès: ${transformedMissions.length} missions (sans profiles)`);
+      console.log(`Query completed successfully: ${transformedMissions.length} missions (without profiles)`);
       return transformedMissions;
     } catch (error) {
       console.error("Error in fetchMissions:", error);
@@ -182,7 +183,7 @@ export function useMissions({
     }
   }, [refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user, forceAdminView, role]);
 
-  // Utilisation de react-query pour une meilleure gestion du cache et de l'état
+  // Use react-query for better cache and state management
   const { 
     data: missions = [], 
     isLoading: loading, 
@@ -191,14 +192,14 @@ export function useMissions({
   } = useQuery({
     queryKey: ['missions', refreshTrigger, showAllMissions, filterStatus, limit, isAdmin, user?.id, forceAdminView, role],
     queryFn: fetchMissions,
-    staleTime: 0, // Toujours considérer les données comme obsolètes
-    refetchInterval: role === 'admin' ? 90000 : 90000, // 90 sec pour tous (était 3 sec pour admin)
-    retryDelay: 1000, // Attendre 1 seconde entre les tentatives
-    retry: 3, // Maximum de 3 tentatives en cas d'échec
+    staleTime: 0, // Always consider data as stale
+    refetchInterval: role === 'admin' ? 90000 : 90000, // 90 sec for all (was 3 sec for admin)
+    retryDelay: 1000, // Wait 1 second between retry attempts
+    retry: 3, // Maximum of 3 attempts in case of failure
     meta: {
       onError: (err: any) => {
         console.error('Error in useMissions hook:', err);
-        toast.error("Erreur lors de la récupération des missions");
+        toast.error("Error retrieving missions");
       }
     }
   });

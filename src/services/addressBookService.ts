@@ -1,12 +1,12 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { ContactEntry } from "@/types/addressBook";
+import { safeTable } from "@/utils/supabase-helper";
 
 export const addressBookService = {
   async getContacts() {
     try {
-      const { data, error } = await supabase
-        .from('contacts')
+      const { data, error } = await safeTable('contacts')
         .select('*')
         .order('last_name', { ascending: true });
 
@@ -30,17 +30,16 @@ export const addressBookService = {
     }
   },
 
-  async addContact(contact: ContactEntry) {
+  async addContact(contact: Omit<ContactEntry, "id">) {
     try {
-      const { data, error } = await supabase
-        .from('contacts')
+      const { data, error } = await safeTable('contacts')
         .insert({
           first_name: contact.firstName,
           last_name: contact.lastName,
           email: contact.email,
           phone: contact.phone,
-          type: contact.type,
-          notes: contact.notes,
+          type: contact.type || 'general',
+          notes: contact.notes || '',
           user_id: (await supabase.auth.getUser()).data.user?.id || ''
         })
         .select();
@@ -66,19 +65,19 @@ export const addressBookService = {
     }
   },
 
-  async updateContact(contact: ContactEntry) {
+  async updateContact(id: string, updates: Partial<Omit<ContactEntry, "id">>) {
     try {
-      const { data, error } = await supabase
-        .from('contacts')
-        .update({
-          first_name: contact.firstName,
-          last_name: contact.lastName,
-          email: contact.email,
-          phone: contact.phone,
-          type: contact.type,
-          notes: contact.notes
-        })
-        .eq('id', contact.id)
+      const updateData: Record<string, any> = {};
+      if (updates.firstName !== undefined) updateData.first_name = updates.firstName;
+      if (updates.lastName !== undefined) updateData.last_name = updates.lastName;
+      if (updates.email !== undefined) updateData.email = updates.email;
+      if (updates.phone !== undefined) updateData.phone = updates.phone;
+      if (updates.type !== undefined) updateData.type = updates.type;
+      if (updates.notes !== undefined) updateData.notes = updates.notes;
+
+      const { data, error } = await safeTable('contacts')
+        .update(updateData)
+        .eq('id', id)
         .select();
 
       if (error) throw error;
@@ -104,8 +103,7 @@ export const addressBookService = {
 
   async deleteContact(id: string) {
     try {
-      const { error } = await supabase
-        .from('contacts')
+      const { error } = await safeTable('contacts')
         .delete()
         .eq('id', id);
 

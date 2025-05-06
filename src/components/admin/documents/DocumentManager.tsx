@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Check, File, FileText, Upload, X } from "lucide-react";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { useAuthContext } from "@/context/AuthContext";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
@@ -17,6 +17,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DocumentItem, DocumentType } from "@/types/database";
+import { safeTable } from "@/utils/supabase-helper";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DocumentManagerProps {
   entityId?: string;
@@ -59,7 +61,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
   const [viewDocument, setViewDocument] = useState<DocumentItem | null>(null);
   const { user } = useAuthContext();
   
-  // Si aucun entityId n'est fourni, utiliser l'id de l'utilisateur connecté
+  // If no entityId is provided, use the connected user's id
   const effectiveEntityId = entityId || user?.id;
   
   useEffect(() => {
@@ -77,7 +79,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       let tableName = '';
       let filter: Record<string, any> = {};
       
-      // Déterminer quelle table utiliser et quel filtre appliquer
+      // Determine which table to use and which filter to apply
       if (entityType === 'user') {
         tableName = 'documents';
         filter = { user_id: effectiveEntityId };
@@ -85,16 +87,15 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
         tableName = 'mission_documents';
         filter = { mission_id: effectiveEntityId };
       } else if (entityType === 'invoice') {
-        tableName = 'documents'; // Ou une table dédiée aux documents de facture
+        tableName = 'documents'; // Or a dedicated table for invoice documents
         filter = { invoice_id: effectiveEntityId };
       }
       
       if (!tableName) {
-        throw new Error('Type d\'entité non supporté');
+        throw new Error('Unsupported entity type');
       }
       
-      const { data, error } = await extendedSupabase
-        .from(tableName)
+      const { data, error } = await safeTable(tableName)
         .select('*')
         .match(filter)
         .order('uploaded_at', { ascending: false });
@@ -102,10 +103,10 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       if (error) throw error;
       
       // Cast to the correct type and set state
-      setDocuments((data || []) as DocumentItem[]);
+      setDocuments((data || []) as any[] as DocumentItem[]);
     } catch (error) {
-      console.error('Erreur lors du chargement des documents:', error);
-      toast.error('Erreur lors du chargement des documents');
+      console.error('Error loading documents:', error);
+      toast.error('Error loading documents');
     } finally {
       setLoading(false);
     }
@@ -117,7 +118,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
     
     setSelectedFile(file);
     
-    // Créer une URL pour la prévisualisation
+    // Create a URL for preview
     if (file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -128,7 +129,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
   
   const handleUpload = async () => {
     if (!selectedFile || !selectedDocumentType || !effectiveEntityId) {
-      toast.error('Veuillez sélectionner un fichier et un type de document');
+      toast.error('Please select a file and document type');
       return;
     }
     
@@ -136,12 +137,12 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
     setUploadProgress(0);
     
     try {
-      // 1. Télécharger le fichier dans le bucket de stockage
+      // 1. Upload file to storage bucket
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${entityType}_${effectiveEntityId}_${selectedDocumentType}_${Date.now()}.${fileExt}`;
       const filePath = `${entityType}s/${effectiveEntityId}/${fileName}`;
       
-      // Simuler la progression du téléchargement
+      // Simulate upload progress
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 95) {
@@ -152,7 +153,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
         });
       }, 100);
       
-      const { data: uploadData, error: uploadError } = await extendedSupabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('documents')
         .upload(filePath, selectedFile);
         
@@ -161,14 +162,14 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       clearInterval(progressInterval);
       setUploadProgress(100);
       
-      // 2. Obtenir l'URL publique du fichier
-      const { data: urlData } = extendedSupabase.storage
+      // 2. Get public URL for the file
+      const { data: urlData } = supabase.storage
         .from('documents')
         .getPublicUrl(filePath);
         
       const publicUrl = urlData.publicUrl;
       
-      // 3. Créer l'entrée de document dans la base de données
+      // 3. Create document entry in database
       let tableName = '';
       let documentData: Record<string, any> = {};
       
@@ -193,7 +194,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
           file_type: selectedFile.type
         };
       } else if (entityType === 'invoice') {
-        tableName = 'documents'; // Ou une table dédiée
+        tableName = 'documents'; // Or a dedicated table
         documentData = {
           invoice_id: effectiveEntityId,
           document_type: selectedDocumentType as DocumentType,
@@ -204,23 +205,22 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
         };
       }
       
-      const { error: dbError } = await extendedSupabase
-        .from(tableName)
+      const { error: dbError } = await safeTable(tableName)
         .insert(documentData);
         
       if (dbError) throw dbError;
       
-      toast.success('Document téléchargé avec succès');
+      toast.success('Document uploaded successfully');
       setSelectedFile(null);
       setPreviewUrl(null);
       setSelectedDocumentType('');
       
-      // Actualiser la liste des documents
+      // Refresh documents list
       fetchDocuments();
       
     } catch (error: any) {
-      console.error('Erreur lors du téléchargement:', error);
-      toast.error(`Erreur: ${error.message || 'Problème lors du téléchargement'}`);
+      console.error('Upload error:', error);
+      toast.error(`Error: ${error.message || 'Problem during upload'}`);
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -228,7 +228,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
   };
   
   const handleDelete = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
+    if (!confirm('Are you sure you want to delete this document?')) return;
     
     try {
       let table = '';
@@ -238,30 +238,29 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       } else if (entityType === 'mission') {
         table = 'mission_documents';
       } else if (entityType === 'invoice') {
-        table = 'documents'; // Ou table dédiée
+        table = 'documents'; // Or dedicated table
       }
       
-      const { error } = await extendedSupabase
-        .from(table)
+      const { error } = await safeTable(table)
         .delete()
         .eq('id', id);
         
       if (error) throw error;
       
-      // Mettre à jour la liste locale
+      // Update local list
       setDocuments(prev => prev.filter(doc => doc.id !== id));
-      toast.success('Document supprimé');
+      toast.success('Document deleted');
       
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
-      toast.error('Erreur lors de la suppression du document');
+      console.error('Delete error:', error);
+      toast.error('Error deleting document');
     }
   };
   
   const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + ' octets';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' Ko';
-    return (bytes / (1024 * 1024)).toFixed(2) + ' Mo';
+    if (bytes < 1024) return bytes + ' bytes';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
   };
   
   const getFileTypeIcon = (fileType: string | undefined): React.ReactNode => {
@@ -278,9 +277,9 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       <CardHeader>
         <CardTitle>Documents</CardTitle>
         <CardDescription>
-          Gérer les documents associés à {
-            entityType === 'user' ? 'l\'utilisateur' : 
-            entityType === 'mission' ? 'la mission' : 'la facture'
+          Manage documents associated with {
+            entityType === 'user' ? 'the user' : 
+            entityType === 'mission' ? 'the mission' : 'the invoice'
           }
         </CardDescription>
       </CardHeader>
@@ -288,16 +287,16 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
         {!effectiveEntityId ? (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erreur</AlertTitle>
+            <AlertTitle>Error</AlertTitle>
             <AlertDescription>
-              ID d'entité manquant. Impossible de gérer les documents.
+              Missing entity ID. Unable to manage documents.
             </AlertDescription>
           </Alert>
         ) : (
           <>
             <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-4 flex flex-wrap">
-                <TabsTrigger value="all">Tous</TabsTrigger>
+                <TabsTrigger value="all">All</TabsTrigger>
                 {documentTypes.map((type) => (
                   <TabsTrigger key={type} value={type}>
                     {getDocumentTypeLabel(type)}
@@ -313,9 +312,9 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                 ) : filteredDocuments.length === 0 ? (
                   <div className="text-center p-6 border rounded-md border-dashed">
                     <File className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
-                    <h3 className="text-lg font-medium mb-1">Aucun document</h3>
+                    <h3 className="text-lg font-medium mb-1">No documents</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Aucun document n'a été téléchargé {activeTab !== 'all' && `de type "${getDocumentTypeLabel(activeTab)}"`}.
+                      No documents have been uploaded {activeTab !== 'all' && `of type "${getDocumentTypeLabel(activeTab)}"`}.
                     </p>
                   </div>
                 ) : (
@@ -351,7 +350,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                               size="sm" 
                               onClick={() => setViewDocument(document)}
                             >
-                              Voir
+                              View
                             </Button>
                             <Button 
                               variant="ghost" 
@@ -359,7 +358,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                               className="text-destructive hover:text-destructive"
                               onClick={() => handleDelete(document.id)}
                             >
-                              Supprimer
+                              Delete
                             </Button>
                           </div>
                         </div>
@@ -371,10 +370,10 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
             </Tabs>
             
             <div className="mt-6">
-              <h3 className="text-lg font-medium mb-4">Télécharger un nouveau document</h3>
+              <h3 className="text-lg font-medium mb-4">Upload a new document</h3>
               <div className="space-y-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="document-type">Type de document</Label>
+                  <Label htmlFor="document-type">Document type</Label>
                   <select
                     id="document-type"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -382,7 +381,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                     onChange={(e) => setSelectedDocumentType(e.target.value)}
                     disabled={uploading}
                   >
-                    <option value="">Sélectionnez un type</option>
+                    <option value="">Select a type</option>
                     {documentTypes.map((type) => (
                       <option key={type} value={type}>
                         {getDocumentTypeLabel(type)}
@@ -392,7 +391,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                 </div>
                 
                 <div className="grid gap-2">
-                  <Label htmlFor="document-file">Fichier</Label>
+                  <Label htmlFor="document-file">File</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       id="document-file"
@@ -421,7 +420,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                   <div className="mt-2">
                     <img 
                       src={previewUrl} 
-                      alt="Prévisualisation" 
+                      alt="Preview" 
                       className="max-h-40 rounded-md border"
                     />
                   </div>
@@ -437,7 +436,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                   <div className="space-y-2">
                     <Progress value={uploadProgress} className="h-2" />
                     <p className="text-xs text-muted-foreground text-center">
-                      Téléchargement en cours... {uploadProgress}%
+                      Uploading... {uploadProgress}%
                     </p>
                   </div>
                 )}
@@ -448,7 +447,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
       </CardContent>
       <CardFooter className="flex justify-between border-t pt-4">
         <Button variant="ghost" disabled={uploading}>
-          Annuler
+          Cancel
         </Button>
         <Button 
           onClick={handleUpload} 
@@ -457,18 +456,18 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
           {uploading ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" /> 
-              Téléchargement...
+              Uploading...
             </>
           ) : (
             <>
               <Upload className="mr-2 h-4 w-4" /> 
-              Télécharger
+              Upload
             </>
           )}
         </Button>
       </CardFooter>
       
-      {/* Modal de visualisation du document */}
+      {/* Document viewing modal */}
       <Dialog open={!!viewDocument} onOpenChange={(open) => !open && setViewDocument(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
@@ -498,14 +497,14 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                 <div className="text-center p-8 border rounded-md">
                   {getFileTypeIcon(viewDocument.file_type)}
                   <p className="mt-2">
-                    Ce type de fichier ne peut pas être prévisualisé. 
+                    This file type cannot be previewed. 
                     <a 
                       href={viewDocument.document_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-primary hover:underline ml-1"
                     >
-                      Télécharger le fichier
+                      Download the file
                     </a>
                   </p>
                 </div>
@@ -521,7 +520,7 @@ const DocumentManager = ({ entityId, entityType, documentTypes = [] }: DocumentM
                 rel="noopener noreferrer"
                 className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
               >
-                Télécharger
+                Download
               </a>
             )}
           </DialogFooter>
