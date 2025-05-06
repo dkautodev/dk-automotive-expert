@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
 import { formatMissionClientName } from "@/utils/clientFormatter";
 import { safeTable } from "@/utils/supabase-helper";
+import { UnifiedUserData, isUnifiedUserData } from "@/components/mission-form/hooks/types/clientTypes";
 
 export interface CompletedMissionsTableProps {
   missions?: MissionRow[];
@@ -51,12 +52,12 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
         if (clientError) throw clientError;
         
         const missionsWithClientInfo = missionData.map(mission => {
-          // Adapter le profil client pour le rendre compatible avec UserProfileRow
+          // Trouver le profil client correspondant
           const clientProfile = clientProfiles?.find(profile => 
             profile.id === mission.client_id
           );
           
-          if (clientProfile) {
+          if (clientProfile && isUnifiedUserData(clientProfile)) {
             // Créer un objet qui respecte l'interface UserProfileRow
             mission.clientProfile = {
               id: clientProfile.id,

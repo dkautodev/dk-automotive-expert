@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { safeTable } from "@/utils/supabase-helper";
-import { ClientData } from "../../types/clientTypes";
+import { ClientData, UnifiedUserData } from "../../types/clientTypes";
 import { clientMappingService } from "../mappers/clientMappingService";
 
 /**
@@ -13,8 +13,8 @@ export const clientFetchingService = {
    */
   fetchClientsViaUnifiedTable: async () => {
     try {
-      // Récupérer les utilisateurs depuis la table unifiée
-      const { data: users, error: usersError } = await safeTable("unified_users")
+      // Récupérer les utilisateurs depuis la table unifiée avec cast de type explicite
+      const { data: usersData, error: usersError } = await safeTable("unified_users")
         .select("*")
         .eq("role", "client");
 
@@ -23,6 +23,13 @@ export const clientFetchingService = {
         return { success: false, clients: [] };
       }
 
+      // Vérifier que usersData est un tableau
+      if (!Array.isArray(usersData)) {
+        console.error("Données non valides reçues de la table unified_users");
+        return { success: false, clients: [] };
+      }
+
+      const users = usersData as UnifiedUserData[];
       console.log("Utilisateurs unifiés récupérés:", users?.length || 0);
 
       // Si pas d'utilisateurs, retourner un tableau vide
@@ -31,16 +38,16 @@ export const clientFetchingService = {
       }
 
       // Transformation des utilisateurs en format client
-      const clients: ClientData[] = users.map((user: any) => {
+      const clients: ClientData[] = users.map((user) => {
         return {
           id: user.id,
           name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Client sans nom',
           email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          company: user.company_name,
-          client_code: user.client_code,
-          phone: user.phone
+          first_name: user.first_name || undefined,
+          last_name: user.last_name || undefined,
+          company: user.company_name || undefined,
+          client_code: user.client_code || undefined,
+          phone: user.phone || undefined
         };
       });
 

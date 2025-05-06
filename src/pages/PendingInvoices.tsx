@@ -11,28 +11,50 @@ const PendingInvoices = () => {
 
   useEffect(() => {
     const fetchMissions = async () => {
-      // Utilisation de la table unifiée
-      const { data, error } = await safeTable('unified_missions')
-        .select('*')
-        .eq('status', 'confirmé')
-        .order('created_at', { ascending: false });
+      try {
+        // Utilisation de la table unifiée avec gestion explicite des types
+        const { data, error } = await safeTable('unified_missions')
+          .select('*')
+          .eq('status', 'confirmé')
+          .order('created_at', { ascending: false });
 
-      if (!error && data) {
-        // Conversion explicite pour assurer la compatibilité des types
-        const missionsData = data.map((mission: any) => {
-          const missionRow: MissionRow = {
-            ...mission,
-            // Ajout des propriétés requises qui pourraient manquer
-            quote_id: mission.quote_id || null,
-            quote_number: mission.quote_number || null,
-            pickup_time: mission.pickup_time || null,
-            delivery_time: mission.delivery_time || null,
-            vehicles: mission.vehicles || null
-          };
-          return missionRow;
-        });
-        
-        setMissions(missionsData);
+        if (!error && data) {
+          // Conversion explicite pour assurer la compatibilité des types
+          const missionsData = data.map((mission: any) => {
+            const missionRow: MissionRow = {
+              id: mission.id,
+              client_id: mission.client_id,
+              driver_id: mission.driver_id || null,
+              admin_id: mission.admin_id || null,
+              quote_id: null, // Valeur par défaut pour les champs obligatoires
+              mission_type: mission.mission_type as "livraison" | "restitution",
+              status: mission.status as any, // Cast vers MissionStatus
+              mission_number: mission.mission_number || null,
+              quote_number: null,
+              pickup_address: mission.pickup_address || '',
+              delivery_address: mission.delivery_address || '',
+              distance: mission.distance || '',
+              price_ht: mission.price_ht || null,
+              price_ttc: mission.price_ttc || null,
+              vehicle_info: mission.vehicle_info || null,
+              pickup_date: mission.pickup_date || null,
+              pickup_time: null,
+              delivery_date: mission.delivery_date || null,
+              delivery_time: null,
+              pickup_contact: mission.pickup_contact || null,
+              delivery_contact: mission.delivery_contact || null,
+              created_at: mission.created_at,
+              updated_at: mission.updated_at || null,
+              vehicles: null,
+              additional_info: mission.additional_info || null
+            };
+            return missionRow;
+          });
+          
+          setMissions(missionsData);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des missions:", error);
       }
     };
 
