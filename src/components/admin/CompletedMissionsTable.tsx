@@ -26,30 +26,33 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
       setLoading(true);
       try {
         // Utilisez la nouvelle table unified_missions
-        const { data, error } = await safeTable('unified_missions')
+        const missionResult = await safeTable('unified_missions')
           .select('*')
           .eq('status', 'livre')
           .order('delivery_date', { ascending: false })
           .limit(5);
         
-        if (error) throw error;
+        if (missionResult.error) throw missionResult.error;
         
-        if (!data || data.length === 0) {
+        if (!missionResult.data || missionResult.data.length === 0) {
           setMissions([]);
           setLoading(false);
           return;
         }
 
         // Conversion sécurisée des données
-        const missionData = data as unknown as MissionRow[];
+        const missionData = missionResult.data as unknown as MissionRow[];
         
         const clientIds = missionData.map(mission => mission.client_id);
+        
         // Utilisez la nouvelle table unified_users
-        const { data: clientProfiles, error: clientError } = await safeTable('unified_users')
+        const clientResult = await safeTable('unified_users')
           .select('*')
           .in('id', clientIds);
+          
+        if (clientResult.error) throw clientResult.error;
         
-        if (clientError) throw clientError;
+        const clientProfiles = clientResult.data;
         
         const missionsWithClientInfo = missionData.map(mission => {
           // Trouver le profil client correspondant

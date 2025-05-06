@@ -1,11 +1,10 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { MissionRow, UserProfileRow, MissionStatus } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthContext } from "@/context/AuthContext";
-import { extractAddressComponents } from "@/utils/addressUtils";
+import { extractAddressParts } from "@/utils/addressUtils";
 
 interface UseMissionsProps {
   refreshTrigger?: number;
@@ -132,7 +131,7 @@ export function useMissions({
         // Si les colonnes city et postal_code sont vides, mais qu'il y a une adresse de pickup,
         // essayer d'extraire les composantes de l'adresse
         if (!typedMission.city && typedMission.pickup_address && typedMission.pickup_address !== 'Non spécifié') {
-          const addressComponents = extractAddressComponents(typedMission.pickup_address);
+          const addressComponents = extractAddressParts(typedMission.pickup_address);
           typedMission.street_number = typedMission.street_number || addressComponents.streetNumber;
           typedMission.postal_code = typedMission.postal_code || addressComponents.postalCode;
           typedMission.city = typedMission.city || addressComponents.city;

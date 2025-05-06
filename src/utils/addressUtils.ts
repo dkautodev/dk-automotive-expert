@@ -82,3 +82,6 @@ export function extractAddressParts(address: string | null): {
   
   return result;
 }
+
+// Add alias for backward compatibility
+export const extractAddressComponents = extractAddressParts;
