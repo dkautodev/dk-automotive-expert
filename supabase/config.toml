@@ -1,9 +1,1 @@
-
-project_id = "lqjwvaqqhqgmkjsriijw"
-
-[functions.send-contact-email]
-verify_jwt = false
-
-[functions.send-quote-request]
-verify_jwt = false
-
+project_id = "pkeaejtnetzvowmvmxpq"
