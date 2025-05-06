@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "@/components/ui/loader";
@@ -10,7 +9,6 @@ import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
 import { formatMissionClientName } from "@/utils/clientFormatter";
 import { safeTable } from "@/utils/supabase-helper";
-import { UnifiedUserData, isUnifiedUserData } from "@/components/mission-form/hooks/types/clientTypes";
 
 export interface CompletedMissionsTableProps {
   missions?: MissionRow[];
@@ -25,7 +23,7 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
     const fetchCompletedMissions = async () => {
       setLoading(true);
       try {
-        // Utilisez la nouvelle table unified_missions
+        // Use the safeTable helper for the unified_missions table
         const missionResult = await safeTable('unified_missions')
           .select('*')
           .eq('status', 'livre')
@@ -40,12 +38,12 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
           return;
         }
 
-        // Conversion sécurisée des données
-        const missionData = missionResult.data as unknown as MissionRow[];
+        // Explicit casting to MissionRow[]
+        const missionData = missionResult.data as any[] as MissionRow[];
         
         const clientIds = missionData.map(mission => mission.client_id);
         
-        // Utilisez la nouvelle table unified_users
+        // Use safeTable helper for unified_users
         const clientResult = await safeTable('unified_users')
           .select('*')
           .in('id', clientIds);
@@ -55,16 +53,16 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
         const clientProfiles = clientResult.data;
         
         const missionsWithClientInfo = missionData.map(mission => {
-          // Trouver le profil client correspondant
-          const clientProfile = clientProfiles?.find(profile => 
+          // Find the corresponding client profile
+          const clientProfile = clientProfiles?.find((profile: any) => 
             profile.id === mission.client_id
           );
           
-          if (clientProfile && isUnifiedUserData(clientProfile)) {
-            // Créer un objet qui respecte l'interface UserProfileRow
+          if (clientProfile) {
+            // Create an object that conforms to UserProfileRow interface
             mission.clientProfile = {
               id: clientProfile.id,
-              user_id: clientProfile.id, // Utiliser l'id comme user_id pour compatibilité
+              user_id: clientProfile.id, // Use id as user_id for compatibility
               first_name: clientProfile.first_name || '',
               last_name: clientProfile.last_name || '',
               company_name: clientProfile.company_name || '',
