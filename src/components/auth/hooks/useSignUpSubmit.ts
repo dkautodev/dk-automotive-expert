@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { SignUpFormData } from "../schemas/signUpSchema";
-import { supabase } from '@/integrations/supabase/client';
+import { extendedSupabase } from '@/integrations/supabase/extended-client';
 
 export const useSignUpSubmit = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,8 +18,8 @@ export const useSignUpSubmit = () => {
     setIsLoading(true);
     
     try {
-      // Ajouter des logs pour le débogage
-      console.log("Envoi de la demande d'inscription avec les données:", {
+      // Log the registration data for debugging
+      console.log("Sending registration request with data:", {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -27,8 +27,8 @@ export const useSignUpSubmit = () => {
         phone: data.phone
       });
       
-      // Étape 1: Créer l'utilisateur dans Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Create user in Supabase Auth
+      const { data: authData, error: authError } = await extendedSupabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -43,18 +43,18 @@ export const useSignUpSubmit = () => {
       });
       
       if (authError) {
-        console.error("Erreur lors de la création dans Auth:", authError);
-        throw new Error("Erreur lors de la création du compte: " + authError.message);
+        console.error("Error creating Auth user:", authError);
+        throw new Error("Error creating account: " + authError.message);
       }
       
-      console.log("Utilisateur créé avec succès dans Supabase Auth:", authData);
+      console.log("User created successfully in Supabase Auth:", authData);
       
       if (!authData.user) {
-        throw new Error("Impossible de créer l'utilisateur");
+        throw new Error("Could not create user");
       }
       
-      // Mock user profile creation instead of accessing the database 
-      console.log("Création du profil utilisateur avec les données:", {
+      // Mock user profile creation instead of database access
+      console.log("User profile that would be created:", {
         user_id: authData.user.id,
         first_name: data.firstName,
         last_name: data.lastName,
@@ -62,14 +62,14 @@ export const useSignUpSubmit = () => {
         phone: data.phone
       });
           
-      toast.success("Inscription réussie ! Vous allez être redirigé vers la page de connexion.");
+      toast.success("Registration successful! You will be redirected to the login page.");
       
       setTimeout(() => {
         navigate('/auth', { state: { email: data.email } });
       }, 2000);
     } catch (error: any) {
-      console.error('Erreur d\'inscription:', error);
-      toast.error(error.message || "Une erreur est survenue lors de l'inscription");
+      console.error('Registration error:', error);
+      toast.error(error.message || "An error occurred during registration");
     } finally {
       setIsLoading(false);
     }

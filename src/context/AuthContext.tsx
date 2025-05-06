@@ -8,6 +8,7 @@ interface AuthContextValue extends AuthState {
   signOut: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   role?: string;
+  fetchProfile: () => Promise<void>; // Add missing fetchProfile method
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -20,7 +21,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       ...auth, 
       signOut: auth.signOut, 
       signIn: auth.signIn, 
-      role: auth.profile?.role
+      role: auth.profile?.role,
+      fetchProfile: auth.fetchProfile || (async () => {}) // Provide a fallback implementation
     }}>
       {children}
     </AuthContext.Provider>

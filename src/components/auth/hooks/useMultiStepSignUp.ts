@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { CompleteSignUpType } from "../schemas/signUpStepSchema";
-import { supabase } from '@/integrations/supabase/client';
+import { extendedSupabase } from '@/integrations/supabase/extended-client';
 
 export const useMultiStepSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,10 +13,10 @@ export const useMultiStepSignUp = () => {
     setIsLoading(true);
     
     try {
-      // Construire l'adresse complète
+      // Format the complete address
       const formattedAddress = `${data.street}, ${data.postalCode} ${data.city}, ${data.country}`;
       
-      console.log("Envoi de la demande d'inscription avec les données:", {
+      console.log("Sending registration request with data:", {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -27,8 +27,8 @@ export const useMultiStepSignUp = () => {
         vatNumber: data.vatNumber
       });
       
-      // Créer l'utilisateur dans Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Create user in Supabase Auth
+      const { data: authData, error: authError } = await extendedSupabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -43,18 +43,18 @@ export const useMultiStepSignUp = () => {
       });
       
       if (authError) {
-        console.error("Erreur lors de la création dans Auth:", authError);
-        throw new Error("Erreur lors de la création du compte: " + authError.message);
+        console.error("Error creating Auth user:", authError);
+        throw new Error("Error creating account: " + authError.message);
       }
       
-      console.log("Utilisateur créé avec succès dans Supabase Auth:", authData);
+      console.log("User created successfully in Supabase Auth:", authData);
       
       if (!authData.user) {
-        throw new Error("Impossible de créer l'utilisateur");
+        throw new Error("Could not create user");
       }
       
-      // Mock user profile creation instead of accessing the database
-      console.log("Profil utilisateur qui serait créé:", {
+      // Mock user profile creation instead of database access
+      console.log("User profile that would be created:", {
         user_id: authData.user.id,
         first_name: data.firstName,
         last_name: data.lastName,
@@ -65,14 +65,14 @@ export const useMultiStepSignUp = () => {
         vat_number: data.vatNumber
       });
           
-      toast.success("Inscription réussie ! Veuillez vérifier votre boîte mail pour confirmer votre compte.");
+      toast.success("Registration successful! Please check your email to confirm your account.");
       
-      // Redirection immédiate vers la page d'authentification
+      // Redirect to authentication page
       navigate('/auth', { state: { email: data.email } });
       
     } catch (error: any) {
-      console.error('Erreur d\'inscription:', error);
-      toast.error(error.message || "Une erreur est survenue lors de l'inscription");
+      console.error('Registration error:', error);
+      toast.error(error.message || "An error occurred during registration");
     } finally {
       setIsLoading(false);
     }

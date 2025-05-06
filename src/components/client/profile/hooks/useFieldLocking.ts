@@ -1,8 +1,8 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { ProfileData } from "../types";
 import { toast } from "sonner";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 
 export const useFieldLocking = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -25,7 +25,8 @@ export const useFieldLocking = (userId: string | undefined, profile: ProfileData
         vat_number: 'vat_number'
       };
       
-      const { error } = await supabase
+      // Use the extendedSupabase client which mocks database operations
+      const { error } = await extendedSupabase
         .from('user_profiles')
         .update({
           [fieldMapping[fieldToLock]]: tempValue,

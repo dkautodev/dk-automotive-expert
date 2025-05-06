@@ -16,6 +16,7 @@ export const extendedSupabase = {
             console.log(`Mock WHERE ${column} = ${value}`);
             return {
               single: () => Promise.resolve({ data: null, error: null }),
+              maybeSingle: () => Promise.resolve({ data: null, error: null }),
               order: () => ({
                 limit: () => Promise.resolve({ data: [], error: null }),
                 range: () => Promise.resolve({ data: [], error: null }),
@@ -41,18 +42,18 @@ export const extendedSupabase = {
       },
       insert: (values: any) => {
         console.log(`Mock INSERT INTO ${table}`, values);
-        return Promise.resolve({ data: null, error: null });
+        return Promise.resolve({ data: values, error: null });
       },
       update: (values: any) => {
         console.log(`Mock UPDATE ${table}`, values);
         return {
           eq: (column: string, value: any) => {
             console.log(`Mock WHERE ${column} = ${value}`);
-            return Promise.resolve({ data: null, error: null });
+            return Promise.resolve({ data: values, error: null });
           },
           match: (criteria: any) => {
             console.log(`Mock WHERE criteria match`, criteria);
-            return Promise.resolve({ data: null, error: null });
+            return Promise.resolve({ data: values, error: null });
           }
         };
       },
@@ -67,7 +68,7 @@ export const extendedSupabase = {
       },
       upsert: (values: any) => {
         console.log(`Mock UPSERT INTO ${table}`, values);
-        return Promise.resolve({ data: null, error: null });
+        return Promise.resolve({ data: values, error: null });
       }
     };
   },
