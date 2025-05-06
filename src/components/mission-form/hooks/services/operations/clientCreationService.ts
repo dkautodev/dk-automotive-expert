@@ -2,7 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { NewClientData, ClientData } from "../../types/clientTypes";
 import { toast } from "sonner";
-import { safeDataAccess, safeFirstItem } from "@/utils/supabase-helper";
+import { safeTable, safeArrayData, safeFirstItem } from "@/utils/supabase-helper";
 
 /**
  * Service for creating and managing clients
@@ -23,13 +23,13 @@ export const clientCreationService = {
       }
       
       // Check if the client already exists with this email
-      const existingUserResult = await supabase
-        .from("unified_users")
+      const existingUserResponse = await safeTable("unified_users")
         .select("*")
         .eq("email", clientData.email)
         .eq("role", "client");
 
-      const existingUser = safeFirstItem(existingUserResult, null);
+      const existingUsers = safeArrayData(existingUserResponse, []);
+      const existingUser = existingUsers.length > 0 ? existingUsers[0] : null;
       
       if (existingUser) {
         console.log("Client already exists:", existingUser);
@@ -54,8 +54,7 @@ export const clientCreationService = {
       }
       
       // Create the new client
-      const insertResult = await supabase
-        .from("unified_users")
+      const insertResult = await safeTable("unified_users")
         .insert({
           email: clientData.email,
           role: "client",
@@ -66,9 +65,10 @@ export const clientCreationService = {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .select("*");
+        .select();
         
-      const newUser = safeFirstItem(insertResult, null);
+      const newUsers = safeArrayData(insertResult, []);
+      const newUser = newUsers.length > 0 ? newUsers[0] : null;
       
       if (!newUser) {
         throw new Error("Failed to create client");
@@ -89,6 +89,20 @@ export const clientCreationService = {
     } catch (error: any) {
       console.error("Error creating client:", error);
       toast.error(`Erreur lors de la création du client: ${error.message}`);
+      return null;
+    }
+  },
+  
+  /**
+   * Add a client to the system and return their ID
+   */
+  addClient: async (clientData: NewClientData): Promise<string | null> => {
+    try {
+      const client = await clientCreationService.createClient(clientData);
+      return client ? client.id : null;
+    } catch (error: any) {
+      console.error("Error adding client:", error);
+      toast.error(`Erreur: ${error.message}`);
       return null;
     }
   }
