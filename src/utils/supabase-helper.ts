@@ -9,6 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
  * @returns A query builder for the specified table
  */
 export function safeTable(tableName: string) {
-  // @ts-ignore - This is intentional to work around TypeScript limitations
-  return supabase.from(tableName);
+  // Using 'any' type to bypass TypeScript's type checking for unknown tables
+  return supabase.from(tableName) as any;
 }
