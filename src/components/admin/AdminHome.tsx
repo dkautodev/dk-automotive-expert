@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthContext } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -25,7 +24,7 @@ const AdminHome = () => {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              Nouvelle structure de données
+              Nouveau système
             </p>
             <p className="text-xs text-muted-foreground">
               Gestion des utilisateurs simplifiée

@@ -25,17 +25,6 @@ const DashboardHome = () => {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Contacts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-xs text-muted-foreground">
-              Total des contacts
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Compte</CardTitle>
           </CardHeader>
           <CardContent>
@@ -44,6 +33,19 @@ const DashboardHome = () => {
             </p>
             <p className="text-xs text-muted-foreground">
               Email de connexion
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              Actif
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Votre compte est actif
             </p>
           </CardContent>
         </Card>
