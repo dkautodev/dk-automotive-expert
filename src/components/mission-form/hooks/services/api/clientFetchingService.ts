@@ -1,5 +1,6 @@
+
 import { supabase } from "@/integrations/supabase/client";
-import { safeTable, safeDataAccess } from "@/utils/supabase-helper";
+import { safeTable, safeArrayData, safeDataAccess } from "@/utils/supabase-helper";
 import { ClientData, UnifiedUserData } from "../../types/clientTypes";
 import { clientMappingService } from "../mappers/clientMappingService";
 
@@ -17,7 +18,7 @@ export const clientFetchingService = {
         .select("*")
         .eq("role", "client");
 
-      const usersData = safeDataAccess(response, []);
+      const usersData = safeArrayData<any>(response, []);
 
       // Log for debugging
       console.log("Unified users retrieved:", usersData?.length || 0);
@@ -63,7 +64,7 @@ export const clientFetchingService = {
         .from("user_profiles")
         .select("*");
 
-      const profiles = safeDataAccess(response, []);
+      const profiles = safeArrayData(response, []);
 
       console.log("Profiles retrieved:", profiles?.length || 0);
 
@@ -90,7 +91,14 @@ export const clientFetchingService = {
   fetchClientsViaEdgeFunction: async () => {
     try {
       const response = await supabase.functions.invoke("get_users_with_profiles");
-      const data = safeDataAccess(response, []);
+      
+      // Since this is an edge function response, it has a different structure
+      if (response.error) {
+        throw response.error;
+      }
+      
+      // Safely handle edge function data
+      const data = response.data || [];
 
       console.log("Edge Function Data:", data?.length || 0);
 

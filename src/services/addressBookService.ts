@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { ContactEntry } from "@/types/addressBook";
-import { safeTable, safeDataAccess, safeFirstItem } from "@/utils/supabase-helper";
+import { safeTable, safeArrayData, safeFirstItem } from "@/utils/supabase-helper";
 
 export const addressBookService = {
   async getContacts() {
@@ -10,17 +10,15 @@ export const addressBookService = {
         .select('*')
         .order('last_name', { ascending: true });
       
-      const contacts = safeDataAccess(response, []);
-      
-      // Map the database column names to our frontend model
-      return contacts.map(contact => ({
+      return safeArrayData<ContactEntry>(response, []).map(contact => ({
         id: contact.id,
         firstName: contact.first_name,
         lastName: contact.last_name,
         email: contact.email,
         phone: contact.phone,
         type: contact.type || 'general',
-        notes: contact.notes || ''
+        notes: contact.notes || '',
+        company: contact.company || '',
       }));
     } catch (error) {
       console.error("Error fetching contacts:", error);
@@ -38,6 +36,7 @@ export const addressBookService = {
           phone: contact.phone,
           type: contact.type || 'general',
           notes: contact.notes || '',
+          company: contact.company || '',
           user_id: (await supabase.auth.getUser()).data.user?.id || ''
         })
         .select();
@@ -55,7 +54,8 @@ export const addressBookService = {
         email: newContact.email,
         phone: newContact.phone,
         type: newContact.type,
-        notes: newContact.notes || ''
+        notes: newContact.notes || '',
+        company: newContact.company || '',
       };
     } catch (error) {
       console.error("Error adding contact:", error);
@@ -72,6 +72,7 @@ export const addressBookService = {
       if (updates.phone !== undefined) updateData.phone = updates.phone;
       if (updates.type !== undefined) updateData.type = updates.type;
       if (updates.notes !== undefined) updateData.notes = updates.notes;
+      if (updates.company !== undefined) updateData.company = updates.company;
 
       const response = await safeTable('contacts')
         .update(updateData)
@@ -91,7 +92,8 @@ export const addressBookService = {
         email: updatedContact.email,
         phone: updatedContact.phone,
         type: updatedContact.type,
-        notes: updatedContact.notes || ''
+        notes: updatedContact.notes || '',
+        company: updatedContact.company || '',
       };
     } catch (error) {
       console.error("Error updating contact:", error);

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,7 +7,7 @@ import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
 import { formatMissionClientName } from "@/utils/clientFormatter";
-import { safeTable, safeDataAccess } from "@/utils/supabase-helper";
+import { safeTable, safeArrayData, safeMapData } from "@/utils/supabase-helper";
 import { UserProfileRow } from '@/types/database';
 
 export interface CompletedMissionsTableProps {
@@ -31,7 +30,7 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
           .order('delivery_date', { ascending: false })
           .limit(5);
         
-        const missionData = safeDataAccess(missionResult, []) as MissionRow[];
+        const missionData = safeArrayData<MissionRow>(missionResult, []);
         
         if (missionData.length === 0) {
           setMissions([]);
@@ -52,7 +51,7 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
           .select('*')
           .in('id', clientIds);
           
-        const clientProfiles = safeDataAccess(clientResult, []);
+        const clientProfiles = safeArrayData(clientResult, []);
         
         const missionsWithClientInfo = missionData.map(mission => {
           // Find the corresponding client profile
