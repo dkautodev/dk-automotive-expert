@@ -1,139 +1,110 @@
 
-import { useEffect, useMemo, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { AuthError, User } from '@supabase/supabase-js';
+import { useEffect, useState, useMemo } from 'react';
 import { AuthState, UserProfile } from './types';
 import { toast } from 'sonner';
+import { mockAuthService } from '@/services/auth/mockAuthService';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    session: null,
+    loading: true,
+    error: null,
+    isAuthenticated: false,
+    role: null,
+  });
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
-  // Reset state to initial values
-  const resetState = () => {
-    setUser(null);
-    setProfile(null);
-  };
-
-  // Load user on mount
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchInitialSession = async () => {
       try {
-        setIsLoading(true);
+        const authState = await mockAuthService.getSession();
         
-        // Get current user from supabase
-        const { data: { user }, error } = await supabase.auth.getUser();
+        setState({
+          user: authState.user,
+          session: authState.session,
+          loading: false,
+          error: null,
+          isAuthenticated: authState.isAuthenticated,
+          role: authState.user?.role as any,
+        });
         
-        if (error) {
-          console.error('Error fetching user:', error);
-          resetState();
-          return;
+        if (authState.profile) {
+          setProfile(authState.profile);
         }
-        
-        if (user) {
-          setUser(user);
-          await fetchProfile();
-        } else {
-          resetState();
-        }
-      } catch (error) {
-        console.error('Error in auth hook:', error);
-        resetState();
-      } finally {
-        setIsLoading(false);
+      } catch (error: any) {
+        console.error('Error fetching session:', error);
+        setState({
+          user: null,
+          session: null,
+          loading: false,
+          error: error.message,
+          isAuthenticated: false,
+          role: null,
+        });
       }
     };
-    
-    fetchUser();
-    
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session && session.user) {
-        setUser(session.user);
-        await fetchProfile();
-      } else {
-        resetState();
+
+    fetchInitialSession();
+
+    // Mettre en place un observateur d'événements d'authentification
+    const { unsubscribe } = mockAuthService.onAuthStateChange(
+      async (authState) => {
+        setState({
+          user: authState.user,
+          session: authState.session,
+          loading: false,
+          error: null,
+          isAuthenticated: authState.isAuthenticated,
+          role: authState.user?.role as any,
+        });
+        
+        if (authState.profile) {
+          setProfile(authState.profile);
+        } else {
+          setProfile(null);
+        }
       }
-    });
-    
+    );
+
     return () => {
-      subscription?.unsubscribe();
+      unsubscribe();
     };
   }, []);
-  
-  // Fetch user profile
-  const fetchProfile = async () => {
-    try {
-      // Mock profile data since we're not connecting to the database
-      const mockProfileData = {
-        id: '123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'user@example.com',
-        phone: '+33123456789',
-        company: 'ACME Corp',
-        role: 'client'
-      };
-      
-      setProfile(mockProfileData);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      toast.error('Erreur lors du chargement du profil');
-    }
-  };
 
-  // Sign in function
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const authState = await mockAuthService.signIn(email, password);
       
-      if (error) throw error;
-      
-      return data;
+      // L'état sera mis à jour par l'observateur d'événements
+      return authState;
     } catch (error: any) {
-      console.error('Sign in error:', error);
-      let message = 'Erreur lors de la connexion';
-      
-      if (error instanceof AuthError) {
-        if (error.message.includes('Invalid login credentials')) {
-          message = 'Email ou mot de passe invalide';
-        } else if (error.message.includes('Email not confirmed')) {
-          message = 'Veuillez confirmer votre email avant de vous connecter';
-        }
-      }
-      
-      toast.error(message);
-      throw error;
-    }
-  };
-  
-  // Sign out function
-  const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      resetState();
-    } catch (error) {
-      console.error('Sign out error:', error);
-      toast.error('Erreur lors de la déconnexion');
+      console.error('Error signing in:', error);
       throw error;
     }
   };
 
-  // Memoize state to avoid unnecessary re-renders
-  const state = useMemo<AuthState>(() => ({
-    user,
-    isLoading,
-    isAuthenticated: !!user,
+  const signOut = async () => {
+    try {
+      await mockAuthService.signOut();
+      // L'état sera mis à jour par l'observateur d'événements
+    } catch (error: any) {
+      console.error('Error signing out:', error);
+      toast.error('Erreur lors de la déconnexion');
+    }
+  };
+
+  const fetchProfile = async () => {
+    // Cette fonction n'est plus nécessaire car le profil est déjà inclus
+    // dans l'état d'authentification dans notre mise en œuvre mockée
+    console.log("fetchProfile appelé - cette fonction est maintenant un no-op");
+  };
+
+  return useMemo(() => ({
+    ...state,
     profile,
     signIn,
     signOut,
-    fetchProfile,
-  }), [user, isLoading, profile]);
-
-  return state;
+    fetchProfile
+  }), [state, profile]);
 };

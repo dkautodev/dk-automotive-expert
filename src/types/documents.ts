@@ -7,11 +7,12 @@ export interface DriverDocument {
   document_type: DriverDocumentType;
   document_url: string;
   uploaded_at: string;
+  verified: boolean;
 }
 
 export const DOCUMENT_TYPE_LABELS: Record<DriverDocumentType, string> = {
-  kbis: "Kbis",
-  driving_license: "Permis de conduire",
-  id_card: "Carte d'identité",
-  vigilance_certificate: "Attestation de vigilance"
+  kbis: 'Extrait KBIS',
+  driving_license: 'Permis de conduire',
+  id_card: 'Carte d\'identité',
+  vigilance_certificate: 'Attestation de vigilance'
 };

@@ -1,30 +1,17 @@
 
 import { ProfileData } from "../types";
 import { toast } from "sonner";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { mockProfileService } from "@/services/profile/mockProfileService";
 
 export const useLogoUpdate = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const handleLogoUpdate = async (logoUrl: string) => {
     if (!userId) return;
     
     try {
-      // Use the extendedSupabase client which mocks database operations
-      const { error } = await extendedSupabase
-        .from('user_profiles')
-        .update({
-          profile_picture: logoUrl
-        })
-        .eq('id', userId);
-        
-      if (error) throw error;
+      const updatedProfile = await mockProfileService.updateLogo(userId, logoUrl);
       
-      // Update local profile with new logo
-      if (profile) {
-        setProfile({
-          ...profile,
-          profile_picture: logoUrl
-        });
-      }
+      // Update local profile
+      setProfile(updatedProfile);
       
       toast.success("Logo mis à jour avec succès");
     } catch (error) {

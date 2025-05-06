@@ -1,14 +1,56 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { UserProfile } from "@/hooks/auth/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { mapDatabaseProfileToUserProfile } from "@/hooks/auth/types";
 import { Loader } from "@/components/ui/loader";
+
+// Simule un délai réseau
+const simulateDelay = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Service mock pour les utilisateurs
+const mockUserService = {
+  getUsers: async (): Promise<UserProfile[]> => {
+    await simulateDelay();
+    
+    // Données mockes d'utilisateurs
+    return [
+      {
+        id: "user-1",
+        firstName: "Admin",
+        lastName: "User",
+        email: "admin@example.com",
+        phone: "+33123456789",
+        company: "Admin Inc",
+        avatarUrl: null,
+        role: "admin"
+      },
+      {
+        id: "user-2",
+        firstName: "Client",
+        lastName: "User",
+        email: "client@example.com",
+        phone: "+33987654321",
+        company: "Client Corp",
+        avatarUrl: null,
+        role: "client"
+      },
+      {
+        id: "user-3",
+        firstName: "Driver",
+        lastName: "User",
+        email: "driver@example.com",
+        phone: "+33555555555",
+        company: "Driver LLC",
+        avatarUrl: null,
+        role: "driver"
+      }
+    ];
+  }
+};
 
 const UserManagement = () => {
   const { role } = useAuthContext();
@@ -24,14 +66,8 @@ const UserManagement = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*');
-          
-        if (error) throw error;
-        
-        const mappedUsers = data.map(user => mapDatabaseProfileToUserProfile(user)).filter(Boolean) as UserProfile[];
-        setUsers(mappedUsers);
+        const users = await mockUserService.getUsers();
+        setUsers(users);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {

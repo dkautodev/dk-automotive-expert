@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ProfileData } from "../types";
 import { ProfileFormSchemaType } from "../schemas/profileFormSchema";
 import { toast } from "sonner";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { mockProfileService } from "@/services/profile/mockProfileService";
 
 export const useProfileUpdate = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,46 +21,26 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
       // Mapping from form fields to database columns
       const updateData: Record<string, any> = {
         phone: data.phone,
-        billing_address: formattedBillingAddress
+        billing_address_street: data.billing_address_street,
+        billing_address_city: data.billing_address_city,
+        billing_address_postal_code: data.billing_address_postal_code,
+        billing_address_country: data.billing_address_country
       };
 
       // Handle locked fields
       if (!profile?.siret_locked) {
-        updateData.siret_number = data.siret;
+        updateData.siret = data.siret;
       }
       if (!profile?.vat_number_locked) {
         updateData.vat_number = data.vat_number;
       }
 
       console.log("Sending to database:", updateData);
-      console.log("User ID:", userId);
-
-      // Use the extendedSupabase client which mocks database operations
-      const { error } = await extendedSupabase
-        .from('user_profiles')
-        .update(updateData)
-        .eq('id', userId);
       
-      if (error) {
-        console.error("Database update error:", error);
-        throw error;
-      }
-      
-      console.log("Database update successful");
+      const updatedProfile = await mockProfileService.updateProfile(userId, updateData);
       
       // Update local profile
-      if (profile) {
-        setProfile({
-          ...profile,
-          phone: data.phone,
-          billing_address_street: data.billing_address_street,
-          billing_address_city: data.billing_address_city,
-          billing_address_postal_code: data.billing_address_postal_code,
-          billing_address_country: data.billing_address_country,
-          siret: !profile.siret_locked ? data.siret : profile.siret,
-          vat_number: !profile.vat_number_locked ? data.vat_number : profile.vat_number
-        });
-      }
+      setProfile(updatedProfile);
       
       toast.success("Vos informations ont été mises à jour avec succès.");
     } catch (error: any) {

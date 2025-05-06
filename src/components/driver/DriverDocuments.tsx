@@ -1,12 +1,57 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { DriverDocument, DriverDocumentType, DOCUMENT_TYPE_LABELS } from "@/types/documents";
+
+// Simule un délai réseau
+const simulateDelay = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Service mock pour les documents
+const mockDocumentService = {
+  getDocuments: async (userId: string): Promise<DriverDocument[]> => {
+    await simulateDelay();
+    
+    // Récupérer depuis localStorage ou utiliser des données mockées
+    const storedDocs = localStorage.getItem(`driver_documents_${userId}`);
+    return storedDocs ? JSON.parse(storedDocs) : [];
+  },
+  
+  uploadDocument: async (userId: string, documentType: DriverDocumentType, file: File): Promise<DriverDocument> => {
+    await simulateDelay(1500);
+    
+    // Simuler un téléchargement de fichier
+    const mockUrl = `https://example.com/documents/${documentType}_${Date.now()}.pdf`;
+    
+    const newDocument: DriverDocument = {
+      id: `doc_${Date.now()}`,
+      user_id: userId,
+      document_type: documentType,
+      document_url: mockUrl,
+      uploaded_at: new Date().toISOString(),
+      verified: false
+    };
+    
+    // Sauvegarder dans localStorage
+    const storedDocs = localStorage.getItem(`driver_documents_${userId}`);
+    const existingDocs: DriverDocument[] = storedDocs ? JSON.parse(storedDocs) : [];
+    
+    // Remplacer le document existant s'il existe
+    const docIndex = existingDocs.findIndex(doc => doc.document_type === documentType);
+    if (docIndex >= 0) {
+      existingDocs[docIndex] = newDocument;
+    } else {
+      existingDocs.push(newDocument);
+    }
+    
+    localStorage.setItem(`driver_documents_${userId}`, JSON.stringify(existingDocs));
+    
+    return newDocument;
+  }
+};
 
 const DriverDocuments = () => {
   const [documents, setDocuments] = useState<Record<DriverDocumentType, DriverDocument | null>>({
@@ -31,12 +76,9 @@ const DriverDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("*")
-        .eq("user_id", user?.id);
-
-      if (error) throw error;
+      if (!user?.id) return;
+      
+      const docs = await mockDocumentService.getDocuments(user.id);
 
       const documentMap: Record<DriverDocumentType, DriverDocument | null> = {
         kbis: null,
@@ -45,8 +87,8 @@ const DriverDocuments = () => {
         vigilance_certificate: null,
       };
 
-      if (data) {
-        data.forEach((doc) => {
+      if (docs) {
+        docs.forEach((doc) => {
           const documentType = doc.document_type as DriverDocumentType;
           if (documentType) {
             documentMap[documentType] = doc;
@@ -71,48 +113,14 @@ const DriverDocuments = () => {
     try {
       setLoading((prev) => ({ ...prev, [documentType]: true }));
 
-      // Upload file to storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}-${documentType}-${Date.now()}.${fileExt}`;
-      const filePath = `driver-documents/${fileName}`;
-
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from("documents")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from("documents")
-        .getPublicUrl(filePath);
-
-      if (!urlData?.publicUrl) throw new Error("Failed to get public URL");
-
-      // Add or update document record in database
-      const documentData = {
-        user_id: user.id,
-        document_type: documentType,
-        document_url: urlData.publicUrl,
-      };
-
-      let dbOperation;
-      if (documents[documentType]) {
-        // Update existing document
-        dbOperation = supabase
-          .from("documents")
-          .update(documentData)
-          .eq("id", documents[documentType]?.id);
-      } else {
-        // Insert new document
-        dbOperation = supabase.from("documents").insert([documentData]);
-      }
-
-      const { error: dbError, data: dbData } = await dbOperation;
-      if (dbError) throw dbError;
-
-      // Refresh documents
-      await fetchDocuments();
+      const uploadedDoc = await mockDocumentService.uploadDocument(user.id, documentType, file);
+      
+      // Mettre à jour l'état local
+      setDocuments(prev => ({
+        ...prev,
+        [documentType]: uploadedDoc
+      }));
+      
       toast.success(`${DOCUMENT_TYPE_LABELS[documentType]} mis à jour avec succès`);
     } catch (error: any) {
       console.error("Erreur d'envoi de fichier:", error.message);
