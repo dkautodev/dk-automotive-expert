@@ -1,19 +1,18 @@
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
-import { SignInFormData, signInFormSchema } from "./types";
+import { SignInFormSchemaType, signInFormSchema } from "../schemas/signInSchema";
 
-export const useSignInForm = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuthContext();
+export function useSignInForm() {
   const navigate = useNavigate();
-
-  const form = useForm<SignInFormData>({
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuthContext();
+  
+  const form = useForm<SignInFormSchemaType>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
@@ -21,50 +20,25 @@ export const useSignInForm = () => {
     },
   });
 
-  const onSubmit = async (data: SignInFormData) => {
+  async function onSubmit(values: SignInFormSchemaType) {
     try {
-      setIsLoading(true);
-      console.log("Tentative de connexion avec", data.email);
+      setLoading(true);
       
-      // Vérification pour l'administrateur
-      if (data.email === 'dkautomotive70@gmail.com') {
-        console.log("Tentative de connexion administrateur");
-        try {
-          await signIn(data.email, data.password);
-          toast.success("Connexion administrateur réussie");
-          navigate('/dashboard/admin');
-          return;
-        } catch (error: any) {
-          console.error("Erreur connexion admin:", error);
-          toast.error("Identifiants administrateur incorrects");
-          setIsLoading(false);
-          return;
-        }
-      }
+      await signIn(values.email, values.password);
       
-      // Pour les utilisateurs réguliers
-      try {
-        await signIn(data.email, data.password);
-        toast.success("Connexion réussie");
-        navigate('/dashboard/client');
-      } catch (error: any) {
-        console.error("Erreur connexion:", error);
-        toast.error("Identifiants incorrects");
-      } finally {
-        setIsLoading(false);
-      }
-    } catch (error: any) {
-      console.error("Erreur générale:", error);
-      toast.error("Une erreur est survenue");
-      setIsLoading(false);
+      toast.success("Connexion réussie !");
+      navigate("/");
+    } catch (error) {
+      // The error is already handled in the signIn function
+      console.log("Sign in failed", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return {
     form,
-    isLoading,
-    showPassword,
-    setShowPassword,
     onSubmit,
+    loading,
   };
-};
+}

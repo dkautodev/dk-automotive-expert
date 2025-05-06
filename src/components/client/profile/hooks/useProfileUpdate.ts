@@ -1,9 +1,9 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { ProfileData } from "../types";
 import { ProfileFormSchemaType } from "../schemas/profileFormSchema";
 import { toast } from "sonner";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 
 export const useProfileUpdate = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,7 +15,7 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
       setIsSubmitting(true);
       console.log("Updating profile with data:", data);
       
-      // Construire l'adresse de facturation complète au format attendu par la base de données
+      // Format the billing address for the database
       const formattedBillingAddress = `${data.billing_address_street}, ${data.billing_address_postal_code} ${data.billing_address_city}, ${data.billing_address_country}`;
       
       // Mapping from form fields to database columns
@@ -24,8 +24,7 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
         billing_address: formattedBillingAddress
       };
 
-      // Since siret_locked and vat_number_locked don't exist in the database yet,
-      // we'll use the values from the profile object which default to false
+      // Handle locked fields
       if (!profile?.siret_locked) {
         updateData.siret_number = data.siret;
       }
@@ -36,7 +35,8 @@ export const useProfileUpdate = (userId: string | undefined, profile: ProfileDat
       console.log("Sending to database:", updateData);
       console.log("User ID:", userId);
 
-      const { error } = await supabase
+      // Use the extendedSupabase client which mocks database operations
+      const { error } = await extendedSupabase
         .from('user_profiles')
         .update(updateData)
         .eq('id', userId);

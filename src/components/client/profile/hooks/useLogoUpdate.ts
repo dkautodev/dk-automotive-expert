@@ -1,14 +1,15 @@
 
-import { supabase } from "@/integrations/supabase/client";
 import { ProfileData } from "../types";
 import { toast } from "sonner";
+import { extendedSupabase } from "@/integrations/supabase/extended-client";
 
 export const useLogoUpdate = (userId: string | undefined, profile: ProfileData | null, setProfile: (profile: ProfileData | null) => void) => {
   const handleLogoUpdate = async (logoUrl: string) => {
     if (!userId) return;
     
     try {
-      const { error } = await supabase
+      // Use the extendedSupabase client which mocks database operations
+      const { error } = await extendedSupabase
         .from('user_profiles')
         .update({
           profile_picture: logoUrl

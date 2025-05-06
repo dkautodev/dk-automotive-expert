@@ -101,5 +101,12 @@ export interface UserProfileRow {
   siret_number?: string | null;
   vat_number?: string | null;
   client_code?: string | null;
+  // Add fields that were missing
+  billing_address_street?: string | null;
+  billing_address_city?: string | null;
+  billing_address_postal_code?: string | null;
+  billing_address_country?: string | null;
+  siret_locked?: boolean;
+  vat_number_locked?: boolean;
   [key: string]: any;
 }
