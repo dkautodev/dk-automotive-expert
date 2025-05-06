@@ -29,7 +29,11 @@ export const clientFetchingService = {
         return { success: false, clients: [] };
       }
 
-      const users = usersData as UnifiedUserData[];
+      // Cast explicite vers le type UnifiedUserData[]
+      const users = (usersData as any[]).filter(user => 
+        user && typeof user.id === 'string' && typeof user.email === 'string'
+      ) as UnifiedUserData[];
+      
       console.log("Utilisateurs unifiés récupérés:", users?.length || 0);
 
       // Si pas d'utilisateurs, retourner un tableau vide
