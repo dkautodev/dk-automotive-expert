@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/services/mockSupabaseClient';
 import { User, Mail, Phone, Building, Save } from "lucide-react";
 
 interface UserProfile {

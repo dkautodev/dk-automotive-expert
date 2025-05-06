@@ -1,20 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Clock, CheckCircle, CircleDollarSign, ChevronRight, BarChart, CalendarClock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/services/mockSupabaseClient';
 import { Loader } from "@/components/ui/loader";
-import { MissionRow } from "@/types/database";
-import { MissionStatusBadge } from "../client/MissionStatusBadge";
-import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, parseISO, isWithinInterval } from "date-fns";
-import { fr } from "date-fns/locale";
-import { ExtendedMissionStatusBadge } from "../missions/ExtendedMissionStatusBadge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, LineChart, Line } from "recharts";
-import NotificationCenter from "../notifications/NotificationCenter";
 
 // Composant pour l'indicateur de performance du chauffeur
 const PerformanceIndicator = ({ value, label, icon, description, trend }: { 

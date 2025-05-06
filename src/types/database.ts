@@ -1,4 +1,3 @@
-
 // Basic database type definitions
 export interface ProfileRow {
   id: string;
@@ -66,27 +65,21 @@ export interface InvoiceRow {
 // These will be properly implemented later when we rebuild these features
 export interface MissionRow {
   id: string;
-  mission_number?: string;
-  client_id?: string;
-  price_ttc?: number;
-  status?: MissionStatus;
-  delivery_date?: string;
-  clientProfile?: UserProfileRow;
-  pickup_address?: string;
-  delivery_address?: string;
-  mission_type?: "livraison" | "restitution";
+  created_at: string | null;
+  status: string;
+  client_id?: string | null;
+  driver_id?: string | null;
+  admin_id?: string | null;
+  mission_number?: string | null;
+  pickup_address: string;
+  delivery_address: string;
   pickup_date?: string | null;
   pickup_time?: string | null;
+  delivery_date?: string | null;
   delivery_time?: string | null;
-  additional_info?: string | null;
-  driver_id?: string | null;
-  vehicle_info?: any;
-  pickup_contact?: any;
-  delivery_contact?: any;
-  city?: string;
-  postal_code?: string;
-  admin_id?: string; // Added admin_id field
-  [key: string]: any;
+  distance?: number | null;
+  price_ht?: number | null;
+  price_ttc?: number | null;
 }
 
 export interface UserProfileRow {
@@ -109,4 +102,17 @@ export interface UserProfileRow {
   siret_locked?: boolean;
   vat_number_locked?: boolean;
   [key: string]: any;
+}
+
+export type NotificationType = 'mission_status' | 'payment' | 'system' | 'message';
+
+export interface NotificationRow {
+  id: string;
+  created_at: string;
+  user_id: string;
+  message: string;
+  type: NotificationType;
+  read: boolean;
+  mission_id?: string | null;
+  metadata?: Record<string, any> | null;
 }

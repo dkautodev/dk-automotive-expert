@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useAuthContext } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
+import { extendedSupabase } from '@/services/mockSupabaseClient';
 
 const Profile = () => {
   const { user, profile } = useAuthContext();

@@ -1,15 +1,10 @@
-
-import { useState, useEffect } from "react";
-import { Bell } from "lucide-react";
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/context/AuthContext";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
-import { NotificationRow } from "@/types/database";
+import { extendedSupabase } from '@/services/mockSupabaseClient';
+import { NotificationRow } from '@/types/database';
+import { useEffect, useState } from 'react';
+import { Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuthContext } from '@/context/AuthContext';
+import { Badge } from '@/components/ui/badge';
 
 export type Notification = NotificationRow;
 
@@ -103,9 +98,9 @@ export const NotificationBell = () => {
         <Button variant="ghost" className="relative p-2 h-8 w-8">
           <Bell size={20} />
           {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs flex items-center justify-center text-white">
+            <Badge variant="red" className="absolute top-0 right-0 h-4 w-4 text-xs flex items-center justify-center">
               {unreadCount}
-            </span>
+            </Badge>
           )}
         </Button>
       </PopoverTrigger>

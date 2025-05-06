@@ -1,21 +1,27 @@
-
-import { useState, useEffect } from "react";
-import { Bell, Check } from "lucide-react";
+import { extendedSupabase } from '@/services/mockSupabaseClient';
+import { NotificationRow, NotificationType } from '@/types/database';
+import { useEffect, useState } from 'react';
+import { Bell, Check, X, MessageSquare, Truck, CreditCard, Info, MoreHorizontal } from 'lucide-react';
 import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/context/AuthContext";
-import { extendedSupabase } from "@/integrations/supabase/extended-client";
-import { NotificationRow, NotificationType } from "@/types/database";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger 
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { useAuthContext } from '@/context/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 export interface Notification extends NotificationRow {
   formattedDate?: string;
@@ -137,12 +143,12 @@ export const NotificationCenter = ({ variant = "default" }: NotificationCenterPr
     }
   };
   
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = async (notification: NotificationRow) => {
     try {
       const { error } = await extendedSupabase
         .from('notifications')
         .update({ read: true })
-        .eq('id', notificationId);
+        .eq('id', notification.id);
         
       if (error) {
         console.error("Erreur lors du marquage de la notification comme lue:", error);
@@ -151,11 +157,31 @@ export const NotificationCenter = ({ variant = "default" }: NotificationCenterPr
       
       // Mise à jour locale
       setNotifications(prev => 
-        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+        prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error("Erreur lors du marquage de la notification comme lue:", error);
+    }
+  };
+  
+  const deleteNotification = async (id: string) => {
+    try {
+      const { error } = await extendedSupabase
+        .from('notifications')
+        .delete()
+        .eq('id', id);
+        
+      if (error) {
+        console.error("Erreur lors de la suppression de la notification:", error);
+        return;
+      }
+      
+      // Mise à jour locale
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la notification:", error);
     }
   };
   

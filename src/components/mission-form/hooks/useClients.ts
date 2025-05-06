@@ -70,7 +70,7 @@ export const useClients = (form?: any) => {
   }, [clients]);
 
   // Transformer les clients en format d'affichage
-  const clientDisplayList = transformToClientDisplayList(clients);
+  const clientDisplayList = clients.length > 0 ? transformToClientDisplayList(clients) : [];
 
   return { 
     clients, 
