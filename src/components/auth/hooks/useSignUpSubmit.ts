@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { SignUpFormData } from "../schemas/signUpSchema";
-import { extendedSupabase } from '@/integrations/supabase/extended-client';
+import { extendedSupabase } from '@/services/mockSupabaseClient';
 
 export const useSignUpSubmit = () => {
   const [isLoading, setIsLoading] = useState(false);

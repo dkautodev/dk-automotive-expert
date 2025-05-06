@@ -10,7 +10,7 @@ import { ForgotPasswordForm } from "./ForgotPasswordForm";
 import { Button } from "@/components/ui/button";
 
 const SignInCard = () => {
-  const { form, isLoading, onSubmit } = useSignInForm();
+  const { form, loading, onSubmit } = useSignInForm();
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   return (
@@ -29,7 +29,7 @@ const SignInCard = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <EmailField form={form} />
               <PasswordField form={form} />
-              <SubmitButton isLoading={isLoading} />
+              <SubmitButton isLoading={loading} />
               <Button 
                 type="button" 
                 variant="link" 

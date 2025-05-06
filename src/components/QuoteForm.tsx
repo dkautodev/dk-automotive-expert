@@ -1,7 +1,7 @@
 
 import { Form } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/services/mockSupabaseClient';
 import { QuoteFormValues } from './quote-form/quoteFormSchema';
 import VehicleDetailsForm from './quote-form/VehicleDetailsForm';
 import AddressForm from './quote-form/address-form';

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/services/mockSupabaseClient';
 import { MissionRow } from "@/types/database";
 import { MissionStatusBadge } from "../client/MissionStatusBadge";
 import { format, startOfMonth, endOfMonth, subMonths, parseISO, isWithinInterval, getDaysInMonth } from "date-fns";

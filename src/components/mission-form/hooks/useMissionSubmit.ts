@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MissionFormValues, missionFormSchema } from "../missionFormSchema";
 import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/services/mockSupabaseClient';
 import { toast } from "sonner";
 import { extractAddressParts } from "@/utils/addressUtils";
 import { MissionRow } from "@/types/database";

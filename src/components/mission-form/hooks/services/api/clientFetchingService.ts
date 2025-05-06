@@ -1,119 +1,47 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { safeTable, safeArrayData, safeDataAccess } from "@/utils/supabase-helper";
-import { ClientData, UnifiedUserData } from "../../types/clientTypes";
-import { clientMappingService } from "../mappers/clientMappingService";
+import { ClientData, NewClientData } from "../../types/clientTypes";
+import { supabase } from '@/services/mockSupabaseClient';
 
-/**
- * Service for fetching client data from different sources
- */
-export const clientFetchingService = {
-  /**
-   * Fetch clients via the new unified_users table
-   */
-  fetchClientsViaUnifiedTable: async () => {
-    try {
-      // Get users from the unified table with explicit type casting
-      const response = await safeTable("unified_users")
-        .select("*")
-        .eq("role", "client");
+// Mock helper function to replace supabase-helper
+const processSupabaseResult = <T>(data: T[] | null, error: any) => {
+  if (error) {
+    console.error("Supabase error:", error);
+    return { data: null, error: error.message };
+  }
+  return { data, error: null };
+};
 
-      const usersData = safeArrayData<any>(response, []);
-
-      // Log for debugging
-      console.log("Unified users retrieved:", usersData?.length || 0);
-
-      // If no users, return empty array
-      if (!usersData || usersData.length === 0) {
-        return { success: true, clients: [] };
+export const fetchClientsFromApi = async (): Promise<{ clients: ClientData[], error: string | null }> => {
+  try {
+    console.log("Mock: Fetching clients from API");
+    
+    // Return mock data
+    const mockClients: ClientData[] = [
+      {
+        id: "c1",
+        first_name: "Jean",
+        last_name: "Dupont",
+        email: "jean.dupont@example.com",
+        phone: "+33123456789",
+        company_name: "Dupont SAS",
+        created_at: new Date().toISOString(),
+        client_code: "CL001"
+      },
+      {
+        id: "c2",
+        first_name: "Marie",
+        last_name: "Martin",
+        email: "marie.martin@example.com",
+        phone: "+33987654321",
+        company_name: "Martin Enterprise",
+        created_at: new Date().toISOString(),
+        client_code: "CL002"
       }
-
-      // Safe conversion using type assertion after validation
-      const safeUsers = usersData.filter((user: any) => 
-        user && typeof user.id === 'string' && typeof user.email === 'string'
-      ) as UnifiedUserData[];
-      
-      // Transform users to client format
-      const clients: ClientData[] = safeUsers.map((user) => {
-        return {
-          id: user.id,
-          name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Unnamed client',
-          email: user.email,
-          first_name: user.first_name || undefined,
-          last_name: user.last_name || undefined,
-          company: user.company_name || undefined,
-          client_code: user.client_code || undefined,
-          phone: user.phone || undefined
-        };
-      });
-
-      return { success: true, clients };
-    } catch (error) {
-      console.error("Error fetching clients via unified table:", error);
-      return { success: false, clients: [] };
-    }
-  },
-
-  /**
-   * Fetch clients via user profiles table
-   */
-  fetchClientsViaProfiles: async () => {
-    try {
-      // Get user profiles
-      const response = await supabase
-        .from("user_profiles")
-        .select("*");
-
-      const profiles = safeArrayData(response, []);
-
-      console.log("Profiles retrieved:", profiles?.length || 0);
-
-      // If no profiles, return empty array
-      if (!profiles || profiles.length === 0) {
-        return { success: true, clients: [] };
-      }
-
-      // Transform profiles to client format
-      const clients: ClientData[] = profiles.map((profile) => {
-        return clientMappingService.mapProfileToClient(profile, { email: "" });
-      });
-
-      return { success: true, clients };
-    } catch (error) {
-      console.error("Error fetching clients via profiles:", error);
-      return { success: false, clients: [] };
-    }
-  },
-
-  /**
-   * Fetch clients via edge function
-   */
-  fetchClientsViaEdgeFunction: async () => {
-    try {
-      const response = await supabase.functions.invoke("get_users_with_profiles");
-      
-      // Since this is an edge function response, it has a different structure
-      if (response.error) {
-        throw response.error;
-      }
-      
-      // Safely handle edge function data
-      const data = response.data || [];
-
-      console.log("Edge Function Data:", data?.length || 0);
-
-      // Filter to keep only clients
-      const clientUsers = Array.isArray(data)
-        ? data.filter((user) => user.user_type === "client")
-        : [];
-
-      // Transform data to ClientData format
-      const clients: ClientData[] = clientUsers.map(clientMappingService.mapUserToClient);
-
-      return { success: true, clients };
-    } catch (error) {
-      console.error("Error fetching clients via Edge Function:", error);
-      return { success: false, clients: [] };
-    }
+    ];
+    
+    return { clients: mockClients, error: null };
+  } catch (error: any) {
+    console.error("Error fetching clients:", error);
+    return { clients: [], error: error.message };
   }
 };

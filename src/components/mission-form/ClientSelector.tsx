@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ClientData } from "./hooks/types/clientTypes";
 import { MissionFormValues } from "./missionFormSchema";
 import { useAuthContext } from "@/context/AuthContext";
-import { transformToClientDisplay } from "./hooks/utils/clientTransformers";
+import { transformToClientDisplay, transformToClientDisplayList } from "./hooks/utils/clientTransformers";
 
 interface ClientSelectorProps {
   form: UseFormReturn<MissionFormValues>;

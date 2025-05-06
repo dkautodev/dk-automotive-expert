@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { CompleteSignUpType } from "../schemas/signUpStepSchema";
-import { extendedSupabase } from '@/integrations/supabase/extended-client';
+import { extendedSupabase } from '@/services/mockSupabaseClient';
 
 export const useMultiStepSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
