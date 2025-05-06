@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { safeTable } from "@/utils/supabase-helper";
 import { NewClientData } from "../../types/clientTypes";
 import { toast } from "sonner";
 
@@ -28,8 +29,7 @@ export const clientCreationService = {
     
     if (authData?.user) {
       // Create unified user
-      const { data: userData, error: userError } = await supabase
-        .from('unified_users')
+      const { data: userData, error: userError } = await safeTable("unified_users")
         .insert({
           id: authData.user.id,
           email: newClientData.email,
@@ -58,8 +58,7 @@ export const clientCreationService = {
    * Creates a unified user profile without auth user
    */
   createUnifiedProfileOnly: async (newClientData: NewClientData): Promise<string | null> => {
-    const { data: userData, error: userError } = await supabase
-      .from('unified_users')
+    const { data: userData, error: userError } = await safeTable("unified_users")
       .insert({
         email: newClientData.email || 'client-' + Date.now() + '@example.com',
         role: 'client',

@@ -14,8 +14,7 @@ export const clientFetchingService = {
   fetchClientsViaUnifiedTable: async () => {
     try {
       // Récupérer les utilisateurs depuis la table unifiée
-      const { data: users, error: usersError } = await supabase
-        .from("unified_users")
+      const { data: users, error: usersError } = await safeTable("unified_users")
         .select("*")
         .eq("role", "client");
 
@@ -32,9 +31,10 @@ export const clientFetchingService = {
       }
 
       // Transformation des utilisateurs en format client
-      const clients: ClientData[] = users.map((user) => {
+      const clients: ClientData[] = users.map((user: any) => {
         return {
           id: user.id,
+          name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Client sans nom',
           email: user.email,
           first_name: user.first_name,
           last_name: user.last_name,

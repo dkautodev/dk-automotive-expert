@@ -9,6 +9,7 @@ import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
 import { formatMissionClientName } from "@/utils/clientFormatter";
+import { safeTable } from "@/utils/supabase-helper";
 
 export interface CompletedMissionsTableProps {
   missions?: MissionRow[];
@@ -24,8 +25,7 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
       setLoading(true);
       try {
         // Utilisez la nouvelle table unified_missions
-        const { data, error } = await extendedSupabase
-          .from('unified_missions')
+        const { data, error } = await safeTable('unified_missions')
           .select('*')
           .eq('status', 'livre')
           .order('delivery_date', { ascending: false })
@@ -39,21 +39,39 @@ const CompletedMissionsTable = ({ missions: initialMissions = [], refreshTrigger
           return;
         }
 
+        // Conversion sécurisée des données
         const missionData = data as unknown as MissionRow[];
         
         const clientIds = missionData.map(mission => mission.client_id);
         // Utilisez la nouvelle table unified_users
-        const { data: clientProfiles, error: clientError } = await extendedSupabase
-          .from('unified_users')
+        const { data: clientProfiles, error: clientError } = await safeTable('unified_users')
           .select('*')
           .in('id', clientIds);
         
         if (clientError) throw clientError;
         
         const missionsWithClientInfo = missionData.map(mission => {
-          mission.clientProfile = clientProfiles?.find(profile => 
+          // Adapter le profil client pour le rendre compatible avec UserProfileRow
+          const clientProfile = clientProfiles?.find(profile => 
             profile.id === mission.client_id
-          ) || null;
+          );
+          
+          if (clientProfile) {
+            // Créer un objet qui respecte l'interface UserProfileRow
+            mission.clientProfile = {
+              id: clientProfile.id,
+              user_id: clientProfile.id, // Utiliser l'id comme user_id pour compatibilité
+              first_name: clientProfile.first_name || '',
+              last_name: clientProfile.last_name || '',
+              company_name: clientProfile.company_name || '',
+              phone: clientProfile.phone || '',
+              profile_picture: clientProfile.profile_picture || '',
+              client_code: clientProfile.client_code || '',
+              siret_number: clientProfile.siret_number || '',
+              vat_number: clientProfile.vat_number || '',
+              billing_address: clientProfile.billing_address || ''
+            };
+          }
           
           return mission;
         });
