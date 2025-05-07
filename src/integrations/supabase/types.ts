@@ -9,51 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      pricing_grids_public: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          id: number | null
+          max_distance: number | null
+          min_distance: number | null
+          price_ht: number | null
+          price_ttc: number | null
+          type_tarif: string | null
+          updated_at: string | null
+          updated_by: string | null
+          vehicle_category: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: number | null
+          max_distance?: number | null
+          min_distance?: number | null
+          price_ht?: number | null
+          price_ttc?: number | null
+          type_tarif?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vehicle_category?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: number | null
+          max_distance?: number | null
+          min_distance?: number | null
+          price_ht?: number | null
+          price_ttc?: number | null
+          type_tarif?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          vehicle_category?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      add_vigilance_certificate_enum: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      calculate_price_from_distance: {
-        Args: { p_vehicle_type_id: string; p_distance: number }
-        Returns: {
-          price_ht: number
-          is_per_km: boolean
-        }[]
-      }
-      calculate_price_ttc: {
-        Args: { price_ht: number; vat_rate?: number }
-        Returns: number
-      }
-      create_contact_mapping_fields: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      generate_mission_number: {
-        Args: Record<PropertyKey, never> | { mission_type_param: string }
-        Returns: string
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never> | { user_id: string }
-        Returns: boolean
-      }
-      register_user: {
-        Args: {
-          email: string
-          password: string
-          user_type: string
-          profile: Json
-        }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "admin" | "client" | "driver"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -168,8 +174,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["admin", "client", "driver"],
-    },
+    Enums: {},
   },
 } as const
