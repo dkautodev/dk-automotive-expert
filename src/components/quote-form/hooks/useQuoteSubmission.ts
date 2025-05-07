@@ -1,22 +1,40 @@
 
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { QuoteFormValues } from '../quoteFormSchema';
-import { supabase } from '@/services/mockSupabaseClient';
 
-export const useQuoteSubmission = () => {
-  const [loading, setLoading] = useState(false);
-
-  const submitQuote = async (values: QuoteFormValues) => {
+export const useQuoteSubmission = (
+  form: any,  
+  setLoading: (loading: boolean) => void,
+  setStep: (step: number) => void,
+  distance: number | null,
+  priceHT: string | null,
+  priceTTC: string | null
+) => {
+  const onSubmit = async (data: QuoteFormValues) => {
     setLoading(true);
     
     try {
-      console.log('Submitting quote with values:', values);
+      console.log('Submitting quote with values:', data);
       
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Log price and distance info
+      console.log('Price and distance information:', {
+        distance,
+        priceHT,
+        priceTTC
+      });
+      
       // Simulate successful quote submission
       toast.success('Votre demande de devis a été envoyée avec succès !');
+      
+      // Reset form
+      form.reset();
+      
+      // Reset to step 1
+      setStep(1);
       
       return { success: true };
     } catch (error: any) {
@@ -28,5 +46,5 @@ export const useQuoteSubmission = () => {
     }
   };
   
-  return { submitQuote, loading };
+  return { onSubmit };
 };
