@@ -2,22 +2,40 @@
 import { getDistanceRangeId } from '@/utils/priceCalculations';
 
 /**
+ * Mapping of frontend vehicle type IDs to the database vehicle_category values
+ */
+const vehicleTypeToCategory = {
+  'citadine': 'citadine',
+  'berline': 'berline', 
+  'suv': '4x4_suv',
+  'utilitaire-3-5': 'utilitaire_3_5m3',
+  'utilitaire-6-12': 'utilitaire_6_12m3',
+  'utilitaire-12-15': 'utilitaire_12_15m3',
+  'utilitaire-15-20': 'utilitaire_15_20m3',
+  'utilitaire-20-plus': 'utilitaire_plus_20m3'
+};
+
+/**
  * Récupère le prix pour un type de véhicule et une distance donnée
  * depuis la table pricing_grids_public
  */
 export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number) => {
   try {
-    // Déterminer la tranche de distance
-    const rangeId = getDistanceRangeId(distance);
+    // Convert frontend ID to database category
+    const vehicleCategory = vehicleTypeToCategory[vehicleTypeId as keyof typeof vehicleTypeToCategory] || vehicleTypeId;
     
-    // Simuler un appel à la base de données
+    // Determine distance range
+    const rangeId = getDistanceRangeId(distance);
+    console.log(`Getting price for vehicle category: ${vehicleCategory}, distance: ${distance}km (range: ${rangeId})`);
+    
+    // Simulate a database call
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Retourner un prix basé sur le type de véhicule et la distance
-    return calculatePriceFromVehicleAndRange(vehicleTypeId, rangeId, distance);
+    // Return price based on vehicle type and distance
+    return calculatePriceFromVehicleAndRange(vehicleCategory, rangeId, distance);
   } catch (error) {
-    console.error('Erreur dans le service de pricing:', error);
-    // En cas d'erreur, utiliser un prix par défaut
+    console.error('Error in pricing service:', error);
+    // Return default price in case of error
     return {
       priceHT: distance * 1.5,
       isPerKm: true
@@ -28,18 +46,19 @@ export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, dista
 /**
  * Calcule le prix en fonction du type de véhicule et de la tranche de distance
  */
-const calculatePriceFromVehicleAndRange = (vehicleTypeId: string, rangeId: string, distance: number) => {
+const calculatePriceFromVehicleAndRange = (vehicleCategory: string, rangeId: string, distance: number) => {
   // Facteur multiplicateur selon le type de véhicule
   let vehicleFactor = 1.0;
   
-  switch (vehicleTypeId) {
+  switch (vehicleCategory) {
     case 'citadine': vehicleFactor = 1.0; break;
     case 'berline': vehicleFactor = 1.2; break;
-    case 'suv': vehicleFactor = 1.3; break;
-    case 'utilitaire-6-12': vehicleFactor = 1.4; break;
-    case 'utilitaire-12-15': vehicleFactor = 1.5; break;
-    case 'utilitaire-15-20': vehicleFactor = 1.7; break;
-    case 'utilitaire-20-plus': vehicleFactor = 1.9; break;
+    case '4x4_suv': vehicleFactor = 1.3; break;
+    case 'utilitaire_3_5m3': vehicleFactor = 1.35; break;
+    case 'utilitaire_6_12m3': vehicleFactor = 1.4; break;
+    case 'utilitaire_12_15m3': vehicleFactor = 1.5; break;
+    case 'utilitaire_15_20m3': vehicleFactor = 1.7; break;
+    case 'utilitaire_plus_20m3': vehicleFactor = 1.9; break;
     default: vehicleFactor = 1.0;
   }
   
@@ -80,8 +99,8 @@ const calculatePriceFromVehicleAndRange = (vehicleTypeId: string, rangeId: strin
 };
 
 /**
- * Fonctions nécessaires aux composants admin (non utilisées dans le parcours public)
- * mais qui doivent être disponibles pour que l'application compile
+ * Functions needed by admin components (not used in public flows)
+ * but must be available for the application to compile
  */
 export const fetchPriceGrids = async () => [];
 export const initializeDefaultPriceGrids = async () => [];
