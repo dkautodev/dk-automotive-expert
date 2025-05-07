@@ -28,7 +28,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
   const [isCalculating, setIsCalculating] = useState(false);
   const [localPriceInfo, setLocalPriceInfo] = useState<PriceInfo | null>(null);
 
-  const { calculateDistance } = useDistanceCalculation();
+  const { calculateDistance, isCalculating: isDistanceCalculating } = useDistanceCalculation();
   const { calculatePrice } = usePriceCalculation();
   
   // Utiliser priceInfo des props s'il existe, sinon utiliser le state local
@@ -149,11 +149,11 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
           <Button 
             type="button" 
             onClick={handleCalculate}
-            disabled={isCalculating}
+            disabled={isCalculating || isDistanceCalculating}
             variant="outline"
             className="w-full md:w-auto"
           >
-            {isCalculating ? (
+            {(isCalculating || isDistanceCalculating) ? (
               <>
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
                 CALCUL EN COURS...

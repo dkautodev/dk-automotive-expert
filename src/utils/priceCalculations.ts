@@ -1,23 +1,6 @@
 
 /**
- * Convertit un prix en chaîne de caractères formatée avec 2 décimales
- */
-export const formatPrice = (price: number | string): string => {
-  const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-  return numericPrice.toFixed(2);
-};
-
-/**
- * Calcule le prix TTC à partir du prix HT (TVA à 20%)
- */
-export const calculateTTC = (priceHT: string | number): string => {
-  const numericPrice = typeof priceHT === 'string' ? parseFloat(priceHT) : priceHT;
-  const priceTTC = numericPrice * 1.2;
-  return formatPrice(priceTTC);
-};
-
-/**
- * Détermine la tranche de distance appropriée pour le calcul du prix
+ * Détermine la tranche de distance pour un prix
  */
 export const getDistanceRangeId = (distance: number): string => {
   if (distance <= 10) return '1-10';
@@ -37,4 +20,25 @@ export const getDistanceRangeId = (distance: number): string => {
   if (distance <= 600) return '501-600';
   if (distance <= 700) return '601-700';
   return '701+';
+};
+
+/**
+ * Calcule le prix TTC à partir du prix HT
+ */
+export const calculateTTC = (priceHT: string): string => {
+  const priceAsNumber = parseFloat(priceHT);
+  if (isNaN(priceAsNumber)) return '0.00';
+  
+  const priceTTC = priceAsNumber * 1.2;
+  return formatPrice(priceTTC);
+};
+
+/**
+ * Formate un prix avec 2 décimales
+ */
+export const formatPrice = (price: number | string): string => {
+  const priceAsNumber = typeof price === 'string' ? parseFloat(price) : price;
+  if (isNaN(priceAsNumber)) return '0.00';
+  
+  return priceAsNumber.toFixed(2);
 };

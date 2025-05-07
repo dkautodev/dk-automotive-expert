@@ -4,7 +4,7 @@ import { getDistanceRangeId } from '@/utils/priceCalculations';
 /**
  * Mapping of frontend vehicle type IDs to the database vehicle_category values
  */
-const vehicleTypeToCategory = {
+export const vehicleTypeToCategory = {
   'citadine': 'citadine',
   'berline': 'berline', 
   'suv': '4x4_suv',
