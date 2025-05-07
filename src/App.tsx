@@ -11,7 +11,6 @@ import About from "./pages/About";
 import Devis from "./pages/Devis";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
-import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
@@ -48,9 +47,7 @@ const App = () => {
               <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
               <Route path="/cgv" element={<CGV />} />
               
-              {/* Route d'authentification */}
-              <Route path="/auth" element={<Auth />} />
-              
+              {/* Route 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

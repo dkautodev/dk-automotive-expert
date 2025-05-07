@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
@@ -57,10 +58,10 @@ const Navbar = () => {
                         {link.text}
                       </Link>)}
                     <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white transition-colors w-full mt-4 hover-scale">
-                      <Link to="/auth">
+                      <a href="https://app-private.dkautomotive.fr/home" target="_blank" rel="noopener noreferrer">
                         <UserRound className="mr-2" />
                         Espace professionnel
-                      </Link>
+                      </a>
                     </Button>
                   </nav>
                 </SheetContent>
@@ -69,10 +70,10 @@ const Navbar = () => {
                     {link.text}
                   </Link>)}
                 <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white transition-colors hover-scale">
-                  <Link to="/auth">
+                  <a href="https://app-private.dkautomotive.fr/home" target="_blank" rel="noopener noreferrer">
                     <UserRound className="mr-2" />
                     Espace professionnel
-                  </Link>
+                  </a>
                 </Button>
               </div>}
           </div>
