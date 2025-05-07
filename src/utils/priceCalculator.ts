@@ -1,5 +1,6 @@
+
 import { calculateTTC } from './priceCalculations';
-import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
+import { getPriceForVehicleAndDistance } from '@/services/pricing/localPricingGridsService';
 
 /**
  * Calcule le prix pour un type de véhicule et une distance donnée

@@ -1,46 +1,29 @@
 
-import { useState } from 'react';
-import { getPriceForVehicleAndDistance } from '@/services/pricingGridsService';
+import { getPriceForVehicleAndDistance } from '@/services/pricing/localPricingGridsService';
 import { calculateTTC } from '@/utils/priceCalculations';
 
 export const usePriceCalculation = () => {
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [priceHT, setPriceHT] = useState<string | null>(null);
-  const [priceTTC, setPriceTTC] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const calculatePrice = async (vehicleTypeId: string, distance: number) => {
+  const calculatePrice = async (vehicleType: string, distance: number) => {
     try {
-      setIsCalculating(true);
-      setError(null);
+      const { priceHT, isPerKm } = await getPriceForVehicleAndDistance(vehicleType, distance);
       
-      console.log(`Calcul de prix pour ${vehicleTypeId} et ${distance} km`);
+      const formattedPriceHT = priceHT.toFixed(2);
+      const formattedPriceTTC = calculateTTC(formattedPriceHT);
       
-      const result = await getPriceForVehicleAndDistance(vehicleTypeId, distance);
-      
-      const priceHTString = result.priceHT.toString();
-      const priceTTCString = calculateTTC(priceHTString);
-      
-      console.log(`Prix calculé: HT=${priceHTString}€, TTC=${priceTTCString}€`);
-      
-      setPriceHT(priceHTString);
-      setPriceTTC(priceTTCString);
-      
-      setIsCalculating(false);
-      return { priceHT: priceHTString, priceTTC: priceTTCString };
-    } catch (err: any) {
-      console.error('Erreur lors du calcul du prix:', err);
-      setError(err.message || 'Erreur lors du calcul du prix');
-      setIsCalculating(false);
-      throw err;
+      return {
+        priceHT: formattedPriceHT,
+        priceTTC: formattedPriceTTC,
+        isPerKm
+      };
+    } catch (error) {
+      console.error("Erreur lors du calcul du prix:", error);
+      return {
+        priceHT: "0.00",
+        priceTTC: "0.00",
+        isPerKm: false
+      };
     }
   };
-
-  return {
-    calculatePrice,
-    isCalculating,
-    priceHT,
-    priceTTC,
-    error
-  };
+  
+  return { calculatePrice };
 };
