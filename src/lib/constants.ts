@@ -3,7 +3,7 @@
  * Clé API Google Maps
  * À remplacer par votre propre clé API Google Maps
  */
-export const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
+export const GOOGLE_MAPS_API_KEY = "AIzaSyA5RjbR6obTrUwTbVGvCZ3JSG_SvHZ_NBs";
 
 /**
  * Constantes pour la gestion des utilisateurs
