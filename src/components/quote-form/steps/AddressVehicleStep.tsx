@@ -4,10 +4,9 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import VehicleTypeSelector from '../VehicleTypeSelector';
 import { Loader } from '@/components/ui/loader';
-import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { toast } from 'sonner';
@@ -26,19 +25,12 @@ interface AddressVehicleStepProps {
 }
 
 const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehicleStepProps) => {
-  const pickupInputRef = useRef<HTMLInputElement>(null);
-  const deliveryInputRef = useRef<HTMLInputElement>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [localPriceInfo, setLocalPriceInfo] = useState<PriceInfo | null>(null);
 
-  const { calculateDistance, isLoaded: isDistanceApiLoaded } = useDistanceCalculation();
+  const { calculateDistance } = useDistanceCalculation();
   const { calculatePrice } = usePriceCalculation();
   
-  const { isLoaded: isPickupAutocompleteLoaded } = useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
-  const { isLoaded: isDeliveryAutocompleteLoaded } = useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
-
-  const isGoogleApiReady = isDistanceApiLoaded && isPickupAutocompleteLoaded && isDeliveryAutocompleteLoaded;
-
   // Utiliser priceInfo des props s'il existe, sinon utiliser le state local
   const displayPriceInfo = priceInfo?.distance ? priceInfo : localPriceInfo;
 
@@ -50,11 +42,6 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
   }, [priceInfo]);
 
   const handleCalculate = async () => {
-    if (!isGoogleApiReady) {
-      toast.error("Les API Google Maps sont en cours de chargement. Veuillez patienter.");
-      return;
-    }
-
     const pickupAddress = form.getValues('pickup_address');
     const deliveryAddress = form.getValues('delivery_address');
     const vehicleType = form.getValues('vehicle_type');
@@ -113,13 +100,6 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Adresse et véhicule</h2>
       
-      {!isGoogleApiReady && (
-        <div className="p-4 bg-blue-50 text-blue-700 rounded-md flex items-center space-x-2">
-          <Loader className="h-4 w-4"/>
-          <p>Chargement des services Google Maps...</p>
-        </div>
-      )}
-      
       <div className="space-y-4">
         <VehicleTypeSelector form={form} />
         
@@ -136,8 +116,6 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   placeholder="Ex: 123 Rue de Paris, 75001 Paris"
                   className="bg-[#EEF1FF]"
                   {...field}
-                  ref={pickupInputRef}
-                  disabled={!isPickupAutocompleteLoaded}
                 />
               </FormControl>
               <FormMessage />
@@ -158,8 +136,6 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   placeholder="Ex: 456 Avenue des Champs-Élysées, 75008 Paris"
                   className="bg-[#EEF1FF]"
                   {...field}
-                  ref={deliveryInputRef}
-                  disabled={!isDeliveryAutocompleteLoaded}
                 />
               </FormControl>
               <FormMessage />
@@ -171,7 +147,7 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
           <Button 
             type="button" 
             onClick={handleCalculate}
-            disabled={isCalculating || !isGoogleApiReady}
+            disabled={isCalculating}
             variant="outline"
             className="w-full md:w-auto"
           >
