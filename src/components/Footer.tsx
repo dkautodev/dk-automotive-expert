@@ -91,7 +91,7 @@ const Footer = () => {
         <div className="mt-12 text-center text-sm">
           <p>
             &copy; {new Date().getFullYear()} DK AUTOMOTIVE. 
-            <Link to="/admin/auth" className="ml-1 underline hover:text-gray-300 transition">
+            <Link to="/admin/auth" className="ml-1 hover:text-gray-300 transition">
               Tous droits réservés
             </Link>
           </p>
