@@ -1,4 +1,14 @@
 
-// Re-export from our new structure for backward compatibility
-export { useAuth } from './auth/useAuth';
-export type { UserRole } from './auth/types';
+// Simple auth hook for future implementation
+export const useAuth = () => {
+  return {
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    signIn: async () => {},
+    signOut: async () => {},
+    signUp: async () => {},
+  };
+};
+
+export type UserRole = 'admin' | 'client' | 'driver';
