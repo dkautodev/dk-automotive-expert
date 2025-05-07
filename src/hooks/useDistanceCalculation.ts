@@ -8,7 +8,7 @@ export const useDistanceCalculation = () => {
 
   /**
    * Calcule la distance entre deux adresses
-   * Version simplifiée pour le projet sans Supabase
+   * Version simplifiée pour le projet sans API Google Maps
    */
   const calculateDistance = async (origin: string, destination: string): Promise<number> => {
     try {
@@ -34,7 +34,7 @@ export const useDistanceCalculation = () => {
   
   return { 
     calculateDistance,
-    isLoaded,
-    isCalculating
+    isCalculating,
+    isLoaded
   };
 };
