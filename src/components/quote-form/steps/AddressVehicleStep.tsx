@@ -4,12 +4,13 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import VehicleTypeSelector from '../VehicleTypeSelector';
 import { Loader } from '@/components/ui/loader';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { toast } from 'sonner';
+import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 
 interface PriceInfo {
   distance: string | null;
@@ -27,6 +28,10 @@ interface AddressVehicleStepProps {
 const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehicleStepProps) => {
   const [isCalculating, setIsCalculating] = useState(false);
   const [localPriceInfo, setLocalPriceInfo] = useState<PriceInfo | null>(null);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  
+  const pickupInputRef = useRef<HTMLInputElement | null>(null);
+  const deliveryInputRef = useRef<HTMLInputElement | null>(null);
 
   const { calculateDistance, isCalculating: isDistanceCalculating } = useDistanceCalculation();
   const { calculatePrice } = usePriceCalculation();
@@ -40,6 +45,92 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
       setLocalPriceInfo(priceInfo);
     }
   }, [priceInfo]);
+
+  // Charger l'API Google Maps
+  useEffect(() => {
+    // Ne pas charger si déjà disponible ou déjà en cours de chargement
+    if (window.google?.maps?.places || googleMapsLoaded) {
+      if (window.google?.maps?.places) setGoogleMapsLoaded(true);
+      return;
+    }
+    
+    // Ne rien faire si la clé API n'est pas configurée
+    if (!GOOGLE_MAPS_API_KEY) {
+      console.warn("Clé API Google Maps non configurée");
+      return;
+    }
+    
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    
+    script.onload = () => {
+      console.log("API Google Maps chargée avec succès");
+      setGoogleMapsLoaded(true);
+    };
+    
+    script.onerror = (error) => {
+      console.error("Erreur lors du chargement de l'API Google Maps:", error);
+      toast.error("Impossible de charger l'autocomplétion d'adresse. Vous pouvez tout de même saisir vos adresses manuellement.");
+    };
+    
+    document.head.appendChild(script);
+    
+    return () => {
+      if (script.parentNode) document.head.removeChild(script);
+    };
+  }, [googleMapsLoaded]);
+
+  // Initialiser l'autocomplétion d'adresses quand Google Maps est chargé
+  useEffect(() => {
+    if (!googleMapsLoaded || !window.google?.maps?.places) return;
+    
+    // Configurer l'autocomplétion pour l'adresse de départ
+    if (pickupInputRef.current) {
+      try {
+        const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInputRef.current, {
+          componentRestrictions: { country: ["fr"] },
+          fields: ["formatted_address"],
+        });
+        
+        pickupAutocomplete.addListener("place_changed", () => {
+          const place = pickupAutocomplete.getPlace();
+          if (place.formatted_address) {
+            form.setValue("pickup_address", place.formatted_address, { shouldValidate: true });
+          }
+        });
+      } catch (error) {
+        console.error("Erreur lors de l'initialisation de l'autocomplétion pour l'adresse de départ:", error);
+      }
+    }
+    
+    // Configurer l'autocomplétion pour l'adresse de destination
+    if (deliveryInputRef.current) {
+      try {
+        const deliveryAutocomplete = new google.maps.places.Autocomplete(deliveryInputRef.current, {
+          componentRestrictions: { country: ["fr"] },
+          fields: ["formatted_address"],
+        });
+        
+        deliveryAutocomplete.addListener("place_changed", () => {
+          const place = deliveryAutocomplete.getPlace();
+          if (place.formatted_address) {
+            form.setValue("delivery_address", place.formatted_address, { shouldValidate: true });
+          }
+        });
+      } catch (error) {
+        console.error("Erreur lors de l'initialisation de l'autocomplétion pour l'adresse de destination:", error);
+      }
+    }
+  }, [googleMapsLoaded, form]);
+  
+  // Empêcher la soumission du formulaire lors de l'appui sur Entrée dans les champs d'adresse
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
 
   const handleCalculate = async () => {
     const pickupAddress = form.getValues('pickup_address');
@@ -58,6 +149,12 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
       
       // Calculate distance
       const distance = await calculateDistance(pickupAddress, deliveryAddress);
+      
+      if (distance <= 0) {
+        toast.error("Impossible de calculer la distance entre ces adresses");
+        setIsCalculating(false);
+        return;
+      }
       
       // Calculate price using the mapped vehicle type 
       const { priceHT, priceTTC } = await calculatePrice(vehicleType, distance);
@@ -118,6 +215,13 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   placeholder="Ex: 123 Rue de Paris, 75001 Paris"
                   className="bg-[#EEF1FF]"
                   {...field}
+                  onKeyDown={handleKeyDown}
+                  ref={(el) => {
+                    pickupInputRef.current = el;
+                    if (typeof field.ref === 'function') {
+                      field.ref(el);
+                    }
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -138,6 +242,13 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
                   placeholder="Ex: 456 Avenue des Champs-Élysées, 75008 Paris"
                   className="bg-[#EEF1FF]"
                   {...field}
+                  onKeyDown={handleKeyDown}
+                  ref={(el) => {
+                    deliveryInputRef.current = el;
+                    if (typeof field.ref === 'function') {
+                      field.ref(el);
+                    }
+                  }}
                 />
               </FormControl>
               <FormMessage />
