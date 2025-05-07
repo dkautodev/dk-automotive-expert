@@ -1,5 +1,5 @@
 
-import { supabase } from '@/services/mockSupabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { formatPrice, getDistanceRangeId } from '@/utils/priceCalculations';
 import { toast } from 'sonner';
 
@@ -16,12 +16,12 @@ export const usePriceCalculation = () => {
       const rangeId = getDistanceRangeId(distance);
       console.log(`Tranche de distance identifiée: ${rangeId}`);
       
-      // Récupération du prix depuis la table publique
+      // Récupération du prix depuis Supabase
       const { data, error } = await supabase
         .from('pricing_grids_public')
-        .select('price_ht, is_per_km')
-        .eq('vehicle_type_id', vehicleType)
-        .eq('distance_range_id', rangeId)
+        .select('price_ht, type_tarif')
+        .eq('vehicle_category', vehicleType)
+        .is('min_distance', null) // Pour les tarifs fixes
         .single();
       
       if (error) {
@@ -42,7 +42,7 @@ export const usePriceCalculation = () => {
       }
       
       if (!data) {
-        console.warn(`Aucun prix trouvé pour ${vehicleType} dans la tranche ${rangeId}, utilisation du prix par défaut`);
+        console.warn(`Aucun prix trouvé pour ${vehicleType}, utilisation du prix par défaut`);
         
         // Prix par défaut
         const defaultPricePerKm = 1.0;
@@ -60,8 +60,9 @@ export const usePriceCalculation = () => {
       
       // Calcul du prix final
       let finalPriceHT: number;
+      const isPerKm = data.type_tarif === 'au_km';
       
-      if (data.is_per_km) {
+      if (isPerKm) {
         finalPriceHT = data.price_ht * distance;
         console.log(`Calcul par km: ${data.price_ht} € x ${distance} km = ${finalPriceHT} €`);
       } else {
@@ -70,7 +71,7 @@ export const usePriceCalculation = () => {
       }
       
       // Ajoute un forfait de base pour les courtes distances si prix au km
-      if (data.is_per_km && distance < 100) {
+      if (isPerKm && distance < 100) {
         finalPriceHT += 20;
         console.log(`Ajout d'un forfait de base de 20€, prix total: ${finalPriceHT} €`);
       }
@@ -83,7 +84,7 @@ export const usePriceCalculation = () => {
       return {
         priceHT: formatPrice(finalPriceHT),
         priceTTC: formatPrice(finalPriceTTC),
-        isPerKm: data.is_per_km
+        isPerKm
       };
     } catch (error) {
       console.error('Erreur lors du calcul du prix:', error);
@@ -100,5 +101,11 @@ export const usePriceCalculation = () => {
     }
   };
   
-  return { calculatePrice };
+  // Pour être compatible avec les composants qui utilisent isCalculating
+  return { 
+    calculatePrice,
+    isCalculating: false,
+    priceHT: null,
+    priceTTC: null
+  };
 };

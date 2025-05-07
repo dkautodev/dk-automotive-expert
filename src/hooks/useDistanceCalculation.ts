@@ -25,5 +25,9 @@ export const useDistanceCalculation = () => {
     }
   };
   
-  return { calculateDistance };
+  // Pour être compatible avec les composants qui utilisent isLoaded
+  return { 
+    calculateDistance,
+    isLoaded: true
+  };
 };
