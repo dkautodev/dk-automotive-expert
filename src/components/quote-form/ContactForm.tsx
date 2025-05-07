@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { QuoteFormValues } from './quoteFormSchema';
 import { Loader } from '@/components/ui/loader';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState, useEffect } from 'react';
 
 interface PriceInfo {
   distance: string;
@@ -20,20 +22,54 @@ interface PriceInfo {
 
 interface ContactFormProps {
   form: UseFormReturn<QuoteFormValues>;
-  onSubmit: (data: QuoteFormValues) => void;
+  onSubmit: (data: QuoteFormValues) => Promise<{ success: boolean; error?: any }>;
   onPrevious: () => void;
   loading: boolean;
   priceInfo?: PriceInfo;
 }
 
 const ContactForm = ({ form, onSubmit, onPrevious, loading, priceInfo }: ContactFormProps) => {
-  const handleSubmit = () => {
-    form.handleSubmit(onSubmit)();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  
+  // Clear error when form changes
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      if (submitError) setSubmitError(null);
+    });
+    return () => subscription.unsubscribe();
+  }, [form, submitError]);
+
+  const handleSubmit = async () => {
+    // Validate form first
+    const isValid = await form.trigger();
+    if (!isValid) {
+      return;
+    }
+    
+    setSubmitError(null);
+    try {
+      const data = form.getValues();
+      console.log('Submitting form with data:', data);
+      const result = await onSubmit(data);
+      
+      if (!result.success && result.error) {
+        setSubmitError(result.error.message || 'Erreur lors de l\'envoi du formulaire');
+      }
+    } catch (error: any) {
+      console.error('Form submission error:', error);
+      setSubmitError(error.message || 'Erreur lors de l\'envoi du formulaire');
+    }
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy mb-4">Vos coordonnées</h2>
+      
+      {submitError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{submitError}</AlertDescription>
+        </Alert>
+      )}
       
       {priceInfo && (
         <div className="bg-gray-100 p-4 rounded-md mb-6">
