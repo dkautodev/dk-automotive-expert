@@ -5,6 +5,8 @@ import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
 const Navbar = () => {
   const isMobile = useIsMobile();
   const navLinks = [{
@@ -20,6 +22,7 @@ const Navbar = () => {
     to: "/faq",
     text: "FAQ"
   }];
+  
   return <div className="w-full sticky top-0 z-50">
       <div className="bg-dk-navy text-white py-2 px-4">
         <div className="container flex justify-between items-center mx-auto">
@@ -57,24 +60,34 @@ const Navbar = () => {
                     {navLinks.map(link => <Link key={link.to} to={link.to} className="text-dk-navy hover:text-dk-blue transition-colors py-2 text-lg font-medium hover-scale">
                         {link.text}
                       </Link>)}
-                    <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white transition-colors w-full mt-4 hover-scale">
-                      <a href="https://app-private.dkautomotive.fr/home" target="_blank" rel="noopener noreferrer">
-                        <UserRound className="mr-2" />
-                        Espace professionnel
-                      </a>
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" className="w-full mt-4 opacity-50 cursor-not-allowed" disabled>
+                          <UserRound className="mr-2" />
+                          Espace professionnel
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Cette fonctionnalité n'est pas disponible actuellement</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </nav>
                 </SheetContent>
               </Sheet> : <div className="hidden md:flex space-x-8 items-center">
                 {navLinks.map(link => <Link key={link.to} to={link.to} className="text-dk-navy hover:text-dk-blue transition-colors font-medium hover-scale">
                     {link.text}
                   </Link>)}
-                <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white transition-colors hover-scale">
-                  <a href="https://app-private.dkautomotive.fr/home" target="_blank" rel="noopener noreferrer">
-                    <UserRound className="mr-2" />
-                    Espace professionnel
-                  </a>
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" className="bg-gray-100 opacity-50 cursor-not-allowed" disabled>
+                      <UserRound className="mr-2" />
+                      Espace professionnel
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Cette fonctionnalité n'est pas disponible actuellement</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>}
           </div>
         </div>
