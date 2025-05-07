@@ -54,18 +54,20 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
     setIsCalculating(true);
     
     try {
-      // Calcul de la distance
+      console.log(`Calculating distance and price for vehicle type: ${vehicleType}`);
+      
+      // Calculate distance
       const distance = await calculateDistance(pickupAddress, deliveryAddress);
       
-      // Calcul du prix
+      // Calculate price using the mapped vehicle type 
       const { priceHT, priceTTC } = await calculatePrice(vehicleType, distance);
       
-      // Mise à jour du formulaire
+      // Update form
       form.setValue('distance', distance.toString());
       form.setValue('price_ht', priceHT);
       form.setValue('price_ttc', priceTTC);
       
-      // Stocker les résultats localement pour garantir l'affichage
+      // Store results locally
       setLocalPriceInfo({
         distance: `${distance} km`,
         priceHT,
