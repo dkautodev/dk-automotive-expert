@@ -1,15 +1,21 @@
 
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice, getDistanceRangeId } from '@/utils/priceCalculations';
 import { toast } from 'sonner';
 
 export const usePriceCalculation = () => {
+  const [priceHT, setPriceHT] = useState<string | null>(null);
+  const [priceTTC, setPriceTTC] = useState<string | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+
   /**
    * Calcule le prix en fonction du type de véhicule et de la distance
    * Version utilisant la table pricing_grids_public
    */
   const calculatePrice = async (vehicleType: string, distance: number) => {
     try {
+      setIsCalculating(true);
       console.log(`Calculer le prix pour ${vehicleType} sur ${distance} km`);
       
       // Déterminer la tranche de distance
@@ -29,14 +35,17 @@ export const usePriceCalculation = () => {
         
         // Prix par défaut si erreur
         const defaultPricePerKm = 1.0;
-        const priceHT = defaultPricePerKm * distance + 20; // 20€ de forfait de base
-        const priceTTC = priceHT * 1.2;
+        const finalPriceHT = defaultPricePerKm * distance + 20; // 20€ de forfait de base
+        const finalPriceTTC = finalPriceHT * 1.2;
         
-        console.log(`Prix par défaut calculé: ${priceHT}€ HT, ${priceTTC}€ TTC`);
+        console.log(`Prix par défaut calculé: ${finalPriceHT}€ HT, ${finalPriceTTC}€ TTC`);
+        
+        setPriceHT(formatPrice(finalPriceHT));
+        setPriceTTC(formatPrice(finalPriceTTC));
         
         return {
-          priceHT: formatPrice(priceHT),
-          priceTTC: formatPrice(priceTTC),
+          priceHT: formatPrice(finalPriceHT),
+          priceTTC: formatPrice(finalPriceTTC),
           isPerKm: true
         };
       }
@@ -46,14 +55,17 @@ export const usePriceCalculation = () => {
         
         // Prix par défaut
         const defaultPricePerKm = 1.0;
-        const priceHT = defaultPricePerKm * distance + 20; // 20€ de forfait de base
-        const priceTTC = priceHT * 1.2;
+        const finalPriceHT = defaultPricePerKm * distance + 20; // 20€ de forfait de base
+        const finalPriceTTC = finalPriceHT * 1.2;
         
-        console.log(`Prix par défaut calculé: ${priceHT}€ HT, ${priceTTC}€ TTC`);
+        console.log(`Prix par défaut calculé: ${finalPriceHT}€ HT, ${finalPriceTTC}€ TTC`);
+        
+        setPriceHT(formatPrice(finalPriceHT));
+        setPriceTTC(formatPrice(finalPriceTTC));
         
         return {
-          priceHT: formatPrice(priceHT),
-          priceTTC: formatPrice(priceTTC),
+          priceHT: formatPrice(finalPriceHT),
+          priceTTC: formatPrice(finalPriceTTC),
           isPerKm: true
         };
       }
@@ -81,6 +93,9 @@ export const usePriceCalculation = () => {
       
       console.log(`Prix calculé: ${finalPriceHT}€ HT, ${finalPriceTTC}€ TTC`);
       
+      setPriceHT(formatPrice(finalPriceHT));
+      setPriceTTC(formatPrice(finalPriceTTC));
+      
       return {
         priceHT: formatPrice(finalPriceHT),
         priceTTC: formatPrice(finalPriceTTC),
@@ -93,19 +108,23 @@ export const usePriceCalculation = () => {
       // Prix par défaut en cas d'erreur
       const defaultPrice = distance * 1.2 + 20;
       
+      setPriceHT(formatPrice(defaultPrice));
+      setPriceTTC(formatPrice(defaultPrice * 1.2));
+      
       return {
         priceHT: formatPrice(defaultPrice),
         priceTTC: formatPrice(defaultPrice * 1.2),
         isPerKm: true
       };
+    } finally {
+      setIsCalculating(false);
     }
   };
   
-  // Pour être compatible avec les composants qui utilisent isCalculating
   return { 
     calculatePrice,
-    isCalculating: false,
-    priceHT: null,
-    priceTTC: null
+    isCalculating,
+    priceHT,
+    priceTTC
   };
 };

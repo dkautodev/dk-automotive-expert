@@ -1,8 +1,8 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MissionRow } from "@/types/database";
+import { mockCancelMission } from "@/services/mockMissionService"; 
 
 interface UseMissionCancellationProps {
   onSuccess?: () => void;
@@ -27,20 +27,17 @@ export function useMissionCancellation({ onSuccess }: UseMissionCancellationProp
       setIsLoading(true);
       console.log("Cancelling mission with ID:", selectedMissionId);
       
-      const { error } = await supabase
-        .from('missions')
-        .update({ status: 'annulé' })
-        .eq('id', selectedMissionId);
+      // Mock implementation instead of using Supabase directly
+      const success = await mockCancelMission(selectedMissionId);
+      
+      if (success) {
+        toast.success("La mission a été annulée avec succès");
         
-      if (error) {
-        console.error("Error cancelling mission:", error);
-        throw error;
-      }
-      
-      toast.success("La mission a été annulée avec succès");
-      
-      if (onSuccess) {
-        onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        throw new Error("Error cancelling mission");
       }
     } catch (error) {
       console.error("Error cancelling mission:", error);

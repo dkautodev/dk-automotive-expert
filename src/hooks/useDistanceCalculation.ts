@@ -1,13 +1,18 @@
 
+import { useState } from "react";
 import { toast } from 'sonner';
 
 export const useDistanceCalculation = () => {
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(true);
+
   /**
    * Calcule la distance entre deux adresses
    * Version simplifiée pour le projet sans Supabase
    */
   const calculateDistance = async (origin: string, destination: string): Promise<number> => {
     try {
+      setIsCalculating(true);
       console.log(`Calculer la distance entre ${origin} et ${destination}`);
       
       // Simulation d'un appel API avec délai
@@ -22,12 +27,14 @@ export const useDistanceCalculation = () => {
       console.error('Erreur lors du calcul de la distance:', error);
       toast.error('Impossible de calculer la distance. Veuillez réessayer.');
       return 0;
+    } finally {
+      setIsCalculating(false);
     }
   };
   
-  // Pour être compatible avec les composants qui utilisent isLoaded
   return { 
     calculateDistance,
-    isLoaded: true
+    isLoaded,
+    isCalculating
   };
 };

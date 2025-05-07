@@ -8,12 +8,9 @@ import { supabase } from '@/services/mockSupabaseClient';
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { Paperclip, Trash2, Download, FileText, File, Image, FileSpreadsheet, AlertTriangle } from "lucide-react";
-import { useAuthContext } from "@/context/AuthContext";
-import { useAttachmentUpload } from "@/hooks/useAttachmentUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { missionService } from "@/services/missionService";
+import { missionService } from '@/services/missionService';
 import { formatFileSize } from "@/utils/fileUtils";
-import { UserRole } from "@/hooks/auth/types";
 
 interface Attachment {
   id: string;
@@ -39,20 +36,14 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   missionId,
   missionNumber
 }) => {
-  const { user, role } = useAuthContext();
-  const { 
-    uploadAttachments, 
-    isUploading, 
-    getFileDownloadUrl, 
-    deleteAttachment, 
-    isDeleting, 
-    uploadProgress 
-  } = useAttachmentUpload();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [acceptedFileTypes, setAcceptedFileTypes] = useState(
     ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
   );
@@ -99,7 +90,7 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
   };
 
   const handleUpload = async () => {
-    if (!missionId || !user) return;
+    if (!missionId) return;
     
     if (files.length === 0) {
       toast.error("Veuillez sélectionner au moins un fichier");
@@ -107,19 +98,34 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     }
     
     setUploadError(null);
+    setIsUploading(true);
     
     try {
-      const success = await uploadAttachments(missionId, files, user.id);
+      // Mock upload process
+      const uploadPromises = files.map(async (file, index) => {
+        // Simulate upload progress
+        for (let progress = 0; progress <= 100; progress += 10) {
+          setUploadProgress(prev => ({
+            ...prev,
+            [file.name]: progress
+          }));
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        return true;
+      });
       
-      if (success) {
-        setFiles([]);
-        loadAttachments();
-      } else {
-        setUploadError("Certains fichiers n'ont pas pu être téléchargés. Veuillez réessayer.");
-      }
+      await Promise.all(uploadPromises);
+      
+      toast.success("Fichiers téléchargés avec succès");
+      setFiles([]);
+      loadAttachments();
     } catch (error: any) {
       console.error("Erreur de téléchargement:", error);
       setUploadError(`Erreur lors du téléchargement: ${error.message || "Erreur inconnue"}`);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress({});
     }
   };
 
@@ -127,41 +133,8 @@ export const MissionAttachmentsDialog: React.FC<MissionAttachmentsDialogProps> =
     try {
       console.log("Téléchargement depuis Supabase Storage:", attachment.file_path);
       
-      const { data: existsData, error: existsError } = await supabase.storage
-        .from('mission-attachments')
-        .list(attachment.file_path.split('/').slice(0, -1).join('/'), {
-          search: attachment.file_path.split('/').pop() || ''
-        });
-      
-      if (existsError) {
-        console.error("Erreur lors de la vérification de l'existence du fichier:", existsError);
-      }
-      
-      if (existsData && existsData.length === 0) {
-        console.error("Le fichier n'existe pas dans le stockage");
-        toast.error("Le fichier n'existe pas dans le stockage");
-        return;
-      }
-      
-      const { data, error } = await supabase.storage
-        .from('mission-attachments')
-        .download(attachment.file_path);
-
-      if (error) {
-        console.error("Erreur lors du téléchargement du fichier:", error);
-        throw error;
-      }
-
-      const url = URL.createObjectURL(data);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = attachment.file_name;
-      document.body.appendChild(a);
-      a.click();
-      
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      // Mock download process
+      toast.success("Téléchargement initié");
     } catch (error: any) {
       console.error("Erreur lors du téléchargement du fichier:", error.message);
       toast.error("Erreur lors du téléchargement du fichier");

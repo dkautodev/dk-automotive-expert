@@ -8,6 +8,9 @@ export interface ClientData {
   company_name?: string;
   created_at?: string;
   client_code?: string;
+  name?: string;
+  company?: string;
+  address?: string;
 }
 
 export interface NewClientData {

@@ -1,87 +1,49 @@
 
-/**
- * Extracts postal code and city from a full address string
- * @param address The full address string
- * @returns Object containing postal code and city
- */
-export function extractPostalCodeAndCity(address: string | null): string {
-  if (!address) return "Non spécifié";
-  
-  // Match French postal code (5 digits) followed by city name
-  const postalCodeCityRegex = /\b(\d{5})\s+([A-Za-zÀ-ÖØ-öø-ÿ\s\-']+)(?:\s*,|\s*$)/;
-  const match = address.match(postalCodeCityRegex);
-  
-  if (match) {
-    const postalCode = match[1];
-    const city = match[2].trim();
-    return `${postalCode} ${city}`;
-  }
-  
-  return "Non spécifié";
+interface AddressComponents {
+  streetNumber: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
 }
 
 /**
- * Extract individual components from a full address
- * @param address Full address string
- * @returns Object with address components
+ * Extract components from a formatted address string
  */
-export function extractAddressParts(address: string | null): {
-  streetNumber: string;
-  street: string;
-  postalCode: string;
-  city: string;
-  country: string;
-} {
-  // Default empty result
-  const result = {
-    streetNumber: '',
-    street: '',
-    postalCode: '',
-    city: '',
-    country: 'France' // Default country
+export const extractAddressParts = (address: string): AddressComponents => {
+  console.log("Extracting address parts from:", address);
+  
+  // Simple regex for postal code in France (5 digits)
+  const postalCodeMatch = address.match(/\b\d{5}\b/);
+  
+  // Default result
+  const result: AddressComponents = {
+    streetNumber: null,
+    postalCode: postalCodeMatch ? postalCodeMatch[0] : null,
+    city: null,
+    country: "France"
   };
   
-  if (!address) return result;
-  
-  // Extract postal code and city
-  const postalCodeCityRegex = /\b(\d{5})\s+([A-Za-zÀ-ÖØ-öø-ÿ\s\-']+)(?:\s*,|\s*$)/;
-  const postalCityMatch = address.match(postalCodeCityRegex);
-  
-  if (postalCityMatch) {
-    result.postalCode = postalCityMatch[1];
-    result.city = postalCityMatch[2].trim();
-  }
-  
-  // Extract street number and street name
-  // This is more complex, we'll do a simple extraction
-  const streetRegex = /^([\d\-\/]*\s*[A-Za-z]*)[\s,]+(.+?)(?:\s*\d{5}|\s*$)/;
-  const streetMatch = address.match(streetRegex);
-  
-  if (streetMatch) {
-    const firstPart = streetMatch[1].trim();
-    const numberMatch = firstPart.match(/^(\d+[\-\/\w]*)/);
-    
-    if (numberMatch) {
-      result.streetNumber = numberMatch[1];
-      result.street = firstPart.substring(numberMatch[1].length).trim() + " " + streetMatch[2].trim();
-    } else {
-      result.street = firstPart + " " + streetMatch[2].trim();
+  // If we have a postal code, try to find the city
+  if (result.postalCode) {
+    // City is often after the postal code
+    const postalCodeIndex = address.indexOf(result.postalCode);
+    if (postalCodeIndex !== -1) {
+      // Extract everything after the postal code until the end or a comma
+      const afterPostalCode = address.substring(postalCodeIndex + result.postalCode.length).trim();
+      const cityMatch = afterPostalCode.match(/^([^,]+)/);
+      if (cityMatch) {
+        result.city = cityMatch[1].trim();
+      }
     }
   }
   
-  // Extract country if present
-  const countryMatch = address.match(/([A-Za-zÀ-ÖØ-öø-ÿ\s\-']+)$/);
-  if (countryMatch && !postalCityMatch?.includes(countryMatch[1])) {
-    const potentialCountry = countryMatch[1].trim();
-    // List of common countries
-    const countries = ['France', 'Belgique', 'Suisse', 'Luxembourg', 'Allemagne', 'Espagne', 'Italie'];
-    if (countries.includes(potentialCountry)) {
-      result.country = potentialCountry;
-    }
+  // Try to extract street number (usually at the beginning)
+  const streetNumberMatch = address.match(/^\s*(\d+)\s/);
+  if (streetNumberMatch) {
+    result.streetNumber = streetNumberMatch[1];
   }
+  
+  console.log("Extracted address components:", result);
   
   return result;
-}
-
-// Add alias for backward compatibility
-export const extractAddressComponents = extractAddressParts;
+};

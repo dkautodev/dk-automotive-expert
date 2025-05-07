@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -81,7 +80,7 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
   );
   
   const [missionType, setMissionType] = useState<"livraison" | "restitution">(
-    mission?.mission_type || "livraison"
+    (mission?.mission_type as "livraison" | "restitution") || "livraison"
   );
   const [vehicleInfo, setVehicleInfo] = useState({
     brand: (mission?.vehicle_info as any)?.brand || '',
@@ -179,7 +178,8 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
         email: (mission.delivery_contact as any)?.email || ''
       });
       
-      setMissionType(mission.mission_type);
+      // Use proper type assertion for mission_type
+      setMissionType(mission.mission_type as "livraison" | "restitution");
       setVehicleInfo({
         brand: (mission.vehicle_info as any)?.brand || '',
         model: (mission.vehicle_info as any)?.model || '',
@@ -270,7 +270,7 @@ export const EditMissionDetailsDialog: React.FC<EditMissionDetailsDialogProps> =
                 <h3 className="text-sm font-medium">Type de mission</h3>
                 <Select 
                   value={missionType} 
-                  onValueChange={(value) => setMissionType(value as "livraison" | "restitution")}
+                  onValueChange={(value: "livraison" | "restitution") => setMissionType(value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner le type de mission" />

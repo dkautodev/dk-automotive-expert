@@ -8,7 +8,18 @@ import { supabase } from '@/services/mockSupabaseClient';
 import { toast } from "sonner";
 import { extractAddressParts } from "@/utils/addressUtils";
 import { MissionRow } from "@/types/database";
-import { useAttachmentUpload } from "./useAttachmentUpload";
+
+// Mock attachment upload hook
+const useAttachmentUpload = () => {
+  const uploadAttachments = async (missionId: string, files: File[]): Promise<boolean> => {
+    // Simulate upload process
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log(`${files.length} files uploaded for mission ${missionId}`);
+    return true;
+  };
+  
+  return { uploadAttachments };
+};
 
 interface UseMissionSubmitProps {
   onSuccess: () => void;
@@ -188,53 +199,52 @@ export const useMissionSubmit = ({
       console.log("Statut de la mission:", statusToUse);
       console.log("Admin ID utilisé:", admin_id || "Non spécifié (NULL)");
 
-      const { data, error } = await supabase.rpc(
-        'create_mission',
-        {
-          mission_data: missionData,
-          mission_type_value: values.mission_type
-        }
-      );
-
-      if (error) {
-        console.error("Erreur détaillée:", error);
-        throw error;
-      }
-
-      const createdMission = Array.isArray(data) && data.length > 0 ? data[0] as MissionRow : null;
+      // Mock RPC call instead of using the actual Supabase RPC
+      console.log("Mock RPC: create_mission with data", { missionData, mission_type_value: values.mission_type });
       
-      if (createdMission) {
-        console.log("Mission créée avec succès:", createdMission);
-        console.log("ID mission:", createdMission.id);
-        console.log("Numéro mission:", createdMission.mission_number);
-        console.log("Statut mission:", createdMission.status);
-        console.log("Client ID:", createdMission.client_id);
-        console.log("Admin ID:", createdMission.admin_id);
+      // Simulate the response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockMissionId = "mock-" + Math.random().toString(36).substring(2, 9);
+      const mockMissionNumber = "M" + Date.now().toString().substring(8);
+      
+      const createdMission: MissionRow = {
+        id: mockMissionId,
+        created_at: new Date().toISOString(),
+        client_id: missionData.client_id || "anonymous",
+        mission_number: mockMissionNumber,
+        status: statusToUse as any,
+        pickup_address: values.pickup_address,
+        delivery_address: values.delivery_address,
+        mission_type: values.mission_type,
+        distance: values.distance,
+        price_ht: parseFloat(values.price_ht || "0"),
+        price_ttc: parseFloat(values.price_ttc || "0"),
+      };
+      
+      console.log("Mission créée avec succès:", createdMission);
+      console.log("ID mission:", createdMission.id);
+      console.log("Numéro mission:", createdMission.mission_number);
+      console.log("Statut mission:", createdMission.status);
+      console.log("Client ID:", createdMission.client_id);
+      console.log("Admin ID:", admin_id);
+      
+      if (values.attachments && values.attachments.length > 0) {
+        console.log(`Téléchargement de ${values.attachments.length} pièces jointes pour la mission ${createdMission.id}`);
         
-        if (values.attachments && values.attachments.length > 0) {
-          console.log(`Téléchargement de ${values.attachments.length} pièces jointes pour la mission ${createdMission.id}`);
-          
-          try {
-            await uploadAttachments(createdMission.id, values.attachments as File[]);
-            console.log("Pièces jointes téléchargées avec succès");
-          } catch (attachmentError) {
-            console.error("Erreur lors du téléchargement des pièces jointes:", attachmentError);
-            toast.error("La mission a été créée mais certaines pièces jointes n'ont pas pu être téléchargées");
-          }
+        try {
+          await uploadAttachments(createdMission.id, values.attachments as File[]);
+          console.log("Pièces jointes téléchargées avec succès");
+        } catch (attachmentError) {
+          console.error("Erreur lors du téléchargement des pièces jointes:", attachmentError);
+          toast.error("La mission a été créée mais certaines pièces jointes n'ont pas pu être téléchargées");
         }
-        
-        if (statusToUse === "en_attente") {
-          toast.success(`Demande de devis ${createdMission.mission_number} envoyée avec succès`);
-        } else {
-          toast.success(`Mission ${createdMission.mission_number} créée avec succès`);
-        }
+      }
+      
+      if (statusToUse === "en_attente") {
+        toast.success(`Demande de devis ${createdMission.mission_number} envoyée avec succès`);
       } else {
-        console.log("Données retournées:", data);
-        if (statusToUse === "en_attente") {
-          toast.success("Demande de devis envoyée avec succès");
-        } else {
-          toast.success("Mission créée avec succès");
-        }
+        toast.success(`Mission ${createdMission.mission_number} créée avec succès`);
       }
       
       onSuccess();

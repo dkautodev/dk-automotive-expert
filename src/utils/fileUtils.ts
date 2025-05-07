@@ -1,6 +1,6 @@
 
 /**
- * Formate la taille d'un fichier en une chaîne lisible
+ * Formats a file size in bytes to a human-readable format
  */
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';

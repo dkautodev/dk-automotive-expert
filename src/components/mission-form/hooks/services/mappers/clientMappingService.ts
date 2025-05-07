@@ -16,13 +16,14 @@ export const clientMappingService = {
     
     return {
       id: profile.user_id,
-      name: fullName || userData?.email || 'Client sans nom',
-      email: userData?.email || '',
-      phone: profile.phone || '',
-      company: profile.company_name || '',
-      address: profile.billing_address || '',
       first_name: profile.first_name || userData?.first_name || '',
       last_name: profile.last_name || userData?.last_name || '',
+      email: userData?.email || '',
+      phone: profile.phone || '',
+      company_name: profile.company_name || '',
+      address: profile.billing_address || '',
+      name: fullName || userData?.email || 'Client sans nom',
+      company: profile.company_name || '',
       client_code: profile.client_code || ''
     };
   },
@@ -38,13 +39,14 @@ export const clientMappingService = {
     
     return {
       id: userData.id,
-      name: fullName || userData.email || 'Client sans nom',
-      email: userData.email || '',
-      phone: userData.phone || '',
-      company: userData.company_name || '',
-      address: '',
       first_name: userData.first_name || '',
       last_name: userData.last_name || '',
+      email: userData.email || '',
+      phone: userData.phone || '',
+      company_name: userData.company_name || '',
+      address: '',
+      name: fullName || userData.email || 'Client sans nom',
+      company: userData.company_name || '',
       client_code: userData.client_code || ''
     };
   }
