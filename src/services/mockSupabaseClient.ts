@@ -4,6 +4,8 @@
  * Utilisé uniquement pour les fonctionnalités publiques du site
  */
 
+import { getPriceForVehicleAndDistance } from './pricing/localPricingGridsService';
+
 // Définition des types de base pour le client mocké
 interface MockSupabaseAuthResponse {
   data: {
@@ -37,6 +39,32 @@ const mockAuth = {
   }
 };
 
+// Tables mockées avec des données
+const mockTables = {
+  'pricing_grids_public': {
+    select: (columns: string) => ({
+      eq: (column: string, value: any) => ({
+        eq: (column2: string, value2: any) => ({
+          single: async () => {
+            if (column === 'vehicle_type_id' && column2 === 'distance_range_id') {
+              // Utiliser le service local pour obtenir les données
+              const result = await getPriceForVehicleAndDistance(value, 100); // Distance fictive
+              return { 
+                data: {
+                  price_ht: result.priceHT, 
+                  is_per_km: result.isPerKm 
+                }, 
+                error: null 
+              };
+            }
+            return { data: null, error: null };
+          }
+        })
+      })
+    })
+  }
+};
+
 // Client Supabase mocké
 export const supabase = {
   auth: mockAuth,
@@ -47,23 +75,36 @@ export const supabase = {
       upload: async () => ({ data: { path: '' }, error: null })
     })
   },
-  from: (table: string) => ({
-    select: () => ({
-      eq: () => ({
-        single: async () => ({ data: null, error: null }),
-        maybeSingle: async () => ({ data: null, error: null }),
-        order: () => ({
-          limit: () => ({
-            then: async () => ({ data: [], error: null })
+  from: (table: string) => {
+    // Si la table existe dans notre mock
+    if (table in mockTables) {
+      return mockTables[table as keyof typeof mockTables];
+    }
+    
+    // Sinon, retourner le comportement générique
+    return {
+      select: () => ({
+        eq: (column: string, value: any) => ({
+          single: async () => ({ data: null, error: null }),
+          maybeSingle: async () => ({ data: null, error: null }),
+          order: () => ({
+            limit: () => ({
+              then: async () => ({ data: [], error: null })
+            })
+          })
+        }),
+        eq: (column: string, value: any) => ({
+          eq: (column2: string, value2: any) => ({
+            single: async () => ({ data: null, error: null })
           })
         })
-      })
-    }),
-    insert: async () => ({ data: null, error: null }),
-    update: async () => ({ data: null, error: null }),
-    delete: async () => ({ data: null, error: null }),
-    upsert: async () => ({ data: null, error: null })
-  }),
+      }),
+      insert: async () => ({ data: null, error: null }),
+      update: async () => ({ data: null, error: null }),
+      delete: async () => ({ data: null, error: null }),
+      upsert: async () => ({ data: null, error: null })
+    };
+  },
   rpc: (func: string, params: any) => ({
     single: async () => ({ data: null, error: null })
   }),
