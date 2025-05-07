@@ -1,8 +1,16 @@
 
-// Ce fichier contient les constantes globales de l'application
+/**
+ * Clé API Google Maps
+ * À remplacer par votre propre clé API Google Maps
+ */
+export const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
 
-// Pricing constants
-export const PRICE_PER_KM = 2.5;
-
-// Google Maps API Key
-export const GOOGLE_MAPS_API_KEY = "AIzaSyA5RjbR6obTrUwTbVGvCZ3JSG_SvHZ_NBs";
+/**
+ * Constantes pour la gestion des utilisateurs
+ */
+export const USER_ROLES = {
+  ADMIN: 'admin',
+  CLIENT: 'client',
+  DRIVER: 'driver',
+  ANONYMOUS: 'anonymous'
+};

@@ -16,8 +16,188 @@ export const vehicleTypeToCategory = {
 };
 
 /**
+ * Table de prix réels pour chaque catégorie de véhicule et tranche de distance
+ */
+const priceTable = {
+  // Prix forfaitaires pour distances ≤ 100km
+  fixedPrices: {
+    'citadine': {
+      '1-10': 79, 
+      '11-20': 85, 
+      '21-30': 90, 
+      '31-40': 95, 
+      '41-50': 100, 
+      '51-60': 105, 
+      '61-70': 112, 
+      '71-80': 117, 
+      '81-90': 122, 
+      '91-100': 127
+    },
+    'berline': {
+      '1-10': 95, 
+      '11-20': 102, 
+      '21-30': 108, 
+      '31-40': 114, 
+      '41-50': 120, 
+      '51-60': 126, 
+      '61-70': 134, 
+      '71-80': 140, 
+      '81-90': 146, 
+      '91-100': 152
+    },
+    '4x4_suv': {
+      '1-10': 103, 
+      '11-20': 111, 
+      '21-30': 117, 
+      '31-40': 124, 
+      '41-50': 130, 
+      '51-60': 137, 
+      '61-70': 146, 
+      '71-80': 152, 
+      '81-90': 159, 
+      '91-100': 165
+    },
+    'utilitaire_3_5m3': {
+      '1-10': 107, 
+      '11-20': 115, 
+      '21-30': 122, 
+      '31-40': 128, 
+      '41-50': 135, 
+      '51-60': 142, 
+      '61-70': 151, 
+      '71-80': 158, 
+      '81-90': 165, 
+      '91-100': 171
+    },
+    'utilitaire_6_12m3': {
+      '1-10': 111, 
+      '11-20': 119, 
+      '21-30': 126, 
+      '31-40': 133, 
+      '41-50': 140, 
+      '51-60': 147, 
+      '61-70': 157, 
+      '71-80': 164, 
+      '81-90': 171, 
+      '91-100': 178
+    },
+    'utilitaire_12_15m3': {
+      '1-10': 119, 
+      '11-20': 128, 
+      '21-30': 135, 
+      '31-40': 143, 
+      '41-50': 150, 
+      '51-60': 158, 
+      '61-70': 168, 
+      '71-80': 176, 
+      '81-90': 183, 
+      '91-100': 191
+    },
+    'utilitaire_15_20m3': {
+      '1-10': 134, 
+      '11-20': 145, 
+      '21-30': 153, 
+      '31-40': 162, 
+      '41-50': 170, 
+      '51-60': 179, 
+      '61-70': 190, 
+      '71-80': 199, 
+      '81-90': 207, 
+      '91-100': 216
+    },
+    'utilitaire_plus_20m3': {
+      '1-10': 150, 
+      '11-20': 162, 
+      '21-30': 171, 
+      '31-40': 181, 
+      '41-50': 190, 
+      '51-60': 200, 
+      '61-70': 213, 
+      '71-80': 223, 
+      '81-90': 232, 
+      '91-100': 241
+    }
+  },
+  // Prix au km pour distances > 100km (€/km)
+  perKmPrices: {
+    'citadine': {
+      '101-200': 1.28, 
+      '201-300': 1.14, 
+      '301-400': 1.09, 
+      '401-500': 1.02, 
+      '501-600': 0.98, 
+      '601-700': 0.94, 
+      '701+': 0.92
+    },
+    'berline': {
+      '101-200': 1.54, 
+      '201-300': 1.37, 
+      '301-400': 1.31, 
+      '401-500': 1.22, 
+      '501-600': 1.18, 
+      '601-700': 1.13, 
+      '701+': 1.10
+    },
+    '4x4_suv': {
+      '101-200': 1.66, 
+      '201-300': 1.48, 
+      '301-400': 1.42, 
+      '401-500': 1.33, 
+      '501-600': 1.27, 
+      '601-700': 1.22, 
+      '701+': 1.20
+    },
+    'utilitaire_3_5m3': {
+      '101-200': 1.73, 
+      '201-300': 1.54, 
+      '301-400': 1.47, 
+      '401-500': 1.38, 
+      '501-600': 1.32, 
+      '601-700': 1.27, 
+      '701+': 1.24
+    },
+    'utilitaire_6_12m3': {
+      '101-200': 1.79, 
+      '201-300': 1.60, 
+      '301-400': 1.53, 
+      '401-500': 1.43, 
+      '501-600': 1.37, 
+      '601-700': 1.32, 
+      '701+': 1.29
+    },
+    'utilitaire_12_15m3': {
+      '101-200': 1.92, 
+      '201-300': 1.71, 
+      '301-400': 1.64, 
+      '401-500': 1.53, 
+      '501-600': 1.47, 
+      '601-700': 1.41, 
+      '701+': 1.38
+    },
+    'utilitaire_15_20m3': {
+      '101-200': 2.18, 
+      '201-300': 1.94, 
+      '301-400': 1.85, 
+      '401-500': 1.73, 
+      '501-600': 1.67, 
+      '601-700': 1.60, 
+      '701+': 1.56
+    },
+    'utilitaire_plus_20m3': {
+      '101-200': 2.43, 
+      '201-300': 2.17, 
+      '301-400': 2.07, 
+      '401-500': 1.94, 
+      '501-600': 1.86, 
+      '601-700': 1.79, 
+      '701+': 1.75
+    }
+  }
+};
+
+/**
  * Récupère le prix pour un type de véhicule et une distance donnée
- * depuis la table pricing_grids_public
+ * depuis la grille tarifaire locale
  */
 export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number) => {
   try {
@@ -29,7 +209,7 @@ export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, dista
     console.log(`Getting price for vehicle category: ${vehicleCategory}, distance: ${distance}km (range: ${rangeId})`);
     
     // Simulate a database call
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
     
     // Return price based on vehicle type and distance
     return calculatePriceFromVehicleAndRange(vehicleCategory, rangeId, distance);
@@ -47,53 +227,36 @@ export const getPriceForVehicleAndDistance = async (vehicleTypeId: string, dista
  * Calcule le prix en fonction du type de véhicule et de la tranche de distance
  */
 const calculatePriceFromVehicleAndRange = (vehicleCategory: string, rangeId: string, distance: number) => {
-  // Facteur multiplicateur selon le type de véhicule
-  let vehicleFactor = 1.0;
-  
-  switch (vehicleCategory) {
-    case 'citadine': vehicleFactor = 1.0; break;
-    case 'berline': vehicleFactor = 1.2; break;
-    case '4x4_suv': vehicleFactor = 1.3; break;
-    case 'utilitaire_3_5m3': vehicleFactor = 1.35; break;
-    case 'utilitaire_6_12m3': vehicleFactor = 1.4; break;
-    case 'utilitaire_12_15m3': vehicleFactor = 1.5; break;
-    case 'utilitaire_15_20m3': vehicleFactor = 1.7; break;
-    case 'utilitaire_plus_20m3': vehicleFactor = 1.9; break;
-    default: vehicleFactor = 1.0;
-  }
-  
-  // Prix de base et type (par km ou forfaitaire) selon la tranche
-  let basePrice = 0;
+  let finalPriceHT = 0;
   let isPerKm = false;
   
-  // Tranches avec prix forfaitaires
-  if (rangeId === '1-10') { basePrice = 79 / 1.2; isPerKm = false; }
-  else if (rangeId === '11-20') { basePrice = 85 / 1.2; isPerKm = false; }
-  else if (rangeId === '21-30') { basePrice = 90 / 1.2; isPerKm = false; }
-  else if (rangeId === '31-40') { basePrice = 95 / 1.2; isPerKm = false; }
-  else if (rangeId === '41-50') { basePrice = 100 / 1.2; isPerKm = false; }
-  else if (rangeId === '51-60') { basePrice = 105 / 1.2; isPerKm = false; }
-  else if (rangeId === '61-70') { basePrice = 112 / 1.2; isPerKm = false; }
-  else if (rangeId === '71-80') { basePrice = 117 / 1.2; isPerKm = false; }
-  else if (rangeId === '81-90') { basePrice = 122 / 1.2; isPerKm = false; }
-  else if (rangeId === '91-100') { basePrice = 127 / 1.2; isPerKm = false; }
-  // Tranches avec prix au km
-  else if (rangeId === '101-200') { basePrice = 1.28 / 1.2; isPerKm = true; }
-  else if (rangeId === '201-300') { basePrice = 1.14 / 1.2; isPerKm = true; }
-  else if (rangeId === '301-400') { basePrice = 1.09 / 1.2; isPerKm = true; }
-  else if (rangeId === '401-500') { basePrice = 1.02 / 1.2; isPerKm = true; }
-  else if (rangeId === '501-600') { basePrice = 0.98 / 1.2; isPerKm = true; }
-  else if (rangeId === '601-700') { basePrice = 0.94 / 1.2; isPerKm = true; }
-  else if (rangeId === '701+') { basePrice = 0.92 / 1.2; isPerKm = true; }
+  // Vérifier si c'est une tranche avec prix forfaitaire (≤ 100km)
+  if (parseInt(rangeId.split('-')[0]) <= 100) {
+    const priceRanges = priceTable.fixedPrices[vehicleCategory as keyof typeof priceTable.fixedPrices];
+    if (priceRanges && priceRanges[rangeId as keyof typeof priceRanges]) {
+      finalPriceHT = priceRanges[rangeId as keyof typeof priceRanges] / 1.2; // Diviser par 1.2 pour obtenir le prix HT (nos prix sont TTC dans la table)
+      isPerKm = false;
+    }
+  } 
+  // Sinon c'est une tranche avec prix au km (> 100km)
+  else {
+    const priceRanges = priceTable.perKmPrices[vehicleCategory as keyof typeof priceTable.perKmPrices];
+    if (priceRanges && priceRanges[rangeId as keyof typeof priceRanges]) {
+      const pricePerKm = priceRanges[rangeId as keyof typeof priceRanges] / 1.2; // Diviser par 1.2 pour obtenir le prix HT (nos prix sont TTC dans la table)
+      finalPriceHT = pricePerKm * distance;
+      isPerKm = true;
+    }
+  }
   
-  // Appliquer le facteur multiplicateur du véhicule
-  const finalBasePrice = basePrice * vehicleFactor;
-  
-  // Calculer le prix final
-  let finalPrice = isPerKm ? finalBasePrice * distance : finalBasePrice;
+  // Si aucun prix trouvé, utiliser un prix par défaut
+  if (finalPriceHT === 0) {
+    console.warn(`Aucun prix trouvé pour ${vehicleCategory} dans la tranche ${rangeId}`);
+    finalPriceHT = distance * 1.25; // Prix par défaut
+    isPerKm = true;
+  }
   
   return {
-    priceHT: finalPrice,
+    priceHT: finalPriceHT,
     isPerKm
   };
 };
