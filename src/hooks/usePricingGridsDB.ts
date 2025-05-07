@@ -39,7 +39,7 @@ export const usePricingGridsDB = () => {
 
   const { getPriceForVehicleAndDistance } = usePriceQuery();
 
-  // Load price grids on component mount
+  // Charger les grilles tarifaires au montage du composant
   useEffect(() => {
     loadPriceGrids();
   }, []);

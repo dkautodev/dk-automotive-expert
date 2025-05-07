@@ -1,9 +1,9 @@
 
 import { calculateTTC } from '@/utils/priceCalculations';
-import { getPriceForVehicleAndDistance as getPrice } from '@/services/pricingGridsService';
+import { getPriceForVehicleAndDistance as getPrice } from '@/services/pricing/localPricingGridsService';
 
 export const usePriceQuery = () => {
-  // Function to get prices for a vehicle type and distance
+  // Fonction pour obtenir les prix pour un type de véhicule et une distance
   const getPriceForVehicleAndDistance = async (vehicleTypeId: string, distance: number) => {
     try {
       const selectedPrice = await getPrice(vehicleTypeId, distance);

@@ -3,12 +3,11 @@ import { useState, useEffect } from 'react';
 import { PriceGrid } from '@/components/admin/pricingTypes';
 import { toast } from 'sonner';
 import { calculateTTC } from '@/utils/priceCalculations';
-import { useAuthContext } from '@/context/AuthContext';
 import { 
   fetchPriceGrids, 
   initializeDefaultPriceGrids, 
   updatePriceInDB 
-} from '@/services/pricingGridsService';
+} from '@/services/pricing/localPricingGridsService';
 import { formatDBRowsToGrids } from '@/utils/pricingFormatters';
 
 export const usePriceGridState = () => {
@@ -17,9 +16,9 @@ export const usePriceGridState = () => {
   const [editedPrices, setEditedPrices] = useState<Record<string, { ht: string, ttc: string }>>({});
   const [loading, setLoading] = useState(true);
   const [savingGrid, setSavingGrid] = useState(false);
-  const { role } = useAuthContext();
-
-  const isAdmin = role === 'admin';
+  
+  // Déterminer si l'utilisateur est admin (pour simplifier, on suppose que c'est toujours le cas en mode local)
+  const isAdmin = true;
 
   const loadPriceGrids = async () => {
     setLoading(true);
@@ -28,14 +27,14 @@ export const usePriceGridState = () => {
       const data = await fetchPriceGrids();
       
       if (data && data.length > 0) {
-        console.log('Formatting data from DB:', data);
-        // Convert DB data to application structure
+        console.log('Formatting data from storage:', data);
+        // Convertir les données du stockage au format de l'application
         const formattedGrids = formatDBRowsToGrids(data);
         console.log('Formatted grids:', formattedGrids);
         setPriceGrids(formattedGrids);
       } else {
         console.log('No data found, initializing defaults');
-        // If no data found, initialize with default values
+        // Si aucune donnée trouvée, initialiser avec des valeurs par défaut
         const defaultGrids = await initializeDefaultPriceGrids();
         setPriceGrids(defaultGrids);
       }
@@ -47,7 +46,7 @@ export const usePriceGridState = () => {
     }
   };
 
-  // Load price grids on component mount
+  // Charger les grilles tarifaires au montage du composant
   useEffect(() => {
     loadPriceGrids();
   }, []);

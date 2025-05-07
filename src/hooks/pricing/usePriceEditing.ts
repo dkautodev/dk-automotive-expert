@@ -2,7 +2,7 @@
 import { calculateTTC } from '@/utils/priceCalculations';
 import { toast } from 'sonner';
 import { PriceGrid } from '@/components/admin/pricingTypes';
-import { updatePriceInDB } from '@/services/pricingGridsService';
+import { updatePriceInDB } from '@/services/pricing/localPricingGridsService';
 
 export const usePriceEditing = (
   priceGrids: PriceGrid[],
