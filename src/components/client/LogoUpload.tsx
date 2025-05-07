@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { supabase } from '@/services/mockSupabaseClient';
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -25,19 +24,15 @@ export const LogoUpload = ({ currentLogo, onUploadSuccess }: LogoUploadProps) =>
 
     try {
       setIsUploading(true);
-      const fileName = `${Date.now()}-${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('logos')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('logos')
-        .getPublicUrl(fileName);
-
-      onUploadSuccess(publicUrl);
       
+      // Mock implementation - in a real app, this would upload to a server
+      // Here we just create a local object URL
+      const objectUrl = URL.createObjectURL(file);
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      onUploadSuccess(objectUrl);
       toast.success("Votre logo a été mis à jour.");
     } catch (error) {
       console.error('Upload error:', error);
