@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { QuoteFormValues } from '../quoteFormSchema';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useQuoteSubmission = (
   form: any,  
@@ -11,40 +12,54 @@ export const useQuoteSubmission = (
   priceHT: string | null,
   priceTTC: string | null
 ) => {
+  const [error, setError] = useState<string | null>(null);
+
   const onSubmit = async (data: QuoteFormValues) => {
     setLoading(true);
+    setError(null);
     
     try {
       console.log('Submitting quote with values:', data);
+      console.log('With additional info - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC);
       
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Log price and distance info
-      console.log('Price and distance information:', {
-        distance,
+      // Prepare the data for submission including price information
+      const submissionData = {
+        ...data,
+        distance: distance ? `${distance} km` : undefined,
         priceHT,
         priceTTC
-      });
+      };
       
-      // Simulate successful quote submission
+      // Call the Supabase edge function to send the quote request
+      const { data: responseData, error: functionError } = await supabase.functions.invoke(
+        'send-quote-request', 
+        {
+          body: submissionData
+        }
+      );
+      
+      if (functionError) {
+        throw new Error(functionError.message || 'Error in send-quote-request function');
+      }
+      
+      // Display success message
       toast.success('Votre demande de devis a été envoyée avec succès !');
       
-      // Reset form
+      // Reset form and go back to step 1
       form.reset();
-      
-      // Reset to step 1
       setStep(1);
       
       return { success: true };
     } catch (error: any) {
       console.error('Error submitting quote:', error);
-      toast.error('Erreur lors de l\'envoi du devis: ' + (error.message || 'Erreur inconnue'));
+      const errorMessage = error.message || 'Erreur inconnue lors de l\'envoi du devis';
+      setError(errorMessage);
+      toast.error('Erreur lors de l\'envoi du devis: ' + errorMessage);
       return { success: false, error };
     } finally {
       setLoading(false);
     }
   };
   
-  return { onSubmit };
+  return { onSubmit, error };
 };

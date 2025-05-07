@@ -237,7 +237,7 @@ serve(async (req) => {
       ${createDetailRow("Téléphone", data.phone)}
     `;
 
-    const distanceHtml = data.distance ? `<p><strong>Distance estimée :</strong> ${data.distance} km</p>` : "";
+    const distanceHtml = data.distance ? `<p><strong>Distance estimée :</strong> ${data.distance}</p>` : "";
     const priceHTHtml = data.priceHT ? `<p><strong>Prix HT estimé :</strong> ${data.priceHT} €</p>` : "";
     const priceTTCHtml = data.priceTTC ? `<p><strong>Prix TTC estimé :</strong> ${data.priceTTC} €</p>` : "";
 
@@ -300,7 +300,8 @@ serve(async (req) => {
 
       const apiKey = Deno.env.get("BREVO_API_KEY");
       if (!apiKey) {
-        throw new Error("BREVO_API_KEY n'est pas configurée");
+        console.error("BREVO_API_KEY n'est pas configurée");
+        throw new Error("La clé API Brevo n'est pas configurée. Veuillez contacter l'administrateur.");
       }
 
       console.log("Preparing API requests to Brevo...");
@@ -340,8 +341,8 @@ serve(async (req) => {
         console.log("Client email response status:", clientResponse.status);
 
         // Logging de la réponse détaillée
-        let dkResponseText = "N/A";
-        let clientResponseText = "N/A";
+        let dkResponseText;
+        let clientResponseText;
         
         try {
           dkResponseText = await dkResponse.text();
@@ -358,10 +359,10 @@ serve(async (req) => {
         }
 
         if (!dkResponse.ok) {
-          throw new Error(`Error sending email to DK: ${dkResponse.status} - ${dkResponseText}`);
+          throw new Error(`Error sending email to DK: ${dkResponse.status} - ${dkResponseText || "No response details"}`);
         }
         if (!clientResponse.ok) {
-          throw new Error(`Error sending email to client: ${clientResponse.status} - ${clientResponseText}`);
+          throw new Error(`Error sending email to client: ${clientResponse.status} - ${clientResponseText || "No response details"}`);
         }
       } catch (fetchError) {
         clearTimeout(timeoutId);
