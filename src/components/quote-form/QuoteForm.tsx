@@ -39,12 +39,6 @@ const QuoteForm = () => {
             nextStep(data);
           }}
           onPrevious={prevStep}
-          priceInfo={{
-            distance: distance ? `${distance} km` : null,
-            priceHT,
-            priceTTC,
-            isPerKm
-          }}
         />;
       case 3:
         return <VehicleDetailsStep 

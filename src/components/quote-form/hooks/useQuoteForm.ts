@@ -19,7 +19,9 @@ export const useQuoteForm = () => {
     priceTTC,
     setPriceTTC,
     isPerKm,
-    setIsPerKm
+    setIsPerKm,
+    formValidated,
+    setFormValidated
   } = useQuoteFormState();
   
   const form = useForm<QuoteFormValues>({
@@ -65,6 +67,17 @@ export const useQuoteForm = () => {
       const success = await calculateQuote(data);
       if (!success) return;
     }
+    
+    // Validation spécifique avant la dernière étape
+    if (step === 3) {
+      const isValid = await form.trigger(['brand', 'model']);
+      if (!isValid) {
+        console.log('Validation failed for brand and model');
+        return;
+      }
+      setFormValidated(true);
+    }
+    
     setStep(step + 1);
   };
 
@@ -80,6 +93,7 @@ export const useQuoteForm = () => {
     priceHT,
     priceTTC,
     isPerKm,
+    formValidated,
     nextStep,
     prevStep,
     onSubmit

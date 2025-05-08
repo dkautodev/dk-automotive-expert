@@ -46,9 +46,11 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
     const isPerKm = priceData.type_tarif === 'km';
     
     if (isPerKm) {
+      // Prix au kilomètre
       finalPriceHT = priceData.price_ht * distance;
       console.log(`Per km price: ${priceData.price_ht} € × ${distance} km = ${finalPriceHT} €`);
     } else {
+      // Prix forfaitaire
       finalPriceHT = priceData.price_ht;
       console.log(`Fixed price: ${finalPriceHT} €`);
     }
