@@ -14,7 +14,7 @@ export const useQuoteSubmission = (
 ) => {
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (data: QuoteFormValues) => {
+  const onSubmit = async (data: QuoteFormValues): Promise<{ success: boolean; error?: any }> => {
     setLoading(true);
     setError(null);
     
