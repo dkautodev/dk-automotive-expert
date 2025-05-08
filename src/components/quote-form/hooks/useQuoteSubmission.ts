@@ -10,7 +10,8 @@ export const useQuoteSubmission = (
   setStep: (step: number) => void,
   distance: number | null,
   priceHT: string | null,
-  priceTTC: string | null
+  priceTTC: string | null,
+  isPerKm: boolean = false
 ) => {
   const [error, setError] = useState<string | null>(null);
 
@@ -20,14 +21,15 @@ export const useQuoteSubmission = (
     
     try {
       console.log('Submitting quote with values:', data);
-      console.log('With additional info - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC);
+      console.log('With additional info - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC, 'Is Per Km:', isPerKm);
       
       // Prepare the data for submission including price information
       const submissionData = {
         ...data,
         distance: distance ? `${distance} km` : undefined,
         priceHT,
-        priceTTC
+        priceTTC,
+        isPerKm
       };
       
       // Call the Supabase edge function to send the quote request
@@ -42,6 +44,8 @@ export const useQuoteSubmission = (
         console.error('Error from edge function:', functionError);
         throw new Error(functionError.message || 'Error in send-quote-request function');
       }
+      
+      console.log('Response from send-quote-request function:', responseData);
       
       // Display success message
       toast.success('Votre demande de devis a été envoyée avec succès !');

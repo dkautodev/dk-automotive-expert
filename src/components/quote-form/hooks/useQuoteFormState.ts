@@ -7,6 +7,7 @@ export const useQuoteFormState = () => {
   const [distance, setDistance] = useState<number | null>(null);
   const [priceHT, setPriceHT] = useState<string | null>(null);
   const [priceTTC, setPriceTTC] = useState<string | null>(null);
+  const [isPerKm, setIsPerKm] = useState<boolean>(false);
 
   return {
     step,
@@ -18,6 +19,8 @@ export const useQuoteFormState = () => {
     priceHT,
     setPriceHT,
     priceTTC,
-    setPriceTTC
+    setPriceTTC,
+    isPerKm,
+    setIsPerKm
   };
 };

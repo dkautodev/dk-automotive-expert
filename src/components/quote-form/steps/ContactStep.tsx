@@ -11,11 +11,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Loader } from '@/components/ui/loader';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PriceInfo {
   distance: string;
   priceHT: string;
   priceTTC: string;
+  isPerKm?: boolean;
 }
 
 interface ContactStepProps {
@@ -54,9 +56,15 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: Contact
               <p className="text-lg">{priceInfo.distance}</p>
             </div>
             <div>
-              <p className="text-sm font-medium">Prix estimé:</p>
+              <p className="text-sm font-medium">Type de tarif:</p>
+              <p className="text-lg font-medium">{priceInfo.isPerKm ? 'Prix au kilomètre' : 'Prix forfaitaire'}</p>
               <p className="text-lg">HT: {priceInfo.priceHT} €</p>
               <p className="text-lg">TTC: {priceInfo.priceTTC} €</p>
+              {priceInfo.isPerKm && priceInfo.distance && priceInfo.priceHT && (
+                <p className="text-sm text-gray-600">
+                  ({(parseFloat(priceInfo.priceHT) / parseFloat(priceInfo.distance.replace(' km', ''))).toFixed(2)} € HT/km)
+                </p>
+              )}
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -146,6 +154,26 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: Contact
           )}
         />
       </div>
+
+      <FormField
+        control={form.control}
+        name="additionalInfo"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-dk-navy font-semibold">
+              INFORMATIONS COMPLÉMENTAIRES
+            </FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Ajoutez des informations supplémentaires concernant votre demande"
+                className="bg-[#EEF1FF] min-h-[100px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <div className="flex justify-between mt-6">
         <Button 
