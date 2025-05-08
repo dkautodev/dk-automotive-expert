@@ -1,11 +1,9 @@
 
-import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { toast } from 'sonner';
-import { formatPrice } from '@/utils/priceCalculations';
 
 export const useQuoteCalculations = (
   form: UseFormReturn<QuoteFormValues>,
@@ -40,6 +38,7 @@ export const useQuoteCalculations = (
         return false;
       }
       
+      console.log(`Distance calculée: ${calculatedDistance} km`);
       setDistance(calculatedDistance);
       
       // Calculer le prix
@@ -50,17 +49,16 @@ export const useQuoteCalculations = (
         return false;
       }
       
-      // Formater les prix avec 2 décimales
-      const formattedPriceHT = formatPrice(priceResult.priceHT);
-      const formattedPriceTTC = formatPrice(priceResult.priceTTC);
+      // Mettre à jour les prix
+      setPriceHT(priceResult.priceHT);
+      setPriceTTC(priceResult.priceTTC);
       
-      setPriceHT(formattedPriceHT);
-      setPriceTTC(formattedPriceTTC);
+      console.log(`Prix calculés: HT=${priceResult.priceHT}€, TTC=${priceResult.priceTTC}€, isPerKm=${priceResult.isPerKm}`);
       
       // Mettre à jour le formulaire avec ces valeurs
       form.setValue('distance', calculatedDistance.toString());
-      form.setValue('price_ht', formattedPriceHT);
-      form.setValue('price_ttc', formattedPriceTTC);
+      form.setValue('price_ht', priceResult.priceHT);
+      form.setValue('price_ttc', priceResult.priceTTC);
 
       return true;
     } catch (error) {
