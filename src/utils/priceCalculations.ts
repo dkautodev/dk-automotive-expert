@@ -1,6 +1,29 @@
 
 /**
+ * Calcule le prix TTC à partir du prix HT
+ */
+export const calculateTTC = (priceHT: string): string => {
+  const priceAsNumber = parseFloat(priceHT);
+  if (isNaN(priceAsNumber)) return '0.00';
+  
+  const priceTTC = priceAsNumber * 1.2;
+  return formatPrice(priceTTC);
+};
+
+/**
+ * Formate un prix avec 2 décimales
+ */
+export const formatPrice = (price: number | string): string => {
+  const priceAsNumber = typeof price === 'string' ? parseFloat(price) : price;
+  if (isNaN(priceAsNumber)) return '0.00';
+  
+  return priceAsNumber.toFixed(2);
+};
+
+/**
  * Détermine la tranche de distance pour un prix
+ * Note: Cette fonction est conservée pour les composants qui pourraient l'utiliser
+ * mais n'est plus utilisée pour les calculs de prix réels
  */
 export const getDistanceRangeId = (distance: number): string => {
   if (distance <= 10) return '1-10';
@@ -20,25 +43,4 @@ export const getDistanceRangeId = (distance: number): string => {
   if (distance <= 600) return '501-600';
   if (distance <= 700) return '601-700';
   return '701+';
-};
-
-/**
- * Calcule le prix TTC à partir du prix HT
- */
-export const calculateTTC = (priceHT: string): string => {
-  const priceAsNumber = parseFloat(priceHT);
-  if (isNaN(priceAsNumber)) return '0.00';
-  
-  const priceTTC = priceAsNumber * 1.2;
-  return formatPrice(priceTTC);
-};
-
-/**
- * Formate un prix avec 2 décimales
- */
-export const formatPrice = (price: number | string): string => {
-  const priceAsNumber = typeof price === 'string' ? parseFloat(price) : price;
-  if (isNaN(priceAsNumber)) return '0.00';
-  
-  return priceAsNumber.toFixed(2);
 };
