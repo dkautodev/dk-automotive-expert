@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Loader } from '@/components/ui/loader';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface PriceInfo {
   distance: string;
@@ -29,23 +31,55 @@ interface ContactStepProps {
 }
 
 const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: ContactStepProps) => {
-  // Fonction explicite pour le débogage
-  const handleSubmit = () => {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  
+  // Fonction explicite pour le débogage et gestion de soumission
+  const handleSubmit = async () => {
     console.log("Submit button clicked");
-    console.log("Form values before validation:", form.getValues());
-    console.log("Form errors:", form.formState.errors);
     
-    form.handleSubmit((data) => {
+    try {
+      // Déclencher la validation du formulaire complet
+      const isValid = await form.trigger();
+      console.log("Form values before validation:", form.getValues());
+      console.log("Form validation result:", isValid);
+      console.log("Form errors:", form.formState.errors);
+      
+      if (!isValid) {
+        console.error("Form validation failed with errors:", form.formState.errors);
+        setSubmitError("Veuillez remplir tous les champs obligatoires.");
+        return;
+      }
+      
+      // Ajouter les champs calculés si disponibles
+      if (priceInfo && priceInfo.distance) {
+        form.setValue('distance', priceInfo.distance.replace(' km', ''));
+      }
+      if (priceInfo && priceInfo.priceHT) {
+        form.setValue('price_ht', priceInfo.priceHT);
+      }
+      if (priceInfo && priceInfo.priceTTC) {
+        form.setValue('price_ttc', priceInfo.priceTTC);
+      }
+      
+      const data = form.getValues();
       console.log("Form validated successfully, data:", data);
+      setSubmitError(null);
       onSubmit(data);
-    }, (errors) => {
-      console.error("Form validation failed with errors:", errors);
-    })();
+    } catch (error: any) {
+      console.error("Error during form submission:", error);
+      setSubmitError(error.message || "Erreur lors de la soumission du formulaire");
+    }
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy mb-4">Vos coordonnées</h2>
+      
+      {submitError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{submitError}</AlertDescription>
+        </Alert>
+      )}
       
       {priceInfo && (
         <div className="bg-gray-100 p-4 rounded-md mb-6">

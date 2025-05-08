@@ -1,6 +1,7 @@
 
 import { z } from 'zod';
 
+// Schéma pour le formulaire de devis
 export const quoteFormSchema = z.object({
   mission_type: z.enum(['livraison', 'restitution']),
   vehicle_type: z.string().min(1, 'Le type de véhicule est requis'),
@@ -39,6 +40,11 @@ export const quoteFormSchema = z.object({
   
   // Informations complémentaires
   additionalInfo: z.string().optional(),
+  
+  // Champs calculés pour le prix et la distance
+  distance: z.string().optional(),
+  price_ht: z.string().optional(),
+  price_ttc: z.string().optional(),
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;

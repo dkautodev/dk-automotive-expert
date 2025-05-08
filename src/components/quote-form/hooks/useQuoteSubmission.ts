@@ -23,16 +23,24 @@ export const useQuoteSubmission = (
       console.log('Submitting quote with values:', data);
       console.log('With additional info - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC, 'Is Per Km:', isPerKm);
       
-      // Prepare the data for submission including price information
+      // Valider les champs obligatoires
+      const isValid = await form.trigger();
+      if (!isValid) {
+        const errors = form.formState.errors;
+        console.error('Form validation failed:', errors);
+        throw new Error('Veuillez remplir tous les champs obligatoires');
+      }
+      
+      // Préparer les données pour l'envoi avec les informations de prix
       const submissionData = {
         ...data,
-        distance: distance ? `${distance} km` : undefined,
+        distance: distance ? distance.toString() : undefined,
         priceHT,
         priceTTC,
         isPerKm
       };
       
-      // Call the Supabase edge function to send the quote request
+      // Appel de la fonction Edge pour envoyer la demande de devis
       const { data: responseData, error: functionError } = await supabase.functions.invoke(
         'send-quote-request', 
         {
@@ -42,15 +50,15 @@ export const useQuoteSubmission = (
       
       if (functionError) {
         console.error('Error from edge function:', functionError);
-        throw new Error(functionError.message || 'Error in send-quote-request function');
+        throw new Error(functionError.message || 'Erreur dans la fonction send-quote-request');
       }
       
       console.log('Response from send-quote-request function:', responseData);
       
-      // Display success message
+      // Afficher un message de succès
       toast.success('Votre demande de devis a été envoyée avec succès !');
       
-      // Reset form and go back to step 1
+      // Réinitialiser le formulaire et revenir à l'étape 1
       form.reset();
       setStep(1);
       

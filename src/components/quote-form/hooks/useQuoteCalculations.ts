@@ -1,93 +1,99 @@
 
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { calculatePrice } from '@/utils/priceCalculator';
+import { toast } from 'sonner';
+import { getDistanceFromLatLonInKm } from '@/hooks/useDistanceCalculation';
+import { useGoogleMapsApi } from '@/hooks/useGoogleMapsApi';
+import { useState } from 'react';
 
 export const useQuoteCalculations = (
-  form: any,
-  setDistance: (distance: number | null) => void,
-  setPriceHT: (price: string | null) => void,
-  setPriceTTC: (price: string | null) => void,
+  form: UseFormReturn<QuoteFormValues>,
+  setDistance: (distance: number) => void,
+  setPriceHT: (price: string) => void,
+  setPriceTTC: (price: string) => void,
   setIsPerKm: (isPerKm: boolean) => void
 ) => {
-  const [calculating, setCalculating] = useState(false);
+  const { isLoaded } = useGoogleMapsApi();
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  const calculateQuote = async (data: Partial<QuoteFormValues>) => {
-    if (!data.vehicle_type || !data.pickup_address || !data.delivery_address) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
+  const calculateQuote = async (data: Partial<QuoteFormValues>): Promise<boolean> => {
+    if (!isLoaded) {
+      toast.error("L'API Google Maps n'est pas chargée. Veuillez réessayer.");
       return false;
     }
 
-    setCalculating(true);
+    if (!data.pickup_address || !data.delivery_address || !data.vehicle_type) {
+      toast.error("Veuillez remplir toutes les adresses et sélectionner un type de véhicule.");
+      return false;
+    }
+
+    setIsCalculating(true);
+    
     try {
-      // Simulate distance calculation (in a real app, you'd use a mapping API)
-      const distanceData = await simulateDistanceCalculation(
-        data.pickup_address!,
-        data.delivery_address!
+      // Convertir les adresses en coordonnées
+      const geocoder = new google.maps.Geocoder();
+      
+      // Obtenir les coordonnées de l'adresse de départ
+      const pickupCoordinates = await new Promise<google.maps.LatLng>((resolve, reject) => {
+        geocoder.geocode({ address: data.pickup_address }, (results, status) => {
+          if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+            resolve(results[0].geometry.location);
+          } else {
+            reject(new Error(`Erreur lors de la géocodification de l'adresse de départ: ${status}`));
+          }
+        });
+      });
+      
+      // Obtenir les coordonnées de l'adresse de livraison
+      const deliveryCoordinates = await new Promise<google.maps.LatLng>((resolve, reject) => {
+        geocoder.geocode({ address: data.delivery_address }, (results, status) => {
+          if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+            resolve(results[0].geometry.location);
+          } else {
+            reject(new Error(`Erreur lors de la géocodification de l'adresse de livraison: ${status}`));
+          }
+        });
+      });
+      
+      // Calculer la distance entre les deux points
+      const distanceInKm = getDistanceFromLatLonInKm(
+        pickupCoordinates.lat(),
+        pickupCoordinates.lng(),
+        deliveryCoordinates.lat(),
+        deliveryCoordinates.lng()
       );
-
-      if (!distanceData.success) {
-        toast.error('Erreur lors du calcul de la distance: ' + distanceData.error);
+      
+      const distance = Math.round(distanceInKm);
+      console.log(`Distance calculated: ${distance} km`);
+      
+      // Mettre à jour l'état avec la distance calculée
+      setDistance(distance);
+      
+      // Calculer le prix en fonction du type de véhicule et de la distance
+      const { priceHT, priceTTC, isPerKm, error } = await calculatePrice(data.vehicle_type, distance);
+      
+      if (error) {
+        toast.error(`Erreur lors du calcul du prix: ${error}`);
         return false;
       }
-
-      setDistance(distanceData.distance);
-
-      // Calculate price based on vehicle type and distance
-      const priceResult = await calculatePrice(data.vehicle_type!, distanceData.distance);
-
-      if (!priceResult || priceResult.error) {
-        toast.error('Erreur lors du calcul du prix: ' + (priceResult?.error || 'Prix non disponible'));
-        return false;
-      }
-
-      console.log('Price calculation result:', priceResult);
-
-      // Set price variables
-      setPriceHT(priceResult.priceHT);
-      setPriceTTC(priceResult.priceTTC);
-      setIsPerKm(priceResult.isPerKm);
-
+      
+      // Mettre à jour les états avec les prix calculés
+      setPriceHT(priceHT);
+      setPriceTTC(priceTTC);
+      setIsPerKm(isPerKm);
+      
+      console.log(`Price calculated - HT: ${priceHT}€, TTC: ${priceTTC}€, isPerKm: ${isPerKm}`);
+      
       return true;
     } catch (error: any) {
-      console.error('Error during calculation:', error);
-      toast.error('Erreur lors du calcul: ' + error.message);
+      console.error('Error calculating quote:', error);
+      toast.error(`Erreur lors du calcul du devis: ${error.message}`);
       return false;
     } finally {
-      setCalculating(false);
+      setIsCalculating(false);
     }
   };
 
-  // Function to simulate distance calculation
-  const simulateDistanceCalculation = async (
-    originAddress: string,
-    destinationAddress: string
-  ): Promise<{ success: boolean; distance: number; error?: string }> => {
-    try {
-      // In a real app, you'd use Google Maps API or similar
-      // For demo purposes, we'll generate a random distance between 20 and 500 km
-      const distance = Math.floor(Math.random() * 481) + 20;
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      return {
-        success: true,
-        distance
-      };
-    } catch (error: any) {
-      console.error('Distance calculation error:', error);
-      return {
-        success: false,
-        distance: 0,
-        error: error.message || 'Erreur inconnue'
-      };
-    }
-  };
-
-  return {
-    calculateQuote,
-    calculating
-  };
+  return { calculateQuote, isCalculating };
 };

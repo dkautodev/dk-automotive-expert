@@ -8,6 +8,7 @@ export const useQuoteFormState = () => {
   const [priceHT, setPriceHT] = useState<string | null>(null);
   const [priceTTC, setPriceTTC] = useState<string | null>(null);
   const [isPerKm, setIsPerKm] = useState<boolean>(false);
+  const [formValidated, setFormValidated] = useState<boolean>(false);
 
   return {
     step,
@@ -21,6 +22,8 @@ export const useQuoteFormState = () => {
     priceTTC,
     setPriceTTC,
     isPerKm,
-    setIsPerKm
+    setIsPerKm,
+    formValidated,
+    setFormValidated
   };
 };
