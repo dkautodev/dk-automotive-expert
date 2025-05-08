@@ -24,6 +24,7 @@ interface QuoteRequest {
   distance?: string;
   priceHT?: string;
   priceTTC?: string;
+  isPerKm?: boolean;
   // Include additional optional fields if sent by form
   pickupStreetNumber?: string;
   pickupStreetType?: string;
@@ -39,6 +40,7 @@ interface QuoteRequest {
   deliveryPostalCode?: string;
   deliveryCity?: string;
   deliveryCountry?: string;
+  additionalInfo?: string;
 }
 
 // Helper functions for security
@@ -121,37 +123,33 @@ serve(async (req) => {
   }
 
   try {
+    // Ajouter plus de logs pour le débogage
+    console.log("==== Début de la fonction send-quote-request ====");
+    console.log("Method:", req.method);
+    console.log("URL:", req.url);
+
     // Extract client IP for rate limiting
     const forwardedFor = req.headers.get("x-forwarded-for") || "unknown";
     const clientIp = forwardedFor.split(',')[0].trim();
-    
-    // Detailed logging for debugging
-    console.log("==== New quote request received ====");
-    console.log("Request method:", req.method);
-    console.log("Request URL:", req.url);
     console.log("Client IP:", clientIp);
-    console.log("Headers:", Object.fromEntries(req.headers.entries()));
     
-    // Parse request body with detailed error handling
+    // Parse request body
     let data: QuoteRequest;
-    let rawBody = "";
-    
     try {
-      rawBody = await req.text();
-      console.log("Raw request body:", rawBody);
+      const bodyText = await req.text();
+      console.log("Request body (raw):", bodyText);
       
-      if (!rawBody || rawBody.trim() === "") {
+      if (!bodyText || bodyText.trim() === "") {
         throw new Error("Empty request body");
       }
       
       try {
-        data = JSON.parse(rawBody);
+        data = JSON.parse(bodyText);
+        console.log("Request body (parsed):", data);
       } catch (jsonError) {
         console.error("Failed to parse JSON:", jsonError);
         throw new Error(`Invalid JSON in request body: ${jsonError.message}`);
       }
-      
-      console.log("Request body successfully parsed:", data);
     } catch (error) {
       console.error("Error handling request body:", error);
       throw new Error(`Failed to process request body: ${error.message}`);
@@ -159,13 +157,15 @@ serve(async (req) => {
     
     // Sanitize input data
     data = sanitizeRequestData(data);
+    console.log("Sanitized data:", data);
     
     // Check rate limiting
     if (!checkRateLimit(clientIp, data.email)) {
+      console.warn("Rate limit exceeded for IP:", clientIp, "Email:", data.email);
       throw new Error("Rate limit exceeded. Please try again later.");
     }
     
-    // Validate essential fields with detailed error messages
+    // Validate essential fields
     const missingFields = [];
     
     if (!data.firstName) missingFields.push("firstName");
@@ -183,10 +183,12 @@ serve(async (req) => {
     
     // Validate email and phone
     if (!validateEmail(data.email)) {
+      console.error("Invalid email format:", data.email);
       throw new Error("Invalid email format");
     }
     
     if (!validatePhone(data.phone)) {
+      console.error("Invalid phone format:", data.phone);
       throw new Error("Invalid phone format");
     }
 
@@ -226,7 +228,6 @@ serve(async (req) => {
     `;
 
     const pickupAddressHtml = pickupFullAddress ? `<p><strong>Adresse complète départ :</strong> ${pickupFullAddress}</p>` : "";
-
     const deliveryAddressHtml = deliveryFullAddress ? `<p><strong>Adresse complète arrivée :</strong> ${deliveryFullAddress}</p>` : "";
 
     const contactHtml = `
@@ -238,8 +239,25 @@ serve(async (req) => {
     `;
 
     const distanceHtml = data.distance ? `<p><strong>Distance estimée :</strong> ${data.distance}</p>` : "";
-    const priceHTHtml = data.priceHT ? `<p><strong>Prix HT estimé :</strong> ${data.priceHT} €</p>` : "";
-    const priceTTCHtml = data.priceTTC ? `<p><strong>Prix TTC estimé :</strong> ${data.priceTTC} €</p>` : "";
+    
+    let priceInfoHtml = "";
+    if (data.priceHT && data.priceTTC) {
+      if (data.isPerKm) {
+        priceInfoHtml = `
+          <p><strong>Tarification :</strong> Prix au kilomètre</p>
+          <p><strong>Prix HT estimé :</strong> ${data.priceHT} € (${parseFloat(data.priceHT) / parseFloat(data.distance?.replace(' km', '') || "1")} €/km)</p>
+          <p><strong>Prix TTC estimé :</strong> ${data.priceTTC} € (${parseFloat(data.priceTTC) / parseFloat(data.distance?.replace(' km', '') || "1")} €/km)</p>
+        `;
+      } else {
+        priceInfoHtml = `
+          <p><strong>Tarification :</strong> Prix forfaitaire</p>
+          <p><strong>Prix HT estimé :</strong> ${data.priceHT} €</p>
+          <p><strong>Prix TTC estimé :</strong> ${data.priceTTC} €</p>
+        `;
+      }
+    }
+    
+    const additionalInfoHtml = data.additionalInfo ? `<p><strong>Informations complémentaires :</strong> ${data.additionalInfo}</p>` : "";
 
     // Email to DK Automotive
     const emailToDK = {
@@ -256,12 +274,12 @@ serve(async (req) => {
         <p><strong>Adresse arrivée:</strong> ${data.delivery_address}</p>
         ${deliveryAddressHtml}
         ${distanceHtml}
-        ${priceHTHtml}
-        ${priceTTCHtml}
+        ${priceInfoHtml}
         <h3>Véhicule</h3>
         ${vehicleInfoHtml}
         <h3>Contact</h3>
         ${contactHtml}
+        ${additionalInfoHtml}
       `
     };
 
@@ -285,18 +303,18 @@ serve(async (req) => {
         <p>${data.delivery_address}</p>
         ${deliveryAddressHtml}
         ${distanceHtml}
-        ${priceHTHtml}
-        ${priceTTCHtml}
+        ${priceInfoHtml}
         <h4>Détails véhicule</h4>
         ${vehicleInfoHtml}
         <h4>Contact</h4>
         ${contactHtml}
+        ${additionalInfoHtml}
         <p>Cordialement,<br>L'équipe DK Automotive</p>
       `
     };
 
     try {
-      console.log("Sending emails via Brevo API...");
+      console.log("Envoi d'emails via l'API Brevo...");
 
       const apiKey = Deno.env.get("BREVO_API_KEY");
       if (!apiKey) {
@@ -304,94 +322,80 @@ serve(async (req) => {
         throw new Error("La clé API Brevo n'est pas configurée. Veuillez contacter l'administrateur.");
       }
 
-      console.log("Preparing API requests to Brevo...");
+      console.log("Préparation des requêtes API vers Brevo...");
       
       // Add timeout for API calls
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      try {
-        // Send emails with timeout
-        const [dkResponse, clientResponse] = await Promise.all([
-          fetch("https://api.brevo.com/v3/smtp/email", {
-            method: "POST",
-            headers: {
-              "Accept": "application/json",
-              "Content-Type": "application/json",
-              "api-key": apiKey
-            },
-            body: JSON.stringify(emailToDK),
-            signal: controller.signal
-          }),
-          fetch("https://api.brevo.com/v3/smtp/email", {
-            method: "POST",
-            headers: {
-              "Accept": "application/json",
-              "Content-Type": "application/json",
-              "api-key": apiKey
-            },
-            body: JSON.stringify(emailToClient),
-            signal: controller.signal
-          })
-        ]);
-        
-        clearTimeout(timeoutId);
+      // Prepare request options with better error handling
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "api-key": apiKey
+        },
+        signal: controller.signal
+      };
+      
+      console.log("Envoi email à DK Automotive...");
+      const dkResponse = await fetch(
+        "https://api.brevo.com/v3/smtp/email", 
+        {
+          ...requestOptions,
+          body: JSON.stringify(emailToDK)
+        }
+      );
+      
+      console.log("Envoi email au client...");
+      const clientResponse = await fetch(
+        "https://api.brevo.com/v3/smtp/email", 
+        {
+          ...requestOptions,
+          body: JSON.stringify(emailToClient)
+        }
+      );
+      
+      clearTimeout(timeoutId);
 
-        console.log("DK email response status:", dkResponse.status);
-        console.log("Client email response status:", clientResponse.status);
+      console.log("Réponse email DK (status):", dkResponse.status);
+      console.log("Réponse email client (status):", clientResponse.status);
 
-        // Logging de la réponse détaillée
-        let dkResponseText;
-        let clientResponseText;
-        
-        try {
-          dkResponseText = await dkResponse.text();
-          console.log("DK email full response:", dkResponseText);
-        } catch (err) {
-          console.error("Could not read DK response body:", err);
-        }
-        
-        try {
-          clientResponseText = await clientResponse.text();
-          console.log("Client email full response:", clientResponseText);
-        } catch (err) {
-          console.error("Could not read client response body:", err);
-        }
+      // Logging des réponses complètes
+      const dkResponseData = await dkResponse.text();
+      const clientResponseData = await clientResponse.text();
+      
+      console.log("Réponse complète email DK:", dkResponseData);
+      console.log("Réponse complète email client:", clientResponseData);
 
-        if (!dkResponse.ok) {
-          throw new Error(`Error sending email to DK: ${dkResponse.status} - ${dkResponseText || "No response details"}`);
-        }
-        if (!clientResponse.ok) {
-          throw new Error(`Error sending email to client: ${clientResponse.status} - ${clientResponseText || "No response details"}`);
-        }
-      } catch (fetchError) {
-        clearTimeout(timeoutId);
-        if (fetchError.name === 'AbortError') {
-          throw new Error('Email API request timed out after 10 seconds');
-        }
-        throw fetchError;
+      if (!dkResponse.ok) {
+        throw new Error(`Erreur lors de l'envoi de l'email à DK: ${dkResponse.status} - ${dkResponseData}`);
+      }
+      if (!clientResponse.ok) {
+        throw new Error(`Erreur lors de l'envoi de l'email au client: ${clientResponse.status} - ${clientResponseData}`);
       }
 
-      console.log("Emails sent successfully");
+      console.log("Emails envoyés avec succès!");
       
       return new Response(JSON.stringify({ 
         success: true,
-        message: "Emails sent successfully"
+        message: "Emails envoyés avec succès"
       }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
       
     } catch (emailError) {
-      console.error("Error during email sending:", emailError);
-      throw new Error(`Failed to send emails: ${emailError.message}`);
+      console.error("Erreur lors de l'envoi des emails:", emailError);
+      throw new Error(`Échec de l'envoi des emails: ${emailError.message}`);
     }
 
   } catch (error) {
-    console.error("Error in send-quote-request function:", error);
+    console.error("Erreur dans la fonction send-quote-request:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message || "Unknown error",
+        error: error.message || "Erreur inconnue",
         success: false
       }),
       { 

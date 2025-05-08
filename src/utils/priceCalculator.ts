@@ -43,8 +43,9 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
     
     // Calculer le prix final
     let finalPriceHT: number;
+    const isPerKm = priceData.type_tarif === 'km';
     
-    if (priceData.type_tarif === 'km') {
+    if (isPerKm) {
       finalPriceHT = priceData.price_ht * distance;
       console.log(`Per km price: ${priceData.price_ht} € × ${distance} km = ${finalPriceHT} €`);
     } else {
@@ -55,12 +56,12 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
     const priceHTString = finalPriceHT.toFixed(2);
     const priceTTCString = calculateTTC(priceHTString);
     
-    console.log(`Final price calculated: HT=${priceHTString}€, TTC=${priceTTCString}€`);
+    console.log(`Final price calculated: HT=${priceHTString}€, TTC=${priceTTCString}€, Type=${isPerKm ? 'per km' : 'fixed'}`);
     
     return {
       priceHT: priceHTString,
       priceTTC: priceTTCString,
-      isPerKm: priceData.type_tarif === 'km'
+      isPerKm: isPerKm
     };
   } catch (error: any) {
     console.error('Erreur lors du calcul du prix:', error);

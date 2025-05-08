@@ -17,7 +17,9 @@ export const useQuoteForm = () => {
     priceHT,
     setPriceHT,
     priceTTC,
-    setPriceTTC
+    setPriceTTC,
+    isPerKm,
+    setIsPerKm
   } = useQuoteFormState();
   
   const form = useForm<QuoteFormValues>({
@@ -51,11 +53,12 @@ export const useQuoteForm = () => {
       deliveryPostalCode: '',
       deliveryCity: '',
       deliveryCountry: 'France',
+      additionalInfo: '',
     }
   });
 
-  const { calculateQuote } = useQuoteCalculations(form, setDistance, setPriceHT, setPriceTTC);
-  const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC);
+  const { calculateQuote } = useQuoteCalculations(form, setDistance, setPriceHT, setPriceTTC, setIsPerKm);
+  const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC, isPerKm);
 
   const nextStep = async (data: Partial<QuoteFormValues>) => {
     if (step === 2) {
@@ -76,6 +79,7 @@ export const useQuoteForm = () => {
     distance,
     priceHT,
     priceTTC,
+    isPerKm,
     nextStep,
     prevStep,
     onSubmit

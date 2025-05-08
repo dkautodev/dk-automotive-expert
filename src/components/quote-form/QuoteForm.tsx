@@ -15,6 +15,7 @@ const QuoteForm = () => {
     distance,
     priceHT,
     priceTTC,
+    isPerKm,
     nextStep,
     prevStep,
     onSubmit
@@ -41,7 +42,8 @@ const QuoteForm = () => {
           priceInfo={{
             distance: distance ? `${distance} km` : null,
             priceHT,
-            priceTTC
+            priceTTC,
+            isPerKm
           }}
         />;
       case 3:
@@ -65,7 +67,8 @@ const QuoteForm = () => {
           priceInfo={{
             distance: distance ? `${distance} km` : "Non calculée",
             priceHT: priceHT || "Non calculé",
-            priceTTC: priceTTC || "Non calculé"
+            priceTTC: priceTTC || "Non calculé",
+            isPerKm: isPerKm
           }}
         />;
       default:
