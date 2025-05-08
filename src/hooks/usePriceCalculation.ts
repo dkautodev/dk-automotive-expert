@@ -53,7 +53,7 @@ export const usePriceCalculation = () => {
       // Calculer le prix TTC (TVA 20%)
       const priceTTC = calculateTTC(formattedPriceHT);
       
-      console.log(`Prix calculé: HT=${formattedPriceHT}€, TTC=${priceTTC}€`);
+      console.log(`Prix calculé: HT=${formattedPriceHT}€, TTC=${priceTTC}€, type=${priceData.type_tarif}`);
       
       return {
         priceHT: formattedPriceHT,

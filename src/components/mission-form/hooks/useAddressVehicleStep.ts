@@ -17,6 +17,7 @@ export const useAddressVehicleStep = (
   const [distance, setDistance] = useState<number | null>(null);
   const [priceHT, setPriceHT] = useState<string | null>(null);
   const [priceTTC, setPriceTTC] = useState<string | null>(null);
+  const [isPerKm, setIsPerKm] = useState<boolean>(false);
   const [isCalculatingTotal, setIsCalculatingTotal] = useState<boolean>(false);
 
   const { 
@@ -79,14 +80,17 @@ export const useAddressVehicleStep = (
       if (priceResult) {
         setPriceHT(priceResult.priceHT);
         setPriceTTC(priceResult.priceTTC);
+        setIsPerKm(priceResult.isPerKm);
         
         form.setValue("price_ht", priceResult.priceHT);
         form.setValue("price_ttc", priceResult.priceTTC);
         
+        console.log(`Prix calculés: HT=${priceResult.priceHT}€, TTC=${priceResult.priceTTC}€, isPerKm=${priceResult.isPerKm}`);
         toast.success("Calcul effectué avec succès");
       } else {
         setPriceHT(null);
         setPriceTTC(null);
+        setIsPerKm(false);
         toast.error("Impossible de calculer le prix pour ce véhicule et cette distance");
       }
     } catch (error: any) {
@@ -95,9 +99,10 @@ export const useAddressVehicleStep = (
       setDistance(null);
       setPriceHT(null);
       setPriceTTC(null);
-      form.setValue("distance", null);
-      form.setValue("price_ht", null);
-      form.setValue("price_ttc", null);
+      setIsPerKm(false);
+      form.setValue("distance", "");
+      form.setValue("price_ht", "");
+      form.setValue("price_ttc", "");
     } finally {
       setIsCalculatingTotal(false);
     }
@@ -107,6 +112,7 @@ export const useAddressVehicleStep = (
     distance,
     priceHT,
     priceTTC,
+    isPerKm,
     isCalculating,
     clients,
     clientsLoading,
