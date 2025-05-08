@@ -93,7 +93,7 @@ export const usePricingGridsDB = () => {
       
       let finalPriceHT: number;
       
-      if (data.type_tarif === 'par_km') {
+      if (data.type_tarif === 'km') {
         finalPriceHT = data.price_ht * distance;
       } else {
         finalPriceHT = data.price_ht;
@@ -102,7 +102,7 @@ export const usePricingGridsDB = () => {
       return {
         priceHT: finalPriceHT.toString(),
         priceTTC: (finalPriceHT * 1.2).toFixed(2),
-        isPerKm: data.type_tarif === 'par_km'
+        isPerKm: data.type_tarif === 'km'
       };
     } catch (error: any) {
       console.error('Error getting price:', error);

@@ -38,8 +38,8 @@ export const usePriceCalculation = () => {
       
       let finalPriceHT: number;
       
-      // Déterminer si le prix est par km ou forfaitaire
-      if (priceData.type_tarif === 'par_km') {
+      // Déterminer si le prix est par km (type_tarif = "km") ou forfaitaire (type_tarif = "forfait")
+      if (priceData.type_tarif === 'km') {
         finalPriceHT = priceData.price_ht * distance;
         console.log(`Prix au km: ${priceData.price_ht} € × ${distance} km = ${finalPriceHT} €`);
       } else {
@@ -58,7 +58,7 @@ export const usePriceCalculation = () => {
       return {
         priceHT: formattedPriceHT,
         priceTTC: priceTTC,
-        isPerKm: priceData.type_tarif === 'par_km'
+        isPerKm: priceData.type_tarif === 'km'
       };
     } catch (error) {
       console.error('Erreur lors du calcul du prix:', error);
