@@ -39,6 +39,7 @@ export const useQuoteSubmission = (
       );
       
       if (functionError) {
+        console.error('Error from edge function:', functionError);
         throw new Error(functionError.message || 'Error in send-quote-request function');
       }
       

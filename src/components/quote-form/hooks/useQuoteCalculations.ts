@@ -43,12 +43,16 @@ export const useQuoteCalculations = (
       setDistance(calculatedDistance);
       
       // Calculer le prix
-      const { priceHT: calculatedPriceHT, priceTTC: calculatedPriceTTC } = 
-        await calculatePrice(data.vehicle_type!, calculatedDistance);
+      const priceResult = await calculatePrice(data.vehicle_type!, calculatedDistance);
+      
+      if (!priceResult) {
+        toast.error("Impossible de calculer le prix pour ce type de véhicule et cette distance");
+        return false;
+      }
       
       // Formater les prix avec 2 décimales
-      const formattedPriceHT = formatPrice(calculatedPriceHT);
-      const formattedPriceTTC = formatPrice(calculatedPriceTTC);
+      const formattedPriceHT = formatPrice(priceResult.priceHT);
+      const formattedPriceTTC = formatPrice(priceResult.priceTTC);
       
       setPriceHT(formattedPriceHT);
       setPriceTTC(formattedPriceTTC);
