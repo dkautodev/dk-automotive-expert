@@ -21,9 +21,9 @@ export const useQuoteSubmission = (
     
     try {
       console.log('Submitting quote with values:', data);
-      console.log('With additional info - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC, 'Is Per Km:', isPerKm);
+      console.log('With additional calculations - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC, 'Is Per Km:', isPerKm);
       
-      // Valider les champs obligatoires
+      // Validate required fields
       const isValid = await form.trigger();
       if (!isValid) {
         const errors = form.formState.errors;
@@ -31,16 +31,18 @@ export const useQuoteSubmission = (
         throw new Error('Veuillez remplir tous les champs obligatoires');
       }
       
-      // Préparer les données pour l'envoi avec les informations de prix
+      // Prepare complete submission data
       const submissionData = {
         ...data,
-        distance: distance ? distance.toString() : undefined,
-        priceHT,
-        priceTTC,
+        distance: distance ? distance.toString() : "Non calculée",
+        priceHT: priceHT || "Non calculé",
+        priceTTC: priceTTC || "Non calculé",
         isPerKm
       };
       
-      // Appel de la fonction Edge pour envoyer la demande de devis
+      console.log('Complete submission data:', submissionData);
+      
+      // Call the edge function to send the quote request
       const { data: responseData, error: functionError } = await supabase.functions.invoke(
         'send-quote-request', 
         {
@@ -50,15 +52,15 @@ export const useQuoteSubmission = (
       
       if (functionError) {
         console.error('Error from edge function:', functionError);
-        throw new Error(functionError.message || 'Erreur dans la fonction send-quote-request');
+        throw new Error(functionError.message || 'Erreur lors de l\'envoi du devis');
       }
       
       console.log('Response from send-quote-request function:', responseData);
       
-      // Afficher un message de succès
+      // Show success message
       toast.success('Votre demande de devis a été envoyée avec succès !');
       
-      // Réinitialiser le formulaire et revenir à l'étape 1
+      // Reset form and return to step 1
       form.reset();
       setStep(1);
       

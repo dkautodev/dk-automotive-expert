@@ -9,8 +9,8 @@ const corsHeaders = {
 interface QuoteRequest {
   mission_type: string;
   vehicle_type: string;
-  brand?: string;
-  model?: string;
+  brand: string;
+  model: string;
   year?: string;
   fuel?: string;
   licensePlate?: string;
@@ -25,7 +25,8 @@ interface QuoteRequest {
   priceHT?: string;
   priceTTC?: string;
   isPerKm?: boolean;
-  // Include additional optional fields if sent by form
+  additionalInfo?: string;
+  // Détails supplémentaires pour les adresses
   pickupStreetNumber?: string;
   pickupStreetType?: string;
   pickupStreetName?: string;
@@ -40,165 +41,83 @@ interface QuoteRequest {
   deliveryPostalCode?: string;
   deliveryCity?: string;
   deliveryCountry?: string;
-  additionalInfo?: string;
 }
-
-// Helper functions for security
-const sanitizeInput = (input: string): string => {
-  if (!input) return '';
-  return input
-    .trim()
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/\\/g, '&#92;')
-    .replace(/`/g, '&#96;')
-    .replace(/\$/g, '&#36;');
-};
-
-const sanitizeRequestData = (data: QuoteRequest): QuoteRequest => {
-  const sanitized: Record<string, any> = {};
-  
-  Object.entries(data).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      sanitized[key] = sanitizeInput(value);
-    } else {
-      sanitized[key] = value;
-    }
-  });
-  
-  return sanitized as QuoteRequest;
-};
-
-const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return emailRegex.test(email);
-};
-
-const validatePhone = (phone: string): boolean => {
-  const phoneRegex = /^(?:\+33|0)[1-9](?:[\s.-]?[0-9]{2}){4}$/;
-  return phoneRegex.test(phone);
-};
-
-// Rate limiting map
-const requestCounts: Map<string, { count: number, timestamp: number }> = new Map();
-
-// Rate limit check
-const checkRateLimit = (ip: string, email: string): boolean => {
-  const now = Date.now();
-  const ipKey = `ip:${ip}`;
-  const emailKey = `email:${email}`;
-  
-  const ipData = requestCounts.get(ipKey) || { count: 0, timestamp: now };
-  const emailData = requestCounts.get(emailKey) || { count: 0, timestamp: now };
-  
-  // Reset counters if older than 1 hour
-  if (now - ipData.timestamp > 3600000) {
-    ipData.count = 0;
-    ipData.timestamp = now;
-  }
-  
-  if (now - emailData.timestamp > 3600000) {
-    emailData.count = 0;
-    emailData.timestamp = now;
-  }
-  
-  // Increment counters
-  ipData.count++;
-  emailData.count++;
-  
-  // Update maps
-  requestCounts.set(ipKey, ipData);
-  requestCounts.set(emailKey, emailData);
-  
-  // Allow max 5 requests per hour per IP or email
-  return ipData.count <= 5 && emailData.count <= 5;
-};
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Handling OPTIONS request for CORS");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Ajouter plus de logs pour le débogage
-    console.log("==== Début de la fonction send-quote-request ====");
-    console.log("Method:", req.method);
-    console.log("URL:", req.url);
+    console.log("🔄 Starting send-quote-request function");
+    console.log("🔍 Request method:", req.method);
+    console.log("📍 Request URL:", req.url);
 
-    // Extract client IP for rate limiting
-    const forwardedFor = req.headers.get("x-forwarded-for") || "unknown";
-    const clientIp = forwardedFor.split(',')[0].trim();
-    console.log("Client IP:", clientIp);
+    // Extract client IP for logging purposes
+    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    console.log("👤 Client IP:", clientIp);
     
     // Parse request body
-    let data: QuoteRequest;
-    try {
-      const bodyText = await req.text();
-      console.log("Request body (raw):", bodyText);
-      
-      if (!bodyText || bodyText.trim() === "") {
-        throw new Error("Empty request body");
-      }
-      
-      try {
-        data = JSON.parse(bodyText);
-        console.log("Request body (parsed):", data);
-      } catch (jsonError) {
-        console.error("Failed to parse JSON:", jsonError);
-        throw new Error(`Invalid JSON in request body: ${jsonError.message}`);
-      }
-    } catch (error) {
-      console.error("Error handling request body:", error);
-      throw new Error(`Failed to process request body: ${error.message}`);
+    const bodyText = await req.text();
+    console.log("📄 Raw request body length:", bodyText.length);
+    
+    if (!bodyText || bodyText.trim() === "") {
+      console.error("❌ Empty request body");
+      throw new Error("Request body is empty");
     }
     
-    // Sanitize input data
-    data = sanitizeRequestData(data);
-    console.log("Sanitized data:", data);
-    
-    // Check rate limiting
-    if (!checkRateLimit(clientIp, data.email)) {
-      console.warn("Rate limit exceeded for IP:", clientIp, "Email:", data.email);
-      throw new Error("Rate limit exceeded. Please try again later.");
+    let data: QuoteRequest;
+    try {
+      data = JSON.parse(bodyText);
+      console.log("✅ Successfully parsed request body");
+      console.log("📋 Form data summary:", {
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        company: data.company,
+        vehicle: `${data.brand} ${data.model} (${data.vehicle_type})`,
+        addresses: {
+          pickup: data.pickup_address,
+          delivery: data.delivery_address
+        },
+        price: {
+          type: data.isPerKm ? "Per KM" : "Fixed",
+          ht: data.priceHT,
+          ttc: data.priceTTC,
+          distance: data.distance
+        }
+      });
+    } catch (error) {
+      console.error("❌ Failed to parse JSON:", error);
+      throw new Error(`Invalid JSON format: ${error.message}`);
     }
     
     // Validate essential fields
-    const missingFields = [];
+    const requiredFields = [
+      "firstName", 
+      "lastName", 
+      "email", 
+      "phone", 
+      "company",
+      "pickup_address", 
+      "delivery_address",
+      "vehicle_type",
+      "brand",
+      "model"
+    ];
     
-    if (!data.firstName) missingFields.push("firstName");
-    if (!data.lastName) missingFields.push("lastName");
-    if (!data.email) missingFields.push("email");
-    if (!data.phone) missingFields.push("phone");
-    if (!data.pickup_address) missingFields.push("pickup_address");
-    if (!data.delivery_address) missingFields.push("delivery_address");
-    
+    const missingFields = requiredFields.filter(field => !data[field]);
     if (missingFields.length > 0) {
-      const errorMessage = `Missing required fields: ${missingFields.join(", ")}`;
-      console.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    
-    // Validate email and phone
-    if (!validateEmail(data.email)) {
-      console.error("Invalid email format:", data.email);
-      throw new Error("Invalid email format");
-    }
-    
-    if (!validatePhone(data.phone)) {
-      console.error("Invalid phone format:", data.phone);
-      throw new Error("Invalid phone format");
+      console.error("❌ Missing required fields:", missingFields);
+      throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
     }
 
-    // Prepare HTML email content
-    const createDetailRow = (label: string, value?: string) =>
-      value ? `<p><strong>${label}:</strong> ${value}</p>` : "";
-    
+    // Prepare email content
     const missionTypeLabel = data.mission_type === 'livraison' ? 'Livraison' : 'Restitution';
-
-    const pickupFullAddress = [
+    
+    // Format pickup address details if available
+    const pickupAddressDetails = [
       data.pickupStreetNumber,
       data.pickupStreetType,
       data.pickupStreetName,
@@ -207,8 +126,9 @@ serve(async (req) => {
       data.pickupCity,
       data.pickupCountry
     ].filter(Boolean).join(' ');
-
-    const deliveryFullAddress = [
+    
+    // Format delivery address details if available
+    const deliveryAddressDetails = [
       data.deliveryStreetNumber,
       data.deliveryStreetType,
       data.deliveryStreetName,
@@ -218,6 +138,11 @@ serve(async (req) => {
       data.deliveryCountry
     ].filter(Boolean).join(' ');
 
+    // Helper function to create detail rows in HTML
+    const createDetailRow = (label: string, value?: string) =>
+      value ? `<p><strong>${label}:</strong> ${value}</p>` : "";
+    
+    // Vehicle information HTML block
     const vehicleInfoHtml = `
       ${createDetailRow("Type de véhicule", data.vehicle_type)}
       ${createDetailRow("Marque", data.brand)}
@@ -227,9 +152,14 @@ serve(async (req) => {
       ${createDetailRow("Immatriculation", data.licensePlate)}
     `;
 
-    const pickupAddressHtml = pickupFullAddress ? `<p><strong>Adresse complète départ :</strong> ${pickupFullAddress}</p>` : "";
-    const deliveryAddressHtml = deliveryFullAddress ? `<p><strong>Adresse complète arrivée :</strong> ${deliveryFullAddress}</p>` : "";
+    // Address HTML blocks
+    const pickupAddressHtml = pickupAddressDetails ? 
+      `<p><strong>Détails adresse départ:</strong> ${pickupAddressDetails}</p>` : "";
+    
+    const deliveryAddressHtml = deliveryAddressDetails ? 
+      `<p><strong>Détails adresse arrivée:</strong> ${deliveryAddressDetails}</p>` : "";
 
+    // Contact HTML block
     const contactHtml = `
       ${createDetailRow("Société", data.company)}
       ${createDetailRow("Nom", data.lastName)}
@@ -238,36 +168,42 @@ serve(async (req) => {
       ${createDetailRow("Téléphone", data.phone)}
     `;
 
-    const distanceHtml = data.distance ? `<p><strong>Distance estimée :</strong> ${data.distance}</p>` : "";
+    // Distance and price information HTML blocks
+    const distanceHtml = data.distance ? 
+      `<p><strong>Distance estimée:</strong> ${data.distance} km</p>` : "";
     
     let priceInfoHtml = "";
     if (data.priceHT && data.priceTTC) {
       if (data.isPerKm) {
+        const pricePerKm = parseFloat(data.priceHT) / parseFloat(data.distance || "1");
         priceInfoHtml = `
-          <p><strong>Tarification :</strong> Prix au kilomètre</p>
-          <p><strong>Prix HT estimé :</strong> ${data.priceHT} € (${parseFloat(data.priceHT) / parseFloat(data.distance?.replace(' km', '') || "1")} €/km)</p>
-          <p><strong>Prix TTC estimé :</strong> ${data.priceTTC} € (${parseFloat(data.priceTTC) / parseFloat(data.distance?.replace(' km', '') || "1")} €/km)</p>
+          <p><strong>Type de tarif:</strong> Prix au kilomètre</p>
+          <p><strong>Prix HT:</strong> ${data.priceHT} € (${pricePerKm.toFixed(2)} €/km)</p>
+          <p><strong>Prix TTC:</strong> ${data.priceTTC} €</p>
         `;
       } else {
         priceInfoHtml = `
-          <p><strong>Tarification :</strong> Prix forfaitaire</p>
-          <p><strong>Prix HT estimé :</strong> ${data.priceHT} €</p>
-          <p><strong>Prix TTC estimé :</strong> ${data.priceTTC} €</p>
+          <p><strong>Type de tarif:</strong> Prix forfaitaire</p>
+          <p><strong>Prix HT:</strong> ${data.priceHT} €</p>
+          <p><strong>Prix TTC:</strong> ${data.priceTTC} €</p>
         `;
       }
     }
     
-    const additionalInfoHtml = data.additionalInfo ? `<p><strong>Informations complémentaires :</strong> ${data.additionalInfo}</p>` : "";
+    // Additional information HTML block
+    const additionalInfoHtml = data.additionalInfo ? 
+      `<p><strong>Informations complémentaires:</strong> ${data.additionalInfo}</p>` : "";
 
     // Email to DK Automotive
     const emailToDK = {
       sender: { name: "DK Automotive", email: "noreply@dkautomotive.fr" },
       to: [{ email: "contact@dkautomotive.fr" }],
-      subject: `Nouvelle demande de devis - ${data.firstName} ${data.lastName} (${data.company || "sans société"})`,
+      subject: `Nouvelle demande de devis - ${data.firstName} ${data.lastName} (${data.company})`,
       htmlContent: `
         <h2>Nouvelle demande de devis</h2>
         <h3>Type de mission</h3>
         <p>${missionTypeLabel}</p>
+        
         <h3>Adresses</h3>
         <p><strong>Adresse départ:</strong> ${data.pickup_address}</p>
         ${pickupAddressHtml}
@@ -275,11 +211,15 @@ serve(async (req) => {
         ${deliveryAddressHtml}
         ${distanceHtml}
         ${priceInfoHtml}
+        
         <h3>Véhicule</h3>
         ${vehicleInfoHtml}
+        
         <h3>Contact</h3>
         ${contactHtml}
         ${additionalInfoHtml}
+        
+        <p>Demande envoyée le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</p>
       `
     };
 
@@ -292,54 +232,58 @@ serve(async (req) => {
         <h2>Merci pour votre demande de devis</h2>
         <p>Cher(e) ${data.firstName} ${data.lastName},</p>
         <p>Nous avons bien reçu votre demande de devis pour le transport de votre véhicule.</p>
-        <p>Notre équipe étudiera votre demande et vous répondra dans les 24 heures ouvrées.</p>
+        <p>Notre équipe étudiera votre demande et vous répondra dans les meilleurs délais.</p>
+        
         <h3>Récapitulatif de votre demande</h3>
         <h4>Type de mission</h4>
         <p>${missionTypeLabel}</p>
-        <h4>Adresse départ</h4>
+        
+        <h4>Adresse de départ</h4>
         <p>${data.pickup_address}</p>
         ${pickupAddressHtml}
-        <h4>Adresse arrivée</h4>
+        
+        <h4>Adresse d'arrivée</h4>
         <p>${data.delivery_address}</p>
         ${deliveryAddressHtml}
         ${distanceHtml}
         ${priceInfoHtml}
+        
         <h4>Détails véhicule</h4>
         ${vehicleInfoHtml}
-        <h4>Contact</h4>
+        
+        <h4>Vos coordonnées</h4>
         ${contactHtml}
         ${additionalInfoHtml}
+        
         <p>Cordialement,<br>L'équipe DK Automotive</p>
       `
     };
 
+    // Send emails via Brevo API
+    console.log("📧 Preparing to send emails via Brevo API");
+    
+    const apiKey = Deno.env.get("BREVO_API_KEY");
+    if (!apiKey) {
+      console.error("❌ BREVO_API_KEY is not configured");
+      throw new Error("La clé API Brevo n'est pas configurée");
+    }
+    
+    // Set up request options with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15-second timeout
+    
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "api-key": apiKey
+      },
+      signal: controller.signal
+    };
+    
     try {
-      console.log("Envoi d'emails via l'API Brevo...");
-
-      const apiKey = Deno.env.get("BREVO_API_KEY");
-      if (!apiKey) {
-        console.error("BREVO_API_KEY n'est pas configurée");
-        throw new Error("La clé API Brevo n'est pas configurée. Veuillez contacter l'administrateur.");
-      }
-
-      console.log("Préparation des requêtes API vers Brevo...");
-      
-      // Add timeout for API calls
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
-      // Prepare request options with better error handling
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "api-key": apiKey
-        },
-        signal: controller.signal
-      };
-      
-      console.log("Envoi email à DK Automotive...");
+      console.log("📧 Sending email to DK Automotive...");
       const dkResponse = await fetch(
         "https://api.brevo.com/v3/smtp/email", 
         {
@@ -348,7 +292,15 @@ serve(async (req) => {
         }
       );
       
-      console.log("Envoi email au client...");
+      const dkResponseText = await dkResponse.text();
+      console.log("🔄 DK email API response status:", dkResponse.status);
+      console.log("🔄 DK email API response body:", dkResponseText);
+      
+      if (!dkResponse.ok) {
+        throw new Error(`DK email failed: ${dkResponse.status} - ${dkResponseText}`);
+      }
+      
+      console.log("📧 Sending confirmation email to client...");
       const clientResponse = await fetch(
         "https://api.brevo.com/v3/smtp/email", 
         {
@@ -357,45 +309,36 @@ serve(async (req) => {
         }
       );
       
-      clearTimeout(timeoutId);
-
-      console.log("Réponse email DK (status):", dkResponse.status);
-      console.log("Réponse email client (status):", clientResponse.status);
-
-      // Logging des réponses complètes
-      const dkResponseData = await dkResponse.text();
-      const clientResponseData = await clientResponse.text();
+      const clientResponseText = await clientResponse.text();
+      console.log("🔄 Client email API response status:", clientResponse.status);
+      console.log("🔄 Client email API response body:", clientResponseText);
       
-      console.log("Réponse complète email DK:", dkResponseData);
-      console.log("Réponse complète email client:", clientResponseData);
-
-      if (!dkResponse.ok) {
-        throw new Error(`Erreur lors de l'envoi de l'email à DK: ${dkResponse.status} - ${dkResponseData}`);
-      }
       if (!clientResponse.ok) {
-        throw new Error(`Erreur lors de l'envoi de l'email au client: ${clientResponse.status} - ${clientResponseData}`);
+        throw new Error(`Client email failed: ${clientResponse.status} - ${clientResponseText}`);
       }
-
-      console.log("Emails envoyés avec succès!");
       
-      return new Response(JSON.stringify({ 
-        success: true,
-        message: "Emails envoyés avec succès"
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-      
-    } catch (emailError) {
-      console.error("Erreur lors de l'envoi des emails:", emailError);
-      throw new Error(`Échec de l'envoi des emails: ${emailError.message}`);
+      console.log("✅ Both emails sent successfully!");
+    } catch (error) {
+      console.error("❌ Error sending emails:", error);
+      throw new Error(`Failed to send emails: ${error.message}`);
+    } finally {
+      clearTimeout(timeoutId);
     }
-
+    
+    // Return success response
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: "Emails sent successfully"
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+    
   } catch (error) {
-    console.error("Erreur dans la fonction send-quote-request:", error);
+    console.error("❌ Error in send-quote-request function:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message || "Erreur inconnue",
+        error: error.message || "Unknown error",
         success: false
       }),
       { 

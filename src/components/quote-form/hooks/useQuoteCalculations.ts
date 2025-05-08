@@ -1,99 +1,92 @@
 
-import { UseFormReturn } from 'react-hook-form';
+import { useState } from 'react';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { calculatePrice } from '@/utils/priceCalculator';
 import { toast } from 'sonner';
-import { getDistanceFromLatLonInKm } from '@/hooks/useDistanceCalculation';
 import { useGoogleMapsApi } from '@/hooks/useGoogleMapsApi';
-import { useState } from 'react';
 
 export const useQuoteCalculations = (
-  form: UseFormReturn<QuoteFormValues>,
-  setDistance: (distance: number) => void,
-  setPriceHT: (price: string) => void,
-  setPriceTTC: (price: string) => void,
+  form: any,
+  setDistance: (distance: number | null) => void,
+  setPriceHT: (price: string | null) => void,
+  setPriceTTC: (price: string | null) => void,
   setIsPerKm: (isPerKm: boolean) => void
 ) => {
-  const { isLoaded } = useGoogleMapsApi();
-  const [isCalculating, setIsCalculating] = useState(false);
+  const { isLoaded, geocodeAddress, calculateDistance } = useGoogleMapsApi();
+  const [calculating, setCalculating] = useState(false);
 
   const calculateQuote = async (data: Partial<QuoteFormValues>): Promise<boolean> => {
     if (!isLoaded) {
-      toast.error("L'API Google Maps n'est pas chargée. Veuillez réessayer.");
+      toast.error("L'API Google Maps n'est pas chargée");
       return false;
     }
 
-    if (!data.pickup_address || !data.delivery_address || !data.vehicle_type) {
-      toast.error("Veuillez remplir toutes les adresses et sélectionner un type de véhicule.");
-      return false;
-    }
-
-    setIsCalculating(true);
-    
+    setCalculating(true);
     try {
-      // Convertir les adresses en coordonnées
-      const geocoder = new google.maps.Geocoder();
-      
-      // Obtenir les coordonnées de l'adresse de départ
-      const pickupCoordinates = await new Promise<google.maps.LatLng>((resolve, reject) => {
-        geocoder.geocode({ address: data.pickup_address }, (results, status) => {
-          if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
-            resolve(results[0].geometry.location);
-          } else {
-            reject(new Error(`Erreur lors de la géocodification de l'adresse de départ: ${status}`));
-          }
-        });
-      });
-      
-      // Obtenir les coordonnées de l'adresse de livraison
-      const deliveryCoordinates = await new Promise<google.maps.LatLng>((resolve, reject) => {
-        geocoder.geocode({ address: data.delivery_address }, (results, status) => {
-          if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
-            resolve(results[0].geometry.location);
-          } else {
-            reject(new Error(`Erreur lors de la géocodification de l'adresse de livraison: ${status}`));
-          }
-        });
-      });
-      
-      // Calculer la distance entre les deux points
-      const distanceInKm = getDistanceFromLatLonInKm(
-        pickupCoordinates.lat(),
-        pickupCoordinates.lng(),
-        deliveryCoordinates.lat(),
-        deliveryCoordinates.lng()
-      );
-      
-      const distance = Math.round(distanceInKm);
-      console.log(`Distance calculated: ${distance} km`);
-      
-      // Mettre à jour l'état avec la distance calculée
-      setDistance(distance);
-      
-      // Calculer le prix en fonction du type de véhicule et de la distance
-      const { priceHT, priceTTC, isPerKm, error } = await calculatePrice(data.vehicle_type, distance);
-      
-      if (error) {
-        toast.error(`Erreur lors du calcul du prix: ${error}`);
+      console.log("Calculating quote for addresses:", data.pickup_address, data.delivery_address);
+
+      if (!data.pickup_address || !data.delivery_address) {
+        toast.error("Veuillez entrer les adresses de départ et d'arrivée");
         return false;
       }
-      
-      // Mettre à jour les états avec les prix calculés
-      setPriceHT(priceHT);
-      setPriceTTC(priceTTC);
-      setIsPerKm(isPerKm);
-      
-      console.log(`Price calculated - HT: ${priceHT}€, TTC: ${priceTTC}€, isPerKm: ${isPerKm}`);
-      
+
+      if (!data.vehicle_type) {
+        toast.error("Veuillez sélectionner un type de véhicule");
+        return false;
+      }
+
+      // Geocode les adresses pour obtenir les coordonnées
+      const pickupCoords = await geocodeAddress(data.pickup_address);
+      if (!pickupCoords) {
+        toast.error("Impossible de trouver les coordonnées de l'adresse de départ");
+        return false;
+      }
+
+      const deliveryCoords = await geocodeAddress(data.delivery_address);
+      if (!deliveryCoords) {
+        toast.error("Impossible de trouver les coordonnées de l'adresse d'arrivée");
+        return false;
+      }
+
+      // Calculer la distance entre les deux points
+      const distanceResult = await calculateDistance(
+        data.pickup_address,
+        data.delivery_address
+      );
+
+      if (!distanceResult || !distanceResult.distance) {
+        toast.error("Impossible de calculer la distance entre les deux adresses");
+        return false;
+      }
+
+      const distanceKm = Math.ceil(distanceResult.distance / 1000);
+      console.log(`Distance calculated: ${distanceKm} km`);
+      setDistance(distanceKm);
+
+      // Calcul du prix basé sur le type de véhicule et la distance
+      const priceResult = await calculatePrice(data.vehicle_type, distanceKm);
+      if (!priceResult) {
+        toast.error("Erreur lors du calcul du prix");
+        return false;
+      }
+
+      console.log("Price calculation result:", priceResult);
+      setPriceHT(priceResult.priceHT);
+      setPriceTTC(priceResult.priceTTC);
+      setIsPerKm(priceResult.isPerKm);
+
       return true;
-    } catch (error: any) {
-      console.error('Error calculating quote:', error);
-      toast.error(`Erreur lors du calcul du devis: ${error.message}`);
+    } catch (error) {
+      console.error("Error calculating quote:", error);
+      toast.error("Erreur lors du calcul du devis");
       return false;
     } finally {
-      setIsCalculating(false);
+      setCalculating(false);
     }
   };
 
-  return { calculateQuote, isCalculating };
+  return {
+    calculateQuote,
+    calculating
+  };
 };
