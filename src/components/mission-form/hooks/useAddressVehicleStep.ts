@@ -13,8 +13,10 @@ export const useAddressVehicleStep = (
   onPrevious: () => void
 ) => {
   const { calculateDistance, isCalculating: isDistanceCalculating } = useDistanceCalculation();
-  const { calculatePrice, isCalculating: isPriceCalculating, priceHT, priceTTC } = usePriceCalculation();
+  const { calculatePrice, isCalculating: isPriceCalculating } = usePriceCalculation();
   const [distance, setDistance] = useState<number | null>(null);
+  const [priceHT, setPriceHT] = useState<string | null>(null);
+  const [priceTTC, setPriceTTC] = useState<string | null>(null);
   const [isCalculatingTotal, setIsCalculatingTotal] = useState<boolean>(false);
 
   const { 
@@ -73,17 +75,26 @@ export const useAddressVehicleStep = (
 
       // Calculate price
       const priceResult = await calculatePrice(vehicleType, calculatedDistance);
-      console.log("Prix calculé:", priceResult);
       
-      form.setValue("price_ht", priceResult.priceHT);
-      form.setValue("price_ttc", priceResult.priceTTC);
-      
-      toast.success("Calcul effectué avec succès");
+      if (priceResult) {
+        setPriceHT(priceResult.priceHT);
+        setPriceTTC(priceResult.priceTTC);
+        
+        form.setValue("price_ht", priceResult.priceHT);
+        form.setValue("price_ttc", priceResult.priceTTC);
+        
+        toast.success("Calcul effectué avec succès");
+      } else {
+        setPriceHT(null);
+        setPriceTTC(null);
+        toast.error("Impossible de calculer le prix pour ce véhicule et cette distance");
+      }
     } catch (error: any) {
       console.error("Error calculating distance and price:", error);
       
-      // Ne pas afficher de message toast ici car il est déjà géré dans les hooks
       setDistance(null);
+      setPriceHT(null);
+      setPriceTTC(null);
       form.setValue("distance", null);
       form.setValue("price_ht", null);
       form.setValue("price_ttc", null);

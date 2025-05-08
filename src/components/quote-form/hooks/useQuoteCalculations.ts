@@ -41,7 +41,7 @@ export const useQuoteCalculations = (
       console.log(`Distance calculée: ${calculatedDistance} km`);
       setDistance(calculatedDistance);
       
-      // Calculer le prix
+      // Calculer le prix en utilisant directement la table Supabase
       const priceResult = await calculatePrice(data.vehicle_type!, calculatedDistance);
       
       if (!priceResult) {
