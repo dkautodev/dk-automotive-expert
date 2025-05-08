@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const calculatePrice = async (vehicleTypeId: string, distance: number) => {
   try {
+    console.log(`Calculating price for vehicle type: ${vehicleTypeId} and distance: ${distance}km`);
+    
     // Obtenir le prix depuis la table pricing_grids_public
     const { data: priceData, error } = await supabase
       .from('pricing_grids_public')
@@ -37,20 +39,27 @@ export const calculatePrice = async (vehicleTypeId: string, distance: number) =>
       };
     }
     
+    console.log('Price data found:', priceData);
+    
     // Calculer le prix final
     let finalPriceHT: number;
     
     if (priceData.type_tarif === 'par_km') {
       finalPriceHT = priceData.price_ht * distance;
+      console.log(`Per km price: ${priceData.price_ht} € × ${distance} km = ${finalPriceHT} €`);
     } else {
       finalPriceHT = priceData.price_ht;
+      console.log(`Fixed price: ${finalPriceHT} €`);
     }
     
-    const priceHTString = finalPriceHT.toString();
+    const priceHTString = finalPriceHT.toFixed(2);
+    const priceTTCString = calculateTTC(priceHTString);
+    
+    console.log(`Final price calculated: HT=${priceHTString}€, TTC=${priceTTCString}€`);
     
     return {
       priceHT: priceHTString,
-      priceTTC: calculateTTC(priceHTString),
+      priceTTC: priceTTCString,
       isPerKm: priceData.type_tarif === 'par_km'
     };
   } catch (error: any) {
