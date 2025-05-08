@@ -37,7 +37,9 @@ export const useQuoteSubmission = (
         distance: distance ? distance.toString() : "Non calculée",
         priceHT: priceHT || "Non calculé",
         priceTTC: priceTTC || "Non calculé",
-        isPerKm
+        isPerKm,
+        // Add current timestamp
+        timestamp: new Date().toISOString()
       };
       
       console.log('Complete submission data:', submissionData);

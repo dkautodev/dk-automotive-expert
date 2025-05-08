@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { calculatePrice } from '@/utils/priceCalculator';
 import { toast } from 'sonner';
-import { useGoogleMapsApi } from '@/hooks/useGoogleMapsApi';
+import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
 
 export const useQuoteCalculations = (
   form: any,
@@ -12,7 +12,7 @@ export const useQuoteCalculations = (
   setPriceTTC: (price: string | null) => void,
   setIsPerKm: (isPerKm: boolean) => void
 ) => {
-  const { isLoaded, geocodeAddress, calculateDistance } = useGoogleMapsApi();
+  const { calculateDistance, isLoaded, isCalculating } = useDistanceCalculation();
   const [calculating, setCalculating] = useState(false);
 
   const calculateQuote = async (data: Partial<QuoteFormValues>): Promise<boolean> => {
@@ -35,31 +35,17 @@ export const useQuoteCalculations = (
         return false;
       }
 
-      // Geocode les adresses pour obtenir les coordonnées
-      const pickupCoords = await geocodeAddress(data.pickup_address);
-      if (!pickupCoords) {
-        toast.error("Impossible de trouver les coordonnées de l'adresse de départ");
-        return false;
-      }
-
-      const deliveryCoords = await geocodeAddress(data.delivery_address);
-      if (!deliveryCoords) {
-        toast.error("Impossible de trouver les coordonnées de l'adresse d'arrivée");
-        return false;
-      }
-
       // Calculer la distance entre les deux points
-      const distanceResult = await calculateDistance(
+      const distanceKm = await calculateDistance(
         data.pickup_address,
         data.delivery_address
       );
 
-      if (!distanceResult || !distanceResult.distance) {
+      if (!distanceKm) {
         toast.error("Impossible de calculer la distance entre les deux adresses");
         return false;
       }
 
-      const distanceKm = Math.ceil(distanceResult.distance / 1000);
       console.log(`Distance calculated: ${distanceKm} km`);
       setDistance(distanceKm);
 
@@ -87,6 +73,6 @@ export const useQuoteCalculations = (
 
   return {
     calculateQuote,
-    calculating
+    calculating: calculating || isCalculating
   };
 };
