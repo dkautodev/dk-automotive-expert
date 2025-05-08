@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
@@ -33,12 +33,19 @@ interface ContactStepProps {
 const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: ContactStepProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   
-  // Fonction explicite pour le débogage et gestion de soumission
+  // Clear error when form changes
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      if (submitError) setSubmitError(null);
+    });
+    return () => subscription.unsubscribe();
+  }, [form, submitError]);
+  
   const handleSubmit = async () => {
     console.log("Submit button clicked");
     
     try {
-      // Déclencher la validation du formulaire complet
+      // Trigger form validation
       const isValid = await form.trigger();
       console.log("Form values before validation:", form.getValues());
       console.log("Form validation result:", isValid);
@@ -50,15 +57,17 @@ const ContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: Contact
         return;
       }
       
-      // Ajouter les champs calculés si disponibles
-      if (priceInfo && priceInfo.distance) {
-        form.setValue('distance', priceInfo.distance.replace(' km', ''));
-      }
-      if (priceInfo && priceInfo.priceHT) {
-        form.setValue('price_ht', priceInfo.priceHT);
-      }
-      if (priceInfo && priceInfo.priceTTC) {
-        form.setValue('price_ttc', priceInfo.priceTTC);
+      // Add calculated fields if available
+      if (priceInfo) {
+        if (priceInfo.distance) {
+          form.setValue('distance', priceInfo.distance.replace(' km', ''));
+        }
+        if (priceInfo.priceHT) {
+          form.setValue('price_ht', priceInfo.priceHT);
+        }
+        if (priceInfo.priceTTC) {
+          form.setValue('price_ttc', priceInfo.priceTTC);
+        }
       }
       
       const data = form.getValues();
