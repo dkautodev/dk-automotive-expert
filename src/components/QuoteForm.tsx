@@ -18,7 +18,8 @@ const QuoteForm = () => {
     priceHT,
     priceTTC,
     nextStep,
-    prevStep
+    prevStep,
+    onSubmit
   } = useQuoteForm();
 
   const renderStep = () => {
@@ -42,7 +43,15 @@ const QuoteForm = () => {
         return (
           <ContactForm 
             form={form} 
-            onSubmit={handleSubmit}
+            onSubmit={async (data) => {
+              try {
+                const result = await onSubmit(data);
+                return result;
+              } catch (error: any) {
+                console.error('Error in submit handler:', error);
+                return { success: false, error };
+              }
+            }}
             onPrevious={prevStep}
             loading={loading}
             priceInfo={{
@@ -54,44 +63,6 @@ const QuoteForm = () => {
         );
       default:
         return null;
-    }
-  };
-
-  const handleSubmit = async (data: QuoteFormValues) => {
-    try {
-      const { error } = await supabase.functions.invoke('send-quote-request', {
-        body: {
-          ...data,
-          pickup_contact: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            phone: data.phone
-          },
-          delivery_contact: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            phone: data.phone
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Succès",
-        description: "Votre demande de devis a été envoyée avec succès",
-        variant: "default"
-      });
-      form.reset();
-    } catch (error: any) {
-      console.error('Erreur lors de l\'envoi du devis:', error);
-      toast({
-        title: "Erreur",
-        description: error.message || 'Une erreur est survenue lors de l\'envoi de votre demande',
-        variant: "destructive"
-      });
     }
   };
 

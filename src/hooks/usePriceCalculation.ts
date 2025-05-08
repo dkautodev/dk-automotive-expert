@@ -14,25 +14,38 @@ export const usePriceCalculation = () => {
       
       // Obtenir le prix HT de la grille tarifaire
       const result = await getPriceForVehicleAndDistance(vehicleType, distance);
-      const priceHT = formatPrice(result.priceHT);
+      
+      if (!result) {
+        console.error('Aucun prix trouvé pour ce véhicule et cette distance');
+        return null;
+      }
+      
+      let finalPriceHT: number;
+      
+      // Si le prix est au kilomètre, multiplier par la distance
+      if (result.isPerKm) {
+        finalPriceHT = parseFloat(result.priceHT) * distance;
+        console.log(`Prix au km: ${result.priceHT} * ${distance} = ${finalPriceHT}`);
+      } else {
+        finalPriceHT = parseFloat(result.priceHT);
+        console.log(`Prix fixe: ${finalPriceHT}`);
+      }
+      
+      const formattedPriceHT = formatPrice(finalPriceHT);
       
       // Calculer le prix TTC (TVA 20%)
-      const priceTTC = calculateTTC(priceHT);
+      const formattedPriceTTC = calculateTTC(formattedPriceHT);
       
-      console.log(`Prix calculé: HT=${priceHT}€, TTC=${priceTTC}€`);
+      console.log(`Prix calculé: HT=${formattedPriceHT}€, TTC=${formattedPriceTTC}€`);
       
       return {
-        priceHT,
-        priceTTC,
+        priceHT: formattedPriceHT,
+        priceTTC: formattedPriceTTC,
         isPerKm: result.isPerKm
       };
     } catch (error) {
       console.error('Erreur lors du calcul du prix:', error);
-      return {
-        priceHT: '0.00',
-        priceTTC: '0.00',
-        isPerKm: false
-      };
+      return null;
     } finally {
       setIsCalculating(false);
     }

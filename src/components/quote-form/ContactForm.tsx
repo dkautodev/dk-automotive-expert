@@ -43,6 +43,7 @@ const ContactForm = ({ form, onSubmit, onPrevious, loading, priceInfo }: Contact
     // Validate form first
     const isValid = await form.trigger();
     if (!isValid) {
+      console.info('Form validation failed');
       return;
     }
     
