@@ -34,3 +34,6 @@ enabled = false
 # Edge Functions configuration
 [functions.send-quote-request]
 verify_jwt = false
+
+[functions.send-contact-email]
+verify_jwt = false

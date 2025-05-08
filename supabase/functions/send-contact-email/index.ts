@@ -1,6 +1,4 @@
 
-// Edge Function pour envoyer les submissions du formulaire contact via Brevo (ex-Sendinblue)
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 // Utilise la clé d'API Brevo depuis les secrets Supabase
@@ -21,6 +19,34 @@ interface ContactFormData {
   message: string;
 }
 
+// Helper functions for security
+const sanitizeInput = (input: string): string => {
+  if (!input) return '';
+  return input
+    .trim()
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\\/g, '&#92;')
+    .replace(/`/g, '&#96;')
+    .replace(/\$/g, '&#36;');
+};
+
+const sanitizeRequestData = (data: ContactFormData): ContactFormData => {
+  const sanitized: Record<string, any> = {};
+  
+  Object.entries(data).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      sanitized[key] = sanitizeInput(value);
+    } else {
+      sanitized[key] = value;
+    }
+  });
+  
+  return sanitized as ContactFormData;
+};
+
 serve(async (req: Request) => {
   // Gérer le preflight CORS
   if (req.method === "OPTIONS") {
@@ -37,8 +63,41 @@ serve(async (req: Request) => {
       );
     }
 
-    const data: ContactFormData = await req.json();
-    console.log("Données du formulaire reçues:", JSON.stringify(data));
+    // Log HTTP request headers for debugging
+    console.log("==== New contact request received ====");
+    console.log("Request method:", req.method);
+    console.log("Request URL:", req.url);
+    console.log("Headers:", Object.fromEntries(req.headers.entries()));
+    
+    // Read and log body
+    let rawBody = "";
+    try {
+      rawBody = await req.text();
+      console.log("Raw request body:", rawBody);
+      
+      if (!rawBody || rawBody.trim() === "") {
+        throw new Error("Empty request body");
+      }
+    } catch (bodyError) {
+      console.error("Error reading request body:", bodyError);
+      throw new Error(`Failed to read request body: ${bodyError.message}`);
+    }
+    
+    // Parse body
+    let data: ContactFormData;
+    try {
+      data = JSON.parse(rawBody);
+      console.log("Parsed data:", data);
+    } catch (parseError) {
+      console.error("Error parsing JSON body:", parseError);
+      return new Response(
+        JSON.stringify({ error: "Format de données invalide" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    // Sanitize input
+    data = sanitizeRequestData(data);
 
     // Validation des données
     if (!data.email || !data.firstName || !data.lastName || !data.subject || !data.message) {
@@ -86,35 +145,65 @@ serve(async (req: Request) => {
 
     console.log("Envoi à Brevo avec les données:", JSON.stringify(requestBody));
 
-    // Prépare l'appel à l'API Brevo
-    const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "api-key": BREVO_API_KEY,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
+    // Add timeout for API calls
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
+    try {
+      // Prépare l'appel à l'API Brevo
+      const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "api-key": BREVO_API_KEY,
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      let brevoResult;
+      let responseText = "";
+      
+      try {
+        responseText = await brevoResponse.text();
+        console.log(`Réponse Brevo brute (${brevoResponse.status}):`, responseText);
+        
+        if (responseText) {
+          brevoResult = JSON.parse(responseText);
+        }
+      } catch (parseErr) {
+        console.error("Erreur lors du parsing de la réponse Brevo:", parseErr);
+        brevoResult = { parseError: true };
+      }
 
-    const brevoResult = await brevoResponse.json();
-    console.log(`Réponse Brevo (${brevoResponse.status}):`, JSON.stringify(brevoResult));
+      console.log(`Réponse Brevo (${brevoResponse.status}):`, brevoResult || "No parsed result");
 
-    if (!brevoResponse.ok) {
-      console.error("Brevo API error", brevoResult);
-      return new Response(
-        JSON.stringify({ 
-          error: brevoResult?.message || JSON.stringify(brevoResult),
-          status: brevoResponse.status 
-        }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      if (!brevoResponse.ok) {
+        console.error("Brevo API error:", brevoResult);
+        return new Response(
+          JSON.stringify({ 
+            error: (brevoResult && brevoResult.message) ? brevoResult.message : "Erreur lors de l'envoi de l'email",
+            status: brevoResponse.status,
+            details: responseText
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(JSON.stringify({ success: true, messageId: brevoResult?.messageId }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Email API request timed out after 10 seconds');
+      }
+      throw fetchError;
     }
-
-    return new Response(JSON.stringify({ success: true, ...brevoResult }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   } catch (error) {
     console.error("Error in send-contact-email:", error);
     return new Response(

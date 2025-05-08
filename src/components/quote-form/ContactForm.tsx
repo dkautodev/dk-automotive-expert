@@ -149,7 +149,7 @@ const ContactForm = ({ form, onSubmit, onPrevious, loading, priceInfo }: Contact
                 EMAIL <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="votre@email.com" {...field} className="bg-[#EEF1FF]" />
+                <Input placeholder="votre@email.com" {...field} className="bg-[#EEF1FF]" type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
