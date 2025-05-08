@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Mail, Phone, Building } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -10,6 +11,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader } from '@/components/ui/loader';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
@@ -22,6 +26,9 @@ const formSchema = z.object({
 });
 
 const Contact = () => {
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,30 +43,32 @@ const Contact = () => {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    setLoading(true);
+    setSubmitError(null);
+    
     try {
-      const response = await fetch(
-        "https://lqjwvaqqhqgmkjsriijw.functions.supabase.co/send-contact-email",
+      console.log("Sending contact form data:", values);
+      
+      const { data, error } = await supabase.functions.invoke(
+        "send-contact-email",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(values)
+          body: values
         }
       );
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err?.error || "Erreur lors de l'envoi du message");
+      
+      if (error) {
+        throw new Error(error.message || "Erreur lors de l'envoi du message");
       }
-
+      
       toast.success("Message envoyé avec succès !");
       form.reset();
     } catch (error: any) {
-      toast.error(
-        error?.message ||
-          "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer plus tard."
-      );
+      console.error("Contact form submission error:", error);
+      const errorMessage = error.message || "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer plus tard.";
+      setSubmitError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,6 +94,12 @@ const Contact = () => {
                 <h2 className="text-2xl font-bold text-dk-navy mb-6">
                   Envoyez-nous un message
                 </h2>
+                
+                {submitError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertDescription>{submitError}</AlertDescription>
+                  </Alert>
+                )}
                 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -162,8 +177,19 @@ const Contact = () => {
                           <FormMessage />
                         </FormItem>} />
 
-                    <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors">
-                      Envoyer le message
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-dk-navy hover:bg-dk-blue transition-colors"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader className="mr-2 h-4 w-4 animate-spin" />
+                          ENVOI EN COURS...
+                        </>
+                      ) : (
+                        'Envoyer le message'
+                      )}
                     </Button>
                   </form>
                 </Form>
