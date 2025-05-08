@@ -12,7 +12,7 @@ export const usePriceCalculation = () => {
     try {
       console.log(`Calculer le prix pour véhicule ${vehicleType} et distance ${distance}km`);
       
-      // Obtenir le prix HT de la grille tarifaire
+      // Obtenir le prix depuis la grille tarifaire
       const result = await getPriceForVehicleAndDistance(vehicleType, distance);
       
       if (!result) {
@@ -24,17 +24,19 @@ export const usePriceCalculation = () => {
       
       // Si le prix est au kilomètre, multiplier par la distance
       if (result.isPerKm) {
-        finalPriceHT = parseFloat(result.priceHT) * distance;
-        console.log(`Prix au km: ${result.priceHT} * ${distance} = ${finalPriceHT}`);
+        finalPriceHT = result.priceHT * distance;
+        console.log(`Prix au km: ${result.priceHT} € × ${distance} km = ${finalPriceHT} €`);
       } else {
-        finalPriceHT = parseFloat(result.priceHT);
-        console.log(`Prix fixe: ${finalPriceHT}`);
+        finalPriceHT = result.priceHT;
+        console.log(`Prix forfaitaire: ${finalPriceHT} €`);
       }
       
+      // Formater le prix HT avec 2 décimales
       const formattedPriceHT = formatPrice(finalPriceHT);
       
       // Calculer le prix TTC (TVA 20%)
-      const formattedPriceTTC = calculateTTC(formattedPriceHT);
+      const priceTTC = finalPriceHT * 1.2;
+      const formattedPriceTTC = formatPrice(priceTTC);
       
       console.log(`Prix calculé: HT=${formattedPriceHT}€, TTC=${formattedPriceTTC}€`);
       

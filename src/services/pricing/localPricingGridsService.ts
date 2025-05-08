@@ -236,6 +236,7 @@ const calculatePriceFromVehicleAndRange = (vehicleCategory: string, rangeId: str
     if (priceRanges && priceRanges[rangeId as keyof typeof priceRanges]) {
       finalPriceHT = priceRanges[rangeId as keyof typeof priceRanges] / 1.2; // Diviser par 1.2 pour obtenir le prix HT (nos prix sont TTC dans la table)
       isPerKm = false;
+      console.log(`Prix forfaitaire trouvé: ${finalPriceHT} € HT (tranche ${rangeId})`);
     }
   } 
   // Sinon c'est une tranche avec prix au km (> 100km)
@@ -243,17 +244,20 @@ const calculatePriceFromVehicleAndRange = (vehicleCategory: string, rangeId: str
     const priceRanges = priceTable.perKmPrices[vehicleCategory as keyof typeof priceTable.perKmPrices];
     if (priceRanges && priceRanges[rangeId as keyof typeof priceRanges]) {
       const pricePerKm = priceRanges[rangeId as keyof typeof priceRanges] / 1.2; // Diviser par 1.2 pour obtenir le prix HT (nos prix sont TTC dans la table)
-      finalPriceHT = pricePerKm * distance;
+      finalPriceHT = pricePerKm;
       isPerKm = true;
+      console.log(`Prix au km trouvé: ${finalPriceHT} € HT par km (tranche ${rangeId})`);
     }
   }
   
   // Si aucun prix trouvé, utiliser un prix par défaut
   if (finalPriceHT === 0) {
     console.warn(`Aucun prix trouvé pour ${vehicleCategory} dans la tranche ${rangeId}`);
-    finalPriceHT = distance * 1.25; // Prix par défaut
+    finalPriceHT = 1.25; // Prix par défaut au km
     isPerKm = true;
   }
+  
+  console.log(`Prix final: ${finalPriceHT} € HT, isPerKm: ${isPerKm}`);
   
   return {
     priceHT: finalPriceHT,

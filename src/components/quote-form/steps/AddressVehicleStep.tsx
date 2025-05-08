@@ -156,19 +156,29 @@ const AddressVehicleStep = ({ form, onNext, onPrevious, priceInfo }: AddressVehi
         return;
       }
       
-      // Calculate price using the mapped vehicle type 
-      const { priceHT, priceTTC } = await calculatePrice(vehicleType, distance);
+      console.log(`Distance calculée: ${distance} km`);
+      
+      // Calculate price using the vehicle type 
+      const priceResult = await calculatePrice(vehicleType, distance);
+      
+      if (!priceResult) {
+        toast.error("Impossible de calculer le prix pour ce type de véhicule et cette distance");
+        setIsCalculating(false);
+        return;
+      }
+      
+      console.log(`Prix calculé: HT=${priceResult.priceHT}€, TTC=${priceResult.priceTTC}€, isPerKm=${priceResult.isPerKm}`);
       
       // Update form
       form.setValue('distance', distance.toString());
-      form.setValue('price_ht', priceHT);
-      form.setValue('price_ttc', priceTTC);
+      form.setValue('price_ht', priceResult.priceHT);
+      form.setValue('price_ttc', priceResult.priceTTC);
       
       // Store results locally
       setLocalPriceInfo({
         distance: `${distance} km`,
-        priceHT,
-        priceTTC
+        priceHT: priceResult.priceHT,
+        priceTTC: priceResult.priceTTC
       });
       
       toast.success("Calcul effectué avec succès");
