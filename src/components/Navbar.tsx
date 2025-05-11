@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
@@ -6,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-
 const Navbar = () => {
   const isMobile = useIsMobile();
   const navLinks = [{
@@ -22,7 +20,6 @@ const Navbar = () => {
     to: "/faq",
     text: "FAQ"
   }];
-  
   return <div className="w-full sticky top-0 z-50">
       <div className="bg-dk-navy text-white py-2 px-4">
         <div className="container flex justify-between items-center mx-auto">
@@ -73,7 +70,7 @@ const Navbar = () => {
                     {link.text}
                   </Link>)}
                 <Button variant="outline" className="bg-gray-100" asChild>
-                  <Link to="/auth">
+                  <Link to="/auth" className="blue">
                     <UserRound className="mr-2" />
                     Espace professionnel
                   </Link>
