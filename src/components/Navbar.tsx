@@ -60,34 +60,24 @@ const Navbar = () => {
                     {navLinks.map(link => <Link key={link.to} to={link.to} className="text-dk-navy hover:text-dk-blue transition-colors py-2 text-lg font-medium hover-scale">
                         {link.text}
                       </Link>)}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full mt-4 opacity-50 cursor-not-allowed" disabled>
-                          <UserRound className="mr-2" />
-                          Espace professionnel
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Cette fonctionnalité n'est pas disponible actuellement</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <Button variant="outline" className="w-full mt-4" asChild>
+                      <Link to="/auth">
+                        <UserRound className="mr-2" />
+                        Espace professionnel
+                      </Link>
+                    </Button>
                   </nav>
                 </SheetContent>
               </Sheet> : <div className="hidden md:flex space-x-8 items-center">
                 {navLinks.map(link => <Link key={link.to} to={link.to} className="text-dk-navy hover:text-dk-blue transition-colors font-medium hover-scale">
                     {link.text}
                   </Link>)}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" className="bg-gray-100 opacity-50 cursor-not-allowed" disabled>
-                      <UserRound className="mr-2" />
-                      Espace professionnel
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Cette fonctionnalité n'est pas disponible actuellement</p>
-                  </TooltipContent>
-                </Tooltip>
+                <Button variant="outline" className="bg-gray-100" asChild>
+                  <Link to="/auth">
+                    <UserRound className="mr-2" />
+                    Espace professionnel
+                  </Link>
+                </Button>
               </div>}
           </div>
         </div>
