@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, UserRound, Menu, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -64,7 +64,6 @@ const Navbar = () => {
                       <a href="https://app-private.dkautomotive.fr/" target="_blank" rel="noopener noreferrer">
                         <UserRound className="mr-2" />
                         Espace professionnel
-                        <ExternalLink className="ml-2 h-4 w-4" />
                       </a>
                     </Button>
                   </nav>
@@ -77,7 +76,6 @@ const Navbar = () => {
                   <a href="https://app-private.dkautomotive.fr/" target="_blank" rel="noopener noreferrer">
                     <UserRound className="mr-2" />
                     Espace professionnel
-                    <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
               </div>}
