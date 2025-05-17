@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
@@ -17,16 +16,8 @@ const Footer = () => {
                 <Mail className="mr-2 h-5 w-5" />
                 <a href="mailto:contact@dkautomotive.fr" className="hover:text-gray-300 transition">contact@dkautomotive.fr</a>
               </li>
-              <li className="flex items-center">
-                <Phone className="mr-2 h-5 w-5" />
-                <a href="tel:0601020304" className="hover:text-gray-300 transition">06-01-02-03-04</a>
-              </li>
-              <li className="flex items-center">
-                <MapPin className="mr-2 h-5 w-5" />
-                <a href="https://maps.app.goo.gl/t7JAgJJWj3pep2j97" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition">
-                  19 rue de Bresse, 93000 Bobigny
-                </a>
-              </li>
+              
+              
             </ul>
           </div>
           
