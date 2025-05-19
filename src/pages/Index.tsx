@@ -5,15 +5,14 @@ import { Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
 const Index = () => {
   return <div className="min-h-screen bg-white">
       <Navbar />
       
       <main className="animate-fadeIn">
         <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
-          backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
-        }}>
+        backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
+      }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
@@ -179,9 +178,7 @@ const Index = () => {
               <h2 className="text-2xl md:text-4xl font-bold text-[#18257D] mb-6">
                 VOTRE CONFIANCE, NOTRE ENGAGEMENT
               </h2>
-              <p className="text-gray-600 text-lg md:text-xl mb-8">
-                Chez DK Automotive, chaque parcours est une promesse de qualité et de fiabilité.
-              </p>
+              <p className="text-gray-600 text-lg md:text-xl mb-8">Chez DK AUTOMOTIVE, chaque parcours est une promesse de qualité et de fiabilité.</p>
               
               <div className="grid md:grid-cols-3 gap-8 mt-12">
                 <div className="p-6 bg-white rounded-lg shadow-lg">
@@ -264,5 +261,4 @@ const Index = () => {
       <Footer />
     </div>;
 };
-
 export default Index;
