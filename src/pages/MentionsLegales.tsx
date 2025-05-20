@@ -1,12 +1,9 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Separator } from "@/components/ui/separator";
-
 const MentionsLegales = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
@@ -31,7 +28,7 @@ const MentionsLegales = () => {
 
             <section>
               <h2 className="text-xl font-semibold text-dk-navy mb-4">Hébergement du site</h2>
-              <p>Le site internet de DK AUTOMOTIVE est hébergé par O2SWITCH, dont le siège social est situé à 222 BD Gustave Flaubert, 63000 Clermont-Ferrand et joignable par téléphone au +33 4 44 44 60 40.</p>
+              <p>Le site internet de DK AUTOMOTIVE est hébergé par IONOS, dont le siège social est situé à 7, place de la Gare BP 70109 57200 Sarreguemines Cedex France et joignable par téléphone au +33 9 70 80 89 11.</p>
             </section>
 
             <Separator />
@@ -72,8 +69,6 @@ const MentionsLegales = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default MentionsLegales;
