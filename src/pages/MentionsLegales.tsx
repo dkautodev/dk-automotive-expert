@@ -14,13 +14,13 @@ const MentionsLegales = () => {
               <h2 className="text-xl font-semibold text-dk-navy mb-4">Informations légales</h2>
               <div className="space-y-2">
                 <p><strong>Raison sociale :</strong> DK AUTOMOTIVE</p>
-                <p><strong>Forme juridique :</strong> SARL</p>
-                <p><strong>Capital social :</strong> [à compléter]</p>
-                <p><strong>Numéro d'immatriculation :</strong> [à compléter]</p>
-                <p><strong>Siège social :</strong> [adresse complète]</p>
-                <p><strong>Téléphone :</strong> 06-01-02-03-04</p>
-                <p><strong>Email :</strong> [adresse email]</p>
-                <p><strong>Directeur de la publication :</strong> Blin Pierre-Etienne, Agence Niabli</p>
+                <p><strong>Forme juridique :</strong> Association</p>
+                <p><strong>Capital social :</strong> </p>
+                <p><strong>Numéro d'immatriculation :</strong> 93480596100018</p>
+                <p><strong>Siège social :</strong> 19 RUE DE BRESSE 93000 BOBIGNY</p>
+                <p><strong>Téléphone :</strong> </p>
+                <p><strong>Email :</strong> contact@dkautomotive.fr</p>
+                <p><strong>Directeur de la publication :</strong> CarXprtz, 9 rue des colonnes, 75002 PARIS</p>
               </div>
             </section>
 
