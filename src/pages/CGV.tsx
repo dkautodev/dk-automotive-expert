@@ -151,6 +151,161 @@ const CGV = () => {
           </div>
         </div>
       </main>
+       <div className="max-w-4xl mx-auto space-y-8">
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">1. Objet</h2>
+          <p className="mb-2">
+            Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de l'application <span className="font-medium">ConvoySync</span>, développée par <span className="font-medium">DK AUTOMOTIVE</span>, société immatriculée sous le numéro <span className="font-medium">93480596100018</span>, dont le siège est situé à <span className="font-medium">19 rue de Bresse, 93000 Bobigny</span>.
+          </p>
+          <p className="mt-2">
+            Elles s'appliquent à tous les Utilisateurs, qu'ils soient administrateurs, clients ou chauffeurs.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">2. Définitions</h2>
+          <ul className="list-disc pl-6 space-y-1">
+            <li><span className="font-medium">Utilisateur</span> : Toute personne physique ou morale utilisant le Service, qu'elle soit administrateur, client ou chauffeur.</li>
+            <li><span className="font-medium">Compte</span> : Espace personnel créé par un Utilisateur après inscription.</li>
+            <li><span className="font-medium">Mission</span> : Un convoyage de véhicule organisé via le Service, incluant des étapes (acceptation, livraison, facturation).</li>
+            <li><span className="font-medium">Contenu</span> : Les données, documents, fichiers (PDF, images) ou informations transmis(e)s par les Utilisateurs via le Service.</li>
+          </ul>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">3. Accès au Service</h2>
+          <p className="mb-2">
+            L'accès au Service nécessite la création d'un Compte. L'Utilisateur s'engage à fournir des informations exactes, complètes et à jour.
+          </p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Les administrateurs doivent utiliser un token d'invitation pour créer leur Compte.</li>
+            <li>Les clients et chauffeurs doivent remplir un formulaire d'inscription avec leurs coordonnées professionnelles.</li>
+          </ul>
+          <p className="mt-2">
+            DK AUTOMOTIVE se réserve le droit de refuser ou supprimer tout Compte non conforme aux présentes CGU.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">4. Sécurité du Compte</h2>
+          <p className="mb-2">
+            L'Utilisateur est seul responsable de la confidentialité de ses identifiants de connexion. Tout accès non autorisé doit être signalé immédiatement à <span className="text-blue-600">contact@dkautomotive.fr</span>.
+          </p>
+          <p className="mt-2">
+            DK AUTOMOTIVE ne sera pas tenu responsable des pertes ou dommages résultant d'une utilisation non autorisée des identifiants de l'Utilisateur.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">5. Utilisation du Service</h2>
+          <p className="mb-2">
+            L'Utilisateur s'engage à utiliser le Service conformément à la loi et aux présentes CGU. Il s'interdit notamment :
+          </p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>De diffuser des Contenus illicites, falsifiés ou nuisibles.</li>
+            <li>De tenter de contourner les mesures de sécurité du Service.</li>
+            <li>D'utiliser le Service pour des activités frauduleuses ou contraires à l'éthique.</li>
+          </ul>
+          <p className="mt-2">
+            Les Utilisateurs sont responsables des Contenus qu'ils téléversent (ex : permis de conduire, KBIS, factures).
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">6. Propriété Intellectuelle</h2>
+          <p className="mb-2">
+            Le Service et ses éléments (code source, design, logos, textes, bases de données) sont protégés par les lois sur la propriété intellectuelle.
+          </p>
+          <p className="mt-2">
+            Les Utilisateurs conservent la propriété de leurs Contenus, mais accordent à DK AUTOMOTIVE une licence non exclusive, mondiale et gratuite pour traiter ces Contenus dans le cadre de l'exécution du Service.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">7. Responsabilité</h2>
+          <p className="mb-2">
+            Le Service est fourni "en l'état" sans garantie expresse ou implicite. DK AUTOMOTIVE ne pourra être tenue responsable :
+          </p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Des interruptions temporaires du Service dues à des mises à jour ou à des problèmes techniques.</li>
+            <li>Des dommages directs ou indirects résultant de l'utilisation ou de l'impossibilité d'utiliser le Service.</li>
+            <li>Des Contenus fournis par les Utilisateurs ou des erreurs dans les documents générés (devis, factures).</li>
+          </ul>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">8. Données Personnelles</h2>
+          <p className="mb-2">
+            Les données personnelles des Utilisateurs sont collectées et traitées conformément à la Politique de Confidentialité. Les Utilisateurs disposent des droits d'accès, de rectification, d'opposition et de suppression de leurs données via leur espace personnel ou en contactant <span className="text-blue-600">contact@dkautomotive.fr</span>.
+          </p>
+          <p className="mt-2">
+            DK AUTOMOTIVE ne partage aucune donnée personnelle avec des tiers à des fins commerciales.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">9. Résiliation</h2>
+          <p className="mb-2">
+            Tout Utilisateur peut résilier son Compte à tout moment via son espace personnel. DK AUTOMOTIVE se réserve le droit de suspendre ou supprimer un Compte en cas de violation des CGU.
+          </p>
+          <p className="mt-2">
+            Les données personnelles seront conservées pendant 30 jours après résiliation avant d'être définitivement supprimées.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">10. Évolution des CGU</h2>
+          <p className="mb-2">
+            DK AUTOMOTIVE peut modifier les CGU à tout moment. Les modifications seront publiées sur cette page et entreront en vigueur 14 jours après leur publication.
+          </p>
+          <p className="mt-2">
+            L'utilisation continue du Service après ces modifications vaut acceptation des nouvelles CGU.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">11. Loi Applicable et Juridiction</h2>
+          <p className="mb-2">
+            Les présentes CGU sont régies par la loi française. Tout litige relatif au Service sera soumis à la compétence exclusive des tribunaux de Bobigny, France.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section>
+          <h2 className="text-xl font-semibold text-dk-navy mb-4">12. Contact</h2>
+          <p className="mb-2">
+            Pour toute question ou demande concernant le Service, contactez-nous à :
+          </p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li><span className="text-blue-600">contact@dkautomotive.fr</span></li>
+            <li>19 rue de Bresse, 93000 Bobigny</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
       <Footer />
     </div>
   );
