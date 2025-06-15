@@ -22,6 +22,7 @@ export type Database = {
           updated_at: string | null
           updated_by: string | null
           vehicle_category: string | null
+          vehicle_id: number | null
         }
         Insert: {
           active?: boolean | null
@@ -35,6 +36,7 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           vehicle_category?: string | null
+          vehicle_id?: number | null
         }
         Update: {
           active?: boolean | null
@@ -48,6 +50,7 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           vehicle_category?: string | null
+          vehicle_id?: number | null
         }
         Relationships: []
       }

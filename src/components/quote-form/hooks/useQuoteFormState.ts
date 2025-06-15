@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export const useQuoteFormState = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // Commence maintenant à l'étape 1 (adresses & véhicule)
   const [loading, setLoading] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
   const [priceHT, setPriceHT] = useState<string | null>(null);

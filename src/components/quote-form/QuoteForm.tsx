@@ -1,7 +1,6 @@
 
 import { Form } from '@/components/ui/form';
 import { useQuoteForm } from './hooks/useQuoteForm';
-import MissionTypeStep from './steps/MissionTypeStep';
 import AddressVehicleStep from './steps/AddressVehicleStep';
 import VehicleDetailsStep from './steps/VehicleDetailsStep';
 import ContactStep from './steps/ContactStep';
@@ -24,14 +23,6 @@ const QuoteForm = () => {
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <MissionTypeStep 
-          form={form} 
-          onNext={(data) => {
-            console.log("Mission type selected:", data);
-            nextStep(data);
-          }} 
-        />;
-      case 2:
         return <AddressVehicleStep 
           form={form}
           onNext={(data) => {
@@ -40,7 +31,7 @@ const QuoteForm = () => {
           }}
           onPrevious={prevStep}
         />;
-      case 3:
+      case 2:
         return <VehicleDetailsStep 
           form={form}
           onNext={(data) => {
@@ -49,7 +40,7 @@ const QuoteForm = () => {
           }}
           onPrevious={prevStep}
         />;
-      case 4:
+      case 3:
         return <ContactStep 
           form={form}
           onSubmit={(data) => {

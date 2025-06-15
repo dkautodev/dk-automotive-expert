@@ -27,7 +27,7 @@ export const useQuoteForm = () => {
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      mission_type: 'livraison',
+      mission_type: 'livraison', // Valeur par défaut fixée
       vehicle_type: '',
       brand: '',
       model: '',
@@ -63,13 +63,14 @@ export const useQuoteForm = () => {
   const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC, isPerKm);
 
   const nextStep = async (data: Partial<QuoteFormValues>) => {
-    if (step === 2) {
+    // Ajustement des étapes : étape 1 devient étape de calcul
+    if (step === 1) {
       const success = await calculateQuote(data);
       if (!success) return;
     }
     
     // Validation spécifique avant la dernière étape
-    if (step === 3) {
+    if (step === 2) {
       const isValid = await form.trigger(['brand', 'model']);
       if (!isValid) {
         console.log('Validation failed for brand and model');
