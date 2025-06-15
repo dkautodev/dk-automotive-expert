@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
@@ -11,7 +10,7 @@ import FAQ from "@/pages/FAQ";
 import CGV from "@/pages/CGV";
 import MentionsLegales from "@/pages/MentionsLegales";
 import GestionCookies from "@/pages/GestionCookies";
-+import Admin from "@/pages/Admin";
+import Admin from "@/pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +29,7 @@ function App() {
               <Route path="/cgv" element={<CGV />} />
               <Route path="/mentions-legales" element={<MentionsLegales />} />
               <Route path="/gestion-cookies" element={<GestionCookies />} />
-+             <Route path="/admin" element={<Admin />} />
+              <Route path="/admin" element={<Admin />} />
             </Routes>
           </main>
           <Footer />
