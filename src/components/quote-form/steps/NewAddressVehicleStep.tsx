@@ -23,6 +23,16 @@ interface NewAddressVehicleStepProps {
   setPriceTTC: (price: string | null) => void;
 }
 
+// petite fonction utilitaire pour chain les refs RHF et custom
+function assignRefs(...refs: any[]) {
+  return (el: HTMLInputElement | null) => {
+    refs.forEach(ref => {
+      if (typeof ref === "function") ref(el);
+      else if (ref && typeof ref === "object") ref.current = el;
+    });
+  };
+}
+
 const NewAddressVehicleStep = ({
   form,
   onNext,
@@ -38,7 +48,7 @@ const NewAddressVehicleStep = ({
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
-  // Hook pour autocomplétion de prise en charge
+  // Hooks pour autocomplétion de prise en charge
   const pickupAuto = useGoogleAutocomplete({
     ref: pickupInputRef,
     onPlaceSelected: (place) => {
@@ -48,7 +58,7 @@ const NewAddressVehicleStep = ({
     },
     types: ["geocode", "establishment"],
   });
-  // Hook pour autocomplétion de livraison
+  // Hooks pour autocomplétion de livraison
   const deliveryAuto = useGoogleAutocomplete({
     ref: deliveryInputRef,
     onPlaceSelected: (place) => {
@@ -162,10 +172,7 @@ const NewAddressVehicleStep = ({
                     }
                     className={`pl-8 bg-[#EEF1FF] ${pickupAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
                     {...field}
-                    ref={(el) => {
-                      pickupInputRef.current = el;
-                      field.ref(el);
-                    }}
+                    ref={assignRefs(pickupInputRef, field.ref)}
                     disabled={!!pickupAuto.error}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -204,10 +211,7 @@ const NewAddressVehicleStep = ({
                     }
                     className={`pl-8 bg-[#EEF1FF] ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
                     {...field}
-                    ref={(el) => {
-                      deliveryInputRef.current = el;
-                      field.ref(el);
-                    }}
+                    ref={assignRefs(deliveryInputRef, field.ref)}
                     disabled={!!deliveryAuto.error}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
