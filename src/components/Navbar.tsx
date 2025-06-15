@@ -21,7 +21,7 @@ const Navbar = () => {
   }];
   return <nav className="bg-white shadow-sm border-b fixed top-0 left-0 right-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-0 py-[12px]">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-16 px-[25px]">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
               <img className="h-10 w-auto" src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png" alt="DK Automotive" />
