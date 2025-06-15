@@ -11,7 +11,7 @@ const Navbar = () => {
     label: "Accueil"
   }, {
     path: "/devis",
-    label: "Demande de devis"
+    label: "Obtenir votre devis"
   }, {
     path: "/contact",
     label: "Contact"
