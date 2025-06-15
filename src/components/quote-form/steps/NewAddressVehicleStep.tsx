@@ -3,7 +3,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calculator } from 'lucide-react';
+import { Calculator, RefreshCcw } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
 import { useRef } from 'react';
 import { toast } from 'sonner';
@@ -124,6 +124,18 @@ const NewAddressVehicleStep = ({
     onNext(data);
   };
 
+  const handleSwitchAddresses = () => {
+    const pickup = form.getValues('pickup_address');
+    const delivery = form.getValues('delivery_address');
+    form.setValue('pickup_address', delivery || '', { shouldValidate: true });
+    form.setValue('delivery_address', pickup || '', { shouldValidate: true });
+    // Annule les calculs précédents, car le contexte a changé
+    setDistance(null);
+    setPriceHT(null);
+    setPriceTTC(null);
+    toast.success("Les adresses ont été échangées !");
+  };
+
   const pickupAddress = form.watch('pickup_address');
   const deliveryAddress = form.watch('delivery_address');
   const vehicleType = form.watch('vehicle_type');
@@ -131,8 +143,28 @@ const NewAddressVehicleStep = ({
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Adresses et catégorie de véhicule</h2>
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Bloc de saisie d'adresses avec bouton échange */}
+      <div className="grid gap-6 md:grid-cols-2 relative">
         <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
+        {/* Bouton switch visible sur mobile et desktop, position centré entre les deux champs */}
+        <button
+          type="button"
+          aria-label="Échanger les adresses"
+          onClick={handleSwitchAddresses}
+          className="
+            absolute left-1/2 top-1/2 
+            -translate-x-1/2 -translate-y-1/2
+            z-10 
+            bg-white border border-gray-300 rounded-full shadow 
+            p-2 flex items-center justify-center
+            hover:bg-gray-100 active:bg-gray-200
+            transition
+            md:left-auto md:right-[-32px] md:top-1/2
+          "
+          style={{ width: '36px', height: '36px' }}
+        >
+          <RefreshCcw className="w-5 h-5 text-dk-navy" />
+        </button>
         <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
       </div>
       <FormField control={form.control} name="vehicle_type" render={({
