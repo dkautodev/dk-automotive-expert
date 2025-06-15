@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Facebook, Instagram } from "lucide-react";
@@ -22,7 +21,7 @@ const Navbar = () => {
   }];
   return <>
       {/* TOPBAR */}
-      <div className="hidden md:flex fixed top-0 left-0 right-0 z-[55] bg-[#18257D] h-[34px] items-center">
+      <div className="fixed top-0 left-0 right-0 z-[55] bg-[#18257D] h-[34px] flex items-center">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-12">
           {/* Social */}
           <div className="flex items-center gap-4">
