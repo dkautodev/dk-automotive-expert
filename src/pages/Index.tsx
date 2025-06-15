@@ -225,7 +225,9 @@ const Index = () => {
                   <div className="w-24 h-24 bg-[#4A90E2] rounded-full flex items-center justify-center mx-auto mb-6">
                     <PhoneCall className="w-12 h-12 text-white" />
                   </div>
-                  <h4 className="text-lg font-bold text-[#18257D] mb-4">2. APPEL AVEC UN CONSEILLER</h4>
+                  <h4 className="text-lg font-bold text-[#18257D] mb-4">2. APPEL AVEC UN CONSEILLER
+
+                </h4>
                   <p className="text-gray-600">Un conseiller vous rappelle pour planifier votre convoyage.</p>
                 </div>
 
