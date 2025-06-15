@@ -9,6 +9,68 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          password_hash: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          password_hash: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          password_hash?: string
+        }
+        Relationships: []
+      }
+      page_contents: {
+        Row: {
+          block_key: string
+          content_type: string
+          content_value: string | null
+          description: string | null
+          id: string
+          page: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          block_key: string
+          content_type: string
+          content_value?: string | null
+          description?: string | null
+          id?: string
+          page: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          block_key?: string
+          content_type?: string
+          content_value?: string | null
+          description?: string | null
+          id?: string
+          page?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_contents_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing_grids_public: {
         Row: {
           active: boolean | null
