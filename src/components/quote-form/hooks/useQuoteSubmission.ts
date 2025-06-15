@@ -10,8 +10,7 @@ export const useQuoteSubmission = (
   setStep: (step: number) => void,
   distance: number | null,
   priceHT: string | null,
-  priceTTC: string | null,
-  isPerKm: boolean = false
+  priceTTC: string | null
 ) => {
   const [error, setError] = useState<string | null>(null);
 
@@ -20,31 +19,32 @@ export const useQuoteSubmission = (
     setError(null);
     
     try {
-      console.log('Submitting quote with values:', data);
-      console.log('With additional calculations - Distance:', distance, 'Price HT:', priceHT, 'Price TTC:', priceTTC, 'Is Per Km:', isPerKm);
+      console.log('Envoi du devis avec les données:', data);
+      console.log('Calculs - Distance:', distance, 'Prix HT:', priceHT, 'Prix TTC:', priceTTC);
       
-      // Validate required fields
+      // Validation des champs obligatoires
       const isValid = await form.trigger();
       if (!isValid) {
         const errors = form.formState.errors;
-        console.error('Form validation failed:', errors);
+        console.error('Validation échouée:', errors);
         throw new Error('Veuillez remplir tous les champs obligatoires');
       }
       
-      // Prepare complete submission data
+      // Préparation des données complètes
       const submissionData = {
         ...data,
         distance: distance ? distance.toString() : "Non calculée",
         priceHT: priceHT || "Non calculé",
         priceTTC: priceTTC || "Non calculé",
-        isPerKm,
-        // Add current timestamp
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        // Données formatées pour l'email
+        contactEmail: data.email,
+        destinationEmail: 'contact@dkautomotive.fr'
       };
       
-      console.log('Complete submission data:', submissionData);
+      console.log('Données complètes à envoyer:', submissionData);
       
-      // Call the edge function to send the quote request
+      // Appel de la fonction edge pour envoyer les emails
       const { data: responseData, error: functionError } = await supabase.functions.invoke(
         'send-quote-request', 
         {
@@ -53,22 +53,22 @@ export const useQuoteSubmission = (
       );
       
       if (functionError) {
-        console.error('Error from edge function:', functionError);
+        console.error('Erreur de la fonction edge:', functionError);
         throw new Error(functionError.message || 'Erreur lors de l\'envoi du devis');
       }
       
-      console.log('Response from send-quote-request function:', responseData);
+      console.log('Réponse de la fonction send-quote-request:', responseData);
       
-      // Show success message
-      toast.success('Votre demande de devis a été envoyée avec succès !');
+      // Message de succès
+      toast.success('Votre demande de devis a été envoyée avec succès ! Vous recevrez une copie par email.');
       
-      // Reset form and return to step 1
+      // Reset du formulaire et retour à l'étape 1
       form.reset();
       setStep(1);
       
       return { success: true };
     } catch (error: any) {
-      console.error('Error submitting quote:', error);
+      console.error('Erreur lors de l\'envoi du devis:', error);
       const errorMessage = error.message || 'Erreur inconnue lors de l\'envoi du devis';
       setError(errorMessage);
       toast.error('Erreur lors de l\'envoi du devis: ' + errorMessage);

@@ -16,55 +16,33 @@ export const useQuoteForm = () => {
     priceHT,
     setPriceHT,
     priceTTC,
-    setPriceTTC,
-    isPerKm,
-    setIsPerKm,
-    formValidated,
-    setFormValidated
+    setPriceTTC
   } = useQuoteFormState();
   
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      mission_type: 'livraison',
+      pickup_address: '',
+      delivery_address: '',
       vehicle_type: '',
       brand: '',
       model: '',
       year: '',
       fuel: '',
       licensePlate: '',
-      pickup_address: '',
-      delivery_address: '',
+      vin: '',
+      company: '',
       firstName: '',
       lastName: '',
       email: '',
       phone: '',
-      company: '',
-      pickupStreetNumber: '',
-      pickupStreetType: 'Rue',
-      pickupStreetName: '',
-      pickupComplement: '',
-      pickupPostalCode: '',
-      pickupCity: '',
-      pickupCountry: 'France',
-      deliveryStreetNumber: '',
-      deliveryStreetType: 'Rue',
-      deliveryStreetName: '',
-      deliveryComplement: '',
-      deliveryPostalCode: '',
-      deliveryCity: '',
-      deliveryCountry: 'France',
       additionalInfo: '',
     }
   });
 
-  const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC, isPerKm);
+  const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC);
 
   const nextStep = async (data: Partial<QuoteFormValues>) => {
-    if (step === 2) {
-      setFormValidated(true);
-    }
-    
     setStep(step + 1);
   };
 
@@ -79,12 +57,9 @@ export const useQuoteForm = () => {
     distance,
     priceHT,
     priceTTC,
-    isPerKm,
-    formValidated,
     setDistance,
     setPriceHT,
     setPriceTTC,
-    setIsPerKm,
     nextStep,
     prevStep,
     onSubmit
