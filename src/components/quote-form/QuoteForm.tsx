@@ -15,6 +15,10 @@ const QuoteForm = () => {
     priceHT,
     priceTTC,
     isPerKm,
+    setDistance,
+    setPriceHT,
+    setPriceTTC,
+    setIsPerKm,
     nextStep,
     prevStep,
     onSubmit
@@ -30,6 +34,13 @@ const QuoteForm = () => {
             nextStep(data);
           }}
           onPrevious={prevStep}
+          distance={distance}
+          priceHT={priceHT}
+          priceTTC={priceTTC}
+          setDistance={setDistance}
+          setPriceHT={setPriceHT}
+          setPriceTTC={setPriceTTC}
+          setIsPerKm={setIsPerKm}
         />;
       case 2:
         return <VehicleDetailsStep 

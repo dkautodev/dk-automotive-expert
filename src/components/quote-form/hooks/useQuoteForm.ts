@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { quoteFormSchema, type QuoteFormValues } from '../quoteFormSchema';
 import { useQuoteFormState } from './useQuoteFormState';
-import { useQuoteCalculations } from './useQuoteCalculations';
 import { useQuoteSubmission } from './useQuoteSubmission';
 
 export const useQuoteForm = () => {
@@ -27,7 +26,7 @@ export const useQuoteForm = () => {
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteFormSchema),
     defaultValues: {
-      mission_type: 'livraison', // Valeur par défaut fixée
+      mission_type: 'livraison',
       vehicle_type: '',
       brand: '',
       model: '',
@@ -46,7 +45,7 @@ export const useQuoteForm = () => {
       pickupStreetName: '',
       pickupComplement: '',
       pickupPostalCode: '',
-      pickupCity: '',
+      pick upCity: '',
       pickupCountry: 'France',
       deliveryStreetNumber: '',
       deliveryStreetType: 'Rue',
@@ -59,17 +58,9 @@ export const useQuoteForm = () => {
     }
   });
 
-  const { calculateQuote } = useQuoteCalculations(form, setDistance, setPriceHT, setPriceTTC, setIsPerKm);
   const { onSubmit } = useQuoteSubmission(form, setLoading, setStep, distance, priceHT, priceTTC, isPerKm);
 
   const nextStep = async (data: Partial<QuoteFormValues>) => {
-    // Ajustement des étapes : étape 1 devient étape de calcul
-    if (step === 1) {
-      const success = await calculateQuote(data);
-      if (!success) return;
-    }
-    
-    // L'étape 2 n'a plus de validation obligatoire car tous les champs sont facultatifs
     if (step === 2) {
       setFormValidated(true);
     }
@@ -90,6 +81,10 @@ export const useQuoteForm = () => {
     priceTTC,
     isPerKm,
     formValidated,
+    setDistance,
+    setPriceHT,
+    setPriceTTC,
+    setIsPerKm,
     nextStep,
     prevStep,
     onSubmit

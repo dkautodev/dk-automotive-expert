@@ -1,57 +1,42 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ScrollToTop } from "./components/ScrollToTop";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Devis from "./pages/Devis";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import NotFound from "./pages/NotFound";
-import MentionsLegales from "./pages/MentionsLegales";
-import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
-import Cookies from "./pages/Cookies";
-import CGV from "./pages/CGV";
+import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import Index from "@/pages/Index";
+import Devis from "@/pages/Devis";
+import Contact from "@/pages/Contact";
+import FAQ from "@/pages/FAQ";
+import CGV from "@/pages/CGV";
+import MentionsLegales from "@/pages/MentionsLegales";
+import GestionCookies from "@/pages/GestionCookies";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 2,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const App = () => {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+      <Router>
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/devis" element={<Devis />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/cgv" element={<CGV />} />
+              <Route path="/mentions-legales" element={<MentionsLegales />} />
+              <Route path="/gestion-cookies" element={<GestionCookies />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
         <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            {/* Routes publiques uniquement */}
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/devis" element={<Devis />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route path="/mentions-legales" element={<MentionsLegales />} />
-            <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
-            <Route path="/cgv" element={<CGV />} />
-            
-            {/* Route 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      </Router>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
