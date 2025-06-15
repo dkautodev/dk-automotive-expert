@@ -150,6 +150,7 @@ declare namespace google.maps {
 }
 
 declare namespace google.maps.places {
+  // Legacy Autocomplete (deprecated)
   class Autocomplete {
     constructor(
       inputField: HTMLInputElement,
@@ -162,6 +163,24 @@ declare namespace google.maps.places {
     setFields(fields: string[]): void;
     setOptions(options: AutocompleteOptions): void;
     setTypes(types: string[]): void;
+  }
+
+  // New PlaceAutocompleteElement (recommended)
+  class PlaceAutocompleteElement extends HTMLElement {
+    constructor(options?: PlaceAutocompleteElementOptions);
+    connectTo(inputElement: HTMLInputElement): void;
+    addEventListener(type: 'gmp-placeselect', listener: (event: PlaceSelectEvent) => void): void;
+    remove(): void;
+  }
+
+  interface PlaceAutocompleteElementOptions {
+    componentRestrictions?: ComponentRestrictions;
+    types?: string[];
+    fields?: string[];
+  }
+
+  interface PlaceSelectEvent extends Event {
+    place: PlaceResult;
   }
 
   interface AutocompleteOptions {

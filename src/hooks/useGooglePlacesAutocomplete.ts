@@ -25,21 +25,25 @@ export const useGooglePlacesAutocomplete = (
       return;
     }
 
-    console.log("Initializing Google Places Autocomplete for", fieldName);
+    console.log("Initializing Google Places PlaceAutocompleteElement for", fieldName);
     
-    let autocomplete: google.maps.places.Autocomplete | undefined = undefined;
+    let autocompleteElement: google.maps.places.PlaceAutocompleteElement | undefined = undefined;
     
     try {
-      autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
+      autocompleteElement = new google.maps.places.PlaceAutocompleteElement({
         componentRestrictions: { country: ['fr'] },
         types: ['address'],
         fields: ['formatted_address'],
       });
 
-      console.log("Google Places Autocomplete initialized successfully");
+      // Connect to the input field
+      autocompleteElement.connectTo(inputRef.current);
 
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete?.getPlace();
+      console.log("Google Places PlaceAutocompleteElement initialized successfully");
+
+      // Add event listener for place selection
+      autocompleteElement.addEventListener('gmp-placeselect', (event: any) => {
+        const place = event.place;
         console.log("Place selected:", place);
         
         if (place && place.formatted_address) {
@@ -53,8 +57,9 @@ export const useGooglePlacesAutocomplete = (
     }
 
     return () => {
-      if (autocomplete && window.google?.maps?.event) {
-        google.maps.event.clearInstanceListeners(autocomplete);
+      if (autocompleteElement) {
+        // Clean up the element
+        autocompleteElement.remove();
       }
     };
   }, [isLoaded, loadError, inputRef, setValue, fieldName]);
