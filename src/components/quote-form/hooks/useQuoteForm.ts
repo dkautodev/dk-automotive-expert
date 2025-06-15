@@ -45,7 +45,7 @@ export const useQuoteForm = () => {
       pickupStreetName: '',
       pickupComplement: '',
       pickupPostalCode: '',
-      pick upCity: '',
+      pickupCity: '',
       pickupCountry: 'France',
       deliveryStreetNumber: '',
       deliveryStreetType: 'Rue',
