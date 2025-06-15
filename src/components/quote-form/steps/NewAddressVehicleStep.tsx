@@ -38,6 +38,7 @@ const NewAddressVehicleStep = ({
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
+  // Utilise le hook simplifié pour les deux champs
   useGoogleAutocomplete({
     ref: pickupInputRef,
     onPlaceSelected: (place) => {
@@ -47,7 +48,14 @@ const NewAddressVehicleStep = ({
     }
   });
 
-  useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
+  useGoogleAutocomplete({
+    ref: deliveryInputRef,
+    onPlaceSelected: (place) => {
+      if (place && place.formatted_address) {
+        form.setValue("delivery_address", place.formatted_address, { shouldValidate: true });
+      }
+    }
+  });
 
   const handleCalculate = async () => {
     const pickupAddress = form.getValues('pickup_address');
