@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
@@ -171,7 +170,7 @@ const NewAddressVehicleStep = ({
         </Button>
       </div>
       {distance && priceHT && priceTTC && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-2">
           <h3 className="font-semibold text-green-800 mb-2">Résultat du calcul</h3>
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
@@ -187,6 +186,21 @@ const NewAddressVehicleStep = ({
               <p className="font-semibold">{priceTTC} €</p>
             </div>
           </div>
+          {/* Bloc des 3 items avec émojis */}
+          <ul className="mt-4 space-y-1 text-[15px]">
+            <li className="flex items-center gap-2">
+              <span role="img" aria-label="pense-bête">💡</span>
+              Tous frais inclus
+            </li>
+            <li className="flex items-center gap-2">
+              <span role="img" aria-label="chauffeur">🚗</span>
+              Livraison par chauffeur professionnel
+            </li>
+            <li className="flex items-center gap-2">
+              <span role="img" aria-label="assurance">🛡️</span>
+              Assurance tous risques
+            </li>
+          </ul>
         </div>
       )}
       <div className="flex justify-end mt-6">
