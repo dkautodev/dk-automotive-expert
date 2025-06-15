@@ -18,6 +18,21 @@ const Footer = () => {
                   Formulaire de contact
                 </Link>
               </li>
+              <li className="flex items-center">
+                <svg className="mr-2 h-5 w-5" viewBox="0 0 16 16" fill="none">
+                  <rect width="16" height="16" fill="none"/>
+                  <path d="M4 12V13a1 1 0 001 1h6a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <rect x="3" y="3" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+                <a 
+                  href="https://app-private.dkautomotive.fr/home"
+                  className="hover:text-gray-300 transition"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Espace professionnel
+                </a>
+              </li>
             </ul>
           </div>
           
