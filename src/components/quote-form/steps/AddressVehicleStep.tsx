@@ -8,6 +8,7 @@ import { MapPin, Calculator } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
 import { useQuoteCalculations } from '../hooks/useQuoteCalculations';
 import { useRef } from 'react';
+import { toast } from 'sonner';
 import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
 
 interface AddressVehicleStepProps {
