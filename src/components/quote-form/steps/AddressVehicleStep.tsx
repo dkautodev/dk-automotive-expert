@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
@@ -8,9 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Calculator } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
 import { useQuoteCalculations } from '../hooks/useQuoteCalculations';
-import { useEffect, useRef, useState } from 'react';
-import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
-import { toast } from 'sonner';
+import { useRef } from 'react';
+import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
 
 interface AddressVehicleStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -41,68 +39,12 @@ const AddressVehicleStep = ({
     form, setDistance, setPriceHT, setPriceTTC, setIsPerKm
   );
 
-  const pickupInputRef = useRef<HTMLInputElement | null>(null);
-  const deliveryInputRef = useRef<HTMLInputElement | null>(null);
-  const [mapsLoaded, setMapsLoaded] = useState(false);
+  const pickupInputRef = useRef<HTMLInputElement>(null);
+  const deliveryInputRef = useRef<HTMLInputElement>(null);
 
-  // Charger l'API Google Maps
-  useEffect(() => {
-    if (window.google?.maps?.places || !GOOGLE_MAPS_API_KEY || mapsLoaded) {
-      if (window.google?.maps?.places) setMapsLoaded(true);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    
-    script.onload = () => {
-      setMapsLoaded(true);
-    };
-    
-    script.onerror = () => {
-      toast.error("Impossible de charger l'autocomplétion d'adresse");
-    };
-    
-    document.head.appendChild(script);
-    return () => {
-      if (script.parentNode) document.head.removeChild(script);
-    };
-  }, [mapsLoaded]);
-
-  // Initialiser l'autocomplétion
-  useEffect(() => {
-    if (!mapsLoaded || !window.google?.maps?.places) return;
-    
-    const setupAutocomplete = (
-      inputRef: React.RefObject<HTMLInputElement>,
-      fieldName: 'pickup_address' | 'delivery_address'
-    ) => {
-      if (!inputRef.current) return;
-      
-      const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
-        types: ["address"],
-        fields: ["formatted_address"],
-        componentRestrictions: { country: "fr" }
-      });
-      
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (place?.formatted_address) {
-          form.setValue(fieldName, place.formatted_address, { shouldValidate: true });
-        }
-      });
-    };
-    
-    if (pickupInputRef.current) {
-      setupAutocomplete(pickupInputRef, 'pickup_address');
-    }
-    
-    if (deliveryInputRef.current) {
-      setupAutocomplete(deliveryInputRef, 'delivery_address');
-    }
-  }, [mapsLoaded, form]);
+  // Branche le hook Google Places sur les deux inputs
+  useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
+  useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
 
   const handleCalculate = async () => {
     const success = await calculateQuote({});
@@ -144,13 +86,16 @@ const AddressVehicleStep = ({
                 <div className="relative">
                   <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input 
-                    placeholder="Saisissez l'adresse complète" 
+                    placeholder="Saisissez l'adresse complète"
                     className="pl-8 bg-[#EEF1FF]"
                     {...field}
                     ref={(el) => {
                       pickupInputRef.current = el;
                       if (typeof field.ref === 'function') {
                         field.ref(el);
+                      } else if (field.ref && typeof field.ref === 'object') {
+                        // Cas react-hook-form > 7.x
+                        field.ref.current = el;
                       }
                     }}
                     onKeyDown={(e) => {
@@ -178,13 +123,15 @@ const AddressVehicleStep = ({
                 <div className="relative">
                   <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input 
-                    placeholder="Saisissez l'adresse complète" 
+                    placeholder="Saisissez l'adresse complète"
                     className="pl-8 bg-[#EEF1FF]"
                     {...field}
                     ref={(el) => {
                       deliveryInputRef.current = el;
                       if (typeof field.ref === 'function') {
                         field.ref(el);
+                      } else if (field.ref && typeof field.ref === 'object') {
+                        field.ref.current = el;
                       }
                     }}
                     onKeyDown={(e) => {
