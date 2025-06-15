@@ -49,7 +49,7 @@ const Navbar = () => {
           <div className="flex justify-between h-16 px-[25px]">
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0">
-                <img alt="DK Automotive" className="h-10 w-auto object-fill" src="https://53a7f645-5239-4564-a038-600cd9086c4f.lovableproject.com/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" />
+                <img alt="DK Automotive" className="h-10 w-auto object-fill" src="/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" />
               </Link>
             </div>
 
