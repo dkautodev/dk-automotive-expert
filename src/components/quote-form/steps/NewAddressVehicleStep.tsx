@@ -8,7 +8,7 @@ import { MapPin, Calculator } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
 import { useRef } from 'react';
 import { toast } from 'sonner';
-import { useGooglePlacesAutocomplete } from '@/hooks/useGooglePlacesAutocomplete';
+import { useGoogleAutocomplete } from "@/hooks/useGoogleAutocomplete";
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 
@@ -38,7 +38,15 @@ const NewAddressVehicleStep = ({
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
-  useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
+  useGoogleAutocomplete({
+    ref: pickupInputRef,
+    onPlaceSelected: (place) => {
+      if (place && place.formatted_address) {
+        form.setValue("pickup_address", place.formatted_address, { shouldValidate: true });
+      }
+    }
+  });
+
   useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
 
   const handleCalculate = async () => {
