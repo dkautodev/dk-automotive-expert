@@ -1,4 +1,3 @@
-
 declare namespace google.maps {
   class LatLng {
     constructor(lat: number, lng: number, noWrap?: boolean);
@@ -187,6 +186,34 @@ declare namespace google.maps.places {
     name?: string;
     place_id?: string;
   }
+
+  // PlaceAutocompleteElement API (New - 2024)
+  namespace places {
+    // The new PlaceAutocompleteElement class (modulaire, web component-like)
+    class PlaceAutocompleteElement extends HTMLElement {
+      inputElement: HTMLInputElement;
+      value: string;
+      types: string[];
+      componentRestrictions: { country?: string | string[] } | undefined;
+      disabled: boolean;
+      setOptions(options: PlaceAutocompleteElementOptions): void;
+      addEventListener(type: "gmp-placeautocomplete-placechange", listener: (this: PlaceAutocompleteElement, ev: Event) => any, options?: boolean | AddEventListenerOptions): void;
+      getPlace(): PlaceResult;
+    }
+
+    interface PlaceAutocompleteElementOptions {
+      componentRestrictions?: ComponentRestrictions;
+      types?: string[];
+      fields?: string[];
+      strictBounds?: boolean;
+      inputElement?: HTMLInputElement;
+    }
+  }
+}
+
+// Register as a custom element (declaration trick for TS)
+interface HTMLElementTagNameMap {
+  "gmpx-place-autocomplete": google.maps.places.PlaceAutocompleteElement;
 }
 
 interface Window {
