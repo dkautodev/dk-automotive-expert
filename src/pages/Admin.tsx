@@ -1,23 +1,49 @@
 
 import React, { useState } from "react";
-import AdminLoginForm from "@/components/admin/AdminLoginForm";
-import AdminDashboard from "@/components/admin/AdminDashboard";
+
+// Debug : Import check
+let AdminLoginForm: any = null;
+let AdminDashboard: any = null;
+let importError: string | null = null;
+
+try {
+  AdminLoginForm = require("@/components/admin/AdminLoginForm").default;
+  AdminDashboard = require("@/components/admin/AdminDashboard").default;
+  console.log("Imports réussis : AdminLoginForm et AdminDashboard sont chargés.");
+} catch (e: any) {
+  importError = `Erreur d'import : ${e.message}`;
+  console.error(importError, e);
+}
 
 // L’état de session admin est géré localement (pas global ni via JWT ici)
 export default function AdminPage() {
   const [adminUser, setAdminUser] = useState<{ id: string; email: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  console.log("RENDER AdminPage -- adminUser :", adminUser);
+
   let content = null;
-  try {
-    if (!adminUser) {
-      content = <AdminLoginForm onLogin={setAdminUser} />;
-    } else {
-      content = <AdminDashboard />;
+  if (importError) {
+    content = <div className="bg-red-100 text-red-700 p-4 rounded">
+      Problème d'import des composants Admin : {importError}
+    </div>;
+  } else {
+    try {
+      if (!adminUser) {
+        // debug :
+        console.log("Affichage du formulaire de connexion...");
+        content = <AdminLoginForm onLogin={setAdminUser} />;
+      } else {
+        console.log("Affichage du dashboard admin...");
+        content = <AdminDashboard />;
+      }
+    } catch (e: any) {
+      setError("Erreur de rendu du composant Admin. Vérifiez la console ou l'import bcryptjs. Err : " + e.message);
+      content = <div className="bg-red-100 text-red-700 p-4 rounded">
+        Erreur lors du rendu du composant Admin : {e.message}
+      </div>;
+      console.error(e);
     }
-  } catch (e) {
-    setError("Erreur de rendu du composant Admin. Vérifiez la console ou l'import bcryptjs.");
-    content = null;
   }
 
   return (
