@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const corsHeaders = {
@@ -56,44 +55,63 @@ const handler = async (req: Request): Promise<Response> => {
           name: "DK Automotive"
         }
       ],
-      subject: `Nouvelle demande de devis - ${data.company}`,
+      subject: `🚗 Nouvelle demande de devis - ${data.company || `${data.firstName} ${data.lastName}`}`,
       htmlContent: `
-        <h2>Nouvelle demande de devis</h2>
-        
-        <h3>Informations du contact</h3>
-        <p><strong>Société:</strong> ${data.company}</p>
-        <p><strong>Nom:</strong> ${data.firstName} ${data.lastName}</p>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Téléphone:</strong> ${data.phone}</p>
-        
-        <h3>Transport</h3>
-        <p><strong>Adresse de prise en charge:</strong> ${data.pickup_address}</p>
-        <p><strong>Adresse de livraison:</strong> ${data.delivery_address}</p>
-        <p><strong>Catégorie de véhicule:</strong> ${data.vehicle_type}</p>
-        
-        ${data.distance ? `
-        <h3>Calcul de prix</h3>
-        <p><strong>Distance:</strong> ${data.distance} km</p>
-        <p><strong>Prix HT:</strong> ${data.priceHT} €</p>
-        <p><strong>Prix TTC:</strong> ${data.priceTTC} €</p>
-        ` : ''}
-        
-        ${data.brand || data.model || data.year || data.fuel || data.licensePlate || data.vin ? `
-        <h3>Détails du véhicule</h3>
-        ${data.brand ? `<p><strong>Marque:</strong> ${data.brand}</p>` : ''}
-        ${data.model ? `<p><strong>Modèle:</strong> ${data.model}</p>` : ''}
-        ${data.year ? `<p><strong>Année:</strong> ${data.year}</p>` : ''}
-        ${data.fuel ? `<p><strong>Carburant:</strong> ${data.fuel}</p>` : ''}
-        ${data.licensePlate ? `<p><strong>Immatriculation:</strong> ${data.licensePlate}</p>` : ''}
-        ${data.vin ? `<p><strong>VIN:</strong> ${data.vin}</p>` : ''}
-        ` : ''}
-        
-        ${data.additionalInfo ? `
-        <h3>Informations complémentaires</h3>
-        <p>${data.additionalInfo}</p>
-        ` : ''}
-        
-        <p><em>Demande envoyée le ${new Date(data.timestamp).toLocaleString('fr-FR')}</em></p>
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 32px;">
+          <div style="background: #fff; border-radius: 8px; max-width: 680px; margin: auto; padding: 32px; box-shadow: 0 4px 32px rgba(55, 92, 194, 0.10); border: 1px solid #e2e8f0;">
+            <img src="https://dkautomotive.fr/logo.png" alt="DK Automotive" style="height: 62px; margin-bottom: 12px; display: block;" />
+
+            <h2 style="color: #375cc2; margin-bottom: 4px;">Nouvelle demande de devis</h2>
+            <p style="color: #334155; font-size:15px; margin-top: 0;">Vous venez de recevoir une demande via le formulaire en ligne.</p>
+            <hr style="margin: 20px 0;">
+            
+            <h3 style="color:#375cc2;">Informations du contact</h3>
+            <ul style="color: #334155; font-size:15px; list-style: none; padding:0; margin:0;">
+              <li><b>Société :</b> ${data.company || '-'}</li>
+              <li><b>Nom :</b> ${data.firstName} ${data.lastName}</li>
+              <li><b>Email :</b> <a href="mailto:${data.email}" style="color:#4f46e5">${data.email}</a></li>
+              <li><b>Téléphone :</b> <a href="tel:${data.phone}" style="color:#4f46e5">${data.phone}</a></li>
+            </ul>
+
+            <h3 style="color:#375cc2; margin-top:28px;">Détails du transport</h3>
+            <ul style="color: #334155; font-size:15px; list-style: none; padding:0;">
+              <li><b>Adresse de prise en charge :</b><br>${data.pickup_address}</li>
+              <li><b>Adresse de livraison :</b><br>${data.delivery_address}</li>
+              <li><b>Catégorie de véhicule :</b> ${data.vehicle_type}</li>
+            </ul>
+
+            ${(data.distance || data.priceHT || data.priceTTC) ? `
+              <h3 style="color:#375cc2; margin-top:28px;">Devis calculé :</h3>
+              <ul style="color: #334155; font-size:15px; list-style: none; padding:0;">
+                ${data.distance ? `<li><b>Distance :</b> ${data.distance} km</li>` : ''}
+                ${data.priceHT ? `<li><b>Prix HT :</b> ${data.priceHT} €</li>` : ''}
+                ${data.priceTTC ? `<li><b>Prix TTC :</b> ${data.priceTTC} €</li>` : ''}
+              </ul>
+            ` : ''}
+
+            ${(data.brand || data.model || data.year || data.fuel || data.licensePlate || data.vin) ? `
+              <h3 style="color:#375cc2; margin-top:28px;">Informations sur le véhicule :</h3>
+              <ul style="color: #334155; font-size:15px; list-style: none; padding:0;">
+                ${data.brand ? `<li><b>Marque :</b> ${data.brand}</li>` : ''}
+                ${data.model ? `<li><b>Modèle :</b> ${data.model}</li>` : ''}
+                ${data.year ? `<li><b>Année :</b> ${data.year}</li>` : ''}
+                ${data.fuel ? `<li><b>Carburant :</b> ${data.fuel}</li>` : ''}
+                ${data.licensePlate ? `<li><b>Immatriculation :</b> ${data.licensePlate}</li>` : ''}
+                ${data.vin ? `<li><b>VIN :</b> ${data.vin}</li>` : ''}
+              </ul>
+            ` : ''}
+
+            ${data.additionalInfo ? `
+              <h4 style="color:#375cc2; margin-top:28px;">Informations complémentaires :</h4>
+              <p style="color: #334155; font-size:15px;">${data.additionalInfo}</p>
+            ` : ''}
+
+            <hr style="margin: 30px 0;">
+            <p style="font-size:12px; color: #64748b;">Demande transmise le ${new Date(data.timestamp).toLocaleString('fr-FR')}<br>
+            — N° IP : —<br>
+            __Contact généré depuis le site dkautomotive.fr__</p>
+          </div>
+        </div>
       `
     };
 
@@ -109,37 +127,42 @@ const handler = async (req: Request): Promise<Response> => {
           name: `${data.firstName} ${data.lastName}`
         }
       ],
-      subject: "Confirmation de votre demande de devis - DK Automotive",
+      subject: "Votre demande de devis DK Automotive – confirmation",
       htmlContent: `
-        <h2>Merci pour votre demande de devis</h2>
-        
-        <p>Bonjour ${data.firstName},</p>
-        
-        <p>Nous avons bien reçu votre demande de devis pour le transport d'un véhicule.</p>
-        
-        <h3>Récapitulatif de votre demande</h3>
-        <p><strong>Société:</strong> ${data.company}</p>
-        <p><strong>Adresse de prise en charge:</strong> ${data.pickup_address}</p>
-        <p><strong>Adresse de livraison:</strong> ${data.delivery_address}</p>
-        <p><strong>Catégorie de véhicule:</strong> ${data.vehicle_type}</p>
-        
-        ${data.distance ? `
-        <p><strong>Distance estimée:</strong> ${data.distance} km</p>
-        <p><strong>Prix indicatif HT:</strong> ${data.priceHT} €</p>
-        <p><strong>Prix indicatif TTC:</strong> ${data.priceTTC} €</p>
-        ` : ''}
-        
-        <p>Notre équipe va étudier votre demande et vous contactera dans les plus brefs délais pour vous proposer un devis personnalisé.</p>
-        
-        <p>Si vous avez des questions, n'hésitez pas à nous contacter :</p>
-        <ul>
-          <li>Email: contact@dkautomotive.fr</li>
-          <li>Téléphone: ${data.phone}</li>
-        </ul>
-        
-        <p>Cordialement,<br>L'équipe DK Automotive</p>
-        
-        <p><em>Demande envoyée le ${new Date(data.timestamp).toLocaleString('fr-FR')}</em></p>
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 32px;">
+          <div style="background: #fff; border-radius: 8px; max-width: 680px; margin: auto; padding: 32px; box-shadow: 0 4px 32px rgba(55, 92, 194, 0.10); border: 1px solid #e2e8f0;">
+            <img src="https://dkautomotive.fr/logo.png" alt="DK Automotive" style="height: 62px; margin-bottom: 12px; display: block;" />
+
+            <h2 style="color: #375cc2; margin-bottom: 4px;">Merci pour votre demande !</h2>
+            <p style="color: #334155; font-size:15px; margin-top: 0;">
+              Bonjour ${data.firstName},<br>
+              Nous vous confirmons la bonne réception de votre demande de devis pour un transport de véhicule.
+            </p>
+            <div style="background: #f1f5f9; padding: 18px 28px; border-radius: 6px; margin: 20px 0;">
+              <p style="margin: 0; font-size:15px;">Voici un récapitulatif :</p>
+              <ul style="font-size:15px; color:#334155; padding-left:1.3em;">
+                <li><b>Départ :</b> ${data.pickup_address}</li>
+                <li><b>Arrivée :</b> ${data.delivery_address}</li>
+                <li><b>Véhicule :</b> ${data.vehicle_type}${data.brand ? ` — ${data.brand}` : ''}${data.model ? ` ${data.model}` : ''}${data.year ? ` (${data.year})` : ''}</li>
+                ${data.distance ? `<li><b>Distance estimée :</b> ${data.distance} km</li>` : ''}
+                ${data.priceHT ? `<li><b>Estimation prix HT :</b> ${data.priceHT} €</li>` : ''}
+                ${data.priceTTC ? `<li><b>Estimation prix TTC :</b> ${data.priceTTC} €</li>` : ''}
+              </ul>
+              ${data.additionalInfo ? `<p style="margin:0; font-size:14px;"><b>Complément :</b><br>${data.additionalInfo}</p>` : ''}
+            </div>
+            <p style="color: #334155; font-size:15px;">Notre équipe va étudier votre demande et vous recontactera sous 24h ouvrées pour un devis personnalisé.<br>
+              Si votre demande est urgente, contactez-nous directement :</p>
+            <ul style="color: #334155; font-size:15px; list-style:none; padding:0; margin:0;">
+              <li><b>Email :</b> <a style="color:#4f46e5" href="mailto:contact@dkautomotive.fr">contact@dkautomotive.fr</a></li>
+              <li><b>Téléphone :</b> <a style="color:#4f46e5" href="tel:0972588582">09 72 58 85 82</a></li>
+            </ul>
+            <p style="font-size:13px; color: #64748b; margin-top:32px;">
+              Cette confirmation vous est envoyée automatiquement.<br>
+              L’équipe DK Automotive vous remercie de votre confiance.<br>
+              <a href="https://dkautomotive.fr" style="color:#4f46e5; text-decoration:underline;">dkautomotive.fr</a>
+            </p>
+          </div>
+        </div>
       `
     };
 
