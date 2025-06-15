@@ -38,23 +38,25 @@ const NewAddressVehicleStep = ({
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
-  // Utilise le hook simplifié pour les deux champs
-  useGoogleAutocomplete({
+  // Hook pour autocomplétion de prise en charge
+  const pickupAuto = useGoogleAutocomplete({
     ref: pickupInputRef,
     onPlaceSelected: (place) => {
       if (place && place.formatted_address) {
         form.setValue("pickup_address", place.formatted_address, { shouldValidate: true });
       }
-    }
+    },
+    types: ["geocode", "establishment"],
   });
-
-  useGoogleAutocomplete({
+  // Hook pour autocomplétion de livraison
+  const deliveryAuto = useGoogleAutocomplete({
     ref: deliveryInputRef,
     onPlaceSelected: (place) => {
       if (place && place.formatted_address) {
         form.setValue("delivery_address", place.formatted_address, { shouldValidate: true });
       }
-    }
+    },
+    types: ["geocode", "establishment"],
   });
 
   const handleCalculate = async () => {
@@ -153,19 +155,29 @@ const NewAddressVehicleStep = ({
                 <div className="relative">
                   <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input 
-                    placeholder="Saisissez l'adresse complète"
-                    className="pl-8 bg-[#EEF1FF]"
+                    placeholder={
+                      pickupAuto.error 
+                        ? "Petit problème... Une erreur s'est produite"
+                        : "Saisissez l'adresse complète"
+                    }
+                    className={`pl-8 bg-[#EEF1FF] ${pickupAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
                     {...field}
                     ref={(el) => {
                       pickupInputRef.current = el;
                       field.ref(el);
                     }}
+                    disabled={!!pickupAuto.error}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
                       }
                     }}
                   />
+                  {pickupAuto.error && (
+                    <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-destructive">
+                      {pickupAuto.error}
+                    </span>
+                  )}
                 </div>
               </FormControl>
               <FormMessage />
@@ -185,19 +197,29 @@ const NewAddressVehicleStep = ({
                 <div className="relative">
                   <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input 
-                    placeholder="Saisissez l'adresse complète"
-                    className="pl-8 bg-[#EEF1FF]"
+                    placeholder={
+                      deliveryAuto.error
+                        ? "Petit problème... Une erreur s'est produite"
+                        : "Saisissez l'adresse complète"
+                    }
+                    className={`pl-8 bg-[#EEF1FF] ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
                     {...field}
                     ref={(el) => {
                       deliveryInputRef.current = el;
                       field.ref(el);
                     }}
+                    disabled={!!deliveryAuto.error}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
                       }
                     }}
                   />
+                  {deliveryAuto.error && (
+                    <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-destructive">
+                      {deliveryAuto.error}
+                    </span>
+                  )}
                 </div>
               </FormControl>
               <FormMessage />
