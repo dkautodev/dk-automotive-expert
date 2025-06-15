@@ -7,7 +7,7 @@ interface QuoteFormProgressProps {
 
 const QuoteFormProgress = ({ currentStep }: QuoteFormProgressProps) => {
   const steps = [
-    { number: 1, title: "Adresses et grille tarifaire" },
+    { number: 1, title: "Adresses et catégorie de véhicule" }, // Modification ici
     { number: 2, title: "Détails du véhicule" },
     { number: 3, title: "Coordonnées de contact" }
   ];
