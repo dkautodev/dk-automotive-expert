@@ -1,13 +1,16 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
+
 const Index = () => {
-  return <div className="min-h-screen bg-white">
+  return (
+    <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
         <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
-        backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
-      }}>
+          backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
+        }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
@@ -149,8 +152,8 @@ const Index = () => {
               </div>
             </div>
             <div className="mt-12 text-center mx-auto" style={{
-            maxWidth: "calc(100% - 2rem)"
-          }}>
+              maxWidth: "calc(100% - 2rem)"
+            }}>
               <p className="text-gray-600 mb-8 text-xl">
                 Prêt à découvrir la différence avec nos services de convoyage professionnels ? Contactez-nous ou faites une demande de devis personnalisée adaptée à vos besoins de transport.
               </p>
@@ -172,7 +175,7 @@ const Index = () => {
               </h2>
               <p className="text-gray-600 text-lg md:text-xl mb-8">Chez DK AUTOMOTIVE, chaque parcours est une promesse de qualité et de fiabilité.</p>
               
-              <div className="grid md:grid-cols-4 gap-8 mt-12">
+              <div className="grid md:grid-cols-3 gap-8 mt-12">
                 <div className="p-6 bg-white rounded-lg shadow-lg">
                   <div className="w-16 h-16 bg-[#18257D] rounded-full flex items-center justify-center mx-auto mb-4">
                     <Check className="w-8 h-8 text-white" />
@@ -195,12 +198,6 @@ const Index = () => {
                   </div>
                   <h3 className="text-xl font-bold text-[#18257D] mb-3">Satisfaction</h3>
                   <p className="text-gray-600">Votre satisfaction est notre priorité absolue.</p>
-                </div>
-
-                <div className="p-6 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
-                  <div className="w-16 h-16"></div>
-                  <h3 className="text-xl font-bold text-[#18257D] mb-3 invisible">-</h3>
-                  <p className="text-gray-600 text-center">Un conseiller vous rappelle pour planifier votre convoyage</p>
                 </div>
               </div>
             </div>
@@ -232,7 +229,7 @@ const Index = () => {
                     <PhoneCall className="w-12 h-12 text-white" />
                   </div>
                   <h4 className="text-lg font-bold text-[#18257D] mb-4">2. APPEL AVEC UN CONSEILLER</h4>
-                  
+                  <p className="text-gray-600">Un conseiller vous rappelle sous 24h pour voir comment concrétiser votre convoyage.</p>
                 </div>
 
                 <div className="text-center">
@@ -256,6 +253,8 @@ const Index = () => {
           </div>
         </section>
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
