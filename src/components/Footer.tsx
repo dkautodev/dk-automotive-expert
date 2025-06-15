@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AtSign } from 'lucide-react';
+import { AtSign, Copyright } from 'lucide-react';
 
 const Footer = () => {
   return <footer className="text-white py-12 bg-[#051e83]">
@@ -93,12 +93,16 @@ const Footer = () => {
       </div>
       
       <div className="mt-12 text-center text-sm">
-        <p>
-          &copy; {new Date().getFullYear()} DK AUTOMOTIVE. 
-          <a href="https://app-private.dkautomotive.fr/home" className="ml-1 hover:text-gray-300 transition" target="_blank" rel="noopener noreferrer">
-            Tous droits réservés
-          </a>
-        </p>
+        <Link 
+          to="/admin"
+          className="inline-flex items-center justify-center space-x-2 text-inherit hover:underline focus:outline-none focus:ring-2 focus:ring-white/60 transition"
+          title="Accéder à l'administration"
+        >
+          <Copyright size={18} className="inline mr-1 mb-0.5" />
+          <span>
+            {`© ${new Date().getFullYear()} DK AUTOMOTIVE. Tous droits réservés`}
+          </span>
+        </Link>
       </div>
     </div>
   </footer>;
