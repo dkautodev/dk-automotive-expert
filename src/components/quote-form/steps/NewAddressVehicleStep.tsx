@@ -145,19 +145,20 @@ const NewAddressVehicleStep = ({
       <h2 className="text-2xl font-bold text-dk-navy">Adresses et catégorie de véhicule</h2>
       {/* Bloc de saisie d'adresses avec bouton échange */}
       <div className="relative flex flex-col md:flex-row items-stretch gap-0">
-        <div className="w-full md:w-1/2 px-0 md:pr-6">
+        {/* Champ adresse de départ */}
+        <div className="w-full md:w-1/2 px-0 md:pr-6 flex-1">
           <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
         </div>
-        {/* Le bouton échange, positionné absolument au centre vertical et horizontal */}
-        <div className="flex justify-center items-center md:block">
+        {/* Colonne bouton échange */}
+        <div className="relative flex-none flex md:flex-col justify-center items-center md:w-0 h-0 md:h-auto">
           <button
             type="button"
             aria-label="Échanger les adresses"
             onClick={handleSwitchAddresses}
             className="
-              absolute 
-              left-1/2 top-1/2 
-              -translate-x-1/2 -translate-y-1/2
+              absolute md:static
+              left-1/2 md:left-auto top-1/2 md:top-auto
+              -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0
               z-30
               bg-white border border-gray-300 rounded-full shadow
               p-2 flex items-center justify-center
@@ -169,7 +170,8 @@ const NewAddressVehicleStep = ({
             <RefreshCcw className="w-6 h-6 text-[#1a237e]" />
           </button>
         </div>
-        <div className="w-full md:w-1/2 px-0 md:pl-6">
+        {/* Champ adresse d'arrivée */}
+        <div className="w-full md:w-1/2 px-0 md:pl-6 flex-1">
           <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
         </div>
       </div>
