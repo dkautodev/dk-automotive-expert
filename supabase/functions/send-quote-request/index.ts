@@ -46,12 +46,12 @@ const handler = async (req: Request): Promise<Response> => {
     // Email à l'entreprise (contact@dkautomotive.fr)
     const companyEmailPayload = {
       sender: {
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email
+        name: "DK Automotive",
+        email: "noreply@dkautomotive.fr"
       },
       to: [
         {
-          email: data.destinationEmail,
+          email: "contact@dkautomotive.fr",
           name: "DK Automotive"
         }
       ],
@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
       htmlContent: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 32px;">
           <div style="background: #fff; border-radius: 8px; max-width: 680px; margin: auto; padding: 32px; box-shadow: 0 4px 32px rgba(55, 92, 194, 0.10); border: 1px solid #e2e8f0;">
-            <img src="https://dkautomotive.fr/logo.png" alt="DK Automotive" style="height: 62px; margin-bottom: 12px; display: block;" />
+            <img src="https://53a7f645-5239-4564-a038-600cd9086c4f.lovableproject.com/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" alt="DK Automotive" style="height: 62px; margin-bottom: 12px; display: block;" />
 
             <h2 style="color: #375cc2; margin-bottom: 4px;">Nouvelle demande de devis</h2>
             <p style="color: #334155; font-size:15px; margin-top: 0;">Vous venez de recevoir une demande via le formulaire en ligne.</p>
@@ -119,7 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
     const clientEmailPayload = {
       sender: {
         name: "DK Automotive",
-        email: "contact@dkautomotive.fr"
+        email: "noreply@dkautomotive.fr"
       },
       to: [
         {
@@ -131,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
       htmlContent: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; padding: 32px;">
           <div style="background: #fff; border-radius: 8px; max-width: 680px; margin: auto; padding: 32px; box-shadow: 0 4px 32px rgba(55, 92, 194, 0.10); border: 1px solid #e2e8f0;">
-            <img src="https://dkautomotive.fr/logo.png" alt="DK Automotive" style="height: 62px; margin-bottom: 12px; display: block;" />
+            <img src="https://53a7f645-5239-4564-a038-600cd9086c4f.lovableproject.com/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" alt="DK Automotive" style="height: 62px; margin-bottom: 12px; display: block;" />
 
             <h2 style="color: #375cc2; margin-bottom: 4px;">Merci pour votre demande !</h2>
             <p style="color: #334155; font-size:15px; margin-top: 0;">
