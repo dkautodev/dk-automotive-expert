@@ -42,7 +42,6 @@ const AddressVehicleStep = ({
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
-  // Branche le hook Google Places sur les deux inputs
   useGooglePlacesAutocomplete(pickupInputRef, form.setValue, 'pickup_address');
   useGooglePlacesAutocomplete(deliveryInputRef, form.setValue, 'delivery_address');
 
@@ -93,9 +92,9 @@ const AddressVehicleStep = ({
                       pickupInputRef.current = el;
                       if (typeof field.ref === 'function') {
                         field.ref(el);
-                      } else if (field.ref && typeof field.ref === 'object') {
-                        // Cas react-hook-form > 7.x
-                        field.ref.current = el;
+                      } else if (field.ref && typeof field.ref === 'object' && 'current' in field.ref) {
+                        // react-hook-form > 7.x (if ref is provided as object)
+                        (field.ref as React.MutableRefObject<HTMLInputElement | null>).current = el;
                       }
                     }}
                     onKeyDown={(e) => {
@@ -130,8 +129,8 @@ const AddressVehicleStep = ({
                       deliveryInputRef.current = el;
                       if (typeof field.ref === 'function') {
                         field.ref(el);
-                      } else if (field.ref && typeof field.ref === 'object') {
-                        field.ref.current = el;
+                      } else if (field.ref && typeof field.ref === 'object' && 'current' in field.ref) {
+                        (field.ref as React.MutableRefObject<HTMLInputElement | null>).current = el;
                       }
                     }}
                     onKeyDown={(e) => {
