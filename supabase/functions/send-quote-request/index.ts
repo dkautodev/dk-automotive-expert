@@ -154,7 +154,6 @@ const handler = async (req: Request): Promise<Response> => {
               Si votre demande est urgente, contactez-nous directement :</p>
             <ul style="color: #334155; font-size:15px; list-style:none; padding:0; margin:0;">
               <li><b>Email :</b> <a style="color:#4f46e5" href="mailto:contact@dkautomotive.fr">contact@dkautomotive.fr</a></li>
-              <li><b>Téléphone :</b> <a style="color:#4f46e5" href="tel:0972588582">09 72 58 85 82</a></li>
             </ul>
             <p style="font-size:13px; color: #64748b; margin-top:32px;">
               Cette confirmation vous est envoyée automatiquement.<br>
