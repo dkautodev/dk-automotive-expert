@@ -11,6 +11,7 @@ import CGV from "@/pages/CGV";
 import MentionsLegales from "@/pages/MentionsLegales";
 import GestionCookies from "@/pages/GestionCookies";
 import Admin from "@/pages/Admin";
+import AdminSignupPage from "@/pages/AdminSignup";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ function App() {
               <Route path="/mentions-legales" element={<MentionsLegales />} />
               <Route path="/gestion-cookies" element={<GestionCookies />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin-signup" element={<AdminSignupPage />} />
             </Routes>
           </main>
           <Footer />
