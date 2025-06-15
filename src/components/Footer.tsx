@@ -14,10 +14,10 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <AtSign className="mr-2 h-5 w-5" />
-                <a href="mailto:contact@dkautomotive.fr" className="hover:text-gray-300 transition">Formulaire de contact</a>
+                <Link to="/contact" className="hover:text-gray-300 transition">
+                  Formulaire de contact
+                </Link>
               </li>
-              
-              
             </ul>
           </div>
           
