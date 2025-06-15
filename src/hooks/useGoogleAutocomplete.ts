@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 interface UseGoogleAutocompleteOpts {
@@ -30,7 +29,7 @@ export const useGoogleAutocomplete = ({
     const script = document.createElement("script");
     script.id = scriptId;
     script.src =
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyBjGI3KdkPfON3ssMq3_Qp3j9XZLXJHP_M&libraries=places";
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyA5RjbR6obTrUwTbVGvCZ3JSG_SvHZ_NBs&libraries=places";
     script.async = true;
     script.onload = () => setReady(true);
     script.onerror = () => {
