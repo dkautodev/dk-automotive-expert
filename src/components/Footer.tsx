@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, AtSign } from 'lucide-react';
 const Footer = () => {
   return <footer className="text-white py-12 bg-[#051e83]">
       <div className="container mx-auto px-4">
@@ -13,11 +13,11 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Contactez-nous</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
-                <Mail className="mr-2 h-5 w-5" />
-                <a href="mailto:contact@dkautomotive.fr" className="hover:text-gray-300 transition">contact@dkautomotive.fr</a>
+                <AtSign className="mr-2 h-5 w-5" />
+                <Link to="/contact" className="hover:text-gray-300 transition">
+                  formulaire de contact
+                </Link>
               </li>
-              
-              
             </ul>
           </div>
           
