@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface UseGoogleAutocompleteOpts {
   ref: React.RefObject<HTMLInputElement>;
@@ -14,6 +14,8 @@ export const useGoogleAutocomplete = ({
 }: UseGoogleAutocompleteOpts) => {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Sauvegarde l'instance pour ne pas la recréer à chaque render
+  const autocompleteInstance = useRef<google.maps.places.Autocomplete | null>(null);
 
   useEffect(() => {
     if ((window as any).google && window.google.maps && window.google.maps.places) {
@@ -23,7 +25,6 @@ export const useGoogleAutocomplete = ({
 
     const scriptId = "google-maps";
     if (document.getElementById(scriptId)) {
-      // Script déjà présent, attendre qu'il se charge
       const checkGoogleMaps = () => {
         if ((window as any).google && window.google.maps && window.google.maps.places) {
           setReady(true);
@@ -51,49 +52,42 @@ export const useGoogleAutocomplete = ({
   }, []);
 
   useEffect(() => {
+    // Dès que 'ready' et ref ok → attachez une fois et plus jamais
     if (!ready || !ref.current) {
       if (!ready) console.log("[GoogleAutocomplete] Not ready to init (Google API non chargée)");
       if (!ref.current) console.log("[GoogleAutocomplete] ref.current absent lors de l'init");
       return;
     }
 
-    let autocomplete: google.maps.places.Autocomplete | undefined;
+    if (autocompleteInstance.current) {
+      // Autocomplete déjà initialisé pour ce ref, ne rien faire
+      return;
+    }
 
-    // Ajouter un petit délai pour éviter les conflits entre multiples autocomplete
-    const initTimeout = setTimeout(() => {
-      try {
-        console.log('[GoogleAutocomplete] Initialisation autocomplete sur', ref.current);
-        
-        if (!ref.current) {
-          console.log('[GoogleAutocomplete] ref.current perdu pendant le timeout');
-          return;
+    try {
+      console.log('[GoogleAutocomplete] Initialisation autocomplete sur', ref.current);
+
+      autocompleteInstance.current = new window.google.maps.places.Autocomplete(ref.current, {
+        types,
+        componentRestrictions: { country: "fr" },
+        fields: ["formatted_address", "address_components", "geometry"],
+      });
+
+      autocompleteInstance.current.addListener("place_changed", () => {
+        if (onPlaceSelected) {
+          const place = autocompleteInstance.current!.getPlace();
+          console.log('[GoogleAutocomplete] place_changed déclenché, place =', place);
+          onPlaceSelected(place);
         }
+      });
 
-        autocomplete = new window.google.maps.places.Autocomplete(ref.current, {
-          types,
-          componentRestrictions: { country: "fr" },
-          fields: ["formatted_address", "address_components", "geometry"],
-        });
+      console.log('[GoogleAutocomplete] Autocomplete initialisé avec succès');
+    } catch (e) {
+      console.error("[GoogleAutocomplete] Erreur d'init", e);
+      setError("Erreur d'initialisation Google Maps. Contactez le support.");
+    }
 
-        autocomplete.addListener("place_changed", () => {
-          if (onPlaceSelected) {
-            onPlaceSelected(autocomplete!.getPlace());
-          }
-        });
-
-        console.log('[GoogleAutocomplete] Autocomplete initialisé avec succès');
-      } catch (e) {
-        console.error("[GoogleAutocomplete] Erreur d'init", e);
-        setError("Erreur d'initialisation Google Maps. Contactez le support.");
-      }
-    }, 50); // Petit délai pour éviter les conflits
-
-    return () => {
-      clearTimeout(initTimeout);
-      if (autocomplete && window.google?.maps?.event) {
-        google.maps.event.clearInstanceListeners(autocomplete);
-      }
-    };
+    // Pas de detachlistener ici, Google autocomplete gère parfaitement son cycle de vie nativement pour 1 ref.
   }, [ready, ref, types, onPlaceSelected]);
 
   return { ready, error };
