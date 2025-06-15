@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Mail, Phone, Building } from 'lucide-react';
+import { Mail, Phone, Building, Asterisk } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,7 +18,7 @@ const formSchema = z.object({
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Adresse email invalide"),
   phone: z.string().regex(/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/, "Numéro de téléphone invalide"),
-  companyName: z.string().min(2, "Le nom de la société doit contenir au moins 2 caractères"),
+  companyName: z.string().optional(),
   subject: z.string().min(2, "L'objet doit contenir au moins 2 caractères"),
   message: z.string().min(10, "Le message doit contenir au moins 10 caractères")
 });
@@ -25,7 +26,7 @@ const formSchema = z.object({
 const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,21 +43,21 @@ const Contact = () => {
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setSubmitError(null);
-    
+
     try {
       console.log("Sending contact form data:", values);
-      
+
       const { data, error } = await supabase.functions.invoke(
         "send-contact-email",
         {
           body: values
         }
       );
-      
+
       if (error) {
         throw new Error(error.message || "Erreur lors de l'envoi du message");
       }
-      
+
       toast.success("Message envoyé avec succès !");
       form.reset();
     } catch (error: any) {
@@ -68,6 +69,14 @@ const Contact = () => {
       setLoading(false);
     }
   };
+
+  // Helper pour afficher le label avec astérisque
+  const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
+    <span className="flex items-center gap-1">
+      {children}
+      <Asterisk size={14} className="text-red-500 ml-1" aria-label="champ obligatoire" />
+    </span>
+  );
 
   return <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
@@ -100,77 +109,91 @@ const Contact = () => {
                   <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <FormField control={form.control} name="firstName" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel>Prénom</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Votre prénom" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                        field
+                      }) => <FormItem>
+                              <FormLabel>
+                                <RequiredLabel>Prénom</RequiredLabel>
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder="Votre prénom" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>} />
 
                       <FormField control={form.control} name="lastName" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel>Nom</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Votre nom" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                        field
+                      }) => <FormItem>
+                              <FormLabel>
+                                <RequiredLabel>Nom</RequiredLabel>
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder="Votre nom" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>} />
                     </div>
 
                     <FormField control={form.control} name="companyName" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Société</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nom de votre société" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
+                      field
+                    }) => <FormItem>
+                            <FormLabel>
+                              Société <span className="text-xs text-gray-400">(facultatif)</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nom de votre société" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>} />
 
                     <div className="grid grid-cols-2 gap-4">
                       <FormField control={form.control} name="email" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input type="email" placeholder="votre@email.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                        field
+                      }) => <FormItem>
+                              <FormLabel>
+                                <RequiredLabel>Email</RequiredLabel>
+                              </FormLabel>
+                              <FormControl>
+                                <Input type="email" placeholder="votre@email.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>} />
 
                       <FormField control={form.control} name="phone" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel>Téléphone</FormLabel>
-                            <FormControl>
-                              <Input placeholder="06 12 34 56 78" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                        field
+                      }) => <FormItem>
+                              <FormLabel>
+                                <RequiredLabel>Téléphone</RequiredLabel>
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder="06 12 34 56 78" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>} />
                     </div>
 
                     <FormField control={form.control} name="subject" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Objet</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Objet de votre message" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
+                      field
+                    }) => <FormItem>
+                            <FormLabel>
+                              <RequiredLabel>Objet</RequiredLabel>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="Objet de votre message" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>} />
 
                     <FormField control={form.control} name="message" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel>Message</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Votre message..." className="min-h-[150px]" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
+                      field
+                    }) => <FormItem>
+                            <FormLabel>
+                              <RequiredLabel>Message</RequiredLabel>
+                            </FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="Votre message..." className="min-h-[150px]" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>} />
 
                     <Button 
                       type="submit" 
@@ -188,6 +211,9 @@ const Contact = () => {
                     </Button>
                   </form>
                 </Form>
+                <div className="pt-4 text-xs text-gray-500 flex items-center gap-1">
+                  <Asterisk size={12} className="text-red-500" /> <span>champs obligatoires</span>
+                </div>
               </div>
             </div>
           </div>
