@@ -7,38 +7,36 @@ interface QuoteFormProgressProps {
 
 const QuoteFormProgress = ({ currentStep }: QuoteFormProgressProps) => {
   const steps = [
-    { number: 1, title: "Adresses & Véhicule" },
+    { number: 1, title: "Adresses et grille tarifaire" },
     { number: 2, title: "Détails du véhicule" },
-    { number: 3, title: "Contact" }
+    { number: 3, title: "Coordonnées de contact" }
   ];
 
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-between">
         {steps.map((step, index) => (
-          <React.Fragment key={step.number}>
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep >= step.number
-                    ? 'bg-[#1a237e] text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                {step.number}
-              </div>
-              <span className="mt-2 text-xs text-gray-600 text-center max-w-24">
-                {step.title}
-              </span>
+          <div key={step.number} className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                currentStep >= step.number
+                  ? 'bg-[#1a237e] text-white'
+                  : 'bg-gray-200 text-gray-600'
+              }`}
+            >
+              {step.number}
+            </div>
+            <div className="ml-2 text-sm font-medium text-gray-700">
+              {step.title}
             </div>
             {index < steps.length - 1 && (
               <div
-                className={`h-0.5 w-16 mx-4 ${
+                className={`mx-4 h-0.5 w-16 ${
                   currentStep > step.number ? 'bg-[#1a237e]' : 'bg-gray-200'
                 }`}
               />
             )}
-          </React.Fragment>
+          </div>
         ))}
       </div>
     </div>

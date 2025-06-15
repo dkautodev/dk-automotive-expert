@@ -14,14 +14,21 @@ export const useGooglePlacesAutocomplete = (
 
   useEffect(() => {
     if (loadError) {
-      toast.error("Erreur : L'autocomplétion d'adresse Google ne peut pas fonctionner (clé API absente/invalide ou quota atteint).");
+      console.log("Google Maps API error:", loadError);
+      toast.error("Erreur : L'autocomplétion d'adresse Google ne peut pas fonctionner (clé API absente/invalide ou quota atteint).");
     }
   }, [loadError]);
 
   useEffect(() => {
-    if (!isLoaded || !inputRef.current || loadError) return;
+    if (!isLoaded || !inputRef.current || loadError) {
+      console.log("Google Maps not ready:", { isLoaded, hasInput: !!inputRef.current, loadError });
+      return;
+    }
 
+    console.log("Initializing Google Places Autocomplete for", fieldName);
+    
     let autocomplete: google.maps.places.Autocomplete | undefined = undefined;
+    
     try {
       autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
         componentRestrictions: { country: ['fr'] },
@@ -29,9 +36,14 @@ export const useGooglePlacesAutocomplete = (
         fields: ['formatted_address'],
       });
 
+      console.log("Google Places Autocomplete initialized successfully");
+
       autocomplete.addListener('place_changed', () => {
         const place = autocomplete?.getPlace();
+        console.log("Place selected:", place);
+        
         if (place && place.formatted_address) {
+          console.log("Setting address:", place.formatted_address);
           setValue(fieldName, place.formatted_address, { shouldValidate: true });
         }
       });
