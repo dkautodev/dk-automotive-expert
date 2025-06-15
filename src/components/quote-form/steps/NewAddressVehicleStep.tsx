@@ -143,35 +143,32 @@ const NewAddressVehicleStep = ({
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Adresses et catégorie de véhicule</h2>
-      {/* Bloc de saisie d'adresses avec bouton échange */}
-      <div className="relative flex flex-col md:flex-row items-stretch gap-0">
-        {/* Champ adresse de départ */}
-        <div className="w-full md:w-1/2 px-0 md:pr-6 flex-1">
+      {/* Champs d'adresses côte-à-côte avec bouton échange parfaitement centré */}
+      <div className="w-full flex flex-col md:flex-row items-center gap-0 relative">
+        {/* Champ adresse de prise en charge */}
+        <div className="w-full md:w-1/2 flex-1 px-0 md:pr-4">
           <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
         </div>
-        {/* Colonne bouton échange */}
-        <div className="relative flex-none flex md:flex-col justify-center items-center md:w-0 h-0 md:h-auto">
+        {/* Bouton d'échange centré horizontalement ET verticalement */}
+        <div className="flex-shrink-0 flex items-center justify-center md:mx-1 my-4 md:my-0">
           <button
             type="button"
             aria-label="Échanger les adresses"
             onClick={handleSwitchAddresses}
             className="
-              absolute md:static
-              left-1/2 md:left-auto top-1/2 md:top-auto
-              -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0
-              z-30
               bg-white border border-gray-300 rounded-full shadow
               p-2 flex items-center justify-center
               hover:bg-gray-100 active:bg-gray-200
               transition
+              z-30
             "
-            style={{ width: '40px', height: '40px' }}
+            style={{ width: '44px', height: '44px' }}
           >
             <RefreshCcw className="w-6 h-6 text-[#1a237e]" />
           </button>
         </div>
-        {/* Champ adresse d'arrivée */}
-        <div className="w-full md:w-1/2 px-0 md:pl-6 flex-1">
+        {/* Champ adresse de livraison */}
+        <div className="w-full md:w-1/2 flex-1 px-0 md:pl-4">
           <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
         </div>
       </div>
