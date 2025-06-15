@@ -8,6 +8,22 @@ export const quoteFormSchema = z.object({
   delivery_address: z.string().min(1, 'L\'adresse d\'arrivée est requise'),
   vehicle_type: z.string().min(1, 'La catégorie de véhicule est requise'),
   
+  // Champs d'adresse détaillés (pour compatibilité avec l'ancien formulaire)
+  pickupStreetNumber: z.string().optional(),
+  pickupStreetType: z.string().optional(),
+  pickupStreetName: z.string().optional(),
+  pickupComplement: z.string().optional(),
+  pickupPostalCode: z.string().optional(),
+  pickupCity: z.string().optional(),
+  pickupCountry: z.string().optional(),
+  deliveryStreetNumber: z.string().optional(),
+  deliveryStreetType: z.string().optional(),
+  deliveryStreetName: z.string().optional(),
+  deliveryComplement: z.string().optional(),
+  deliveryPostalCode: z.string().optional(),
+  deliveryCity: z.string().optional(),
+  deliveryCountry: z.string().optional(),
+  
   // Étape 2 : Détails du véhicule (facultatif)
   brand: z.string().optional(),
   model: z.string().optional(),
