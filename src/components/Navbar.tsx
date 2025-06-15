@@ -87,9 +87,9 @@ const Navbar = () => {
                 href="https://app-private.dkautomotive.fr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors"
               >
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4 text-white" />
                 Espace professionnel
               </a>
             </div>
@@ -134,10 +134,10 @@ const Navbar = () => {
                   href="https://app-private.dkautomotive.fr"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 text-base font-medium text-blue-600 hover:bg-blue-50 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <User className="w-4 h-4" />
+                  <User className="w-4 h-4 text-white" />
                   Espace professionnel
                 </a>
               </div>
