@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 
 interface UseGoogleAutocompleteOpts {
@@ -42,10 +43,17 @@ export const useGoogleAutocomplete = ({
   }, []);
 
   useEffect(() => {
-    if (!ready || !ref.current) return;
+    if (!ready || !ref.current) {
+      // Ajout log pour le debug sur la disponibilité de la ref
+      if (!ready) console.log("[GoogleAutocomplete] Not ready to init (Google API non chargée)");
+      if (!ref.current) console.log("[GoogleAutocomplete] ref.current absent lors de l'init");
+      return;
+    }
     let autocomplete: google.maps.places.Autocomplete | undefined;
 
     try {
+      // Ajout d'un log de debug pour vérifier à quel moment c'est créé
+      console.log('[GoogleAutocomplete] Initialisation autocomplete sur', ref.current);
       autocomplete = new window.google.maps.places.Autocomplete(ref.current, {
         types,
         componentRestrictions: { country: "fr" },
@@ -58,7 +66,7 @@ export const useGoogleAutocomplete = ({
       });
     } catch (e) {
       setError("Erreur d'initialisation Google Maps. Contactez le support.");
-      console.error(e);
+      console.error("[GoogleAutocomplete] Erreur d'init", e);
     }
 
     return () => {
@@ -66,7 +74,7 @@ export const useGoogleAutocomplete = ({
         google.maps.event.clearInstanceListeners(autocomplete);
       }
     };
-  }, [ready, ref.current]);
+  }, [ready, ref]); // On dépend bien de la ref, PAS ref.current
 
   return { ready, error };
 };
