@@ -5,8 +5,8 @@ import { z } from 'zod';
 export const quoteFormSchema = z.object({
   mission_type: z.enum(['livraison', 'restitution']),
   vehicle_type: z.string().min(1, 'Le type de véhicule est requis'),
-  brand: z.string().min(1, 'La marque est requise'),
-  model: z.string().min(1, 'Le modèle est requis'),
+  brand: z.string().optional(),
+  model: z.string().optional(),
   year: z.string().optional(),
   fuel: z.string().optional(),
   licensePlate: z.string().optional(),
