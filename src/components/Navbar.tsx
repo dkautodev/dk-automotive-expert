@@ -25,7 +25,7 @@ const Navbar = () => {
             <Link to="/" className="flex-shrink-0">
               <img
                 className="h-10 w-auto"
-                src="/lovable-uploads/c77f86e4-e01e-4bc3-8f16-96cb12e2a4b0.png"
+                src="/lovable-uploads/15aa1e07-0fa4-487b-b0c1-3c631f4385b6.png"
                 alt="DK Automotive"
               />
             </Link>

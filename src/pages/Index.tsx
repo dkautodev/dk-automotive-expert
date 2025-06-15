@@ -1,18 +1,16 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+
 const Index = () => {
-  return <div className="min-h-screen bg-white">
-      <Navbar />
-      
+  return (
+    <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
         <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
-        backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
-      }}>
+          backgroundImage: 'url("/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png")'
+        }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
@@ -53,9 +51,6 @@ const Index = () => {
         <section className="relative bg-white py-0">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              
-              
-              
               <div className="mb-8">
                 <h3 className="text-2xl md:text-4xl font-bold mb-4 py-[30px]">
                   FAITES CONFIANCE À DK AUTOMOTIVE
@@ -157,8 +152,8 @@ const Index = () => {
               </div>
             </div>
             <div className="mt-12 text-center mx-auto" style={{
-            maxWidth: "calc(100% - 2rem)"
-          }}>
+              maxWidth: "calc(100% - 2rem)"
+            }}>
               <p className="text-gray-600 mb-8 text-xl">
                 Prêt à découvrir la différence avec nos services de convoyage professionnels ? Contactez-nous ou faites une demande de devis personnalisée adaptée à vos besoins de transport.
               </p>
@@ -258,7 +253,8 @@ const Index = () => {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
