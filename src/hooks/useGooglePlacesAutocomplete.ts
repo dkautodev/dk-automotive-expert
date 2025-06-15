@@ -1,4 +1,5 @@
 
+// MIGRATION VERS L'API "PlaceAutocompleteElement" SI DISPONIBLE
 import { useEffect } from 'react';
 import { UseFormSetValue } from 'react-hook-form';
 import { QuoteFormValues } from '@/components/quote-form/quoteFormSchema';
@@ -20,44 +21,65 @@ export const useGooglePlacesAutocomplete = (
   }, [loadError]);
 
   useEffect(() => {
-    if (!isLoaded || !inputRef.current || loadError) {
-      console.log("Google Maps not ready:", { isLoaded, hasInput: !!inputRef.current, loadError });
-      return;
-    }
+    if (!isLoaded || !inputRef.current || loadError) return;
 
-    console.log("Initializing Google Places Autocomplete for", fieldName);
-    
-    let autocomplete: google.maps.places.Autocomplete | undefined = undefined;
-    
-    try {
+    let cleanup: (() => void) | undefined = undefined;
+
+    // On check d'abord si la nouvelle API PlaceAutocompleteElement est dispo (API 2024+)
+    if (
+      window.customElements &&
+      window.customElements.get &&
+      window.customElements.get('gmpx-place-autocomplete')
+    ) {
+      // Nouvelle API : créer l'élément, le connecter à l'input et écouter les events.
+      console.log("Using Google PlaceAutocompleteElement (modern) for", fieldName);
+      const el = document.createElement('gmpx-place-autocomplete') as any;
+      el.setOptions?.({
+        inputElement: inputRef.current,
+        types: ["address"],
+        componentRestrictions: { country: ["fr"] },
+        fields: ['formatted_address'],
+      });
+      el.inputElement = inputRef.current;
+      el.types = ["address"];
+      el.componentRestrictions = { country: ["fr"] };
+      // Ecouteur d'event natif
+      const onPlaceChange = () => {
+        const place = el.getPlace();
+        if (place && place.formatted_address) {
+          setValue(fieldName, place.formatted_address, { shouldValidate: true });
+        }
+      };
+      el.addEventListener("gmp-placeautocomplete-placechange", onPlaceChange);
+
+      cleanup = () => {
+        el.removeEventListener("gmp-placeautocomplete-placechange", onPlaceChange);
+      };
+    } else if (window.google?.maps?.places?.Autocomplete) {
+      // Ancienne API : garde le fallback aussi pour Chrome vieux ou fail registration
+      console.log("Using legacy Google Maps Places Autocomplete for", fieldName);
+      let autocomplete: google.maps.places.Autocomplete | undefined = undefined;
+
       autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
         componentRestrictions: { country: ['fr'] },
         types: ['address'],
         fields: ['formatted_address'],
       });
-
-      console.log("Google Places Autocomplete initialized successfully");
-
-      // Add event listener for place selection
-      autocomplete.addListener('place_changed', () => {
+      autocomplete.addListener("place_changed", () => {
         const place = autocomplete!.getPlace();
-        console.log("Place selected:", place);
-        
         if (place && place.formatted_address) {
-          console.log("Setting address:", place.formatted_address);
           setValue(fieldName, place.formatted_address, { shouldValidate: true });
         }
       });
-    } catch (e) {
-      console.error("Erreur lors de l'initialisation de Google Places:", e);
-      toast.error("Impossible d'activer les suggestions d'adresse. Veuillez vérifier votre connexion ou contacter le support.");
+      // Pas de cleanup requis pour l'API legacy : listeners liés à l'élément DOM
+    } else {
+      toast.error("Google Maps API non disponible ou trop ancienne pour l'autocomplétion.");
+      console.error("Google Maps API not available, can't attach autocomplete.");
     }
 
-    return () => {
-      // L'API Autocomplete n'a pas de méthode de nettoyage spécifique
-      // Les listeners sont automatiquement nettoyés quand l'élément DOM est supprimé
-    };
+    return cleanup;
   }, [isLoaded, loadError, inputRef, setValue, fieldName]);
 
   return { isLoaded, loadError };
 };
+
