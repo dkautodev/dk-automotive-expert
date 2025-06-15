@@ -1,13 +1,9 @@
-
 import React from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Separator } from "@/components/ui/separator";
 
 const Cookies = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Politique de cookies</h1>
@@ -73,7 +69,6 @@ const Cookies = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
