@@ -172,7 +172,7 @@ const Index = () => {
               </h2>
               <p className="text-gray-600 text-lg md:text-xl mb-8">Chez DK AUTOMOTIVE, chaque parcours est une promesse de qualité et de fiabilité.</p>
               
-              <div className="grid md:grid-cols-3 gap-8 mt-12">
+              <div className="grid md:grid-cols-4 gap-8 mt-12">
                 <div className="p-6 bg-white rounded-lg shadow-lg">
                   <div className="w-16 h-16 bg-[#18257D] rounded-full flex items-center justify-center mx-auto mb-4">
                     <Check className="w-8 h-8 text-white" />
@@ -195,6 +195,12 @@ const Index = () => {
                   </div>
                   <h3 className="text-xl font-bold text-[#18257D] mb-3">Satisfaction</h3>
                   <p className="text-gray-600">Votre satisfaction est notre priorité absolue.</p>
+                </div>
+
+                <div className="p-6 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
+                  <div className="w-16 h-16"></div>
+                  <h3 className="text-xl font-bold text-[#18257D] mb-3 invisible">-</h3>
+                  <p className="text-gray-600 text-center">Un conseiller vous rappelle pour planifier votre convoyage</p>
                 </div>
               </div>
             </div>
