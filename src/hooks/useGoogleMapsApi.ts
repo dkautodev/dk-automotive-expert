@@ -11,14 +11,24 @@ export const useGoogleMapsApi = (options: UseGoogleMapsApiOptions = {}) => {
   const [loadError, setLoadError] = useState<Error | null>(null);
 
   useEffect(() => {
+    console.log("Google Maps API Key present:", !!GOOGLE_MAPS_API_KEY);
+    
     if (window.google) {
+      console.log("Google Maps API already loaded");
       setIsLoaded(true);
+      return;
+    }
+
+    if (!GOOGLE_MAPS_API_KEY) {
+      console.error("Google Maps API key is missing");
+      setLoadError(new Error('Google Maps API key is missing'));
       return;
     }
 
     const callbackName = `googleMapsCallback_${Math.random().toString(36).substring(7)}`;
     
     window[callbackName] = () => {
+      console.log("Google Maps API loaded successfully");
       setIsLoaded(true);
       delete window[callbackName];
     };
@@ -30,10 +40,11 @@ export const useGoogleMapsApi = (options: UseGoogleMapsApiOptions = {}) => {
     script.async = true;
     script.defer = true;
     script.onerror = (error) => {
-      setLoadError(new Error('Failed to load Google Maps API'));
       console.error('Google Maps API loading error:', error);
+      setLoadError(new Error('Failed to load Google Maps API'));
     };
 
+    console.log("Loading Google Maps API with URL:", script.src);
     document.head.appendChild(script);
 
     return () => {
