@@ -1,6 +1,4 @@
 import React from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import {
   Accordion,
@@ -12,8 +10,6 @@ import {
 const FAQ = () => {
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
-      
       <main className="animate-fadeIn">
         <section className="py-16 px-4">
           <div className="container mx-auto">
@@ -66,8 +62,6 @@ const FAQ = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 };
