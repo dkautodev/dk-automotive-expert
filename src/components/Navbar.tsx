@@ -57,7 +57,7 @@ const Navbar = () => {
             
             {/* Bouton Espace professionnel */}
             <a 
-              href="https://app.dkautomotive.fr" 
+              href="https://app-private.dkautomotive.fr" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
@@ -96,7 +96,7 @@ const Navbar = () => {
               
               {/* Bouton Espace professionnel pour mobile */}
               <a 
-                href="https://app.dkautomotive.fr" 
+                href="https://app-private.dkautomotive.fr" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 text-base font-medium text-blue-600 hover:bg-blue-50 transition-colors"
