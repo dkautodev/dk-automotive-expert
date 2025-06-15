@@ -1,65 +1,55 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { calculateTTC, formatPrice } from '@/utils/priceCalculations';
 import { toast } from 'sonner';
+
+interface PriceCalculationResult {
+  priceHT: string;
+  priceTTC: string;
+  isPerKm: boolean;
+}
 
 export const usePriceCalculation = () => {
   const [isCalculating, setIsCalculating] = useState(false);
 
-  // Calculer le prix en fonction du type de véhicule et de la distance
-  const calculatePrice = async (vehicleType: string, distance: number) => {
+  const calculatePrice = async (
+    distance: number,
+    vehicleType: string
+  ): Promise<PriceCalculationResult | null> => {
     setIsCalculating(true);
+    
     try {
-      console.log(`Calculer le prix pour véhicule ${vehicleType} et distance ${distance}km`);
-      
-      // Trouver la tranche de prix correspondante dans la table pricing_grids_public
-      const { data: priceData, error } = await supabase
+      // Récupérer la grille tarifaire correspondante
+      const { data: pricingData, error } = await supabase
         .from('pricing_grids_public')
         .select('*')
         .eq('vehicle_category', vehicleType)
+        .eq('active', true)
         .lte('min_distance', distance)
         .gte('max_distance', distance)
         .single();
-      
-      if (error) {
-        console.error('Erreur lors de la récupération du prix:', error);
-        toast.error('Erreur lors de la récupération du prix');
-        return null;
+
+      if (error || !pricingData) {
+        console.log('Aucune grille tarifaire trouvée, utilisation du tarif au km');
+        
+        // Tarif de base au km si pas de grille trouvée
+        const baseRatePerKm = getBaseRatePerKm(vehicleType);
+        const priceHT = distance * baseRatePerKm;
+        const priceTTC = priceHT * 1.2; // TVA 20%
+        
+        return {
+          priceHT: priceHT.toFixed(2),
+          priceTTC: priceTTC.toFixed(2),
+          isPerKm: true
+        };
       }
-      
-      if (!priceData) {
-        console.warn(`Aucun prix trouvé pour le véhicule ${vehicleType} à la distance ${distance}`);
-        toast.error('Aucun tarif trouvé pour cette combinaison de véhicule et distance');
-        return null;
-      }
-      
-      console.log('Données de prix trouvées:', priceData);
-      
-      let finalPriceHT: number;
-      
-      // Déterminer si le prix est par km (type_tarif = "km") ou forfaitaire (type_tarif = "forfait")
-      if (priceData.type_tarif === 'km') {
-        finalPriceHT = priceData.price_ht * distance;
-        console.log(`Prix au km: ${priceData.price_ht} € × ${distance} km = ${finalPriceHT} €`);
-      } else {
-        finalPriceHT = priceData.price_ht;
-        console.log(`Prix forfaitaire: ${finalPriceHT} €`);
-      }
-      
-      // Formater le prix HT avec 2 décimales
-      const formattedPriceHT = formatPrice(finalPriceHT);
-      
-      // Calculer le prix TTC (TVA 20%)
-      const priceTTC = calculateTTC(formattedPriceHT);
-      
-      console.log(`Prix calculé: HT=${formattedPriceHT}€, TTC=${priceTTC}€, type=${priceData.type_tarif}`);
-      
+
       return {
-        priceHT: formattedPriceHT,
-        priceTTC: priceTTC,
-        isPerKm: priceData.type_tarif === 'km'
+        priceHT: pricingData.price_ht.toFixed(2),
+        priceTTC: pricingData.price_ttc.toFixed(2),
+        isPerKm: pricingData.type_tarif === 'per_km'
       };
+      
     } catch (error) {
       console.error('Erreur lors du calcul du prix:', error);
       toast.error('Erreur lors du calcul du prix');
@@ -73,4 +63,17 @@ export const usePriceCalculation = () => {
     calculatePrice,
     isCalculating
   };
+};
+
+// Tarifs de base au km par type de véhicule
+const getBaseRatePerKm = (vehicleType: string): number => {
+  const rates: Record<string, number> = {
+    'berline': 0.73,
+    'break': 0.75,
+    'suv': 0.78,
+    'utilitaire': 0.80,
+    'premium': 0.85
+  };
+  
+  return rates[vehicleType] || 0.73;
 };

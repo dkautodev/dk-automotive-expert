@@ -1,88 +1,89 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Facebook, Instagram, UserRound, Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
-  const isMobile = useIsMobile();
-  const navLinks = [{
-    to: "/devis",
-    text: "OBTENIR MON DEVIS"
-  }, {
-    to: "/about",
-    text: "QUI SOMMES-NOUS"
-  }, {
-    to: "/contact",
-    text: "CONTACTEZ-NOUS"
-  }, {
-    to: "/faq",
-    text: "FAQ"
-  }];
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
-  return <div className="w-full sticky top-0 z-50">
-      <div className="bg-dk-navy text-white py-2 px-4">
-        <div className="container flex justify-between items-center mx-auto">
-          <div className="flex gap-4">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-dk-blue transition-colors hover-scale">
-              <Facebook size={20} />
-            </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-dk-blue transition-colors hover-scale">
-              <Instagram size={20} />
-            </a>
-          </div>
-          <p className="text-sm text-center hidden md:block font-light">
-            Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.
-          </p>
-          <div className="flex gap-4 items-center">
-            
-          </div>
-        </div>
-      </div>
-      <nav className="bg-white/95 backdrop-blur-sm shadow-md">
-        <div className="container mx-auto py-4 px-4">
-          <div className="flex justify-between items-center">
+  const isActive = (path: string) => location.pathname === path;
+
+  const navItems = [
+    { path: "/", label: "Accueil" },
+    { path: "/devis", label: "Demande de devis" },
+    { path: "/contact", label: "Contact" },
+    { path: "/faq", label: "FAQ" },
+  ];
+
+  return (
+    <nav className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
-              <img src="/lovable-uploads/ea18e979-d5d3-4e98-9a6b-2979a5f6ce83.png" alt="DK AUTOMOTIVE" className="h-8 md:h-12 hover-scale" />
+              <img
+                className="h-10 w-auto"
+                src="/lovable-uploads/c77f86e4-e01e-4bc3-8f16-96cb12e2a4b0.png"
+                alt="DK Automotive"
+              />
             </Link>
-            
-            {isMobile ? <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover-scale">
-                    <Menu className="h-6 w-6" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px] glass-effect">
-                  <nav className="flex flex-col gap-4 mt-8">
-                    {navLinks.map(link => <Link key={link.to} to={link.to} className="text-dk-navy hover:text-dk-blue transition-colors py-2 text-lg font-medium hover-scale">
-                        {link.text}
-                      </Link>)}
-                    <Button variant="outline" className="w-full mt-4 text-dk-blue" asChild>
-                      <a href="https://app-private.dkautomotive.fr/" target="_blank" rel="noopener noreferrer">
-                        <UserRound className="mr-2" />
-                        Espace professionnel
-                      </a>
-                    </Button>
-                  </nav>
-                </SheetContent>
-              </Sheet> : <div className="hidden md:flex space-x-8 items-center">
-                {navLinks.map(link => <Link key={link.to} to={link.to} className="text-dk-navy hover:text-dk-blue transition-colors font-medium hover-scale">
-                    {link.text}
-                  </Link>)}
-                <Button variant="outline" className="bg-gray-100 text-dk-blue" asChild>
-                  <a href="https://app-private.dkautomotive.fr/" target="_blank" rel="noopener noreferrer">
-                    <UserRound className="mr-2" />
-                    Espace professionnel
-                  </a>
-                </Button>
-              </div>}
+          </div>
+
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive(item.path)
+                    ? "text-dk-navy border-b-2 border-dk-navy"
+                    : "text-gray-700 hover:text-dk-navy"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
           </div>
         </div>
-      </nav>
-    </div>;
-};
+
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`block px-3 py-2 text-base font-medium transition-colors ${
+                    isActive(item.path)
+                      ? "text-dk-navy bg-dk-navy/5"
+                      : "text-gray-700 hover:text-dk-navy hover:bg-gray-50"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
 
 export default Navbar;

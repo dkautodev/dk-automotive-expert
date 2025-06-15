@@ -1,78 +1,85 @@
 
-import { useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
-import { calculatePrice } from '@/utils/priceCalculator';
+import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { toast } from 'sonner';
-import { useDistanceCalculation } from '@/hooks/useDistanceCalculation';
+import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 
 export const useQuoteCalculations = (
-  form: any,
+  form: UseFormReturn<QuoteFormValues>,
   setDistance: (distance: number | null) => void,
   setPriceHT: (price: string | null) => void,
   setPriceTTC: (price: string | null) => void,
   setIsPerKm: (isPerKm: boolean) => void
 ) => {
-  const { calculateDistance, isLoaded, isCalculating } = useDistanceCalculation();
-  const [calculating, setCalculating] = useState(false);
+  const { calculatePrice, isCalculating } = usePriceCalculation();
 
   const calculateQuote = async (data: Partial<QuoteFormValues>): Promise<boolean> => {
-    if (!isLoaded) {
-      toast.error("L'API Google Maps n'est pas chargée");
+    const pickupAddress = data.pickup_address || form.getValues('pickup_address');
+    const deliveryAddress = data.delivery_address || form.getValues('delivery_address');
+    const vehicleType = data.vehicle_type || form.getValues('vehicle_type');
+
+    if (!pickupAddress || !deliveryAddress || !vehicleType) {
+      toast.error('Veuillez remplir tous les champs requis');
       return false;
     }
 
-    setCalculating(true);
+    if (!GOOGLE_MAPS_API_KEY) {
+      toast.error('Clé API Google Maps non configurée');
+      return false;
+    }
+
     try {
-      console.log("Calculating quote for addresses:", data.pickup_address, data.delivery_address);
+      // Calculer la distance avec Google Maps
+      const service = new google.maps.DistanceMatrixService();
+      
+      const response = await new Promise<google.maps.DistanceMatrixResponse>((resolve, reject) => {
+        service.getDistanceMatrix({
+          origins: [pickupAddress],
+          destinations: [deliveryAddress],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC,
+          avoidHighways: false,
+          avoidTolls: false
+        }, (response, status) => {
+          if (status === google.maps.DistanceMatrixStatus.OK && response) {
+            resolve(response);
+          } else {
+            reject(new Error(`Erreur Google Maps: ${status}`));
+          }
+        });
+      });
 
-      if (!data.pickup_address || !data.delivery_address) {
-        toast.error("Veuillez entrer les adresses de départ et d'arrivée");
-        return false;
+      const element = response.rows[0]?.elements[0];
+      if (!element || element.status !== 'OK') {
+        throw new Error('Impossible de calculer la distance');
       }
 
-      if (!data.vehicle_type) {
-        toast.error("Veuillez sélectionner un type de véhicule");
-        return false;
-      }
+      const distanceInKm = Math.ceil(element.distance.value / 1000);
+      setDistance(distanceInKm);
 
-      // Calculer la distance entre les deux points
-      const distanceKm = await calculateDistance(
-        data.pickup_address,
-        data.delivery_address
-      );
-
-      if (!distanceKm) {
-        toast.error("Impossible de calculer la distance entre les deux adresses");
-        return false;
-      }
-
-      console.log(`Distance calculated: ${distanceKm} km`);
-      setDistance(distanceKm);
-
-      // Calcul du prix basé sur le type de véhicule et la distance
-      const priceResult = await calculatePrice(data.vehicle_type, distanceKm);
+      // Calculer le prix
+      const priceResult = await calculatePrice(distanceInKm, vehicleType);
       if (!priceResult) {
-        toast.error("Erreur lors du calcul du prix");
         return false;
       }
 
-      console.log("Price calculation result:", priceResult);
       setPriceHT(priceResult.priceHT);
       setPriceTTC(priceResult.priceTTC);
       setIsPerKm(priceResult.isPerKm);
 
+      toast.success('Distance et prix calculés avec succès');
       return true;
+
     } catch (error) {
-      console.error("Error calculating quote:", error);
-      toast.error("Erreur lors du calcul du devis");
+      console.error('Erreur lors du calcul:', error);
+      toast.error('Erreur lors du calcul de la distance et du prix');
       return false;
-    } finally {
-      setCalculating(false);
     }
   };
 
   return {
     calculateQuote,
-    calculating: calculating || isCalculating
+    isCalculating
   };
 };
