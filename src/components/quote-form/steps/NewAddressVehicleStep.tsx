@@ -150,11 +150,19 @@ const NewAddressVehicleStep = ({
               <FormControl>
                 <div className="relative">
                   <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input placeholder={pickupAuto.error ? "Petit problème... Une erreur s'est produite" : "Saisissez l'adresse complète"} className={`pl-8 bg-[#EEF1FF] ${pickupAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`} {...field} ref={assignRefs(pickupInputRef, field.ref)} disabled={!!pickupAuto.error} onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-              }
-            }} />
+                  <Input
+                    placeholder={pickupAuto.error ? "Petit problème... Une erreur s'est produite" : "Saisissez l'adresse complète"}
+                    className={`pl-8 bg-[#EEF1FF] ${pickupAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    {...field}
+                    ref={assignRefs(pickupInputRef, field.ref)}
+                    disabled={!!pickupAuto.error}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                      }
+                    }}
+                    autoComplete="off"
+                  />
                   {pickupAuto.error && <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-destructive">
                       {pickupAuto.error}
                     </span>}
@@ -172,11 +180,19 @@ const NewAddressVehicleStep = ({
               <FormControl>
                 <div className="relative">
                   <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input placeholder={deliveryAuto.error ? "Petit problème... Une erreur s'est produite" : "Saisissez l'adresse complète"} className={`pl-8 bg-[#EEF1FF] ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`} {...field} ref={assignRefs(deliveryInputRef, field.ref)} disabled={!!deliveryAuto.error} onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-              }
-            }} />
+                  <Input
+                    placeholder={deliveryAuto.error ? "Petit problème... Une erreur s'est produite" : "Saisissez l'adresse complète"}
+                    className={`pl-8 bg-[#EEF1FF] ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    {...field}
+                    ref={assignRefs(deliveryInputRef, field.ref)}
+                    disabled={!!deliveryAuto.error}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                      }
+                    }}
+                    autoComplete="off"
+                  />
                   {deliveryAuto.error && <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-destructive">
                       {deliveryAuto.error}
                     </span>}
