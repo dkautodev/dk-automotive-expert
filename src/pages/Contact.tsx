@@ -13,6 +13,7 @@ import { Loader } from '@/components/ui/loader';
 import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
+  fonction: z.string().min(2, "La fonction doit contenir au moins 2 caractères"),
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Adresse email invalide"),
@@ -29,6 +30,7 @@ const Contact = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      fonction: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -98,6 +100,16 @@ const Contact = () => {
                 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                    <FormField control={form.control} name="fonction" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fonction</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Votre fonction (ex : Directeur, Responsable...)" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
                     <div className="grid grid-cols-2 gap-4">
                       <FormField control={form.control} name="firstName" render={({
                       field
