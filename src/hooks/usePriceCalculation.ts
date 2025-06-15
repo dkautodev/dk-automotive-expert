@@ -27,7 +27,7 @@ export const usePriceCalculation = () => {
         .eq('active', true)
         .lte('min_distance', distance)
         .gte('max_distance', distance)
-        .single();
+        .maybeSingle();
 
       if (error || !pricingData) {
         console.log('Aucune grille tarifaire trouvée, utilisation du tarif au km');

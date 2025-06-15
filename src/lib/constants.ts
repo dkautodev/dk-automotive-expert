@@ -15,3 +15,6 @@ export const COMPANY_INFO = {
   phone: "+33 7 68 71 77 44",
   address: "70000 Vesoul, France"
 };
+
+// Prix de base par kilomètre
+export const PRICE_PER_KM = 0.73;
