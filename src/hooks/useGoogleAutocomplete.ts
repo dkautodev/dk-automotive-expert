@@ -15,7 +15,7 @@ export const useGoogleAutocomplete = ({
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Save the instance to avoid recreating on each render
-  const autocompleteInstance = useRef<google.maps.places.PlaceAutocompleteElement | null>(null);
+  const autocompleteInstance = useRef<google.maps.places.Autocomplete | null>(null);
 
   useEffect(() => {
     if ((window as any).google && window.google.maps && window.google.maps.places) {
@@ -65,35 +65,32 @@ export const useGoogleAutocomplete = ({
     }
 
     try {
-      console.log('[GoogleAutocomplete] Initializing PlaceAutocompleteElement on', ref.current);
+      console.log('[GoogleAutocomplete] Initializing Autocomplete on', ref.current);
 
-      // Create the new PlaceAutocompleteElement
-      const element = new window.google.maps.places.PlaceAutocompleteElement({
+      // Create the standard Autocomplete
+      const autocomplete = new window.google.maps.places.Autocomplete(ref.current, {
         componentRestrictions: { country: "fr" },
         types: types,
         fields: ["formatted_address", "address_components", "geometry"],
       });
 
-      // Connect it to our input
-      element.connectTo(ref.current);
-      
       // Add event listener for place selection
-      element.addEventListener('gmp-placeselect', (event: any) => {
+      autocomplete.addListener('place_changed', () => {
         if (onPlaceSelected) {
-          const place = event.place;
-          console.log('[GoogleAutocomplete] gmp-placeselect triggered, place =', place);
+          const place = autocomplete.getPlace();
+          console.log('[GoogleAutocomplete] place_changed triggered, place =', place);
           onPlaceSelected(place);
         }
       });
 
-      autocompleteInstance.current = element;
-      console.log('[GoogleAutocomplete] PlaceAutocompleteElement initialized successfully');
+      autocompleteInstance.current = autocomplete;
+      console.log('[GoogleAutocomplete] Autocomplete initialized successfully');
     } catch (e) {
       console.error("[GoogleAutocomplete] Initialization error", e);
       setError("Google Maps initialization error. Contact support.");
     }
 
-    // No need to detach listener here, PlaceAutocompleteElement manages its lifecycle natively
+    // Cleanup happens automatically when DOM element is removed
   }, [ready, ref, types, onPlaceSelected]);
 
   return { ready, error };
