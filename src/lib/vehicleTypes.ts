@@ -7,6 +7,5 @@ export const vehicleTypes = [
   { id: "utilitaire_6_12m3", name: "Utilitaire 6-12m3" },
   { id: "utilitaire_12_15m3", name: "Utilitaire 12-15m3" },
   { id: "utilitaire_15_20m3", name: "Utilitaire 15-20m3" },
-  { id: "utilitaire_plus_20m3", name: "Utilitaire + de 20m3" },
-  { id: "premium", name: "Premium" }
+  { id: "utilitaire_plus_20m3", name: "Utilitaire + de 20m3" }
 ];
