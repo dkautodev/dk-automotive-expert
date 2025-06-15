@@ -69,13 +69,8 @@ export const useQuoteForm = () => {
       if (!success) return;
     }
     
-    // Validation spécifique avant la dernière étape
+    // L'étape 2 n'a plus de validation obligatoire car tous les champs sont facultatifs
     if (step === 2) {
-      const isValid = await form.trigger(['brand', 'model']);
-      if (!isValid) {
-        console.log('Validation failed for brand and model');
-        return;
-      }
       setFormValidated(true);
     }
     
