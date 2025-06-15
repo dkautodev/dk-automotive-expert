@@ -144,28 +144,34 @@ const NewAddressVehicleStep = ({
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-dk-navy">Adresses et catégorie de véhicule</h2>
       {/* Bloc de saisie d'adresses avec bouton échange */}
-      <div className="grid gap-6 md:grid-cols-2 relative">
-        <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
-        {/* Bouton switch visible sur mobile et desktop, position centré entre les deux champs */}
-        <button
-          type="button"
-          aria-label="Échanger les adresses"
-          onClick={handleSwitchAddresses}
-          className="
-            absolute left-1/2 top-1/2 
-            -translate-x-1/2 -translate-y-1/2
-            z-10 
-            bg-white border border-gray-300 rounded-full shadow 
-            p-2 flex items-center justify-center
-            hover:bg-gray-100 active:bg-gray-200
-            transition
-            md:left-auto md:right-[-32px] md:top-1/2
-          "
-          style={{ width: '36px', height: '36px' }}
-        >
-          <RefreshCcw className="w-5 h-5 text-dk-navy" />
-        </button>
-        <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
+      <div className="relative flex flex-col md:flex-row items-stretch gap-0">
+        <div className="w-full md:w-1/2 px-0 md:pr-6">
+          <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
+        </div>
+        {/* Le bouton échange, positionné absolument au centre vertical et horizontal */}
+        <div className="flex justify-center items-center md:block">
+          <button
+            type="button"
+            aria-label="Échanger les adresses"
+            onClick={handleSwitchAddresses}
+            className="
+              absolute 
+              left-1/2 top-1/2 
+              -translate-x-1/2 -translate-y-1/2
+              z-30
+              bg-white border border-gray-300 rounded-full shadow
+              p-2 flex items-center justify-center
+              hover:bg-gray-100 active:bg-gray-200
+              transition
+            "
+            style={{ width: '40px', height: '40px' }}
+          >
+            <RefreshCcw className="w-6 h-6 text-[#1a237e]" />
+          </button>
+        </div>
+        <div className="w-full md:w-1/2 px-0 md:pl-6">
+          <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
+        </div>
       </div>
       <FormField control={form.control} name="vehicle_type" render={({
         field
