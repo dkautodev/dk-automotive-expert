@@ -11,6 +11,7 @@ import FAQ from "@/pages/FAQ";
 import CGV from "@/pages/CGV";
 import CGU from "@/pages/CGU";
 import MentionsLegales from "@/pages/MentionsLegales";
+import PolitiqueConfidentialite from "@/pages/PolitiqueConfidentialite";
 import GestionCookies from "@/pages/GestionCookies";
 import Admin from "@/pages/Admin";
 
@@ -32,6 +33,7 @@ function AppContent() {
           <Route path="/cgv" element={<CGV />} />
           <Route path="/cgu" element={<CGU />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
+          <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
           <Route path="/gestion-cookies" element={<GestionCookies />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
