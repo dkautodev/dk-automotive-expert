@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -257,41 +256,6 @@ const IndexPageEditor = () => {
         </CardContent>
       </Card>
 
-      {/* Points de confiance */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Points de confiance (Checkmarks)</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {groupedContents.trust_points.map((content, index) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3">Point {index + 1}</h4>
-              {renderEditField(content)}
-              {index < groupedContents.trust_points.length - 1 && <Separator className="mt-4" />}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Section de confiance */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Section "Faites confiance à DK Automotive"</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {groupedContents.trust_section.map((content) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3">
-                {content.block_key.includes('title') ? 'Titre' : 
-                 content.block_key.includes('subtitle') ? 'Sous-titre' : 'Description'}
-              </h4>
-              {renderEditField(content)}
-              <Separator className="mt-4" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
       {/* Sections principales */}
       <Card>
         <CardHeader>
@@ -326,6 +290,41 @@ const IndexPageEditor = () => {
               </div>
             );
           })}
+        </CardContent>
+      </Card>
+
+      {/* Points de confiance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Points de confiance (Checkmarks)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.trust_points.map((content, index) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">Point {index + 1}</h4>
+              {renderEditField(content)}
+              {index < groupedContents.trust_points.length - 1 && <Separator className="mt-4" />}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Section de confiance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section "Faites confiance à DK Automotive"</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.trust_section.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') ? 'Titre' : 
+                 content.block_key.includes('subtitle') ? 'Sous-titre' : 'Description'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
         </CardContent>
       </Card>
 
