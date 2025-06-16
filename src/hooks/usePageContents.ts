@@ -28,7 +28,14 @@ export const usePageContents = (pageSlug: string) => {
         .order('display_order');
 
       if (error) throw error;
-      setContents(data || []);
+      
+      // Type assertion pour s'assurer que block_type correspond à nos types attendus
+      const typedData: PageContent[] = (data || []).map(item => ({
+        ...item,
+        block_type: item.block_type as 'text' | 'image' | 'html'
+      }));
+      
+      setContents(typedData);
     } catch (error) {
       console.error('Erreur lors du chargement des contenus:', error);
       toast.error('Erreur lors du chargement des contenus');
