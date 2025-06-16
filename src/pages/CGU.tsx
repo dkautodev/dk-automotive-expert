@@ -1,9 +1,6 @@
-
 import React from 'react';
-
 const CGU = () => {
-  return (
-    <div className="min-h-screen bg-gray-50 py-12">
+  return <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-dk-navy mb-8 text-center">
@@ -13,9 +10,7 @@ const CGU = () => {
           <div className="prose prose-lg max-w-none">
             <div className="bg-gray-100 p-6 rounded-lg mb-8">
               <h2 className="text-xl font-semibold text-dk-navy mb-4">Préambule</h2>
-              <p className="text-gray-700 leading-relaxed">
-                Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») définissent les droits et obligations des utilisateurs et de l'éditeur du logiciel SaaS dédié à la création de missions, gestion de profils, génération de factures et devis. L'accès et l'utilisation du service impliquent l'acceptation sans réserve des présentes CGU.
-              </p>
+              <p className="text-gray-700 leading-relaxed">Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») définissent les droits et obligations des utilisateurs et de l'éditeur du logiciel SaaS dédié à la création de missions, gestion de profils, génération de factures et devis. L'accès et l'utilisation du service impliquent l'acceptation sans réserve des présentes CGU. En créant un espace client et/ou un espace chauffeur, vous acceptez expressément les présentes CGU.</p>
             </div>
 
             <section className="mb-8">
@@ -137,8 +132,6 @@ const CGU = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default CGU;
