@@ -19,9 +19,13 @@ const MentionsLegales = () => {
     if (!title && !content) return null;
     
     return (
-      <section>
+      <section className="mb-8">
         {title && <h2 className="text-xl font-semibold text-dk-navy mb-4">{title}</h2>}
-        {content && <p>{content}</p>}
+        {content && (
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <p className="text-gray-700 leading-relaxed">{content}</p>
+          </div>
+        )}
       </section>
     );
   };
@@ -45,48 +49,46 @@ const MentionsLegales = () => {
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Mentions Légales</h1>
+          <h1 className="text-3xl font-bold text-center text-dk-navy mb-12">Mentions Légales</h1>
           
-          <div className="max-w-3xl mx-auto space-y-8">
-            <section>
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Informations légales */}
+            <section className="mb-8">
               <h2 className="text-xl font-semibold text-dk-navy mb-4">Informations légales</h2>
-              <div className="space-y-2">
-                <p><strong>Raison sociale :</strong> {getLegalMentionValue('raison_sociale')}</p>
-                <p><strong>Forme juridique :</strong> {getLegalMentionValue('forme_juridique')}</p>
-                {getLegalMentionValue('capital_social') && (
-                  <p><strong>Capital social :</strong> {getLegalMentionValue('capital_social')}</p>
-                )}
-                <p><strong>Numéro d'immatriculation :</strong> {getLegalMentionValue('numero_immatriculation')}</p>
-                <p><strong>Siège social :</strong> {getLegalMentionValue('siege_social')}</p>
-                {getLegalMentionValue('telephone') && (
-                  <p><strong>Téléphone :</strong> {getLegalMentionValue('telephone')}</p>
-                )}
-                <p><strong>Email :</strong> {getLegalMentionValue('email')}</p>
-                <p><strong>Directeur de la publication :</strong> {getLegalMentionValue('directeur_publication')}</p>
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="mb-2"><strong>Raison sociale :</strong> {getLegalMentionValue('raison_sociale')}</p>
+                    <p className="mb-2"><strong>Forme juridique :</strong> {getLegalMentionValue('forme_juridique')}</p>
+                    {getLegalMentionValue('capital_social') && (
+                      <p className="mb-2"><strong>Capital social :</strong> {getLegalMentionValue('capital_social')}</p>
+                    )}
+                    <p className="mb-2"><strong>Numéro d'immatriculation :</strong> {getLegalMentionValue('numero_immatriculation')}</p>
+                  </div>
+                  <div>
+                    <p className="mb-2"><strong>Siège social :</strong> {getLegalMentionValue('siege_social')}</p>
+                    {getLegalMentionValue('telephone') && (
+                      <p className="mb-2"><strong>Téléphone :</strong> {getLegalMentionValue('telephone')}</p>
+                    )}
+                    <p className="mb-2"><strong>Email :</strong> {getLegalMentionValue('email')}</p>
+                    <p className="mb-2"><strong>Directeur de la publication :</strong> {getLegalMentionValue('directeur_publication')}</p>
+                  </div>
+                </div>
               </div>
             </section>
 
-            <Separator />
+            <Separator className="my-8" />
 
+            {/* Sections avec titre + contenu regroupés */}
             {renderSection('hebergement_titre', 'hebergement_contenu')}
-
-            <Separator />
 
             {renderSection('propriete_intellectuelle_titre', 'propriete_intellectuelle_contenu')}
 
-            <Separator />
-
             {renderSection('responsabilite_titre', 'responsabilite_contenu')}
-
-            <Separator />
 
             {renderSection('protection_donnees_titre', 'protection_donnees_contenu')}
 
-            <Separator />
-
             {renderSection('liens_hypertextes_titre', 'liens_hypertextes_contenu')}
-
-            <Separator />
 
             {renderSection('cookies_titre', 'cookies_contenu')}
           </div>
