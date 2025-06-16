@@ -123,20 +123,19 @@ export const useFaqItems = () => {
 
   const reorderFaqItems = async (reorderedItems: FaqItem[]) => {
     try {
-      const updates = reorderedItems.map((item, index) => ({
-        id: item.id,
-        display_order: index + 1
-      }));
+      // Mettre à jour chaque élément individuellement avec le bon ordre
+      const updates = reorderedItems.map(async (item, index) => {
+        return await supabase
+          .from('faq_items')
+          .update({ display_order: index + 1 })
+          .eq('id', item.id);
+      });
 
-      const { error } = await supabase
-        .from('faq_items')
-        .upsert(updates.map(update => ({ 
-          id: update.id, 
-          display_order: update.display_order 
-        })));
+      const results = await Promise.all(updates);
+      const hasError = results.some(result => result.error);
 
-      if (error) {
-        console.error('Error reordering FAQ items:', error);
+      if (hasError) {
+        console.error('Error reordering FAQ items');
         toast.error('Erreur lors du réordonnancement des FAQ');
         return false;
       }
