@@ -6,14 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { User, Lock, LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie } from 'lucide-react';
-
 const Admin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('accueil');
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -32,7 +30,6 @@ const Admin = () => {
       setPassword('');
     }, 1000);
   };
-
   const handleLogout = () => {
     setIsLoggedIn(false);
     setActiveTab('accueil');
@@ -209,129 +206,7 @@ const Admin = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {activeTab === 'accueil' && <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {stats.map((stat, index) => <Card key={index}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <stat.icon className={`w-8 h-8 ${stat.color}`} />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                        <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>)}
-            </div>
-
-            {/* Recent Quotes Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Devis récents</CardTitle>
-                <CardDescription>Liste des dernières demandes de devis</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Client</TableHead>
-                      <TableHead>Enlèvement</TableHead>
-                      <TableHead>Livraison</TableHead>
-                      <TableHead>Véhicule</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentQuotes.map(quote => <TableRow key={quote.id}>
-                        <TableCell className="font-medium">{quote.client}</TableCell>
-                        <TableCell>{quote.pickup}</TableCell>
-                        <TableCell>{quote.delivery}</TableCell>
-                        <TableCell>{quote.vehicle}</TableCell>
-                        <TableCell>{getStatusBadge(quote.status)}</TableCell>
-                        <TableCell>{quote.date}</TableCell>
-                      </TableRow>)}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>}
-
-        {activeTab === 'faq' && <Card>
-            <CardHeader>
-              <CardTitle>Gestion de la FAQ</CardTitle>
-              <CardDescription>Gérez les questions fréquemment posées</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de gestion de la FAQ à développer...</p>
-            </CardContent>
-          </Card>}
-
-        {activeTab === 'mentions-legales' && <Card>
-            <CardHeader>
-              <CardTitle>Mentions légales</CardTitle>
-              <CardDescription>Gérez les mentions légales du site</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de gestion des mentions légales à développer...</p>
-            </CardContent>
-          </Card>}
-
-        {activeTab === 'politique-confidentialite' && <Card>
-            <CardHeader>
-              <CardTitle>Politique de confidentialité</CardTitle>
-              <CardDescription>Gérez la politique de confidentialité</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de gestion de la politique de confidentialité à développer...</p>
-            </CardContent>
-          </Card>}
-
-        {activeTab === 'gestion-cookies' && <Card>
-            <CardHeader>
-              <CardTitle>Gestion des cookies</CardTitle>
-              <CardDescription>Configurez la gestion des cookies</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de gestion des cookies à développer...</p>
-            </CardContent>
-          </Card>}
-
-        {activeTab === 'cgv' && <Card>
-            <CardHeader>
-              <CardTitle>Conditions Générales de Vente</CardTitle>
-              <CardDescription>Gérez les CGV</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de gestion des CGV à développer...</p>
-            </CardContent>
-          </Card>}
-
-        {activeTab === 'cgu' && <Card>
-            <CardHeader>
-              <CardTitle>Conditions Générales d'Utilisation</CardTitle>
-              <CardDescription>Gérez les CGU</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de gestion des CGU à développer...</p>
-            </CardContent>
-          </Card>}
-
-        {activeTab === 'espace-professionnel' && <Card>
-            <CardHeader>
-              <CardTitle>Espace professionnel</CardTitle>
-              <CardDescription>Configuration de l'espace professionnel</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Interface de configuration de l'espace professionnel à développer...</p>
-            </CardContent>
-          </Card>}
-      </main>
+      
     </div>;
 };
-
 export default Admin;
