@@ -88,6 +88,11 @@ const Footer = () => {
                 CGV
               </Link>
             </li>
+            <li>
+              <Link to="/cgu" className="hover:text-gray-300 transition">
+                CGU
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
@@ -109,4 +114,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

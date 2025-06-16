@@ -9,6 +9,7 @@ import Devis from "@/pages/Devis";
 import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
 import CGV from "@/pages/CGV";
+import CGU from "@/pages/CGU";
 import MentionsLegales from "@/pages/MentionsLegales";
 import GestionCookies from "@/pages/GestionCookies";
 import Admin from "@/pages/Admin";
@@ -29,6 +30,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/cgv" element={<CGV />} />
+          <Route path="/cgu" element={<CGU />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
           <Route path="/gestion-cookies" element={<GestionCookies />} />
           <Route path="/admin" element={<Admin />} />
