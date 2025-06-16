@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { User, Lock, LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie } from 'lucide-react';
 import IndexPageEditor from '@/components/admin/IndexPageEditor';
 import FaqEditor from '@/components/admin/FaqEditor';
+import LegalMentionsEditor from '@/components/admin/LegalMentionsEditor';
 
 const Admin = () => {
   const [email, setEmail] = useState('');
@@ -215,7 +216,8 @@ const Admin = () => {
       <main className="py-8">
         {activeTab === 'accueil' && <IndexPageEditor />}
         {activeTab === 'faq' && <FaqEditor />}
-        {activeTab !== 'accueil' && activeTab !== 'faq' && (
+        {activeTab === 'mentions-legales' && <LegalMentionsEditor />}
+        {activeTab !== 'accueil' && activeTab !== 'faq' && activeTab !== 'mentions-legales' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-12">
               <h2 className="text-xl font-semibold text-gray-600 mb-2">

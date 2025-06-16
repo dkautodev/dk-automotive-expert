@@ -1,6 +1,32 @@
+
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
+import { useLegalMentions } from '@/hooks/useLegalMentions';
+import { Loader2 } from 'lucide-react';
+
 const MentionsLegales = () => {
+  const { legalMentions, isLoading } = useLegalMentions();
+
+  const getLegalMentionValue = (fieldKey: string) => {
+    const mention = legalMentions.find(item => item.field_key === fieldKey);
+    return mention?.field_value || '';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-grow">
+          <div className="container mx-auto px-4 py-12">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+              <p>Chargement des mentions légales...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
@@ -10,14 +36,14 @@ const MentionsLegales = () => {
             <section>
               <h2 className="text-xl font-semibold text-dk-navy mb-4">Informations légales</h2>
               <div className="space-y-2">
-                <p><strong>Raison sociale :</strong> DK AUTOMOTIVE</p>
-                <p><strong>Forme juridique :</strong> Association</p>
-                <p><strong>Capital social :</strong> </p>
-                <p><strong>Numéro d'immatriculation :</strong> 93480596100018</p>
-                <p><strong>Siège social :</strong> 19 RUE DE BRESSE 93000 BOBIGNY</p>
-                <p><strong>Téléphone :</strong> </p>
-                <p><strong>Email :</strong> contact@dkautomotive.fr</p>
-                <p><strong>Directeur de la publication :</strong> CarXprtz, 9 rue des colonnes, 75002 PARIS</p>
+                <p><strong>Raison sociale :</strong> {getLegalMentionValue('raison_sociale')}</p>
+                <p><strong>Forme juridique :</strong> {getLegalMentionValue('forme_juridique')}</p>
+                <p><strong>Capital social :</strong> {getLegalMentionValue('capital_social')}</p>
+                <p><strong>Numéro d'immatriculation :</strong> {getLegalMentionValue('numero_immatriculation')}</p>
+                <p><strong>Siège social :</strong> {getLegalMentionValue('siege_social')}</p>
+                <p><strong>Téléphone :</strong> {getLegalMentionValue('telephone')}</p>
+                <p><strong>Email :</strong> {getLegalMentionValue('email')}</p>
+                <p><strong>Directeur de la publication :</strong> {getLegalMentionValue('directeur_publication')}</p>
               </div>
             </section>
 
@@ -25,7 +51,7 @@ const MentionsLegales = () => {
 
             <section>
               <h2 className="text-xl font-semibold text-dk-navy mb-4">Hébergement du site</h2>
-              <p>Le site internet de DK AUTOMOTIVE est hébergé par IONOS, dont le siège social est situé à 7, place de la Gare BP 70109 57200 Sarreguemines Cedex France et joignable par téléphone au +33 9 70 80 89 11.</p>
+              <p>Le site internet de DK AUTOMOTIVE est hébergé par IONOS, dont le siège social est situé à 7, place de la Gare BP 70109 57200 Sarreguemines Cedex France et joignable par téléphone au +33 9 70 80 89 11.</p>
             </section>
 
             <Separator />
@@ -67,4 +93,5 @@ const MentionsLegales = () => {
       </main>
     </div>;
 };
+
 export default MentionsLegales;

@@ -39,6 +39,39 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_mentions: {
+        Row: {
+          created_at: string
+          display_order: number
+          field_key: string
+          field_label: string
+          field_value: string | null
+          id: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          field_key: string
+          field_label: string
+          field_value?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          field_key?: string
+          field_label?: string
+          field_value?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       page_contents: {
         Row: {
           block_key: string
