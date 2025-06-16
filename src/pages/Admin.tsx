@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,7 @@ import PrivacyPolicyEditor from '@/components/admin/PrivacyPolicyEditor';
 import CookieManagementEditor from '@/components/admin/CookieManagementEditor';
 import CgvEditor from '@/components/admin/CgvEditor';
 import CguEditor from '@/components/admin/CguEditor';
+import ProfessionalSpaceEditor from '@/components/admin/ProfessionalSpaceEditor';
 
 const Admin = () => {
   const [email, setEmail] = useState('');
@@ -225,18 +225,7 @@ const Admin = () => {
         {activeTab === 'gestion-cookies' && <CookieManagementEditor />}
         {activeTab === 'cgv' && <CgvEditor />}
         {activeTab === 'cgu' && <CguEditor />}
-        {activeTab === 'espace-professionnel' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold text-gray-600 mb-2">
-                Section en cours de développement
-              </h2>
-              <p className="text-gray-500">
-                L'édition de la section "espace-professionnel" sera bientôt disponible.
-              </p>
-            </div>
-          </div>
-        )}
+        {activeTab === 'espace-professionnel' && <ProfessionalSpaceEditor />}
       </main>
     </div>;
 };

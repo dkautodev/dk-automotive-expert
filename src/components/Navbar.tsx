@@ -1,11 +1,18 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useProfessionalSpaceSettings } from "@/hooks/useProfessionalSpaceSettings";
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { getProfessionalSpaceUrl } = useProfessionalSpaceSettings();
+  
   const isActive = (path: string) => location.pathname === path;
+  const professionalSpaceUrl = getProfessionalSpaceUrl();
+  
   const navItems = [{
     path: "/",
     label: "Accueil"
@@ -19,6 +26,7 @@ const Navbar = () => {
     path: "/faq",
     label: "FAQ"
   }];
+
   return <>
       {/* TOPBAR */}
       <div className="fixed top-0 left-0 right-0 z-[55] bg-[#18257D] h-[34px] flex items-center">
@@ -60,7 +68,7 @@ const Navbar = () => {
                 </Link>)}
 
               {/* Bouton Espace professionnel */}
-              <a href="https://app-private.dkautomotive.fr" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors">
+              <a href={professionalSpaceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors">
                 <User className="w-4 h-4 text-white" />
                 Espace professionnel
               </a>
@@ -82,7 +90,7 @@ const Navbar = () => {
                   </Link>)}
 
                 {/* Bouton Espace professionnel pour mobile */}
-                <a href="https://app-private.dkautomotive.fr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <a href={professionalSpaceUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors" onClick={() => setIsMenuOpen(false)}>
                   <User className="w-4 h-4 text-white" />
                   Espace professionnel
                 </a>
@@ -92,4 +100,5 @@ const Navbar = () => {
       </nav>
     </>;
 };
+
 export default Navbar;
