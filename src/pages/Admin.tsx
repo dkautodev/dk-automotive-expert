@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,13 +51,13 @@ const Admin = () => {
   ];
 
   const getStatusBadge = (status: string) => {
-    const variants = {
+    const variants: Record<string, "secondary" | "default" | "outline" | "destructive"> = {
       'En attente': 'secondary',
-      'Accepté': 'success',
+      'Accepté': 'default',
       'En cours': 'default',
       'Terminé': 'outline'
     };
-    return <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>{status}</Badge>;
+    return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
   };
 
   // Page de connexion
