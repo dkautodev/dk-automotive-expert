@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { useLegalMentions } from '@/hooks/useLegalMentions';
 import { Save, Loader2 } from 'lucide-react';
 
@@ -52,6 +54,28 @@ const LegalMentionsEditor = () => {
     return editedValues[fieldKey] !== undefined;
   };
 
+  // Group mentions by sections (titre/contenu pairs)
+  const groupedMentions = () => {
+    const basicFields = legalMentions.filter(item => 
+      !item.field_key.includes('_titre') && !item.field_key.includes('_contenu')
+    );
+
+    const sections = [
+      { key: 'hebergement', label: 'Hébergement' },
+      { key: 'propriete_intellectuelle', label: 'Propriété intellectuelle' },
+      { key: 'responsabilite', label: 'Responsabilité' },
+      { key: 'protection_donnees', label: 'Protection des données' },
+      { key: 'liens_hypertextes', label: 'Liens hypertextes' },
+      { key: 'cookies', label: 'Cookies' }
+    ].map(section => {
+      const titre = legalMentions.find(item => item.field_key === `${section.key}_titre`);
+      const contenu = legalMentions.find(item => item.field_key === `${section.key}_contenu`);
+      return { ...section, titre, contenu };
+    }).filter(section => section.titre && section.contenu);
+
+    return { basicFields, sections };
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,6 +86,8 @@ const LegalMentionsEditor = () => {
       </div>
     );
   }
+
+  const { basicFields, sections } = groupedMentions();
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,43 +100,130 @@ const LegalMentionsEditor = () => {
             Modifiez les informations légales de votre entreprise
           </p>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {legalMentions.map((item) => (
-              <div key={item.id} className="space-y-2">
-                <Label htmlFor={item.field_key} className="text-sm font-medium">
-                  {item.field_label}
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id={item.field_key}
-                    type="text"
-                    value={getCurrentValue(item)}
-                    onChange={(e) => handleValueChange(item.field_key, e.target.value)}
-                    placeholder={`Entrez ${item.field_label.toLowerCase()}...`}
-                    className="flex-1"
-                  />
-                  {hasChanges(item.field_key) && (
-                    <Button
-                      onClick={() => handleSave(item.id, item.field_key)}
-                      disabled={savingItems.has(item.id)}
-                      size="sm"
-                      className="bg-dk-navy hover:bg-dk-blue"
-                    >
-                      {savingItems.has(item.id) ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-2" />
-                          Sauvegarder
-                        </>
-                      )}
-                    </Button>
-                  )}
+        <CardContent className="space-y-8">
+          
+          {/* Informations de base */}
+          <div>
+            <h3 className="text-lg font-medium text-dk-navy mb-4">Informations légales de base</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {basicFields.map((item) => (
+                <div key={item.id} className="space-y-2">
+                  <Label htmlFor={item.field_key} className="text-sm font-medium">
+                    {item.field_label}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id={item.field_key}
+                      type="text"
+                      value={getCurrentValue(item)}
+                      onChange={(e) => handleValueChange(item.field_key, e.target.value)}
+                      placeholder={`Entrez ${item.field_label.toLowerCase()}...`}
+                      className="flex-1"
+                    />
+                    {hasChanges(item.field_key) && (
+                      <Button
+                        onClick={() => handleSave(item.id, item.field_key)}
+                        disabled={savingItems.has(item.id)}
+                        size="sm"
+                        className="bg-dk-navy hover:bg-dk-blue"
+                      >
+                        {savingItems.has(item.id) ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-2" />
+                            Sauvegarder
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          <Separator />
+
+          {/* Sections avec titre et contenu */}
+          {sections.map((section) => (
+            <div key={section.key} className="space-y-4">
+              <h3 className="text-lg font-medium text-dk-navy">{section.label}</h3>
+              
+              {/* Titre de la section */}
+              {section.titre && (
+                <div className="space-y-2">
+                  <Label htmlFor={section.titre.field_key} className="text-sm font-medium">
+                    {section.titre.field_label}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id={section.titre.field_key}
+                      type="text"
+                      value={getCurrentValue(section.titre)}
+                      onChange={(e) => handleValueChange(section.titre.field_key, e.target.value)}
+                      placeholder={`Entrez ${section.titre.field_label.toLowerCase()}...`}
+                      className="flex-1"
+                    />
+                    {hasChanges(section.titre.field_key) && (
+                      <Button
+                        onClick={() => handleSave(section.titre.id, section.titre.field_key)}
+                        disabled={savingItems.has(section.titre.id)}
+                        size="sm"
+                        className="bg-dk-navy hover:bg-dk-blue"
+                      >
+                        {savingItems.has(section.titre.id) ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-2" />
+                            Sauvegarder
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Contenu de la section */}
+              {section.contenu && (
+                <div className="space-y-2">
+                  <Label htmlFor={section.contenu.field_key} className="text-sm font-medium">
+                    {section.contenu.field_label}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Textarea
+                      id={section.contenu.field_key}
+                      value={getCurrentValue(section.contenu)}
+                      onChange={(e) => handleValueChange(section.contenu.field_key, e.target.value)}
+                      placeholder={`Entrez ${section.contenu.field_label.toLowerCase()}...`}
+                      className="flex-1 min-h-[100px]"
+                    />
+                    {hasChanges(section.contenu.field_key) && (
+                      <Button
+                        onClick={() => handleSave(section.contenu.id, section.contenu.field_key)}
+                        disabled={savingItems.has(section.contenu.id)}
+                        size="sm"
+                        className="bg-dk-navy hover:bg-dk-blue self-start"
+                      >
+                        {savingItems.has(section.contenu.id) ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-2" />
+                            Sauvegarder
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {section.key !== 'cookies' && <Separator />}
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>
