@@ -79,7 +79,7 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link to="/cookies" className="hover:text-gray-300 transition">
+              <Link to="/gestion-cookies" className="hover:text-gray-300 transition">
                 Gestion des cookies
               </Link>
             </li>
