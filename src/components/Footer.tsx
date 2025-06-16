@@ -96,15 +96,9 @@ const Footer = () => {
       </div>
       
       <div className="mt-12 text-center text-sm">
-        <Link 
-          to="/admin"
-          className="inline-flex items-center justify-center space-x-2 text-inherit hover:underline focus:outline-none focus:ring-2 focus:ring-white/60 transition"
-          title="Accéder à l'administration"
-        >
-          <span>
-            {`© ${new Date().getFullYear()} DK AUTOMOTIVE. Tous droits réservés`}
-          </span>
-        </Link>
+        <span>
+          {`© ${new Date().getFullYear()} DK AUTOMOTIVE. Tous droits réservés`}
+        </span>
       </div>
     </div>
   </footer>;
