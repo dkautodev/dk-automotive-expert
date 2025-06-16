@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { User, Lock, LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie } from 'lucide-react';
 import IndexPageEditor from '@/components/admin/IndexPageEditor';
+import FaqEditor from '@/components/admin/FaqEditor';
 
 const Admin = () => {
   const [email, setEmail] = useState('');
@@ -212,7 +214,8 @@ const Admin = () => {
       {/* Main Content */}
       <main className="py-8">
         {activeTab === 'accueil' && <IndexPageEditor />}
-        {activeTab !== 'accueil' && (
+        {activeTab === 'faq' && <FaqEditor />}
+        {activeTab !== 'accueil' && activeTab !== 'faq' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-12">
               <h2 className="text-xl font-semibold text-gray-600 mb-2">
