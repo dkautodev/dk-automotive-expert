@@ -87,6 +87,7 @@ const IndexPageEditor = () => {
 
     if (isEditing) {
       const hasTitle = 'title' in currentValue;
+      const hasSubtitle = 'subtitle' in currentValue;
       const hasDescription = 'description' in currentValue;
       const hasContent = 'content' in currentValue;
       const hasText = 'text' in currentValue;
@@ -101,6 +102,18 @@ const IndexPageEditor = () => {
                 onChange={(e) => setEditValues({
                   ...editValues,
                   [content.block_key]: { ...currentValue, title: e.target.value }
+                })}
+              />
+            </div>
+          )}
+          {hasSubtitle && (
+            <div>
+              <Label>Sous-titre</Label>
+              <Input
+                value={currentValue.subtitle || ''}
+                onChange={(e) => setEditValues({
+                  ...editValues,
+                  [content.block_key]: { ...currentValue, subtitle: e.target.value }
                 })}
               />
             </div>
@@ -169,6 +182,12 @@ const IndexPageEditor = () => {
             <p className="text-sm">{currentValue.title}</p>
           </div>
         )}
+        {'subtitle' in currentValue && (
+          <div>
+            <Label className="text-sm font-medium text-gray-600">Sous-titre:</Label>
+            <p className="text-sm">{currentValue.subtitle}</p>
+          </div>
+        )}
         {'description' in currentValue && (
           <div>
             <Label className="text-sm font-medium text-gray-600">Description:</Label>
@@ -202,8 +221,11 @@ const IndexPageEditor = () => {
   const groupedContents = {
     hero: contents.filter(c => c.block_key.startsWith('hero')),
     trust_points: contents.filter(c => c.block_key.startsWith('trust_point')),
+    trust_section: contents.filter(c => c.block_key.startsWith('trust_section')),
     sections: contents.filter(c => c.block_key.startsWith('section_')),
-    steps: contents.filter(c => c.block_key.startsWith('step_'))
+    engagement: contents.filter(c => c.block_key.startsWith('engagement')),
+    steps: contents.filter(c => c.block_key.startsWith('step_')),
+    how_it_works: contents.filter(c => c.block_key.startsWith('how_it_works'))
   };
 
   if (isLoading) {
@@ -251,6 +273,25 @@ const IndexPageEditor = () => {
         </CardContent>
       </Card>
 
+      {/* Section de confiance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section "Faites confiance à DK Automotive"</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.trust_section.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') ? 'Titre' : 
+                 content.block_key.includes('subtitle') ? 'Sous-titre' : 'Description'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
       {/* Sections principales */}
       <Card>
         <CardHeader>
@@ -272,7 +313,11 @@ const IndexPageEditor = () => {
                     <div key={content.id}>
                       <h5 className="font-medium mb-3">
                         {content.block_key.includes('title') ? 'Titre' : 
-                         content.block_key.includes('content') ? 'Contenu' : 'Image'}
+                         content.block_key.includes('content') ? 'Contenu' : 
+                         content.block_key.includes('subtitle') ? 'Sous-titre' :
+                         content.block_key.includes('image') ? 'Image' :
+                         content.block_key.includes('point') ? `Point ${content.block_key.slice(-1)}` :
+                         content.block_key.includes('cta') ? 'Call-to-Action' : 'Contenu'}
                       </h5>
                       {renderEditField(content)}
                     </div>
@@ -284,12 +329,55 @@ const IndexPageEditor = () => {
         </CardContent>
       </Card>
 
+      {/* Section engagement */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section "Votre confiance, notre engagement"</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.engagement.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') && !content.block_key.includes('card') ? 'Titre principal' :
+                 content.block_key.includes('subtitle') ? 'Sous-titre' :
+                 content.block_key.includes('card_1') ? 'Carte 1 - Fiabilité' :
+                 content.block_key.includes('card_2') ? 'Carte 2 - Expertise' :
+                 content.block_key.includes('card_3') ? 'Carte 3 - Satisfaction' : 'Contenu'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
       {/* Étapes du processus */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Étapes du processus (Comment ça marche)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
+          {/* Titre et sous-titre de la section */}
+          <div className="border rounded-lg p-4">
+            <h4 className="font-semibold mb-4 text-dk-navy">
+              Titre de la section
+            </h4>
+            <div className="space-y-6">
+              {groupedContents.how_it_works.map((content) => (
+                <div key={content.id}>
+                  <h5 className="font-medium mb-3">
+                    {content.block_key.includes('title') && !content.block_key.includes('cta') ? 'Titre principal' :
+                     content.block_key.includes('subtitle') ? 'Sous-titre' :
+                     content.block_key.includes('cta_title') ? 'Titre CTA' :
+                     content.block_key.includes('cta_button') ? 'Texte bouton CTA' : 'Contenu'}
+                  </h5>
+                  {renderEditField(content)}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Étapes individuelles */}
           {[1, 2, 3].map((stepNum) => {
             const stepContents = groupedContents.steps.filter(c => 
               c.block_key.includes(`step_${stepNum}`)
