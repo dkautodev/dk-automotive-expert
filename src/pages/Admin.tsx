@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User } from 'lucide-react';
+import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import IndexPageEditor from '@/components/admin/IndexPageEditor';
@@ -13,6 +13,8 @@ import CookieManagementEditor from '@/components/admin/CookieManagementEditor';
 import CgvEditor from '@/components/admin/CgvEditor';
 import CguEditor from '@/components/admin/CguEditor';
 import ProfessionalSpaceEditor from '@/components/admin/ProfessionalSpaceEditor';
+import LogoEditor from '@/components/admin/LogoEditor';
+import PasswordEditor from '@/components/admin/PasswordEditor';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('accueil');
@@ -146,6 +148,14 @@ const Admin = () => {
                 id: 'espace-professionnel',
                 label: 'Espace professionnel',
                 icon: User
+              }, {
+                id: 'logo',
+                label: 'Logo',
+                icon: Image
+              }, {
+                id: 'mot-de-passe',
+                label: 'Mot de passe',
+                icon: Lock
               }].map(tab => (
                 <button 
                   key={tab.id} 
@@ -174,6 +184,8 @@ const Admin = () => {
           {activeTab === 'cgv' && <CgvEditor />}
           {activeTab === 'cgu' && <CguEditor />}
           {activeTab === 'espace-professionnel' && <ProfessionalSpaceEditor />}
+          {activeTab === 'logo' && <LogoEditor />}
+          {activeTab === 'mot-de-passe' && <PasswordEditor />}
         </main>
       </div>
     </ProtectedRoute>
