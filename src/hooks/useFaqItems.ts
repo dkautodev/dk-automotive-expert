@@ -57,7 +57,11 @@ export const useFaqItems = () => {
 
       if (error) {
         console.error('Error creating FAQ item:', error);
-        toast.error('Erreur lors de la création de la FAQ');
+        if (error.message?.includes('row-level security')) {
+          toast.error('Vous devez être administrateur pour créer des FAQ');
+        } else {
+          toast.error('Erreur lors de la création de la FAQ');
+        }
         return false;
       }
 
@@ -80,7 +84,11 @@ export const useFaqItems = () => {
 
       if (error) {
         console.error('Error updating FAQ item:', error);
-        toast.error('Erreur lors de la mise à jour de la FAQ');
+        if (error.message?.includes('row-level security')) {
+          toast.error('Vous devez être administrateur pour modifier des FAQ');
+        } else {
+          toast.error('Erreur lors de la mise à jour de la FAQ');
+        }
         return false;
       }
 
@@ -107,7 +115,11 @@ export const useFaqItems = () => {
 
       if (error) {
         console.error('Error deleting FAQ item:', error);
-        toast.error('Erreur lors de la suppression de la FAQ');
+        if (error.message?.includes('row-level security')) {
+          toast.error('Vous devez être administrateur pour supprimer des FAQ');
+        } else {
+          toast.error('Erreur lors de la suppression de la FAQ');
+        }
         return false;
       }
 
@@ -136,7 +148,12 @@ export const useFaqItems = () => {
 
       if (hasError) {
         console.error('Error reordering FAQ items');
-        toast.error('Erreur lors du réordonnancement des FAQ');
+        const firstError = results.find(result => result.error)?.error;
+        if (firstError?.message?.includes('row-level security')) {
+          toast.error('Vous devez être administrateur pour réorganiser les FAQ');
+        } else {
+          toast.error('Erreur lors du réordonnancement des FAQ');
+        }
         return false;
       }
 

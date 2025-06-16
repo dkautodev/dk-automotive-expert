@@ -27,7 +27,10 @@ export const usePageContents = (pageSlug: string) => {
         .eq('is_active', true)
         .order('display_order');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur lors du chargement des contenus:', error);
+        throw error;
+      }
       
       // Type assertion pour s'assurer que block_type correspond à nos types attendus
       const typedData: PageContent[] = (data || []).map(item => ({
@@ -51,18 +54,28 @@ export const usePageContents = (pageSlug: string) => {
         .update(updates)
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur lors de la mise à jour:', error);
+        throw error;
+      }
       
       await fetchContents();
       toast.success('Contenu mis à jour avec succès');
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
-      toast.error('Erreur lors de la mise à jour');
+      if (error.message?.includes('row-level security')) {
+        toast.error('Vous devez être administrateur pour effectuer cette modification');
+      } else {
+        toast.error('Erreur lors de la mise à jour');
+      }
     }
   };
 
   const uploadImage = async (file: File, blockKey: string) => {
     try {
+      // First ensure the bucket exists by calling our setup function
+      await fetch('/api/setup-storage', { method: 'POST' });
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${pageSlug}/${blockKey}-${Date.now()}.${fileExt}`;
       
@@ -70,7 +83,10 @@ export const usePageContents = (pageSlug: string) => {
         .from('page-images')
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Erreur lors de l\'upload:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('page-images')
@@ -79,7 +95,11 @@ export const usePageContents = (pageSlug: string) => {
       return publicUrl;
     } catch (error) {
       console.error('Erreur lors de l\'upload:', error);
-      toast.error('Erreur lors de l\'upload de l\'image');
+      if (error.message?.includes('row-level security')) {
+        toast.error('Vous devez être administrateur pour uploader des images');
+      } else {
+        toast.error('Erreur lors de l\'upload de l\'image');
+      }
       return null;
     }
   };
