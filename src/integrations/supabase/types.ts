@@ -19,6 +19,7 @@ export type Database = {
           section_key: string
           section_title: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -29,6 +30,7 @@ export type Database = {
           section_key: string
           section_title: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -39,6 +41,7 @@ export type Database = {
           section_key?: string
           section_title?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -52,6 +55,7 @@ export type Database = {
           section_key: string
           section_title: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -62,6 +66,7 @@ export type Database = {
           section_key: string
           section_title: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -72,6 +77,7 @@ export type Database = {
           section_key?: string
           section_title?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -120,6 +126,7 @@ export type Database = {
           is_active: boolean
           question: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           answer: string
@@ -129,6 +136,7 @@ export type Database = {
           is_active?: boolean
           question: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           answer?: string
@@ -138,6 +146,7 @@ export type Database = {
           is_active?: boolean
           question?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -151,6 +160,7 @@ export type Database = {
           id: string
           is_active: boolean
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -161,6 +171,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -171,6 +182,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -271,6 +283,7 @@ export type Database = {
           section_key: string
           section_title: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -281,6 +294,7 @@ export type Database = {
           section_key: string
           section_title: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -291,6 +305,7 @@ export type Database = {
           section_key?: string
           section_title?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -303,6 +318,7 @@ export type Database = {
           setting_label: string
           setting_value: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -312,6 +328,7 @@ export type Database = {
           setting_label: string
           setting_value?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -321,6 +338,7 @@ export type Database = {
           setting_label?: string
           setting_value?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -331,6 +349,7 @@ export type Database = {
           id: string
           role: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
@@ -338,6 +357,7 @@ export type Database = {
           id: string
           role?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
@@ -345,6 +365,7 @@ export type Database = {
           id?: string
           role?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
