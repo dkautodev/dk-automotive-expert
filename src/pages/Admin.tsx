@@ -10,6 +10,7 @@ import { User, Lock, LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, H
 import IndexPageEditor from '@/components/admin/IndexPageEditor';
 import FaqEditor from '@/components/admin/FaqEditor';
 import LegalMentionsEditor from '@/components/admin/LegalMentionsEditor';
+import PrivacyPolicyEditor from '@/components/admin/PrivacyPolicyEditor';
 
 const Admin = () => {
   const [email, setEmail] = useState('');
@@ -217,7 +218,8 @@ const Admin = () => {
         {activeTab === 'accueil' && <IndexPageEditor />}
         {activeTab === 'faq' && <FaqEditor />}
         {activeTab === 'mentions-legales' && <LegalMentionsEditor />}
-        {activeTab !== 'accueil' && activeTab !== 'faq' && activeTab !== 'mentions-legales' && (
+        {activeTab === 'politique-confidentialite' && <PrivacyPolicyEditor />}
+        {activeTab !== 'accueil' && activeTab !== 'faq' && activeTab !== 'mentions-legales' && activeTab !== 'politique-confidentialite' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-12">
               <h2 className="text-xl font-semibold text-gray-600 mb-2">

@@ -159,6 +159,39 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_policy: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          section_content: string | null
+          section_key: string
+          section_title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key: string
+          section_title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key?: string
+          section_title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
