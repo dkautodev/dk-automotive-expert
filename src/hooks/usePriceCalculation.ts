@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { externalSupabase } from '@/lib/externalSupabase';
 import { toast } from 'sonner';
 
 interface PriceCalculationResult {
@@ -22,9 +22,9 @@ export const usePriceCalculation = () => {
       // Debug : affichage des arguments
       console.log('[CALCUL PRIX] Appel avec: distance', distance, ', vehicleType', vehicleType);
 
-      // Fetch la meilleure grille tarifaire
-      const { data: pricingData, error } = await supabase
-        .from('pricing_grids_public')
+      // Fetch la meilleure grille tarifaire depuis la base externe
+      const { data: pricingData, error } = await externalSupabase
+        .from('pricing_grids')
         .select('*')
         .eq('vehicle_category', vehicleType)
         .eq('active', true)
@@ -34,11 +34,11 @@ export const usePriceCalculation = () => {
         .maybeSingle();
 
       // Affichage debug
-      console.log('[CALCUL PRIX] Résultat grille:', pricingData, error);
+      console.log('[CALCUL PRIX] Résultat grille externe:', pricingData, error);
 
       // Si pas de grille trouvée => taux par km (fallback)
       if (error || !pricingData) {
-        console.log('Aucune grille tarifaire trouvée, utilisation du tarif au km');
+        console.log('Aucune grille tarifaire trouvée dans la base externe, utilisation du tarif au km');
         const baseRatePerKm = getBaseRatePerKm(vehicleType);
         const priceHT = distance * baseRatePerKm;
         const priceTTC = priceHT * 1.2;
@@ -76,9 +76,21 @@ export const usePriceCalculation = () => {
       };
 
     } catch (error) {
-      console.error('Erreur lors du calcul du prix:', error);
-      toast.error('Erreur lors du calcul du prix');
-      return null;
+      console.error('Erreur lors du calcul du prix avec la base externe:', error);
+      
+      // Fallback : utiliser le système de calcul local
+      console.log('Fallback vers le calcul local');
+      const baseRatePerKm = getBaseRatePerKm(vehicleType);
+      const priceHT = distance * baseRatePerKm;
+      const priceTTC = priceHT * 1.2;
+      
+      toast.error('Problème de connexion à la grille tarifaire, calcul avec tarifs de base');
+      
+      return {
+        priceHT: priceHT.toFixed(2),
+        priceTTC: priceTTC.toFixed(2),
+        isPerKm: true
+      };
     } finally {
       setIsCalculating(false);
     }
@@ -90,7 +102,7 @@ export const usePriceCalculation = () => {
   };
 };
 
-// Tarifs de base fallback au km si aucune grille
+// Tarifs de base fallback au km si la base externe n'est pas disponible
 const getBaseRatePerKm = (vehicleType: string): number => {
   const rates: Record<string, number> = {
     'citadine': 0.73,
