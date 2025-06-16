@@ -1,0 +1,15 @@
+
+-- Ajouter les paragraphes manquants des mentions légales
+INSERT INTO public.legal_mentions (field_key, field_label, field_value, display_order) VALUES
+('hebergement_titre', 'Titre - Hébergement', 'Hébergement du site', 9),
+('hebergement_contenu', 'Contenu - Hébergement', 'Le site internet de DK AUTOMOTIVE est hébergé par IONOS, dont le siège social est situé à 7, place de la Gare BP 70109 57200 Sarreguemines Cedex France et joignable par téléphone au +33 9 70 80 89 11.', 10),
+('propriete_intellectuelle_titre', 'Titre - Propriété intellectuelle', 'Propriété intellectuelle', 11),
+('propriete_intellectuelle_contenu', 'Contenu - Propriété intellectuelle', 'L''ensemble des contenus du site (textes, logos, images, éléments graphiques, icônes, vidéos, etc.) sont la propriété exclusive de DK AUTOMOTIVE ou de leurs auteurs respectifs. Toute reproduction, représentation, modification, publication ou adaptation des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans l''autorisation écrite préalable de DK AUTOMOTIVE.', 12),
+('responsabilite_titre', 'Titre - Responsabilité', 'Responsabilité', 13),
+('responsabilite_contenu', 'Contenu - Responsabilité', 'DK AUTOMOTIVE s''efforce de fournir des informations aussi précises que possible sur son site internet. Toutefois, la société ne pourra être tenue responsable des omissions, des inexactitudes et des carences dans la mise à jour des informations fournies, qu''elles soient de son fait ou du fait des tiers partenaires qui lui fournissent ces informations.', 14),
+('protection_donnees_titre', 'Titre - Protection des données', 'Protection des données personnelles', 15),
+('protection_donnees_contenu', 'Contenu - Protection des données', 'DK AUTOMOTIVE s''engage à préserver la confidentialité des informations fournies en ligne par l''utilisateur. Conformément à la loi « Informatique et Libertés » du 6 janvier 1978 modifiée et au Règlement général sur la protection des données (RGPD), l''utilisateur dispose d''un droit d''accès, de rectification, de suppression et d''opposition sur ses données personnelles. Pour exercer ces droits, l''utilisateur peut contacter DK AUTOMOTIVE à l''adresse email mentionnée ci-dessus.', 16),
+('liens_hypertextes_titre', 'Titre - Liens hypertextes', 'Liens hypertextes', 17),
+('liens_hypertextes_contenu', 'Contenu - Liens hypertextes', 'La mise en place de liens hypertextes en direction d''autres sites internet n''engage pas la responsabilité de DK AUTOMOTIVE quant au contenu de ces sites. L''établissement de liens vers le site de DK AUTOMOTIVE nécessite une autorisation préalable et écrite de la société.', 18),
+('cookies_titre', 'Titre - Cookies', 'Cookies', 19),
+('cookies_contenu', 'Contenu - Cookies', 'Le site de DK AUTOMOTIVE utilise des cookies pour améliorer l''expérience utilisateur et réaliser des statistiques de visite. En poursuivant la navigation sur le site, l''utilisateur accepte l''utilisation de cookies. L''utilisateur peut également configurer son navigateur pour refuser les cookies.', 20);
