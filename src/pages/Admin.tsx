@@ -6,12 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { User, Lock, LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie } from 'lucide-react';
+import IndexPageEditor from '@/components/admin/IndexPageEditor';
+
 const Admin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('accueil');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -30,6 +33,7 @@ const Admin = () => {
       setPassword('');
     }, 1000);
   };
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     setActiveTab('accueil');
@@ -206,7 +210,22 @@ const Admin = () => {
       </nav>
 
       {/* Main Content */}
-      
+      <main className="py-8">
+        {activeTab === 'accueil' && <IndexPageEditor />}
+        {activeTab !== 'accueil' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-600 mb-2">
+                Section en cours de développement
+              </h2>
+              <p className="text-gray-500">
+                L'édition de la section "{activeTab}" sera bientôt disponible.
+              </p>
+            </div>
+          </div>
+        )}
+      </main>
     </div>;
 };
+
 export default Admin;

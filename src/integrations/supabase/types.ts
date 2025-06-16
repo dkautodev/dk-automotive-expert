@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      page_contents: {
+        Row: {
+          block_key: string
+          block_type: string
+          content_json: Json | null
+          content_value: string | null
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          page_slug: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          block_key: string
+          block_type: string
+          content_json?: Json | null
+          content_value?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          page_slug: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          block_key?: string
+          block_type?: string
+          content_json?: Json | null
+          content_value?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          page_slug?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       pricing_grids_public: {
         Row: {
           active: boolean | null
