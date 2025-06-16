@@ -9,6 +9,105 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cgu_content: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          section_content: string | null
+          section_key: string
+          section_title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key: string
+          section_title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key?: string
+          section_title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cgv_content: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          section_content: string | null
+          section_key: string
+          section_title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key: string
+          section_title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key?: string
+          section_title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cookie_management: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          section_content: string | null
+          section_key: string
+          section_title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key: string
+          section_title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          section_content?: string | null
+          section_key?: string
+          section_title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       faq_items: {
         Row: {
           answer: string

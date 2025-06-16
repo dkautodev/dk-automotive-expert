@@ -1,53 +1,78 @@
 
 import React from 'react';
+import { Separator } from "@/components/ui/separator";
+import { useCookieManagement } from '@/hooks/useCookieManagement';
+import { Loader2 } from 'lucide-react';
 
 const GestionCookies = () => {
-  return (
-    <div className="container mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold text-dk-navy mb-8">Gestion des Cookies</h1>
-      
-      <div className="prose max-w-none space-y-6">
-        <section>
-          <h2 className="text-2xl font-semibold text-dk-navy mb-4">Qu'est-ce qu'un cookie ?</h2>
-          <p>
-            Un cookie est un petit fichier texte déposé sur votre terminal (ordinateur, tablette, smartphone) 
-            lors de la visite d'un site internet. Il permet de reconnaître votre navigateur et de conserver 
-            certaines informations vous concernant.
-          </p>
-        </section>
+  const { cookieManagementSections, isLoading } = useCookieManagement();
 
-        <section>
-          <h2 className="text-2xl font-semibold text-dk-navy mb-4">Utilisation des cookies sur notre site</h2>
-          <p>
-            Notre site utilise des cookies pour améliorer votre expérience de navigation et analyser 
-            l'utilisation de notre site. Ces cookies nous permettent de :
-          </p>
-          <ul className="list-disc pl-6 mt-2">
-            <li>Mémoriser vos préférences de navigation</li>
-            <li>Analyser le trafic et l'utilisation de notre site</li>
-            <li>Améliorer nos services</li>
-          </ul>
-        </section>
+  const getCookieManagementSection = (sectionKey: string) => {
+    const section = cookieManagementSections.find(item => item.section_key === sectionKey);
+    return section?.section_content || '';
+  };
 
-        <section>
-          <h2 className="text-2xl font-semibold text-dk-navy mb-4">Gestion de vos cookies</h2>
-          <p>
-            Vous pouvez à tout moment modifier vos préférences concernant les cookies via les paramètres 
-            de votre navigateur. Pour plus d'informations sur la gestion des cookies, consultez l'aide 
-            de votre navigateur.
-          </p>
-        </section>
+  const getSectionTitle = (sectionKey: string) => {
+    const section = cookieManagementSections.find(item => item.section_key === sectionKey);
+    return section?.section_title || '';
+  };
 
-        <section>
-          <h2 className="text-2xl font-semibold text-dk-navy mb-4">Contact</h2>
-          <p>
-            Pour toute question concernant notre politique de cookies, contactez-nous à : 
-            <a href="mailto:dkautomotive70@gmail.com" className="text-blue-600 hover:underline ml-1">
-              dkautomotive70@gmail.com
-            </a>
-          </p>
-        </section>
+  const renderSection = (sectionKey: string) => {
+    const title = getSectionTitle(sectionKey);
+    const content = getCookieManagementSection(sectionKey);
+    
+    if (!title && !content) return null;
+    
+    return (
+      <section className="mb-8">
+        {title && <h2 className="text-xl font-semibold text-dk-navy mb-4">{title}</h2>}
+        {content && (
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{content}</p>
+          </div>
+        )}
+      </section>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-grow">
+          <div className="container mx-auto px-4 py-12">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+              <p>Chargement de la gestion des cookies...</p>
+            </div>
+          </div>
+        </main>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 py-12">
+          <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Gestion des Cookies</h1>
+          
+          <div className="max-w-4xl mx-auto space-y-8">
+            {renderSection('introduction')}
+
+            <Separator />
+
+            {renderSection('utilisation')}
+
+            <Separator />
+
+            {renderSection('gestion')}
+
+            <Separator />
+
+            {renderSection('contact')}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
