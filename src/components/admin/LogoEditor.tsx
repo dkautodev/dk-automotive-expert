@@ -11,10 +11,16 @@ const LogoEditor = () => {
   const { contents, isLoading, updateContent, uploadImage, refetch } = usePageContents('navbar');
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
+  const [selectedFaviconFile, setSelectedFaviconFile] = useState<File | null>(null);
 
   // Find the logo content block
   const logoContent = contents.find(item => item.block_key === 'logo');
   const currentLogoUrl = logoContent?.content_value || '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+  
+  // Find the favicon content block
+  const faviconContent = contents.find(item => item.block_key === 'favicon');
+  const currentFaviconUrl = faviconContent?.content_value || '/lovable-uploads/7e8b2843-fdee-4445-992b-9078e0228e73.png';
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,6 +38,25 @@ const LogoEditor = () => {
       }
       
       setSelectedFile(file);
+    }
+  };
+
+  const handleFaviconFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Veuillez sélectionner un fichier image');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Le fichier doit faire moins de 5MB');
+        return;
+      }
+      
+      setSelectedFaviconFile(file);
     }
   };
 
@@ -54,6 +79,40 @@ const LogoEditor = () => {
       }
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'ancien logo:', error);
+    }
+  };
+
+  const deleteOldFavicon = async (faviconUrl: string) => {
+    try {
+      // Check if the favicon is from our storage (contains 'page-images')
+      if (faviconUrl && faviconUrl.includes('page-images')) {
+        const fileName = faviconUrl.split('page-images/')[1];
+        if (fileName) {
+          const { error: deleteError } = await supabase.storage
+            .from('page-images')
+            .remove([fileName]);
+          
+          if (deleteError) {
+            console.error('Erreur lors de la suppression de l\'ancien favicon:', deleteError);
+          } else {
+            console.log('Ancien favicon supprimé avec succès');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'ancien favicon:', error);
+    }
+  };
+
+  const updateFaviconInHtml = (faviconUrl: string) => {
+    try {
+      // Update the favicon link in the document head
+      const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+      if (faviconLink) {
+        faviconLink.href = faviconUrl;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du favicon dans le DOM:', error);
     }
   };
 
@@ -91,6 +150,62 @@ const LogoEditor = () => {
     }
   };
 
+  const handleFaviconUpload = async () => {
+    if (!selectedFaviconFile) return;
+
+    setUploadingFavicon(true);
+    try {
+      // Store the old favicon URL before uploading the new one
+      const oldFaviconUrl = currentFaviconUrl;
+      
+      const imageUrl = await uploadImage(selectedFaviconFile, 'favicon');
+      
+      if (imageUrl) {
+        if (faviconContent) {
+          // Update existing favicon content
+          await updateContent(faviconContent.id, { content_value: imageUrl });
+        } else {
+          // Create new favicon content entry if it doesn't exist
+          const { error } = await supabase
+            .from('page_contents')
+            .insert({
+              page_slug: 'navbar',
+              block_key: 'favicon',
+              block_type: 'image',
+              content_value: imageUrl,
+              display_order: 2,
+              is_active: true
+            });
+            
+          if (error) {
+            console.error('Erreur lors de la création du favicon:', error);
+            throw error;
+          }
+        }
+        
+        // Update favicon in the HTML head
+        updateFaviconInHtml(imageUrl);
+        
+        // Delete the old favicon after successful update
+        if (oldFaviconUrl && oldFaviconUrl !== imageUrl) {
+          await deleteOldFavicon(oldFaviconUrl);
+        }
+        
+        setSelectedFaviconFile(null);
+        // Refresh the contents to get the updated favicon
+        await refetch();
+        toast.success('Favicon mis à jour avec succès');
+      } else {
+        toast.error('Erreur lors de la mise à jour du favicon');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'upload du favicon:', error);
+      toast.error('Erreur lors de l\'upload du favicon');
+    } finally {
+      setUploadingFavicon(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,7 +218,9 @@ const LogoEditor = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      {/* Section Logo */}
       <Card>
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-dk-navy">
@@ -203,6 +320,109 @@ const LogoEditor = () => {
 
         </CardContent>
       </Card>
+
+      {/* Section Favicon */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-dk-navy">
+            Gestion du Favicon
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Changez l'icône qui apparaît dans l'onglet du navigateur
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          
+          {/* Favicon actuel */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-dk-navy">Favicon actuel</h3>
+            <div className="flex items-center justify-center p-8 bg-gray-50 rounded-lg border">
+              <img 
+                src={currentFaviconUrl} 
+                alt="Favicon actuel" 
+                className="w-8 h-8 object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Upload nouveau favicon */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-dk-navy">Changer le favicon</h3>
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <label htmlFor="favicon-upload" className="cursor-pointer">
+                  <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    <Upload className="w-4 h-4" />
+                    <span>Sélectionner un fichier</span>
+                  </div>
+                  <input
+                    id="favicon-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFaviconFileSelect}
+                    className="hidden"
+                  />
+                </label>
+                
+                {selectedFaviconFile && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <ImageIcon className="w-4 h-4" />
+                    <span>{selectedFaviconFile.name}</span>
+                  </div>
+                )}
+              </div>
+
+              {selectedFaviconFile && (
+                <div className="space-y-4">
+                  {/* Aperçu du nouveau favicon */}
+                  <div className="p-4 bg-gray-50 rounded-lg border">
+                    <p className="text-sm font-medium mb-2">Aperçu :</p>
+                    <div className="flex items-center justify-center p-4 bg-white rounded border">
+                      <img 
+                        src={URL.createObjectURL(selectedFaviconFile)} 
+                        alt="Aperçu du nouveau favicon" 
+                        className="w-8 h-8 object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleFaviconUpload}
+                    disabled={uploadingFavicon}
+                    className="bg-dk-navy hover:bg-dk-blue"
+                  >
+                    {uploadingFavicon ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Upload en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Sauvegarder le nouveau favicon
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>• Formats acceptés : PNG, JPG, GIF, WebP</p>
+              <p>• Taille maximale : 5MB</p>
+              <p>• Dimensions recommandées : 32x32 ou 16x16 pixels</p>
+              <p>• L'ancien favicon sera automatiquement supprimé</p>
+              <p>• Le changement sera visible immédiatement dans l'onglet</p>
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+      
     </div>
   );
 };
