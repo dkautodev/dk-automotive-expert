@@ -33,7 +33,7 @@ const FaviconSection = ({
         </div>
 
         <div className="text-sm text-gray-500">
-          <p>Le favicon est fixé sur /lovable-uploads/favicon.png</p>
+          <p>Le favicon est fixé sur /uploads/favicon.png</p>
         </div>
 
       </CardContent>
