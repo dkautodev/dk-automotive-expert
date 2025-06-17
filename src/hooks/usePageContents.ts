@@ -73,6 +73,10 @@ export const usePageContents = (pageSlug: string) => {
 
   const uploadImage = async (file: File, blockKey: string) => {
     try {
+      // Récupérer l'ancienne URL de l'image pour la supprimer
+      const currentContent = contents.find(c => c.block_key === blockKey);
+      const oldImageUrl = currentContent?.content_json?.url;
+      
       // First ensure the bucket exists by calling our setup function
       await fetch('/api/setup-storage', { method: 'POST' });
       
@@ -86,6 +90,21 @@ export const usePageContents = (pageSlug: string) => {
       if (uploadError) {
         console.error('Erreur lors de l\'upload:', uploadError);
         throw uploadError;
+      }
+
+      // Supprimer l'ancienne image si elle existe
+      if (oldImageUrl && oldImageUrl.includes('page-images')) {
+        const oldFileName = oldImageUrl.split('page-images/')[1];
+        if (oldFileName) {
+          const { error: deleteError } = await supabase.storage
+            .from('page-images')
+            .remove([oldFileName]);
+          
+          if (deleteError) {
+            console.error('Erreur lors de la suppression de l\'ancienne image:', deleteError);
+            // Ne pas bloquer le processus si la suppression échoue
+          }
+        }
       }
 
       const { data: { publicUrl } } = supabase.storage
