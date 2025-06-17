@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -108,24 +107,33 @@ const LogoEditor = () => {
     try {
       console.log('Updating favicon in HTML to:', faviconUrl);
       
-      // Remove existing favicon links
-      const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
-      existingFavicons.forEach(link => link.remove());
-      
-      // Create new favicon link
-      const faviconLink = document.createElement('link');
-      faviconLink.rel = 'icon';
-      faviconLink.type = 'image/png';
-      faviconLink.href = faviconUrl;
-      
-      // Add to document head
-      document.head.appendChild(faviconLink);
-      
-      // Force browser to reload favicon by adding a timestamp
-      const timestamp = new Date().getTime();
-      faviconLink.href = `${faviconUrl}?v=${timestamp}`;
-      
-      console.log('Favicon updated successfully in DOM');
+      // Update the existing favicon link with the ID
+      const existingFavicon = document.getElementById('favicon-link') as HTMLLinkElement;
+      if (existingFavicon) {
+        // Force browser to reload favicon by adding a timestamp
+        const timestamp = new Date().getTime();
+        existingFavicon.href = `${faviconUrl}?v=${timestamp}`;
+        console.log('Favicon updated successfully in existing link');
+      } else {
+        // Remove any existing favicon links without ID
+        const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+        existingFavicons.forEach(link => link.remove());
+        
+        // Create new favicon link
+        const faviconLink = document.createElement('link');
+        faviconLink.rel = 'icon';
+        faviconLink.type = 'image/png';
+        faviconLink.id = 'favicon-link';
+        
+        // Add to document head
+        document.head.appendChild(faviconLink);
+        
+        // Force browser to reload favicon by adding a timestamp
+        const timestamp = new Date().getTime();
+        faviconLink.href = `${faviconUrl}?v=${timestamp}`;
+        
+        console.log('Favicon updated successfully in new link');
+      }
     } catch (error) {
       console.error('Erreur lors de la mise à jour du favicon dans le DOM:', error);
     }
