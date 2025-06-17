@@ -7,7 +7,7 @@ import { Upload, Save, Loader2, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const LogoEditor = () => {
-  const { contents, isLoading, updateContent, uploadImage } = usePageContents('navbar');
+  const { contents, isLoading, updateContent, uploadImage, refetch } = usePageContents('navbar');
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -41,16 +41,15 @@ const LogoEditor = () => {
     try {
       const imageUrl = await uploadImage(selectedFile, 'logo');
       
-      if (imageUrl) {
-        if (logoContent) {
-          // Update existing logo content
-          await updateContent(logoContent.id, { content_value: imageUrl });
-        } else {
-          // Create new logo content block (this would need a separate function)
-          toast.error('Impossible de créer le bloc logo. Contactez un développeur.');
-        }
+      if (imageUrl && logoContent) {
+        // Update existing logo content
+        await updateContent(logoContent.id, { content_value: imageUrl });
         setSelectedFile(null);
+        // Refresh the contents to get the updated logo
+        await refetch();
         toast.success('Logo mis à jour avec succès');
+      } else {
+        toast.error('Erreur lors de la mise à jour du logo');
       }
     } catch (error) {
       console.error('Erreur lors de l\'upload:', error);
