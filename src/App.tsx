@@ -25,6 +25,7 @@ function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin';
   const isAuthPage = location.pathname === '/auth';
+  const isAboutPage = location.pathname === '/about';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -46,7 +47,7 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
         </Routes>
       </main>
-      {!isAdminPage && !isAuthPage && <Footer />}
+      {!isAdminPage && !isAuthPage && !isAboutPage && <Footer />}
     </div>
   );
 }
