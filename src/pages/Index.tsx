@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,6 +30,13 @@ const Index = () => {
     missionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Move useEffect before the conditional return to maintain hook order
+  useEffect(() => {
+    if (missionRef.current) {
+      missionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [missionRef]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -39,12 +47,6 @@ const Index = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (missionRef.current) {
-      missionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [missionRef]);
 
   return (
     <div className="min-h-screen">
