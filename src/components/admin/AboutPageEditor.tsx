@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,18 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, Upload, Image as ImageIcon, Edit, Save, X } from 'lucide-react';
 import { useAboutPageContents } from '@/hooks/useAboutPageContents';
-
 const AboutPageEditor = () => {
-  const { contents, isLoading, updateContent, uploadImage } = useAboutPageContents();
+  const {
+    contents,
+    isLoading,
+    updateContent,
+    uploadImage
+  } = useAboutPageContents();
   const [editingBlock, setEditingBlock] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<any>({});
   const [uploadingImages, setUploadingImages] = useState<string[]>([]);
-
   const handleEdit = (blockKey: string, currentData: any) => {
     setEditingBlock(blockKey);
     setEditValues(currentData || {});
   };
-
   const handleSave = async (blockId: string, blockKey: string) => {
     try {
       await updateContent(blockId, {
@@ -31,23 +32,21 @@ const AboutPageEditor = () => {
       console.error('Erreur lors de la sauvegarde:', error);
     }
   };
-
   const handleCancel = () => {
     setEditingBlock(null);
     setEditValues({});
   };
-
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, blockKey: string, blockId: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     setUploadingImages(prev => [...prev, blockKey]);
-    
     try {
       const imageUrl = await uploadImage(file, blockKey);
       if (imageUrl) {
         await updateContent(blockId, {
-          content_json: { url: imageUrl }
+          content_json: {
+            url: imageUrl
+          }
         });
       }
     } catch (error) {
@@ -56,95 +55,60 @@ const AboutPageEditor = () => {
       setUploadingImages(prev => prev.filter(key => key !== blockKey));
     }
   };
-
   const getContentByKey = (key: string) => {
     return contents.find(c => c.block_key === key);
   };
-
   const renderEditField = (content: any) => {
     const currentValue = editValues;
     const isEditing = editingBlock === content.block_key;
-
     if (content.block_type === 'image') {
       const imageUrl = content.content_json?.url;
-      
-      return (
-        <div className="space-y-4">
+      return <div className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-48 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border">
-              {imageUrl ? (
-                <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
-              ) : (
-                <ImageIcon className="w-12 h-12 text-gray-400" />
-              )}
+              {imageUrl ? <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-gray-400" />}
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor={`image-${content.block_key}`} className="cursor-pointer">
                 <Button variant="outline" size="sm" asChild disabled={uploadingImages.includes(content.block_key)}>
                   <span>
-                    {uploadingImages.includes(content.block_key) ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Upload className="w-4 h-4 mr-2" />
-                    )}
+                    {uploadingImages.includes(content.block_key) ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
                     {imageUrl ? 'Changer l\'image' : 'Ajouter une image'}
                   </span>
                 </Button>
               </Label>
-              <input
-                id={`image-${content.block_key}`}
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, content.block_key, content.id)}
-                className="hidden"
-              />
-              {imageUrl && (
-                <p className="text-xs text-gray-500">Image actuelle chargée</p>
-              )}
+              <input id={`image-${content.block_key}`} type="file" accept="image/*" onChange={e => handleImageUpload(e, content.block_key, content.id)} className="hidden" />
+              {imageUrl && <p className="text-xs text-gray-500">Image actuelle chargée</p>}
             </div>
           </div>
-        </div>
-      );
+        </div>;
     }
-
     if (isEditing) {
       const hasTitle = 'title' in currentValue;
       const hasSubtitle = 'subtitle' in currentValue;
       const hasContent = 'content' in currentValue;
-
-      return (
-        <div className="space-y-4">
-          {hasTitle && (
-            <div>
+      return <div className="space-y-4">
+          {hasTitle && <div>
               <Label>Titre</Label>
-              <Input
-                value={currentValue.title || ''}
-                onChange={(e) => setEditValues({ ...currentValue, title: e.target.value })}
-                placeholder="Titre"
-              />
-            </div>
-          )}
-          {hasSubtitle && (
-            <div>
+              <Input value={currentValue.title || ''} onChange={e => setEditValues({
+            ...currentValue,
+            title: e.target.value
+          })} placeholder="Titre" />
+            </div>}
+          {hasSubtitle && <div>
               <Label>Sous-titre</Label>
-              <Input
-                value={currentValue.subtitle || ''}
-                onChange={(e) => setEditValues({ ...currentValue, subtitle: e.target.value })}
-                placeholder="Sous-titre"
-              />
-            </div>
-          )}
-          {hasContent && (
-            <div>
+              <Input value={currentValue.subtitle || ''} onChange={e => setEditValues({
+            ...currentValue,
+            subtitle: e.target.value
+          })} placeholder="Sous-titre" />
+            </div>}
+          {hasContent && <div>
               <Label>Contenu</Label>
-              <Textarea
-                value={currentValue.content || ''}
-                onChange={(e) => setEditValues({ ...currentValue, content: e.target.value })}
-                placeholder="Contenu"
-                rows={4}
-              />
-            </div>
-          )}
+              <Textarea value={currentValue.content || ''} onChange={e => setEditValues({
+            ...currentValue,
+            content: e.target.value
+          })} placeholder="Contenu" rows={4} />
+            </div>}
           <div className="flex gap-2">
             <Button size="sm" onClick={() => handleSave(content.id, content.block_key)}>
               <Save className="w-4 h-4 mr-2" />
@@ -155,71 +119,49 @@ const AboutPageEditor = () => {
               Annuler
             </Button>
           </div>
-        </div>
-      );
+        </div>;
     }
 
     // Display mode
     const contentData = content.content_json || {};
-    return (
-      <div className="space-y-2">
-        {'title' in contentData && (
-          <div>
+    return <div className="space-y-2">
+        {'title' in contentData && <div>
             <Label className="text-sm font-medium text-gray-600">Titre:</Label>
             <p className="text-sm">{contentData.title}</p>
-          </div>
-        )}
-        {'subtitle' in contentData && (
-          <div>
+          </div>}
+        {'subtitle' in contentData && <div>
             <Label className="text-sm font-medium text-gray-600">Sous-titre:</Label>
             <p className="text-sm">{contentData.subtitle}</p>
-          </div>
-        )}
-        {'content' in contentData && (
-          <div>
+          </div>}
+        {'content' in contentData && <div>
             <Label className="text-sm font-medium text-gray-600">Contenu:</Label>
             <p className="text-sm whitespace-pre-wrap">{contentData.content}</p>
-          </div>
-        )}
-        <Button 
-          size="sm" 
-          variant="outline" 
-          onClick={() => handleEdit(content.block_key, contentData)}
-        >
+          </div>}
+        <Button size="sm" variant="outline" onClick={() => handleEdit(content.block_key, contentData)}>
           <Edit className="w-4 h-4 mr-2" />
           Modifier
         </Button>
-      </div>
-    );
+      </div>;
   };
-
   const renderContentBlock = (blockKey: string, title: string, description?: string) => {
     const content = getContentByKey(blockKey);
     if (!content) return null;
-
-    return (
-      <div className="space-y-4">
+    return <div className="space-y-4">
         <div>
           <h4 className="font-semibold text-dk-navy">{title}</h4>
           {description && <p className="text-sm text-gray-600">{description}</p>}
         </div>
         {renderEditField(content)}
         <Separator />
-      </div>
-    );
+      </div>;
   };
-
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
+    return <div className="flex items-center justify-center p-8">
         <Loader2 className="w-8 h-8 animate-spin" />
         <span className="ml-2">Chargement des contenus...</span>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+  return <div className="max-w-6xl mx-auto p-6 space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-dk-navy mb-2">
           Gestion de la page À propos
@@ -233,7 +175,7 @@ const AboutPageEditor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            
             Section Hero (Bannière principale)
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -252,7 +194,7 @@ const AboutPageEditor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            
             Pourquoi choisir DK Automotive
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -274,7 +216,7 @@ const AboutPageEditor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-orange-500 rounded"></div>
+            
             Chauffeurs Expérimentés
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -294,7 +236,7 @@ const AboutPageEditor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-purple-500 rounded"></div>
+            
             Nos Valeurs (3 colonnes)
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -340,7 +282,7 @@ const AboutPageEditor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded"></div>
+            
             Expertise en Convoyage
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -359,7 +301,7 @@ const AboutPageEditor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <div className="w-4 h-4 bg-gray-600 rounded"></div>
+            
             Section Finale (Call-to-Action)
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -373,8 +315,6 @@ const AboutPageEditor = () => {
           {renderContentBlock('final_description', 'Description finale et CTA')}
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default AboutPageEditor;
