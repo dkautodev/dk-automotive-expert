@@ -25,13 +25,13 @@ const FaviconSection = ({ contents, uploadImage, updateContent, refetch }: Favic
   });
 
   const faviconContent = contents.find(item => item.block_key === 'favicon');
-  const currentFaviconUrl = faviconContent?.content_value || '/lovable-uploads/7e8b2843-fdee-4445-992b-9078e0228e73.png';
+  const currentFaviconUrl = faviconContent?.content_value || '/lovable-uploads/favicon.png';
 
   const handleFaviconFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Veuillez sélectionner un fichier image');
+      if (file.type !== 'image/png') {
+        toast.error('Seuls les fichiers PNG sont acceptés pour le favicon');
         return;
       }
       
@@ -57,7 +57,7 @@ const FaviconSection = ({ contents, uploadImage, updateContent, refetch }: Favic
           Gestion du Favicon
         </CardTitle>
         <p className="text-sm text-gray-600">
-          Changez l'icône qui apparaît dans l'onglet du navigateur
+          Changez l'icône qui apparaît dans l'onglet du navigateur (format PNG uniquement)
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -86,12 +86,12 @@ const FaviconSection = ({ contents, uploadImage, updateContent, refetch }: Favic
               <label htmlFor="favicon-upload" className="cursor-pointer">
                 <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   <Upload className="w-4 h-4" />
-                  <span>Sélectionner un fichier</span>
+                  <span>Sélectionner un fichier PNG</span>
                 </div>
                 <input
                   id="favicon-upload"
                   type="file"
-                  accept="image/*"
+                  accept="image/png"
                   onChange={handleFaviconFileSelect}
                   className="hidden"
                 />
@@ -141,10 +141,11 @@ const FaviconSection = ({ contents, uploadImage, updateContent, refetch }: Favic
           </div>
 
           <div className="text-sm text-gray-500 space-y-1">
-            <p>• Formats acceptés : PNG, JPG, GIF, WebP</p>
+            <p>• Format accepté : PNG uniquement</p>
             <p>• Taille maximale : 5MB</p>
             <p>• Dimensions recommandées : 32x32 ou 16x16 pixels</p>
-            <p>• L'ancien favicon sera automatiquement supprimé</p>
+            <p>• Le fichier sera renommé "favicon.png"</p>
+            <p>• L'ancien favicon sera automatiquement remplacé</p>
             <p>• Le changement sera visible immédiatement dans l'onglet</p>
           </div>
         </div>

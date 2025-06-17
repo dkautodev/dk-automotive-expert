@@ -49,7 +49,7 @@ export const useFaviconUpload = ({
       const existingFavicon = document.getElementById('favicon-link') as HTMLLinkElement;
       if (existingFavicon) {
         const timestamp = new Date().getTime();
-        existingFavicon.href = `${faviconUrl}?v=${timestamp}`;
+        existingFavicon.href = `/lovable-uploads/favicon.png?v=${timestamp}`;
         console.log('Favicon updated successfully in existing link');
       } else {
         const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
@@ -63,7 +63,7 @@ export const useFaviconUpload = ({
         document.head.appendChild(faviconLink);
         
         const timestamp = new Date().getTime();
-        faviconLink.href = `${faviconUrl}?v=${timestamp}`;
+        faviconLink.href = `/lovable-uploads/favicon.png?v=${timestamp}`;
         
         console.log('Favicon updated successfully in new link');
       }
@@ -72,13 +72,42 @@ export const useFaviconUpload = ({
     }
   };
 
+  const uploadFaviconToPublic = async (selectedFaviconFile: File) => {
+    try {
+      // Upload avec le nom fixe "favicon.png"
+      const { error: uploadError } = await supabase.storage
+        .from('page-images')
+        .upload('public/favicon.png', selectedFaviconFile, {
+          upsert: true // remplace le fichier s'il existe déjà
+        });
+
+      if (uploadError) {
+        console.error('Erreur lors de l\'upload:', uploadError);
+        throw uploadError;
+      }
+
+      return '/lovable-uploads/favicon.png';
+    } catch (error) {
+      console.error('Erreur lors de l\'upload du favicon:', error);
+      throw error;
+    }
+  };
+
   const handleFaviconUpload = async (selectedFaviconFile: File, faviconContent: PageContent | undefined) => {
+    // Vérifier que c'est un fichier PNG
+    if (selectedFaviconFile.type !== 'image/png') {
+      toast.error('Seuls les fichiers PNG sont acceptés pour le favicon');
+      return;
+    }
+
     setUploadingFavicon(true);
     try {
       console.log('Starting favicon upload...');
       
       const oldFaviconUrl = faviconContent?.content_value || '';
-      const imageUrl = await uploadImage(selectedFaviconFile, 'favicon');
+      
+      // Upload le fichier avec le nom "favicon.png"
+      const imageUrl = await uploadFaviconToPublic(selectedFaviconFile);
       console.log('Favicon uploaded successfully:', imageUrl);
       
       if (imageUrl) {
