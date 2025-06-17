@@ -74,16 +74,25 @@ export const useFaviconUpload = ({
 
   const uploadFaviconToPublic = async (selectedFaviconFile: File) => {
     try {
-      // Upload avec le nom fixe "favicon.png"
-      const { error: uploadError } = await supabase.storage
-        .from('page-images')
-        .upload('public/favicon.png', selectedFaviconFile, {
-          upsert: true // remplace le fichier s'il existe déjà
-        });
+      // Créer un FormData pour uploader le fichier
+      const formData = new FormData();
+      
+      // Renommer le fichier en "favicon.png"
+      const renamedFile = new File([selectedFaviconFile], 'favicon.png', {
+        type: 'image/png'
+      });
+      
+      formData.append('file', renamedFile);
+      formData.append('path', 'favicon.png');
 
-      if (uploadError) {
-        console.error('Erreur lors de l\'upload:', uploadError);
-        throw uploadError;
+      // Upload vers le dossier /public/lovable-uploads/
+      const response = await fetch('/api/upload-favicon', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'upload du favicon');
       }
 
       return '/lovable-uploads/favicon.png';
@@ -106,7 +115,7 @@ export const useFaviconUpload = ({
       
       const oldFaviconUrl = faviconContent?.content_value || '';
       
-      // Upload le fichier avec le nom "favicon.png"
+      // Upload le fichier avec le nom "favicon.png" dans /public/lovable-uploads/
       const imageUrl = await uploadFaviconToPublic(selectedFaviconFile);
       console.log('Favicon uploaded successfully:', imageUrl);
       
