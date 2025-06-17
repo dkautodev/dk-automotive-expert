@@ -71,11 +71,40 @@ export const usePageContents = (pageSlug: string) => {
     }
   };
 
+  const deleteOldImage = async (oldImageUrl: string) => {
+    try {
+      // Extraire le chemin du fichier depuis l'URL
+      const url = new URL(oldImageUrl);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(part => part === 'page-images');
+      
+      if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+        const filePath = pathParts.slice(bucketIndex + 1).join('/');
+        console.log('Suppression de l\'ancienne image:', filePath);
+        
+        const { error } = await supabase.storage
+          .from('page-images')
+          .remove([filePath]);
+
+        if (error) {
+          console.warn('Erreur lors de la suppression de l\'ancienne image:', error);
+          // On ne fait que logger l'erreur, ça ne doit pas bloquer l'upload
+        } else {
+          console.log('Ancienne image supprimée avec succès:', filePath);
+        }
+      }
+    } catch (error) {
+      console.warn('Erreur lors de l\'extraction du chemin de l\'ancienne image:', error);
+      // On continue même si on n'arrive pas à supprimer l'ancienne image
+    }
+  };
+
   const uploadImage = async (file: File, blockKey: string) => {
     try {
-      // First ensure the bucket exists by calling our setup function
-      await fetch('/api/setup-storage', { method: 'POST' });
-      
+      // Récupérer l'ancienne URL avant l'upload
+      const currentContent = contents.find(c => c.block_key === blockKey);
+      const oldImageUrl = currentContent?.content_json?.url || currentContent?.content_value;
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${pageSlug}/${blockKey}-${Date.now()}.${fileExt}`;
       
@@ -91,6 +120,11 @@ export const usePageContents = (pageSlug: string) => {
       const { data: { publicUrl } } = supabase.storage
         .from('page-images')
         .getPublicUrl(fileName);
+
+      // Supprimer l'ancienne image après l'upload réussi
+      if (oldImageUrl) {
+        await deleteOldImage(oldImageUrl);
+      }
 
       return publicUrl;
     } catch (error) {
