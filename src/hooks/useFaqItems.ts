@@ -108,9 +108,12 @@ export const useFaqItems = () => {
 
   const deleteFaqItem = async (id: string) => {
     try {
+      console.log('Attempting to delete FAQ item with ID:', id);
+      
+      // Vraie suppression au lieu d'un UPDATE
       const { error } = await supabase
         .from('faq_items')
-        .update({ is_active: false })
+        .delete()
         .eq('id', id);
 
       if (error) {
