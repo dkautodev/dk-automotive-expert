@@ -106,11 +106,26 @@ const LogoEditor = () => {
 
   const updateFaviconInHtml = (faviconUrl: string) => {
     try {
-      // Update the favicon link in the document head
-      const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (faviconLink) {
-        faviconLink.href = faviconUrl;
-      }
+      console.log('Updating favicon in HTML to:', faviconUrl);
+      
+      // Remove existing favicon links
+      const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+      existingFavicons.forEach(link => link.remove());
+      
+      // Create new favicon link
+      const faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      faviconLink.type = 'image/png';
+      faviconLink.href = faviconUrl;
+      
+      // Add to document head
+      document.head.appendChild(faviconLink);
+      
+      // Force browser to reload favicon by adding a timestamp
+      const timestamp = new Date().getTime();
+      faviconLink.href = `${faviconUrl}?v=${timestamp}`;
+      
+      console.log('Favicon updated successfully in DOM');
     } catch (error) {
       console.error('Erreur lors de la mise à jour du favicon dans le DOM:', error);
     }
@@ -155,17 +170,22 @@ const LogoEditor = () => {
 
     setUploadingFavicon(true);
     try {
+      console.log('Starting favicon upload...');
+      
       // Store the old favicon URL before uploading the new one
       const oldFaviconUrl = currentFaviconUrl;
       
       const imageUrl = await uploadImage(selectedFaviconFile, 'favicon');
+      console.log('Favicon uploaded successfully:', imageUrl);
       
       if (imageUrl) {
         if (faviconContent) {
           // Update existing favicon content
+          console.log('Updating existing favicon content...');
           await updateContent(faviconContent.id, { content_value: imageUrl });
         } else {
           // Create new favicon content entry if it doesn't exist
+          console.log('Creating new favicon content entry...');
           const { error } = await supabase
             .from('page_contents')
             .insert({
@@ -183,7 +203,7 @@ const LogoEditor = () => {
           }
         }
         
-        // Update favicon in the HTML head
+        // Update favicon in the HTML head immediately
         updateFaviconInHtml(imageUrl);
         
         // Delete the old favicon after successful update
@@ -195,6 +215,12 @@ const LogoEditor = () => {
         // Refresh the contents to get the updated favicon
         await refetch();
         toast.success('Favicon mis à jour avec succès');
+        
+        // Additional DOM update after a short delay to ensure it takes effect
+        setTimeout(() => {
+          updateFaviconInHtml(imageUrl);
+        }, 100);
+        
       } else {
         toast.error('Erreur lors de la mise à jour du favicon');
       }
