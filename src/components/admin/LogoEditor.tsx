@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePageContents } from '@/hooks/usePageContents';
 import { Upload, Save, Loader2, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const LogoEditor = () => {
   const { contents, isLoading, updateContent, uploadImage, refetch } = usePageContents('navbar');
@@ -34,16 +35,47 @@ const LogoEditor = () => {
     }
   };
 
+  const deleteOldLogo = async (logoUrl: string) => {
+    try {
+      // Check if the logo is from our storage (contains 'page-images')
+      if (logoUrl && logoUrl.includes('page-images')) {
+        const fileName = logoUrl.split('page-images/')[1];
+        if (fileName) {
+          const { error: deleteError } = await supabase.storage
+            .from('page-images')
+            .remove([fileName]);
+          
+          if (deleteError) {
+            console.error('Erreur lors de la suppression de l\'ancien logo:', deleteError);
+          } else {
+            console.log('Ancien logo supprimé avec succès');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'ancien logo:', error);
+    }
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
 
     setUploading(true);
     try {
+      // Store the old logo URL before uploading the new one
+      const oldLogoUrl = currentLogoUrl;
+      
       const imageUrl = await uploadImage(selectedFile, 'logo');
       
       if (imageUrl && logoContent) {
         // Update existing logo content
         await updateContent(logoContent.id, { content_value: imageUrl });
+        
+        // Delete the old logo after successful update
+        if (oldLogoUrl && oldLogoUrl !== imageUrl) {
+          await deleteOldLogo(oldLogoUrl);
+        }
+        
         setSelectedFile(null);
         // Refresh the contents to get the updated logo
         await refetch();
@@ -165,6 +197,7 @@ const LogoEditor = () => {
               <p>• Formats acceptés : PNG, JPG, GIF, WebP</p>
               <p>• Taille maximale : 5MB</p>
               <p>• Dimensions recommandées : 200x50 pixels environ</p>
+              <p>• L'ancien logo sera automatiquement supprimé</p>
             </div>
           </div>
 
