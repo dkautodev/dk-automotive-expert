@@ -20,8 +20,8 @@ const Navbar = () => {
   const logoUrl = logoContent?.content_value || '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
   
   const navItems = [{
-    path: "/",
-    label: "Accueil"
+    path: "/about",
+    label: "Qui sommes-nous ?"
   }, {
     path: "/devis",
     label: "Obtenir votre devis"
