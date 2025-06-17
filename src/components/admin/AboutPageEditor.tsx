@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Upload, Image, Type, Edit, Save, X } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Loader2, Upload, Image as ImageIcon, Edit, Save, X } from 'lucide-react';
 import { useAboutPageContents } from '@/hooks/useAboutPageContents';
-import { toast } from 'sonner';
 
 const AboutPageEditor = () => {
   const { contents, isLoading, updateContent, uploadImage } = useAboutPageContents();
@@ -36,7 +37,10 @@ const AboutPageEditor = () => {
     setEditValues({});
   };
 
-  const handleImageUpload = async (file: File, blockKey: string, blockId: string) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, blockKey: string, blockId: string) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
     setUploadingImages(prev => [...prev, blockKey]);
     
     try {
@@ -45,154 +49,154 @@ const AboutPageEditor = () => {
         await updateContent(blockId, {
           content_json: { url: imageUrl }
         });
-        toast.success('Image mise à jour avec succès');
       }
     } catch (error) {
       console.error('Erreur lors de l\'upload:', error);
-      toast.error('Erreur lors de l\'upload de l\'image');
     } finally {
       setUploadingImages(prev => prev.filter(key => key !== blockKey));
     }
   };
 
-  const renderBlockEditor = (block: any) => {
-    const isEditing = editingBlock === block.block_key;
-    const currentData = block.content_json || {};
+  const renderEditField = (content: any) => {
+    const currentValue = editValues;
+    const isEditing = editingBlock === content.block_key;
 
-    if (block.block_type === 'image') {
+    if (content.block_type === 'image') {
+      const imageUrl = content.content_json?.url;
+      
       return (
-        <Card key={block.id} className="mb-4">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Image className="w-4 h-4" />
-              {block.block_key.replace(/_/g, ' ').toUpperCase()}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {currentData.url && (
-                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
-                  <img 
-                    src={currentData.url} 
-                    alt={block.block_key}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-48 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border">
+              {imageUrl ? (
+                <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <ImageIcon className="w-12 h-12 text-gray-400" />
               )}
-              
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      handleImageUpload(file, block.block_key, block.id);
-                    }
-                  }}
-                  disabled={uploadingImages.includes(block.block_key)}
-                  className="flex-1"
-                />
-                {uploadingImages.includes(block.block_key) && (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                )}
-              </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor={`image-${content.block_key}`} className="cursor-pointer">
+                <Button variant="outline" size="sm" asChild disabled={uploadingImages.includes(content.block_key)}>
+                  <span>
+                    {uploadingImages.includes(content.block_key) ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    {imageUrl ? 'Changer l\'image' : 'Ajouter une image'}
+                  </span>
+                </Button>
+              </Label>
+              <input
+                id={`image-${content.block_key}`}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, content.block_key, content.id)}
+                className="hidden"
+              />
+              {imageUrl && (
+                <p className="text-xs text-gray-500">Image actuelle chargée</p>
+              )}
+            </div>
+          </div>
+        </div>
       );
     }
 
-    return (
-      <Card key={block.id} className="mb-4">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Type className="w-4 h-4" />
-            {block.block_key.replace(/_/g, ' ').toUpperCase()}
-          </CardTitle>
-          {!isEditing && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleEdit(block.block_key, currentData)}
-            >
-              <Edit className="w-4 h-4" />
+    if (isEditing) {
+      const hasTitle = 'title' in currentValue;
+      const hasSubtitle = 'subtitle' in currentValue;
+      const hasContent = 'content' in currentValue;
+
+      return (
+        <div className="space-y-4">
+          {hasTitle && (
+            <div>
+              <Label>Titre</Label>
+              <Input
+                value={currentValue.title || ''}
+                onChange={(e) => setEditValues({ ...currentValue, title: e.target.value })}
+                placeholder="Titre"
+              />
+            </div>
+          )}
+          {hasSubtitle && (
+            <div>
+              <Label>Sous-titre</Label>
+              <Input
+                value={currentValue.subtitle || ''}
+                onChange={(e) => setEditValues({ ...currentValue, subtitle: e.target.value })}
+                placeholder="Sous-titre"
+              />
+            </div>
+          )}
+          {hasContent && (
+            <div>
+              <Label>Contenu</Label>
+              <Textarea
+                value={currentValue.content || ''}
+                onChange={(e) => setEditValues({ ...currentValue, content: e.target.value })}
+                placeholder="Contenu"
+                rows={4}
+              />
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => handleSave(content.id, content.block_key)}>
+              <Save className="w-4 h-4 mr-2" />
+              Sauvegarder
             </Button>
-          )}
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <div className="space-y-4">
-              {currentData.title !== undefined && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Titre</label>
-                  <Input
-                    value={editValues.title || ''}
-                    onChange={(e) => setEditValues(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Titre"
-                  />
-                </div>
-              )}
-              
-              {currentData.subtitle !== undefined && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Sous-titre</label>
-                  <Input
-                    value={editValues.subtitle || ''}
-                    onChange={(e) => setEditValues(prev => ({ ...prev, subtitle: e.target.value }))}
-                    placeholder="Sous-titre"
-                  />
-                </div>
-              )}
-              
-              {currentData.content !== undefined && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Contenu</label>
-                  <Textarea
-                    value={editValues.content || ''}
-                    onChange={(e) => setEditValues(prev => ({ ...prev, content: e.target.value }))}
-                    placeholder="Contenu"
-                    rows={4}
-                  />
-                </div>
-              )}
-              
-              <div className="flex gap-2">
-                <Button onClick={() => handleSave(block.id, block.block_key)}>
-                  <Save className="w-4 h-4 mr-2" />
-                  Sauvegarder
-                </Button>
-                <Button variant="outline" onClick={handleCancel}>
-                  <X className="w-4 h-4 mr-2" />
-                  Annuler
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {currentData.title && (
-                <div>
-                  <span className="text-sm font-medium text-gray-600">Titre:</span>
-                  <p className="text-base">{currentData.title}</p>
-                </div>
-              )}
-              {currentData.subtitle && (
-                <div>
-                  <span className="text-sm font-medium text-gray-600">Sous-titre:</span>
-                  <p className="text-base">{currentData.subtitle}</p>
-                </div>
-              )}
-              {currentData.content && (
-                <div>
-                  <span className="text-sm font-medium text-gray-600">Contenu:</span>
-                  <p className="text-base whitespace-pre-wrap">{currentData.content}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            <Button size="sm" variant="outline" onClick={handleCancel}>
+              <X className="w-4 h-4 mr-2" />
+              Annuler
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // Display mode
+    const contentData = content.content_json || {};
+    return (
+      <div className="space-y-2">
+        {'title' in contentData && (
+          <div>
+            <Label className="text-sm font-medium text-gray-600">Titre:</Label>
+            <p className="text-sm">{contentData.title}</p>
+          </div>
+        )}
+        {'subtitle' in contentData && (
+          <div>
+            <Label className="text-sm font-medium text-gray-600">Sous-titre:</Label>
+            <p className="text-sm">{contentData.subtitle}</p>
+          </div>
+        )}
+        {'content' in contentData && (
+          <div>
+            <Label className="text-sm font-medium text-gray-600">Contenu:</Label>
+            <p className="text-sm whitespace-pre-wrap">{contentData.content}</p>
+          </div>
+        )}
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={() => handleEdit(content.block_key, contentData)}
+        >
+          <Edit className="w-4 h-4 mr-2" />
+          Modifier
+        </Button>
+      </div>
     );
+  };
+
+  // Group contents by sections for better organization
+  const groupedContents = {
+    hero: contents.filter(c => c.block_key.startsWith('hero')),
+    intro: contents.filter(c => c.block_key.startsWith('intro')),
+    team: contents.filter(c => c.block_key.startsWith('team')),
+    values: contents.filter(c => c.block_key.startsWith('value')),
+    services: contents.filter(c => c.block_key.startsWith('services')),
+    contact: contents.filter(c => c.block_key.startsWith('contact'))
   };
 
   if (isLoading) {
@@ -205,8 +209,8 @@ const AboutPageEditor = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
+    <div className="max-w-6xl mx-auto p-6 space-y-8">
+      <div>
         <h1 className="text-2xl font-bold text-dk-navy mb-2">
           Gestion de la page À propos
         </h1>
@@ -215,9 +219,130 @@ const AboutPageEditor = () => {
         </p>
       </div>
 
-      <div className="space-y-4">
-        {contents.map(renderBlockEditor)}
-      </div>
+      {/* Section Hero */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section Hero (Bannière principale)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.hero.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3 capitalize">
+                {content.block_key.replace('hero_', '').replace('_', ' ')}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Section Introduction */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section Introduction</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.intro.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') ? 'Titre' : 'Contenu'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Section Équipe */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section Équipe</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.team.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') ? 'Titre' : 
+                 content.block_key.includes('content') ? 'Contenu' : 'Image équipe'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Section Valeurs */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Nos Valeurs</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {/* Titre des valeurs */}
+          {contents.filter(c => c.block_key === 'values_title').map((content) => (
+            <div key={content.id}>
+              <h4 className="font-semibold mb-4 text-dk-navy">Titre de la section</h4>
+              {renderEditField(content)}
+            </div>
+          ))}
+          
+          {/* Valeurs individuelles */}
+          {[1, 2, 3].map((valueNum) => {
+            const valueContent = groupedContents.values.find(c => 
+              c.block_key === `value_${valueNum}`
+            );
+            
+            if (!valueContent) return null;
+            
+            return (
+              <div key={valueNum} className="border rounded-lg p-4">
+                <h4 className="font-semibold mb-4 text-dk-navy">
+                  Valeur {valueNum}
+                </h4>
+                {renderEditField(valueContent)}
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      {/* Section Services */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section Services</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.services.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') ? 'Titre' : 'Contenu'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Section Contact */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Section Contact</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {groupedContents.contact.map((content) => (
+            <div key={content.id}>
+              <h4 className="font-medium mb-3">
+                {content.block_key.includes('title') ? 'Titre' : 'Contenu'}
+              </h4>
+              {renderEditField(content)}
+              <Separator className="mt-4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 };
