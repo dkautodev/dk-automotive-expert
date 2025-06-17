@@ -1,21 +1,18 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageContent } from '@/hooks/usePageContents';
-
 interface FaviconSectionProps {
   contents: PageContent[];
   uploadImage: (file: File, blockKey: string) => Promise<string | null>;
   updateContent: (id: string, updates: Partial<PageContent>) => Promise<void>;
   refetch: () => Promise<void>;
 }
-
-const FaviconSection = ({ contents }: FaviconSectionProps) => {
+const FaviconSection = ({
+  contents
+}: FaviconSectionProps) => {
   const faviconContent = contents.find(item => item.block_key === 'favicon');
   const currentFaviconUrl = faviconContent?.content_value || '/lovable-uploads/favicon.png';
-
-  return (
-    <Card>
+  return <Card>
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-dk-navy">
           Favicon actuel
@@ -28,15 +25,10 @@ const FaviconSection = ({ contents }: FaviconSectionProps) => {
         
         {/* Favicon actuel */}
         <div className="space-y-4">
-          <div className="flex items-center justify-center p-8 bg-gray-50 rounded-lg border">
-            <img 
-              src={currentFaviconUrl} 
-              alt="Favicon actuel" 
-              className="w-8 h-8 object-contain"
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder.svg';
-              }}
-            />
+          <div className="flex items-center justify-center p-8 rounded-lg border bg-gray-300">
+            <img src={currentFaviconUrl} alt="Favicon actuel" className="w-8 h-8 object-contain" onError={e => {
+            e.currentTarget.src = '/placeholder.svg';
+          }} />
           </div>
         </div>
 
@@ -45,8 +37,6 @@ const FaviconSection = ({ contents }: FaviconSectionProps) => {
         </div>
 
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default FaviconSection;
