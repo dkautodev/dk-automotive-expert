@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      about_page_contents: {
+        Row: {
+          block_key: string
+          block_type: string
+          content_json: Json | null
+          content_value: string | null
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          page_slug: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          block_key: string
+          block_type: string
+          content_json?: Json | null
+          content_value?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          page_slug?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          block_key?: string
+          block_type?: string
+          content_json?: Json | null
+          content_value?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          page_slug?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       cgu_content: {
         Row: {
           created_at: string

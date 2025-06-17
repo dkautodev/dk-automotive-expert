@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock } from 'lucide-react';
+import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import IndexPageEditor from '@/components/admin/IndexPageEditor';
+import AboutPageEditor from '@/components/admin/AboutPageEditor';
 import FaqEditor from '@/components/admin/FaqEditor';
 import LegalMentionsEditor from '@/components/admin/LegalMentionsEditor';
 import PrivacyPolicyEditor from '@/components/admin/PrivacyPolicyEditor';
@@ -121,6 +122,10 @@ const Admin = () => {
                 label: 'Accueil',
                 icon: Home
               }, {
+                id: 'a-propos',
+                label: 'À propos',
+                icon: Users
+              }, {
                 id: 'faq',
                 label: 'FAQ',
                 icon: HelpCircle
@@ -177,6 +182,7 @@ const Admin = () => {
         {/* Main Content */}
         <main className="py-8">
           {activeTab === 'accueil' && <IndexPageEditor />}
+          {activeTab === 'a-propos' && <AboutPageEditor />}
           {activeTab === 'faq' && <FaqEditor />}
           {activeTab === 'mentions-legales' && <LegalMentionsEditor />}
           {activeTab === 'politique-confidentialite' && <PrivacyPolicyEditor />}
