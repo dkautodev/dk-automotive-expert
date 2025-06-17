@@ -1,22 +1,24 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
 import { usePageContents } from '@/hooks/usePageContents';
-
 const Index = () => {
-  const { contents, isLoading } = usePageContents('index');
+  const {
+    contents,
+    isLoading
+  } = usePageContents('index');
 
   // Helper function pour récupérer le contenu d'un bloc
   const getContent = (blockKey: string) => {
     const content = contents.find(c => c.block_key === blockKey);
     if (!content) return null;
-    
     if (content.content_json) {
       return content.content_json;
     }
-    return { value: content.content_value };
+    return {
+      value: content.content_value
+    };
   };
 
   // Helper function pour récupérer une image
@@ -30,13 +32,11 @@ const Index = () => {
     const content = getContent(blockKey);
     return content?.title || content?.subtitle || content?.description || content?.content || content?.text || content?.value || fallback;
   };
-
   if (isLoading) {
     return <div className="min-h-screen bg-white flex items-center justify-center">
       <div>Chargement...</div>
     </div>;
   }
-
   return <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
         <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
@@ -69,7 +69,7 @@ const Index = () => {
               </p>
               
               <Link to="/devis">
-                <Button className="bg-white text-dk-navy hover:bg-gray-100 transition-colors px-6 py-5 text-base">
+                <Button className="text-dk-navy transition-colors px-6 py-5 text-base bg-[#18257d] text-white">
                   Demander mon devis sur mesure
                 </Button>
               </Link>
