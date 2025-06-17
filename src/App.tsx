@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Index from "@/pages/Index";
@@ -26,6 +27,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       {!isAuthPage && <Navbar />}
       <main className={`flex-1 ${!isAuthPage ? 'pt-16' : ''}`}>
         <Routes>
