@@ -57,6 +57,10 @@ const AboutPageEditor = () => {
     }
   };
 
+  const getContentByKey = (key: string) => {
+    return contents.find(c => c.block_key === key);
+  };
+
   const renderEditField = (content: any) => {
     const currentValue = editValues;
     const isEditing = editingBlock === content.block_key;
@@ -189,14 +193,20 @@ const AboutPageEditor = () => {
     );
   };
 
-  // Group contents by sections for better organization
-  const groupedContents = {
-    hero: contents.filter(c => c.block_key.startsWith('hero')),
-    intro: contents.filter(c => c.block_key.startsWith('intro')),
-    team: contents.filter(c => c.block_key.startsWith('team')),
-    values: contents.filter(c => c.block_key.startsWith('value')),
-    services: contents.filter(c => c.block_key.startsWith('services')),
-    contact: contents.filter(c => c.block_key.startsWith('contact'))
+  const renderContentBlock = (blockKey: string, title: string, description?: string) => {
+    const content = getContentByKey(blockKey);
+    if (!content) return null;
+
+    return (
+      <div className="space-y-4">
+        <div>
+          <h4 className="font-semibold text-dk-navy">{title}</h4>
+          {description && <p className="text-sm text-gray-600">{description}</p>}
+        </div>
+        {renderEditField(content)}
+        <Separator />
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -219,128 +229,148 @@ const AboutPageEditor = () => {
         </p>
       </div>
 
-      {/* Section Hero */}
+      {/* Section Hero Principale */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section Hero (Bannière principale)</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            Section Hero (Bannière principale)
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            La première section visible par vos visiteurs
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.hero.map((content) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3 capitalize">
-                {content.block_key.replace('hero_', '').replace('_', ' ')}
-              </h4>
-              {renderEditField(content)}
-              <Separator className="mt-4" />
-            </div>
-          ))}
+          {renderContentBlock('hero_title', 'Titre principal "BIENVENUE CHEZ"')}
+          {renderContentBlock('hero_main_title', 'Nom de l\'entreprise "DK AUTOMOTIVE"')}
+          {renderContentBlock('hero_subtitle', 'Sous-titre de présentation')}
+          {renderContentBlock('hero_description', 'Description détaillée')}
         </CardContent>
       </Card>
 
-      {/* Section Introduction */}
+      {/* Section Pourquoi choisir DK Automotive */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section Introduction</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            Pourquoi choisir DK Automotive
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Arguments de vente et avantages concurrentiels
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.intro.map((content) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3">
-                {content.block_key.includes('title') ? 'Titre' : 'Contenu'}
-              </h4>
-              {renderEditField(content)}
-              <Separator className="mt-4" />
-            </div>
-          ))}
+          {renderContentBlock('why_choose_image', 'Image de section')}
+          {renderContentBlock('why_choose_title', 'Titre de la section')}
+          {renderContentBlock('why_choose_description', 'Description principale')}
+          {renderContentBlock('why_choose_benefit_1', 'Avantage 1 - Équipe expérimentée')}
+          {renderContentBlock('why_choose_benefit_2', 'Avantage 2 - Couverture géographique')}
+          {renderContentBlock('why_choose_benefit_3', 'Avantage 3 - Services sur mesure')}
+          {renderContentBlock('why_choose_benefit_4', 'Avantage 4 - Tarifs compétitifs')}
         </CardContent>
       </Card>
 
-      {/* Section Équipe */}
+      {/* Section Chauffeurs Expérimentés */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section Équipe</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="w-4 h-4 bg-orange-500 rounded"></div>
+            Chauffeurs Expérimentés
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Présentation de l'équipe et de l'expertise
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.team.map((content) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3">
-                {content.block_key.includes('title') ? 'Titre' : 
-                 content.block_key.includes('content') ? 'Contenu' : 'Image équipe'}
-              </h4>
-              {renderEditField(content)}
-              <Separator className="mt-4" />
-            </div>
-          ))}
+          {renderContentBlock('drivers_title', 'Titre "CHAUFFEURS EXPÉRIMENTÉS"')}
+          {renderContentBlock('drivers_subtitle', 'Sous-titre de la section')}
+          {renderContentBlock('drivers_description_1', 'Description 1 - Sélection rigoureuse')}
+          {renderContentBlock('drivers_description_2', 'Description 2 - Formation continue')}
+          {renderContentBlock('drivers_image', 'Image des chauffeurs')}
         </CardContent>
       </Card>
 
-      {/* Section Valeurs */}
+      {/* Section Nos Valeurs */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Nos Valeurs</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="w-4 h-4 bg-purple-500 rounded"></div>
+            Nos Valeurs (3 colonnes)
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Les trois valeurs principales de l'entreprise
+          </p>
         </CardHeader>
         <CardContent className="space-y-8">
-          {/* Titre des valeurs */}
-          {contents.filter(c => c.block_key === 'values_title').map((content) => (
-            <div key={content.id}>
-              <h4 className="font-semibold mb-4 text-dk-navy">Titre de la section</h4>
-              {renderEditField(content)}
-            </div>
-          ))}
+          {renderContentBlock('values_section_title', 'Titre de la section valeurs')}
           
-          {/* Valeurs individuelles */}
-          {[1, 2, 3].map((valueNum) => {
-            const valueContent = groupedContents.values.find(c => 
-              c.block_key === `value_${valueNum}`
-            );
-            
-            if (!valueContent) return null;
-            
-            return (
-              <div key={valueNum} className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-4 text-dk-navy">
-                  Valeur {valueNum}
-                </h4>
-                {renderEditField(valueContent)}
-              </div>
-            );
-          })}
+          {/* Valeur 1 - Écoconduite */}
+          <div className="border rounded-lg p-4 bg-blue-50">
+            <h4 className="font-semibold mb-4 text-dk-navy">Valeur 1 - Écoconduite</h4>
+            <div className="space-y-4">
+              {renderContentBlock('value_ecoconduite_image', 'Image écoconduite')}
+              {renderContentBlock('value_ecoconduite_title', 'Titre "ÉCOCONDUITE"')}
+              {renderContentBlock('value_ecoconduite_content', 'Description écoconduite')}
+            </div>
+          </div>
+
+          {/* Valeur 2 - Expertise technique */}
+          <div className="border rounded-lg p-4 bg-blue-50">
+            <h4 className="font-semibold mb-4 text-dk-navy">Valeur 2 - Expertise Technique</h4>
+            <div className="space-y-4">
+              {renderContentBlock('value_expertise_image', 'Image expertise')}
+              {renderContentBlock('value_expertise_title', 'Titre "EXPERTISE TECHNIQUE"')}
+              {renderContentBlock('value_expertise_content', 'Description expertise')}
+            </div>
+          </div>
+
+          {/* Valeur 3 - Service sur-mesure */}
+          <div className="border rounded-lg p-4 bg-blue-50">
+            <h4 className="font-semibold mb-4 text-dk-navy">Valeur 3 - Service Sur-mesure</h4>
+            <div className="space-y-4">
+              {renderContentBlock('value_service_image', 'Image service')}
+              {renderContentBlock('value_service_title', 'Titre "SERVICE SUR-MESURE"')}
+              {renderContentBlock('value_service_content', 'Description service')}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Section Services */}
+      {/* Section Expertise en Convoyage */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section Services</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="w-4 h-4 bg-red-500 rounded"></div>
+            Expertise en Convoyage
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Section détaillant l'expertise de l'entreprise
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.services.map((content) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3">
-                {content.block_key.includes('title') ? 'Titre' : 'Contenu'}
-              </h4>
-              {renderEditField(content)}
-              <Separator className="mt-4" />
-            </div>
-          ))}
+          {renderContentBlock('expertise_image', 'Image expertise convoyage')}
+          {renderContentBlock('expertise_title', 'Titre "EXPERTISE EN CONVOYAGE AUTOMOBILE"')}
+          {renderContentBlock('expertise_subtitle', 'Sous-titre de la section')}
+          {renderContentBlock('expertise_description', 'Description de l\'expertise')}
         </CardContent>
       </Card>
 
-      {/* Section Contact */}
+      {/* Section Finale */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Section Contact</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="w-4 h-4 bg-gray-600 rounded"></div>
+            Section Finale (Call-to-Action)
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Conclusion et appel à l'action final
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.contact.map((content) => (
-            <div key={content.id}>
-              <h4 className="font-medium mb-3">
-                {content.block_key.includes('title') ? 'Titre' : 'Contenu'}
-              </h4>
-              {renderEditField(content)}
-              <Separator className="mt-4" />
-            </div>
-          ))}
+          {renderContentBlock('final_title', 'Titre "FAITES LE CHOIX DE L\'EXPERTISE"')}
+          {renderContentBlock('final_main_title', 'Titre principal "DK AUTOMOTIVE"')}
+          {renderContentBlock('final_subtitle', 'Sous-titre final')}
+          {renderContentBlock('final_description', 'Description finale et CTA')}
         </CardContent>
       </Card>
     </div>
