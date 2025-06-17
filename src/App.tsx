@@ -7,6 +7,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Index from "@/pages/Index";
+import About from "@/pages/About";
 import Devis from "@/pages/Devis";
 import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
@@ -32,6 +33,7 @@ function AppContent() {
       <main className={`flex-1 ${!isAuthPage ? 'pt-16' : ''}`}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/about" element={<About />} />
           <Route path="/devis" element={<Devis />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
