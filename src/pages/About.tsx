@@ -1,61 +1,102 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
+import { useAboutPageContents } from '@/hooks/useAboutPageContents';
 
 const About = () => {
-  return <div className="min-h-screen bg-white">
+  const { contents, isLoading } = useAboutPageContents();
+
+  const getContentByKey = (key: string) => {
+    const content = contents.find(c => c.block_key === key);
+    return content?.content_json || {};
+  };
+
+  const getContentValue = (key: string, field: string = 'content') => {
+    const contentData = getContentByKey(key);
+    return contentData[field] || '';
+  };
+
+  const getImageUrl = (key: string) => {
+    const contentData = getContentByKey(key);
+    return contentData.url || '';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="w-8 h-8 animate-spin mr-2" />
+          <span>Chargement...</span>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="animate-fadeIn">
+        {/* Section Hero */}
         <section className="py-16 md:py-24 px-4">
           <div className="container mx-auto">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                BIENVENUE CHEZ
+                {getContentValue('hero_title', 'title')}
               </h1>
               <h2 className="text-4xl md:text-5xl font-bold text-[#18257D] mb-6">
-                DK AUTOMOTIVE
+                {getContentValue('hero_main_title', 'title')}
               </h2>
               <p className="text-lg md:text-xl text-gray-700 mb-6 md:mb-8">
-                Votre partenaire fiable pour le convoyage de véhicules.
+                {getContentValue('hero_subtitle', 'subtitle')}
               </p>
               <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 md:mb-12">
-                Forts de plus de 5 ans d'expérience dans les métiers du convoyage et du transport en général, nous avons développé une expertise inégalée pour répondre aux besoins les plus exigeants de nos clients.
+                {getContentValue('hero_description')}
               </p>
             </div>
           </div>
         </section>
 
+        {/* Section Pourquoi choisir DK Automotive */}
         <section className="py-12 md:py-16 px-4 bg-gray-50">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
-                <img alt="DK Automotive expertise" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/68f33641-ed3b-4ff0-b6f3-288ab97beda1.jpg" />
+                {getImageUrl('why_choose_image') && (
+                  <img 
+                    alt="DK Automotive expertise" 
+                    className="rounded-lg shadow-lg w-full" 
+                    src={getImageUrl('why_choose_image')} 
+                  />
+                )}
               </div>
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
-                  POURQUOI CHOISIR DK AUTOMOTIVE POUR VOS BESOINS EN CONVOYAGE AUTOMOBILE ?
+                  {getContentValue('why_choose_title', 'title')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  En faisant appel à DK AUTOMOTIVE, vous bénéficiez également de la conformité de toutes les régulations européennes en matière de convoyage automobile, garantissant un transport sécurisé de votre véhicule. Pour en savoir plus sur les régulations et les bonnes pratiques en matière de transport de véhicules en Europe, consultez l'article publié par la Commission européenne <a href="https://transport.ec.europa.eu/index_en" target="_blank" rel="noopener noreferrer" className="text-[#18257D] underline">lien</a>.
+                  {getContentValue('why_choose_description')}
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">Une équipe de professionnels expérimentés pour garantir la sécurité de votre véhicule.</p>
+                    <p className="text-gray-600">{getContentValue('why_choose_benefit_1')}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">Une couverture géographique étendue pour répondre à vos besoins de transport en France et pays limitrophes.</p>
+                    <p className="text-gray-600">{getContentValue('why_choose_benefit_2')}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">Des services sur mesure, adaptés à vos exigences et contraintes.</p>
+                    <p className="text-gray-600">{getContentValue('why_choose_benefit_3')}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">Des tarifs compétitifs et transparents pour un rapport qualité-prix optimal en matière de tarif convoyage voiture.</p>
+                    <p className="text-gray-600">{getContentValue('why_choose_benefit_4')}</p>
                   </div>
                 </div>
                 <div className="pt-4">
@@ -68,21 +109,22 @@ const About = () => {
           </div>
         </section>
 
+        {/* Section Chauffeurs Expérimentés */}
         <section className="py-16 px-4 bg-white">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
-                  CHAUFFEURS EXPÉRIMENTÉS
+                  {getContentValue('drivers_title', 'title')}
                 </h3>
                 <h3 className="text-3xl font-bold text-[#18257D]">
-                  Des convoyeurs rigoureusement sélectionnés
+                  {getContentValue('drivers_subtitle', 'title')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Nos convoyeurs expérimentés et sélectionnés avec soin sont notre atout majeur. Tous de nos convoyeurs professionnels ont été sélectionnés rigoureusement pour leur expérience du métier, leur savoir-faire et leur engagement pour la satisfaction clientèle. Chez DK AUTOMOTIVE, nous ne faisons aucun compromis pour assurer la qualité de nos services.
+                  {getContentValue('drivers_description_1')}
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Nous accordons une importance primordiale à la formation continue de nos chauffeurs. En effet, nos différents sont formés aux différentes procédures indispensables pour assurer un transport sûr et respectueux de l'environnement. L'écoconduite, la connaissance technique des différents véhicules et la réalisation de mises en main véhicules font partie intégrante de leur formation.
+                  {getContentValue('drivers_description_2')}
                 </p>
                 <div className="pt-4">
                   <Link to="/contact" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
@@ -91,61 +133,104 @@ const About = () => {
                 </div>
               </div>
               <div>
-                <img alt="DK Automotive drivers" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/95eb9367-8ef9-4af5-b92d-805ea0cdeca3.jpg" />
+                {getImageUrl('drivers_image') && (
+                  <img 
+                    alt="DK Automotive drivers" 
+                    className="rounded-lg shadow-lg w-full" 
+                    src={getImageUrl('drivers_image')} 
+                  />
+                )}
               </div>
             </div>
           </div>
         </section>
 
+        {/* Section Nos Valeurs */}
         <section className="py-16 px-4 bg-[#18257D] text-white">
           <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold">
+                {getContentValue('values_section_title', 'title')}
+              </h3>
+            </div>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <img alt="Écoconduite" className="w-16 h-16 mb-4" src="/lovable-uploads/19f7f830-34f1-4f2b-91ed-e3517a2a87f6.jpg" />
+                  {getImageUrl('value_ecoconduite_image') && (
+                    <img 
+                      alt="Écoconduite" 
+                      className="w-16 h-16 mb-4" 
+                      src={getImageUrl('value_ecoconduite_image')} 
+                    />
+                  )}
                 </div>
-                <h4 className="text-xl font-bold">ÉCOCONDUITE</h4>
+                <h4 className="text-xl font-bold">
+                  {getContentValue('value_ecoconduite_title', 'title')}
+                </h4>
                 <p className="text-sm">
-                  Nos chauffeurs sont formés à adopter des pratiques de conduite écologique pour réduire la consommation de carburant et minimiser l'impact environnemental.
+                  {getContentValue('value_ecoconduite_content')}
                 </p>
               </div>
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <img alt="Expertise technique" className="w-16 h-16 mb-4" src="/lovable-uploads/a527220b-aca5-4730-b21e-ec6177c7b83d.jpg" />
+                  {getImageUrl('value_expertise_image') && (
+                    <img 
+                      alt="Expertise technique" 
+                      className="w-16 h-16 mb-4" 
+                      src={getImageUrl('value_expertise_image')} 
+                    />
+                  )}
                 </div>
-                <h4 className="text-xl font-bold">EXPERTISE TECHNIQUE</h4>
+                <h4 className="text-xl font-bold">
+                  {getContentValue('value_expertise_title', 'title')}
+                </h4>
                 <p className="text-sm">
-                  Les chauffeurs DK AUTOMOTIVE sont experts dans la connaissance technique des différents véhicules, leur permettant de s'adapter à toutes les situations et de garantir un convoyage sécurisé.
+                  {getContentValue('value_expertise_content')}
                 </p>
               </div>
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <img alt="Service sur-mesure" className="w-16 h-16 mb-4" src="/lovable-uploads/2b49a059-d379-4b8f-847a-628ff2c1a7bc.jpg" />
+                  {getImageUrl('value_service_image') && (
+                    <img 
+                      alt="Service sur-mesure" 
+                      className="w-16 h-16 mb-4" 
+                      src={getImageUrl('value_service_image')} 
+                    />
+                  )}
                 </div>
-                <h4 className="text-xl font-bold">SERVICE SUR-MESURE</h4>
+                <h4 className="text-xl font-bold">
+                  {getContentValue('value_service_title', 'title')}
+                </h4>
                 <p className="text-sm">
-                  Chez DK AUTOMOTIVE, nous nous adaptons à vos besoins spécifiques en matière de convoyage, offrant des solutions personnalisées pour assurer une expérience client optimale et un convoyage de véhicules en toute sérénité.
+                  {getContentValue('value_service_content')}
                 </p>
               </div>
             </div>
           </div>
         </section>
 
+        {/* Section Expertise en Convoyage */}
         <section className="py-16 px-4 bg-white">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <img alt="Expertise en convoyage" className="rounded-lg shadow-lg w-full" src="/lovable-uploads/65f150ef-91b6-4e32-ac29-e59c718d1905.jpg" />
+                {getImageUrl('expertise_image') && (
+                  <img 
+                    alt="Expertise en convoyage" 
+                    className="rounded-lg shadow-lg w-full" 
+                    src={getImageUrl('expertise_image')} 
+                  />
+                )}
               </div>
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold text-[#18257D]">
-                  EXPERTISE EN CONVOYAGE AUTOMOBILE
+                  {getContentValue('expertise_title', 'title')}
                 </h3>
                 <h4 className="text-2xl font-bold">
-                  Assurez-vous d'un transport sécurisé et fiable pour vos véhicules
+                  {getContentValue('expertise_subtitle', 'title')}
                 </h4>
                 <p className="text-gray-600 leading-relaxed">
-                  Chez DK AUTOMOTIVE, nous comprenons que la confiance et la satisfaction de nos clients sont essentielles. C'est pourquoi, nous nous efforçons d'offrir un service transparent, professionnel et adapté aux besoins individuels de chaque client. En choisissant DK AUTOMOTIVE, vous optez pour une entreprise qui met tout en œuvre pour vous offrir un service de qualité, capable d'inspirer confiance et de rassurer ses clients.
+                  {getContentValue('expertise_description')}
                 </p>
                 <div className="pt-4">
                   <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
@@ -157,13 +242,20 @@ const About = () => {
           </div>
         </section>
 
+        {/* Section Finale */}
         <section className="py-16 px-4 bg-white">
           <div className="container mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-4">FAITES LE CHOIX DE L'EXPERTISE</h2>
-            <h3 className="text-4xl font-bold text-[#18257D] mb-4">DK AUTOMOTIVE</h3>
-            <p className="text-lg text-gray-700 mb-8">UN PARTENAIRE FIABLE POUR VOS BESOINS EN CONVOYAGE</p>
+            <h2 className="text-4xl font-bold mb-4">
+              {getContentValue('final_title', 'title')}
+            </h2>
+            <h3 className="text-4xl font-bold text-[#18257D] mb-4">
+              {getContentValue('final_main_title', 'title')}
+            </h3>
             <p className="text-lg text-gray-700 mb-8">
-              Rejoignez dès aujourd'hui notre réseau de clients satisfaits et découvrez la différence que DK AUTOMOTIVE peut apporter à votre expérience de convoyage de véhicules. En tant que professionnels de l'automobile, nous sommes impatients de travailler avec vous et de vous fournir les solutions de convoyage les plus adaptées à vos besoins.
+              {getContentValue('final_subtitle', 'subtitle')}
+            </p>
+            <p className="text-lg text-gray-700 mb-8">
+              {getContentValue('final_description')}
             </p>
             <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 text-lg font-semibold hover:bg-[#18257D]/90 transition-colors">
               DEMANDEZ VOTRE DEVIS
@@ -172,7 +264,8 @@ const About = () => {
         </section>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
 
 export default About;
