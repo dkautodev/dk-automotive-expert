@@ -244,7 +244,9 @@ const IndexPageEditor = () => {
           <CardTitle className="text-lg">Section Hero (Bannière principale)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.hero.map((content) => (
+          {groupedContents.hero
+            .sort((a, b) => a.display_order - b.display_order)
+            .map((content) => (
             <div key={content.id}>
               <h4 className="font-medium mb-3">
                 {content.block_key === 'hero_main_title' ? 'Titre principal' :
