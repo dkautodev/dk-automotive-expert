@@ -52,7 +52,8 @@ const IndexPageEditor = () => {
     const currentValue = editValues[content.block_key] || getContentValue(content);
     const isEditing = editingBlock === content.block_key;
 
-    if (content.block_type === 'image') {
+    // Gérer spécifiquement les images (y compris hero_background_image)
+    if (content.block_type === 'image' || content.block_key === 'hero_background_image') {
       return (
         <div className="space-y-4">
           <div className="flex items-center gap-4">
