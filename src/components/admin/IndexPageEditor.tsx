@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -218,7 +219,7 @@ const IndexPageEditor = () => {
   };
 
   const groupedContents = {
-    hero: contents.filter(c => c.block_key.startsWith('hero')),
+    hero: contents.filter(c => c.block_key.startsWith('hero') && c.block_key !== 'hero_background_image'),
     trust_points: contents.filter(c => c.block_key.startsWith('trust_point')),
     trust_section: contents.filter(c => c.block_key.startsWith('trust_section')),
     sections: contents.filter(c => c.block_key.startsWith('section_')),
@@ -254,7 +255,6 @@ const IndexPageEditor = () => {
                  content.block_key === 'hero_point_2' ? 'Point 2 (Checkmark)' :
                  content.block_key === 'hero_point_3' ? 'Point 3 (Checkmark)' :
                  content.block_key === 'hero_description' ? 'Description' :
-                 content.block_key === 'hero_background_image' ? 'Image de fond' :
                  content.block_key.replace('hero_', '').replace('_', ' ')}
               </h4>
               {renderEditField(content)}
