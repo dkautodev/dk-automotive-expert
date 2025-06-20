@@ -1,13 +1,12 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
 import { usePageContents } from '@/hooks/usePageContents';
+
 const Index = () => {
-  const {
-    contents,
-    isLoading
-  } = usePageContents('index');
+  const { contents, isLoading } = usePageContents('index');
 
   // Helper function pour récupérer le contenu d'un bloc
   const getContent = (blockKey: string) => {
@@ -16,9 +15,7 @@ const Index = () => {
     if (content.content_json) {
       return content.content_json;
     }
-    return {
-      value: content.content_value
-    };
+    return { value: content.content_value };
   };
 
   // Helper function pour récupérer une image
@@ -32,35 +29,43 @@ const Index = () => {
     const content = getContent(blockKey);
     return content?.title || content?.subtitle || content?.description || content?.content || content?.text || content?.value || fallback;
   };
+
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center">
-      <div>Chargement...</div>
-    </div>;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div>Chargement...</div>
+      </div>
+    );
   }
-  return <div className="min-h-screen bg-white">
+
+  return (
+    <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
-        <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
-        backgroundImage: `url("${getImageUrl('hero_background', '/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png')}")`
-      }}>
+        <section 
+          className="relative h-[400px] md:h-[600px] bg-cover bg-center" 
+          style={{
+            backgroundImage: `url("${getImageUrl('hero_background_image', '/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png')}")`
+          }}
+        >
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-2xl">
               <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-white leading-tight tracking-tight uppercase">
-                {getText('hero_title', 'Convoyage de véhicules par route en France')}
+                {getText('hero_main_title', 'Convoyage de véhicules par route en France')}
               </h1>
               
               <div className="space-y-3 mb-6 md:mb-8">
                 <div className="flex items-center gap-2 text-white">
                   <Check className="w-5 h-5" />
-                  <span className="text-lg font-light">{getText('trust_point_1', 'Convoyage sur mesure et économique')}</span>
+                  <span className="text-lg font-light">{getText('hero_point_1', 'Convoyage sur mesure et économique')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <Check className="w-5 h-5" />
-                  <span className="text-lg font-light">{getText('trust_point_2', 'Engagement Éco-responsable')}</span>
+                  <span className="text-lg font-light">{getText('hero_point_2', 'Engagement Éco-responsable')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <Check className="w-5 h-5" />
-                  <span className="text-lg font-light">{getText('trust_point_3', 'Livraison rapide et sécurisée')}</span>
+                  <span className="text-lg font-light">{getText('hero_point_3', 'Livraison rapide et sécurisée')}</span>
                 </div>
               </div>
 
@@ -311,6 +316,8 @@ const Index = () => {
           </div>
         </section>
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

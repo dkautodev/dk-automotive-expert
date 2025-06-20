@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -247,8 +246,14 @@ const IndexPageEditor = () => {
         <CardContent className="space-y-6">
           {groupedContents.hero.map((content) => (
             <div key={content.id}>
-              <h4 className="font-medium mb-3 capitalize">
-                {content.block_key.replace('hero_', '').replace('_', ' ')}
+              <h4 className="font-medium mb-3">
+                {content.block_key === 'hero_main_title' ? 'Titre principal' :
+                 content.block_key === 'hero_point_1' ? 'Point 1 (Checkmark)' :
+                 content.block_key === 'hero_point_2' ? 'Point 2 (Checkmark)' :
+                 content.block_key === 'hero_point_3' ? 'Point 3 (Checkmark)' :
+                 content.block_key === 'hero_description' ? 'Description' :
+                 content.block_key === 'hero_background_image' ? 'Image de fond' :
+                 content.block_key.replace('hero_', '').replace('_', ' ')}
               </h4>
               {renderEditField(content)}
               <Separator className="mt-4" />
