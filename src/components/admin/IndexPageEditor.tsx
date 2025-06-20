@@ -52,8 +52,7 @@ const IndexPageEditor = () => {
     const currentValue = editValues[content.block_key] || getContentValue(content);
     const isEditing = editingBlock === content.block_key;
 
-    // Gérer spécifiquement les images (y compris hero_background_image)
-    if (content.block_type === 'image' || content.block_key === 'hero_background_image') {
+    if (content.block_type === 'image') {
       return (
         <div className="space-y-4">
           <div className="flex items-center gap-4">
@@ -246,18 +245,10 @@ const IndexPageEditor = () => {
           <CardTitle className="text-lg">Section Hero (Bannière principale)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {groupedContents.hero
-            .sort((a, b) => a.display_order - b.display_order)
-            .map((content) => (
+          {groupedContents.hero.map((content) => (
             <div key={content.id}>
-              <h4 className="font-medium mb-3">
-                {content.block_key === 'hero_main_title' ? 'Titre principal' :
-                 content.block_key === 'hero_point_1' ? 'Point 1 (Checkmark)' :
-                 content.block_key === 'hero_point_2' ? 'Point 2 (Checkmark)' :
-                 content.block_key === 'hero_point_3' ? 'Point 3 (Checkmark)' :
-                 content.block_key === 'hero_description' ? 'Description' :
-                 content.block_key === 'hero_background_image' ? 'Image de fond' :
-                 content.block_key.replace('hero_', '').replace('_', ' ')}
+              <h4 className="font-medium mb-3 capitalize">
+                {content.block_key.replace('hero_', '').replace('_', ' ')}
               </h4>
               {renderEditField(content)}
               <Separator className="mt-4" />
