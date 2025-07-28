@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /devis
+Allow: /contact
+Allow: /faq
+Allow: /cgv
+Allow: /cgu
+Allow: /mentions-legales
+Allow: /politique-confidentialite
+Allow: /gestion-cookies
+Allow: /lovable-uploads/
+
+Disallow: /admin
+Disallow: /auth
+
+# Crawl-delay: 1
+
+# Sitemap (uncomment when available)
+# Sitemap: https://dkautomotive.fr/sitemap.xml
