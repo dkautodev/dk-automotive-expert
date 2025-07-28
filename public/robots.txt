@@ -16,5 +16,4 @@ Disallow: /auth
 
 # Crawl-delay: 1
 
-# Sitemap (uncomment when available)
-# Sitemap: https://dkautomotive.fr/sitemap.xml
+Sitemap: https://dkautomotive.fr/sitemap.xml
