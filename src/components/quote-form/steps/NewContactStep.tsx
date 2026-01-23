@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
@@ -14,6 +15,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Loader } from '@/components/ui/loader';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CreditCard } from 'lucide-react';
 
 interface PriceInfo {
   distance: string;
@@ -31,6 +33,7 @@ interface NewContactStepProps {
 
 const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewContactStepProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const subscription = form.watch(() => {
@@ -38,6 +41,32 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
     });
     return () => subscription.unsubscribe();
   }, [form, submitError]);
+
+  const handlePreOrder = async () => {
+    try {
+      const isValid = await form.trigger();
+      
+      if (!isValid) {
+        setSubmitError("Veuillez remplir tous les champs obligatoires pour pré-commander.");
+        return;
+      }
+      
+      const data = form.getValues();
+      
+      // Préparer les données pour la page de pré-commande
+      const quoteData = {
+        ...data,
+        distance: priceInfo?.distance?.replace(' km', '') || '',
+        price_ht: priceInfo?.priceHT || '',
+        price_ttc: priceInfo?.priceTTC || '',
+      };
+      
+      // Naviguer vers la page de pré-commande avec les données
+      navigate('/pre-commande', { state: quoteData });
+    } catch (error: any) {
+      setSubmitError(error.message || "Erreur lors de la validation du formulaire");
+    }
+  };
   
   const handleSubmit = async () => {
     try {
@@ -203,7 +232,7 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
         )}
       />
 
-      <div className="flex justify-between mt-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
         <Button 
           type="button" 
           variant="outline" 
@@ -213,21 +242,33 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
           PRÉCÉDENT
         </Button>
         
-        <Button 
-          type="button" 
-          onClick={handleSubmit} 
-          className="bg-[#1a237e] hover:bg-[#3f51b5]" 
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
-              TRAITEMENT...
-            </>
-          ) : (
-            'ENVOYER VOTRE DEMANDE'
-          )}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button 
+            type="button" 
+            onClick={handleSubmit} 
+            className="bg-[#1a237e] hover:bg-[#3f51b5]" 
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                TRAITEMENT...
+              </>
+            ) : (
+              'ENVOYER VOTRE DEMANDE'
+            )}
+          </Button>
+          
+          <Button 
+            type="button" 
+            onClick={handlePreOrder} 
+            className="bg-green-600 hover:bg-green-700 text-white" 
+            disabled={loading}
+          >
+            <CreditCard className="mr-2 h-4 w-4" />
+            PRÉ-COMMANDER
+          </Button>
+        </div>
       </div>
     </div>
   );
