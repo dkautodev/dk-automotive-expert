@@ -18,6 +18,7 @@ import PolitiqueConfidentialite from "@/pages/PolitiqueConfidentialite";
 import GestionCookies from "@/pages/GestionCookies";
 import Admin from "@/pages/Admin";
 import Auth from "@/pages/Auth";
+import PreCommande from "@/pages/PreCommande";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ function AppContent() {
           <Route path="/gestion-cookies" element={<GestionCookies />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/pre-commande" element={<PreCommande />} />
         </Routes>
       </main>
       {!isAdminPage && !isAuthPage && !isAboutPage && <Footer />}
