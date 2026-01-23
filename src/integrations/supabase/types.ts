@@ -233,6 +233,93 @@ export type Database = {
         }
         Relationships: []
       }
+      missions: {
+        Row: {
+          client_company: string | null
+          client_email: string
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          delivery_address: string
+          delivery_city: string | null
+          delivery_postal_code: string | null
+          distance_km: number | null
+          id: string
+          license_plate: string | null
+          notes: string | null
+          payment_intent_id: string | null
+          payment_status: string | null
+          pickup_address: string
+          pickup_city: string | null
+          pickup_postal_code: string | null
+          price_ht: number | null
+          price_ttc: number | null
+          status: string
+          updated_at: string
+          vehicle_brand: string | null
+          vehicle_fuel: string | null
+          vehicle_model: string | null
+          vehicle_type: string | null
+          vehicle_year: string | null
+        }
+        Insert: {
+          client_company?: string | null
+          client_email: string
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          delivery_address: string
+          delivery_city?: string | null
+          delivery_postal_code?: string | null
+          distance_km?: number | null
+          id?: string
+          license_plate?: string | null
+          notes?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
+          pickup_address: string
+          pickup_city?: string | null
+          pickup_postal_code?: string | null
+          price_ht?: number | null
+          price_ttc?: number | null
+          status?: string
+          updated_at?: string
+          vehicle_brand?: string | null
+          vehicle_fuel?: string | null
+          vehicle_model?: string | null
+          vehicle_type?: string | null
+          vehicle_year?: string | null
+        }
+        Update: {
+          client_company?: string | null
+          client_email?: string
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          delivery_address?: string
+          delivery_city?: string | null
+          delivery_postal_code?: string | null
+          distance_km?: number | null
+          id?: string
+          license_plate?: string | null
+          notes?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
+          pickup_address?: string
+          pickup_city?: string | null
+          pickup_postal_code?: string | null
+          price_ht?: number | null
+          price_ttc?: number | null
+          status?: string
+          updated_at?: string
+          vehicle_brand?: string | null
+          vehicle_fuel?: string | null
+          vehicle_model?: string | null
+          vehicle_type?: string | null
+          vehicle_year?: string | null
+        }
+        Relationships: []
+      }
       page_contents: {
         Row: {
           block_key: string

@@ -19,12 +19,13 @@ import GestionCookies from "@/pages/GestionCookies";
 import Admin from "@/pages/Admin";
 import Auth from "@/pages/Auth";
 import PreCommande from "@/pages/PreCommande";
+import Pilote from "@/pages/Pilote";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
-  const isAdminPage = location.pathname === '/admin';
+  const isAdminPage = location.pathname === '/admin' || location.pathname === '/pilote';
   const isAuthPage = location.pathname === '/auth';
   const isAboutPage = location.pathname === '/about';
 
@@ -47,6 +48,7 @@ function AppContent() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pre-commande" element={<PreCommande />} />
+          <Route path="/pilote" element={<Pilote />} />
         </Routes>
       </main>
       {!isAdminPage && !isAuthPage && !isAboutPage && <Footer />}
