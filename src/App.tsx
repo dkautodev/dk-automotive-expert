@@ -20,13 +20,14 @@ import Admin from "@/pages/Admin";
 import Auth from "@/pages/Auth";
 import PreCommande from "@/pages/PreCommande";
 import Pilote from "@/pages/Pilote";
+import PaymentSuccess from "@/pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin' || location.pathname === '/pilote';
-  const isAuthPage = location.pathname === '/auth';
+  const isAuthPage = location.pathname === '/auth' || location.pathname === '/payment-success';
   const isAboutPage = location.pathname === '/about';
 
   return (
@@ -49,6 +50,7 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/pre-commande" element={<PreCommande />} />
           <Route path="/pilote" element={<Pilote />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
         </Routes>
       </main>
       {!isAdminPage && !isAuthPage && !isAboutPage && <Footer />}

@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CreditCard } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Edit2, Check, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface QuoteData {
   pickup_address?: string;
@@ -24,10 +29,144 @@ interface QuoteData {
   additionalInfo?: string;
 }
 
+interface FormData {
+  // Dates & Times
+  pickupDate: string;
+  pickupTime: string;
+  deliveryDate: string;
+  deliveryTime: string;
+  // Vehicle
+  vehicleType: string;
+  brand: string;
+  model: string;
+  year: string;
+  fuel: string;
+  licensePlate: string;
+  vin: string;
+  // Client
+  company: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  // Pickup Contact
+  pickupContactName: string;
+  pickupContactPhone: string;
+  // Delivery Contact
+  deliveryContactName: string;
+  deliveryContactPhone: string;
+  // Notes
+  additionalInfo: string;
+}
+
 const PreCommande = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const quoteData = location.state as QuoteData | null;
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [editMode, setEditMode] = useState<Record<string, boolean>>({});
+
+  const [formData, setFormData] = useState<FormData>({
+    pickupDate: '',
+    pickupTime: '08:00',
+    deliveryDate: '',
+    deliveryTime: '18:00',
+    vehicleType: quoteData?.vehicle_type || '',
+    brand: quoteData?.brand || '',
+    model: quoteData?.model || '',
+    year: quoteData?.year || '',
+    fuel: quoteData?.fuel || '',
+    licensePlate: quoteData?.licensePlate || '',
+    vin: '',
+    company: quoteData?.company || '',
+    firstName: quoteData?.firstName || '',
+    lastName: quoteData?.lastName || '',
+    email: quoteData?.email || '',
+    phone: quoteData?.phone || '',
+    pickupContactName: '',
+    pickupContactPhone: '',
+    deliveryContactName: '',
+    deliveryContactPhone: '',
+    additionalInfo: quoteData?.additionalInfo || '',
+  });
+
+  // Calculate TVA (20%)
+  const priceHT = parseFloat(quoteData?.price_ht || '0');
+  const priceTTC = parseFloat(quoteData?.price_ttc || '0');
+  const tva = priceTTC - priceHT;
+
+  const handleInputChange = (field: keyof FormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const toggleEditMode = (section: string) => {
+    setEditMode(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handlePayment = async () => {
+    // Validate required fields
+    if (!formData.email || !formData.firstName || !formData.lastName) {
+      toast.error('Veuillez remplir les informations de contact');
+      return;
+    }
+
+    if (!formData.pickupDate || !formData.deliveryDate) {
+      toast.error('Veuillez sélectionner les dates de départ et d\'arrivée');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const missionData = {
+        pickup_address: quoteData?.pickup_address || '',
+        delivery_address: quoteData?.delivery_address || '',
+        distance_km: parseFloat(quoteData?.distance || '0'),
+        price_ht: priceHT,
+        price_ttc: priceTTC,
+        vehicle_type: formData.vehicleType,
+        vehicle_brand: formData.brand,
+        vehicle_model: formData.model,
+        vehicle_year: formData.year,
+        vehicle_fuel: formData.fuel,
+        license_plate: formData.licensePlate,
+        vehicle_vin: formData.vin,
+        client_name: `${formData.firstName} ${formData.lastName}`,
+        client_email: formData.email,
+        client_phone: formData.phone,
+        client_company: formData.company,
+        pickup_date: formData.pickupDate,
+        pickup_time: formData.pickupTime,
+        delivery_date: formData.deliveryDate,
+        delivery_time: formData.deliveryTime,
+        pickup_contact_name: formData.pickupContactName,
+        pickup_contact_phone: formData.pickupContactPhone,
+        delivery_contact_name: formData.deliveryContactName,
+        delivery_contact_phone: formData.deliveryContactPhone,
+        notes: formData.additionalInfo,
+      };
+
+      const { data, error } = await supabase.functions.invoke('create-mission-payment', {
+        body: missionData,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de paiement non reçue');
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error(`Erreur lors de la création du paiement: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   if (!quoteData) {
     return (
@@ -52,9 +191,9 @@ const PreCommande = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <main className="flex-1 animate-fadeIn">
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-8">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/devis')} 
@@ -64,138 +203,417 @@ const PreCommande = () => {
             Retour au formulaire de devis
           </Button>
 
-          <h1 className="text-3xl font-bold text-dk-navy mb-8">Pré-commander votre convoyage</h1>
+          <h1 className="text-3xl font-bold text-dk-navy mb-8">Finaliser votre pré-commande</h1>
           
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* Récapitulatif des informations */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-dk-navy">Récapitulatif de votre demande</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Trajet */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-dk-navy">Trajet</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+          <div className="grid gap-8 lg:grid-cols-3">
+            {/* Left column - Editable forms */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Trajet (Non-editable) */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-dk-navy flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Trajet
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
                     <div>
-                      <span className="text-sm text-gray-500">Départ:</span>
-                      <p className="font-medium">{quoteData.pickup_address || 'Non renseigné'}</p>
+                      <span className="text-sm text-gray-500">Départ</span>
+                      <p className="font-medium">{quoteData.pickup_address}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">Arrivée:</span>
-                      <p className="font-medium">{quoteData.delivery_address || 'Non renseigné'}</p>
+                      <span className="text-sm text-gray-500">Arrivée</span>
+                      <p className="font-medium">{quoteData.delivery_address}</p>
                     </div>
-                    {quoteData.distance && (
-                      <div>
-                        <span className="text-sm text-gray-500">Distance:</span>
-                        <p className="font-medium">{quoteData.distance} km</p>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm text-gray-500">Distance: </span>
+                    <span className="font-semibold text-dk-navy">{quoteData.distance} km</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Dates & Heures */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-dk-navy flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Dates et horaires
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-dk-navy">Départ</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="pickupDate">Date</Label>
+                          <Input
+                            id="pickupDate"
+                            type="date"
+                            value={formData.pickupDate}
+                            onChange={(e) => handleInputChange('pickupDate', e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="pickupTime">Heure</Label>
+                          <Input
+                            id="pickupTime"
+                            type="time"
+                            value={formData.pickupTime}
+                            onChange={(e) => handleInputChange('pickupTime', e.target.value)}
+                          />
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Véhicule */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-dk-navy">Véhicule</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                    <div>
-                      <span className="text-sm text-gray-500">Catégorie:</span>
-                      <p className="font-medium">{quoteData.vehicle_type || 'Non renseigné'}</p>
                     </div>
-                    {(quoteData.brand || quoteData.model) && (
-                      <div>
-                        <span className="text-sm text-gray-500">Véhicule:</span>
-                        <p className="font-medium">
-                          {[quoteData.brand, quoteData.model, quoteData.year].filter(Boolean).join(' ')}
-                        </p>
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-dk-navy">Arrivée</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="deliveryDate">Date</Label>
+                          <Input
+                            id="deliveryDate"
+                            type="date"
+                            value={formData.deliveryDate}
+                            onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
+                            min={formData.pickupDate || new Date().toISOString().split('T')[0]}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="deliveryTime">Heure</Label>
+                          <Input
+                            id="deliveryTime"
+                            type="time"
+                            value={formData.deliveryTime}
+                            onChange={(e) => handleInputChange('deliveryTime', e.target.value)}
+                          />
+                        </div>
                       </div>
-                    )}
-                    {quoteData.licensePlate && (
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Véhicule */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-dk-navy flex items-center gap-2">
+                      <Car className="h-5 w-5" />
+                      Véhicule
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleEditMode('vehicle')}
+                    >
+                      {editMode.vehicle ? <Check className="h-4 w-4" /> : <Edit2 className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="vehicleType">Catégorie</Label>
+                      <Input
+                        id="vehicleType"
+                        value={formData.vehicleType}
+                        onChange={(e) => handleInputChange('vehicleType', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="brand">Marque</Label>
+                      <Input
+                        id="brand"
+                        value={formData.brand}
+                        onChange={(e) => handleInputChange('brand', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                        placeholder="Ex: Peugeot"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="model">Modèle</Label>
+                      <Input
+                        id="model"
+                        value={formData.model}
+                        onChange={(e) => handleInputChange('model', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                        placeholder="Ex: 308"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="year">Année</Label>
+                      <Input
+                        id="year"
+                        value={formData.year}
+                        onChange={(e) => handleInputChange('year', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                        placeholder="Ex: 2023"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="fuel">Carburant</Label>
+                      <Input
+                        id="fuel"
+                        value={formData.fuel}
+                        onChange={(e) => handleInputChange('fuel', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                        placeholder="Ex: Essence"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="licensePlate">Immatriculation</Label>
+                      <Input
+                        id="licensePlate"
+                        value={formData.licensePlate}
+                        onChange={(e) => handleInputChange('licensePlate', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                        placeholder="Ex: AB-123-CD"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label htmlFor="vin">Numéro VIN</Label>
+                      <Input
+                        id="vin"
+                        value={formData.vin}
+                        onChange={(e) => handleInputChange('vin', e.target.value)}
+                        disabled={!editMode.vehicle}
+                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
+                        placeholder="Ex: VF3LBHZG8FS000001"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contact client */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-dk-navy flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      Vos coordonnées
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleEditMode('client')}
+                    >
+                      {editMode.client ? <Check className="h-4 w-4" /> : <Edit2 className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <Label htmlFor="company">Société (optionnel)</Label>
+                      <Input
+                        id="company"
+                        value={formData.company}
+                        onChange={(e) => handleInputChange('company', e.target.value)}
+                        disabled={!editMode.client}
+                        className={!editMode.client ? 'bg-gray-50' : ''}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="firstName">Prénom *</Label>
+                      <Input
+                        id="firstName"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        disabled={!editMode.client}
+                        className={!editMode.client ? 'bg-gray-50' : ''}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Nom *</Label>
+                      <Input
+                        id="lastName"
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        disabled={!editMode.client}
+                        className={!editMode.client ? 'bg-gray-50' : ''}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        disabled={!editMode.client}
+                        className={!editMode.client ? 'bg-gray-50' : ''}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Téléphone</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        disabled={!editMode.client}
+                        className={!editMode.client ? 'bg-gray-50' : ''}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contacts de départ et livraison */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-dk-navy flex items-center gap-2">
+                    <Phone className="h-5 w-5" />
+                    Contacts sur place
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-dk-navy">Contact au départ</h4>
                       <div>
-                        <span className="text-sm text-gray-500">Immatriculation:</span>
-                        <p className="font-medium">{quoteData.licensePlate}</p>
+                        <Label htmlFor="pickupContactName">Nom complet</Label>
+                        <Input
+                          id="pickupContactName"
+                          value={formData.pickupContactName}
+                          onChange={(e) => handleInputChange('pickupContactName', e.target.value)}
+                          placeholder="Nom de la personne sur place"
+                        />
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Contact */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-dk-navy">Contact</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                    {quoteData.company && (
                       <div>
-                        <span className="text-sm text-gray-500">Société:</span>
-                        <p className="font-medium">{quoteData.company}</p>
+                        <Label htmlFor="pickupContactPhone">Téléphone</Label>
+                        <Input
+                          id="pickupContactPhone"
+                          type="tel"
+                          value={formData.pickupContactPhone}
+                          onChange={(e) => handleInputChange('pickupContactPhone', e.target.value)}
+                          placeholder="Numéro de téléphone"
+                        />
                       </div>
-                    )}
-                    <div>
-                      <span className="text-sm text-gray-500">Nom:</span>
-                      <p className="font-medium">{quoteData.firstName} {quoteData.lastName}</p>
                     </div>
-                    <div>
-                      <span className="text-sm text-gray-500">Email:</span>
-                      <p className="font-medium">{quoteData.email}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm text-gray-500">Téléphone:</span>
-                      <p className="font-medium">{quoteData.phone}</p>
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-dk-navy">Contact à la livraison</h4>
+                      <div>
+                        <Label htmlFor="deliveryContactName">Nom complet</Label>
+                        <Input
+                          id="deliveryContactName"
+                          value={formData.deliveryContactName}
+                          onChange={(e) => handleInputChange('deliveryContactName', e.target.value)}
+                          placeholder="Nom de la personne sur place"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="deliveryContactPhone">Téléphone</Label>
+                        <Input
+                          id="deliveryContactPhone"
+                          type="tel"
+                          value={formData.deliveryContactPhone}
+                          onChange={(e) => handleInputChange('deliveryContactPhone', e.target.value)}
+                          placeholder="Numéro de téléphone"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                {quoteData.additionalInfo && (
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-dk-navy">Informations complémentaires</h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p>{quoteData.additionalInfo}</p>
+              {/* Informations complémentaires */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-dk-navy">Informations complémentaires</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <textarea
+                    className="w-full min-h-[100px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-dk-navy"
+                    value={formData.additionalInfo}
+                    onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
+                    placeholder="Instructions particulières, accès, horaires spéciaux..."
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right column - Payment */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <Card className="border-2 border-green-500">
+                  <CardHeader className="bg-green-50">
+                    <CardTitle className="text-green-700 flex items-center gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      Paiement sécurisé
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    {/* Tarifs */}
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Prix HT:</span>
+                        <span className="font-semibold">{priceHT.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">TVA (20%):</span>
+                        <span className="text-gray-600">{tva.toFixed(2)} €</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-800 font-medium">Prix TTC:</span>
+                        <span className="font-bold text-xl text-green-600">{priceTTC.toFixed(2)} €</span>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
 
-            {/* Section paiement */}
-            <Card className="border-2 border-green-500">
-              <CardHeader className="bg-green-50">
-                <CardTitle className="text-green-700 flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Paiement sécurisé
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                {/* Tarifs */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">Prix HT:</span>
-                    <span className="font-semibold text-lg">{quoteData.price_ht || 'À confirmer'} €</span>
-                  </div>
-                  <div className="flex justify-between items-center border-t pt-2">
-                    <span className="text-gray-800 font-medium">Prix TTC:</span>
-                    <span className="font-bold text-xl text-green-600">{quoteData.price_ttc || 'À confirmer'} €</span>
-                  </div>
-                </div>
+                    <Separator />
 
-                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                  <p className="text-yellow-800 text-sm">
-                    <strong>Note:</strong> Le paiement Stripe sera bientôt disponible. 
-                    Notre équipe vous contactera pour finaliser votre pré-commande.
-                  </p>
-                </div>
+                    {/* Payment methods info */}
+                    <div className="text-sm text-gray-600">
+                      <p className="font-medium mb-2">Moyens de paiement acceptés:</p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">Carte bancaire</span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">PayPal</span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">SEPA</span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">Apple Pay</span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">Google Pay</span>
+                      </div>
+                    </div>
 
-                <Button 
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
-                  disabled
-                >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Payer maintenant (Bientôt disponible)
-                </Button>
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
+                      onClick={handlePayment}
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Traitement en cours...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="mr-2 h-5 w-5" />
+                          Payer {priceTTC.toFixed(2)} €
+                        </>
+                      )}
+                    </Button>
 
-                <p className="text-xs text-gray-500 text-center">
-                  Paiement sécurisé par Stripe. Vos données bancaires sont protégées.
-                </p>
-              </CardContent>
-            </Card>
+                    <p className="text-xs text-gray-500 text-center">
+                      Paiement sécurisé par Stripe. Vos données bancaires sont protégées.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
         </div>
       </main>

@@ -242,7 +242,11 @@ export type Database = {
           created_at: string
           delivery_address: string
           delivery_city: string | null
+          delivery_contact_name: string | null
+          delivery_contact_phone: string | null
+          delivery_date: string | null
           delivery_postal_code: string | null
+          delivery_time: string | null
           distance_km: number | null
           id: string
           license_plate: string | null
@@ -251,7 +255,11 @@ export type Database = {
           payment_status: string | null
           pickup_address: string
           pickup_city: string | null
+          pickup_contact_name: string | null
+          pickup_contact_phone: string | null
+          pickup_date: string | null
           pickup_postal_code: string | null
+          pickup_time: string | null
           price_ht: number | null
           price_ttc: number | null
           status: string
@@ -260,6 +268,7 @@ export type Database = {
           vehicle_fuel: string | null
           vehicle_model: string | null
           vehicle_type: string | null
+          vehicle_vin: string | null
           vehicle_year: string | null
         }
         Insert: {
@@ -270,7 +279,11 @@ export type Database = {
           created_at?: string
           delivery_address: string
           delivery_city?: string | null
+          delivery_contact_name?: string | null
+          delivery_contact_phone?: string | null
+          delivery_date?: string | null
           delivery_postal_code?: string | null
+          delivery_time?: string | null
           distance_km?: number | null
           id?: string
           license_plate?: string | null
@@ -279,7 +292,11 @@ export type Database = {
           payment_status?: string | null
           pickup_address: string
           pickup_city?: string | null
+          pickup_contact_name?: string | null
+          pickup_contact_phone?: string | null
+          pickup_date?: string | null
           pickup_postal_code?: string | null
+          pickup_time?: string | null
           price_ht?: number | null
           price_ttc?: number | null
           status?: string
@@ -288,6 +305,7 @@ export type Database = {
           vehicle_fuel?: string | null
           vehicle_model?: string | null
           vehicle_type?: string | null
+          vehicle_vin?: string | null
           vehicle_year?: string | null
         }
         Update: {
@@ -298,7 +316,11 @@ export type Database = {
           created_at?: string
           delivery_address?: string
           delivery_city?: string | null
+          delivery_contact_name?: string | null
+          delivery_contact_phone?: string | null
+          delivery_date?: string | null
           delivery_postal_code?: string | null
+          delivery_time?: string | null
           distance_km?: number | null
           id?: string
           license_plate?: string | null
@@ -307,7 +329,11 @@ export type Database = {
           payment_status?: string | null
           pickup_address?: string
           pickup_city?: string | null
+          pickup_contact_name?: string | null
+          pickup_contact_phone?: string | null
+          pickup_date?: string | null
           pickup_postal_code?: string | null
+          pickup_time?: string | null
           price_ht?: number | null
           price_ttc?: number | null
           status?: string
@@ -316,6 +342,7 @@ export type Database = {
           vehicle_fuel?: string | null
           vehicle_model?: string | null
           vehicle_type?: string | null
+          vehicle_vin?: string | null
           vehicle_year?: string | null
         }
         Relationships: []
