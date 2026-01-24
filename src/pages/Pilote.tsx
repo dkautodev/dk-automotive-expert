@@ -35,6 +35,7 @@ interface Mission {
   vehicle_year: string | null;
   vehicle_fuel: string | null;
   license_plate: string | null;
+  vehicle_vin: string | null;
   client_name: string;
   client_email: string;
   client_phone: string | null;
@@ -43,6 +44,14 @@ interface Mission {
   payment_status: string | null;
   payment_intent_id: string | null;
   notes: string | null;
+  pickup_date: string | null;
+  pickup_time: string | null;
+  delivery_date: string | null;
+  delivery_time: string | null;
+  pickup_contact_name: string | null;
+  pickup_contact_phone: string | null;
+  delivery_contact_name: string | null;
+  delivery_contact_phone: string | null;
 }
 
 const statusOptions = [
@@ -325,7 +334,10 @@ const Pilote = () => {
                   <p><strong>Type:</strong> {selectedMission.vehicle_type || '-'}</p>
                   <p><strong>Marque:</strong> {selectedMission.vehicle_brand || '-'}</p>
                   <p><strong>Modèle:</strong> {selectedMission.vehicle_model || '-'}</p>
+                  <p><strong>Année:</strong> {selectedMission.vehicle_year || '-'}</p>
+                  <p><strong>Carburant:</strong> {selectedMission.vehicle_fuel || '-'}</p>
                   <p><strong>Immatriculation:</strong> {selectedMission.license_plate || '-'}</p>
+                  <p><strong>VIN:</strong> {selectedMission.vehicle_vin || '-'}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -333,11 +345,39 @@ const Pilote = () => {
                   <h3 className="font-semibold text-dk-navy mb-2">Enlèvement</h3>
                   <p>{selectedMission.pickup_address}</p>
                   <p>{selectedMission.pickup_postal_code} {selectedMission.pickup_city}</p>
+                  {selectedMission.pickup_date && (
+                    <p className="mt-2">
+                      <strong>Date:</strong> {new Date(selectedMission.pickup_date).toLocaleDateString('fr-FR')} 
+                      {selectedMission.pickup_time && ` à ${selectedMission.pickup_time}`}
+                    </p>
+                  )}
+                  {selectedMission.pickup_contact_name && (
+                    <div className="mt-2 text-sm bg-gray-50 p-2 rounded">
+                      <p><strong>Contact:</strong> {selectedMission.pickup_contact_name}</p>
+                      {selectedMission.pickup_contact_phone && (
+                        <p><strong>Tél:</strong> {selectedMission.pickup_contact_phone}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <h3 className="font-semibold text-dk-navy mb-2">Livraison</h3>
                   <p>{selectedMission.delivery_address}</p>
                   <p>{selectedMission.delivery_postal_code} {selectedMission.delivery_city}</p>
+                  {selectedMission.delivery_date && (
+                    <p className="mt-2">
+                      <strong>Date:</strong> {new Date(selectedMission.delivery_date).toLocaleDateString('fr-FR')} 
+                      {selectedMission.delivery_time && ` à ${selectedMission.delivery_time}`}
+                    </p>
+                  )}
+                  {selectedMission.delivery_contact_name && (
+                    <div className="mt-2 text-sm bg-gray-50 p-2 rounded">
+                      <p><strong>Contact:</strong> {selectedMission.delivery_contact_name}</p>
+                      {selectedMission.delivery_contact_phone && (
+                        <p><strong>Tél:</strong> {selectedMission.delivery_contact_phone}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4">
