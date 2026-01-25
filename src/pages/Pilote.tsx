@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Edit, Trash2, Eye, RefreshCw } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import TimeSelect from '@/components/admin/TimeSelect';
 
 interface Mission {
   id: string;
@@ -541,20 +542,16 @@ const Pilote = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Heure début créneau</label>
-                    <Input
-                      type="time"
-                      step="900"
+                    <TimeSelect
                       value={editForm.pickup_time || ''}
-                      onChange={(e) => setEditForm({ ...editForm, pickup_time: e.target.value })}
+                      onChange={(value) => setEditForm({ ...editForm, pickup_time: value })}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Heure fin créneau</label>
-                    <Input
-                      type="time"
-                      step="900"
+                    <TimeSelect
                       value={editForm.pickup_time_end || ''}
-                      onChange={(e) => setEditForm({ ...editForm, pickup_time_end: e.target.value })}
+                      onChange={(value) => setEditForm({ ...editForm, pickup_time_end: value })}
                     />
                   </div>
                 </div>
@@ -593,20 +590,16 @@ const Pilote = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Heure début créneau</label>
-                    <Input
-                      type="time"
-                      step="900"
+                    <TimeSelect
                       value={editForm.delivery_time || ''}
-                      onChange={(e) => setEditForm({ ...editForm, delivery_time: e.target.value })}
+                      onChange={(value) => setEditForm({ ...editForm, delivery_time: value })}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Heure fin créneau</label>
-                    <Input
-                      type="time"
-                      step="900"
+                    <TimeSelect
                       value={editForm.delivery_time_end || ''}
-                      onChange={(e) => setEditForm({ ...editForm, delivery_time_end: e.target.value })}
+                      onChange={(value) => setEditForm({ ...editForm, delivery_time_end: value })}
                     />
                   </div>
                 </div>
@@ -664,7 +657,8 @@ const Pilote = () => {
                     <label className="block text-sm font-medium mb-1">Type</label>
                     <Input
                       value={editForm.vehicle_type || ''}
-                      onChange={(e) => setEditForm({ ...editForm, vehicle_type: e.target.value })}
+                      disabled
+                      className="bg-gray-100 cursor-not-allowed"
                     />
                   </div>
                 </div>
