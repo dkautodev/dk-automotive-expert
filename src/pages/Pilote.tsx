@@ -72,10 +72,13 @@ const paymentStatusOptions = [
   { value: 'refunded', label: 'Remboursé', color: 'bg-gray-500' },
 ];
 
-const processedFilterOptions = [
-  { value: 'all', label: 'Toutes les missions' },
-  { value: 'to_process', label: 'À traiter' },
-  { value: 'processed', label: 'Traitées' },
+const statusFilterOptions = [
+  { value: 'all', label: 'Tous les statuts' },
+  { value: 'pending', label: 'En attente' },
+  { value: 'confirmed', label: 'Confirmée' },
+  { value: 'in_progress', label: 'En cours' },
+  { value: 'completed', label: 'Terminée' },
+  { value: 'cancelled', label: 'Annulée' },
 ];
 
 const Pilote = () => {
@@ -87,13 +90,11 @@ const Pilote = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Mission>>({});
-  const [processedFilter, setProcessedFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const filteredMissions = missions.filter((mission) => {
-    if (processedFilter === 'all') return true;
-    if (processedFilter === 'to_process') return !mission.is_processed;
-    if (processedFilter === 'processed') return mission.is_processed;
-    return true;
+    if (statusFilter === 'all') return true;
+    return mission.status === statusFilter;
   });
 
   useEffect(() => {
@@ -149,12 +150,12 @@ const Pilote = () => {
           pickup_city: editForm.pickup_city,
           delivery_address: editForm.delivery_address,
           delivery_city: editForm.delivery_city,
-          distance_km: editForm.distance_km,
-          price_ht: editForm.price_ht,
-          price_ttc: editForm.price_ttc,
           vehicle_type: editForm.vehicle_type,
           vehicle_brand: editForm.vehicle_brand,
           vehicle_model: editForm.vehicle_model,
+          vehicle_year: editForm.vehicle_year,
+          vehicle_fuel: editForm.vehicle_fuel,
+          vehicle_vin: editForm.vehicle_vin,
           license_plate: editForm.license_plate,
           client_name: editForm.client_name,
           client_email: editForm.client_email,
@@ -201,27 +202,6 @@ const Pilote = () => {
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
       toast.error('Erreur lors de la suppression de la mission');
-    }
-  };
-
-  const handleToggleProcessed = async (id: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('missions')
-        .update({ is_processed: !currentStatus })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      // Update local state for instant feedback
-      setMissions(prev => prev.map(m => 
-        m.id === id ? { ...m, is_processed: !currentStatus } : m
-      ));
-      
-      toast.success(currentStatus ? 'Mission marquée à traiter' : 'Mission marquée comme traitée');
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-      toast.error('Erreur lors de la mise à jour');
     }
   };
 
@@ -278,12 +258,12 @@ const Pilote = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Missions commandées ({filteredMissions.length}/{missions.length})</CardTitle>
-              <Select value={processedFilter} onValueChange={setProcessedFilter}>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Filtrer par traitement" />
+                  <SelectValue placeholder="Filtrer par statut" />
                 </SelectTrigger>
                 <SelectContent>
-                  {processedFilterOptions.map((option) => (
+                  {statusFilterOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -312,7 +292,6 @@ const Pilote = () => {
                         <TableHead>Prix TTC</TableHead>
                         <TableHead>Statut</TableHead>
                         <TableHead>Paiement</TableHead>
-                        <TableHead>Traité</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -348,14 +327,6 @@ const Pilote = () => {
                           </TableCell>
                           <TableCell>{getStatusBadge(mission.status)}</TableCell>
                           <TableCell>{getPaymentBadge(mission.payment_status)}</TableCell>
-                          <TableCell>
-                            <Badge 
-                              className={`cursor-pointer ${mission.is_processed ? 'bg-green-500 hover:bg-green-600' : 'bg-orange-500 hover:bg-orange-600'} text-white`}
-                              onClick={() => handleToggleProcessed(mission.id, mission.is_processed)}
-                            >
-                              {mission.is_processed ? 'Traité' : 'À traiter'}
-                            </Badge>
-                          </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button size="sm" variant="ghost" onClick={() => handleView(mission)}>
@@ -499,40 +470,47 @@ const Pilote = () => {
             <DialogTitle>Modifier la mission</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Nom client</label>
-                <Input
-                  value={editForm.client_name || ''}
-                  onChange={(e) => setEditForm({ ...editForm, client_name: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <Input
-                  value={editForm.client_email || ''}
-                  onChange={(e) => setEditForm({ ...editForm, client_email: e.target.value })}
-                />
+            {/* Section Client */}
+            <div>
+              <h3 className="font-semibold text-dk-navy mb-3 text-lg">👤 Client</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Nom client</label>
+                    <Input
+                      value={editForm.client_name || ''}
+                      onChange={(e) => setEditForm({ ...editForm, client_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <Input
+                      value={editForm.client_email || ''}
+                      onChange={(e) => setEditForm({ ...editForm, client_email: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Téléphone</label>
+                    <Input
+                      value={editForm.client_phone || ''}
+                      onChange={(e) => setEditForm({ ...editForm, client_phone: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Entreprise</label>
+                    <Input
+                      value={editForm.client_company || ''}
+                      onChange={(e) => setEditForm({ ...editForm, client_company: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Téléphone</label>
-                <Input
-                  value={editForm.client_phone || ''}
-                  onChange={(e) => setEditForm({ ...editForm, client_phone: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Entreprise</label>
-                <Input
-                  value={editForm.client_company || ''}
-                  onChange={(e) => setEditForm({ ...editForm, client_company: e.target.value })}
-                />
-              </div>
-            </div>
+
             {/* Section Départ */}
-            <div className="border-t pt-4 mt-4">
+            <div className="border-t pt-4">
               <h3 className="font-semibold text-dk-navy mb-3 text-lg">🚗 Départ</h3>
               <div className="space-y-4">
                 <div>
@@ -630,97 +608,151 @@ const Pilote = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Distance (km)</label>
-                <Input
-                  type="number"
-                  value={editForm.distance_km || ''}
-                  onChange={(e) => setEditForm({ ...editForm, distance_km: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Prix HT (€)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editForm.price_ht || ''}
-                  onChange={(e) => setEditForm({ ...editForm, price_ht: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Prix TTC (€)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editForm.price_ttc || ''}
-                  onChange={(e) => setEditForm({ ...editForm, price_ttc: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Marque véhicule</label>
-                <Input
-                  value={editForm.vehicle_brand || ''}
-                  onChange={(e) => setEditForm({ ...editForm, vehicle_brand: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Modèle</label>
-                <Input
-                  value={editForm.vehicle_model || ''}
-                  onChange={(e) => setEditForm({ ...editForm, vehicle_model: e.target.value })}
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Immatriculation</label>
-              <Input
-                value={editForm.license_plate || ''}
-                onChange={(e) => setEditForm({ ...editForm, license_plate: e.target.value })}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Statut mission</label>
-                <Select
-                  value={editForm.status || 'pending'}
-                  onValueChange={(value) => setEditForm({ ...editForm, status: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Statut paiement</label>
-                <Select
-                  value={editForm.payment_status || 'unpaid'}
-                  onValueChange={(value) => setEditForm({ ...editForm, payment_status: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {paymentStatusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+            {/* Section Véhicule */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold text-dk-navy mb-3 text-lg">🚙 Véhicule</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Marque</label>
+                    <Input
+                      value={editForm.vehicle_brand || ''}
+                      onChange={(e) => setEditForm({ ...editForm, vehicle_brand: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Modèle</label>
+                    <Input
+                      value={editForm.vehicle_model || ''}
+                      onChange={(e) => setEditForm({ ...editForm, vehicle_model: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Année</label>
+                    <Input
+                      value={editForm.vehicle_year || ''}
+                      onChange={(e) => setEditForm({ ...editForm, vehicle_year: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Carburant</label>
+                    <Input
+                      value={editForm.vehicle_fuel || ''}
+                      onChange={(e) => setEditForm({ ...editForm, vehicle_fuel: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Type</label>
+                    <Input
+                      value={editForm.vehicle_type || ''}
+                      onChange={(e) => setEditForm({ ...editForm, vehicle_type: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Immatriculation</label>
+                    <Input
+                      value={editForm.license_plate || ''}
+                      onChange={(e) => setEditForm({ ...editForm, license_plate: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Numéro VIN</label>
+                    <Input
+                      value={editForm.vehicle_vin || ''}
+                      onChange={(e) => setEditForm({ ...editForm, vehicle_vin: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Notes</label>
+
+            {/* Section Tarification (lecture seule) */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold text-dk-navy mb-3 text-lg">💰 Tarification</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Distance (km)</label>
+                  <Input
+                    type="number"
+                    value={editForm.distance_km || ''}
+                    disabled
+                    className="bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Prix HT (€)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editForm.price_ht || ''}
+                    disabled
+                    className="bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Prix TTC (€)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editForm.price_ttc || ''}
+                    disabled
+                    className="bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section Statuts */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold text-dk-navy mb-3 text-lg">📋 Statuts</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Statut mission</label>
+                  <Select
+                    value={editForm.status || 'pending'}
+                    onValueChange={(value) => setEditForm({ ...editForm, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Statut paiement</label>
+                  <Select
+                    value={editForm.payment_status || 'unpaid'}
+                    onValueChange={(value) => setEditForm({ ...editForm, payment_status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {paymentStatusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Section Notes */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold text-dk-navy mb-3 text-lg">📝 Notes</h3>
               <Textarea
                 value={editForm.notes || ''}
                 onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
