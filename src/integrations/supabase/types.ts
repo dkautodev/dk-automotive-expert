@@ -264,6 +264,7 @@ export type Database = {
           price_ttc: number | null
           status: string
           updated_at: string
+          updated_by: string | null
           vehicle_brand: string | null
           vehicle_fuel: string | null
           vehicle_model: string | null
@@ -301,6 +302,7 @@ export type Database = {
           price_ttc?: number | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
           vehicle_brand?: string | null
           vehicle_fuel?: string | null
           vehicle_model?: string | null
@@ -338,6 +340,7 @@ export type Database = {
           price_ttc?: number | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
           vehicle_brand?: string | null
           vehicle_fuel?: string | null
           vehicle_model?: string | null
