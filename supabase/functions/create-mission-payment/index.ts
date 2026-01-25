@@ -88,9 +88,11 @@ serve(async (req) => {
     console.log("Customer ID:", customerId);
 
     // Create a one-time payment session with multiple payment methods
+    // Note: Apple Pay and Google Pay are automatically enabled when using "card" 
+    // if they are configured in your Stripe account
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ["card", "sepa_debit", "paypal", "link"],
+      payment_method_types: ["card", "sepa_debit", "paypal"],
       line_items: [
         {
           price_data: {
