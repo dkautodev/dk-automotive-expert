@@ -70,6 +70,12 @@ const paymentStatusOptions = [
   { value: 'refunded', label: 'Remboursé', color: 'bg-gray-500' },
 ];
 
+const processedFilterOptions = [
+  { value: 'all', label: 'Toutes les missions' },
+  { value: 'to_process', label: 'À traiter' },
+  { value: 'processed', label: 'Traitées' },
+];
+
 const Pilote = () => {
   const navigate = useNavigate();
   const { isAdmin, isLoading: isAdminLoading } = useAdminCheck();
@@ -79,6 +85,14 @@ const Pilote = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Mission>>({});
+  const [processedFilter, setProcessedFilter] = useState<string>('all');
+
+  const filteredMissions = missions.filter((mission) => {
+    if (processedFilter === 'all') return true;
+    if (processedFilter === 'to_process') return !mission.is_processed;
+    if (processedFilter === 'processed') return mission.is_processed;
+    return true;
+  });
 
   useEffect(() => {
     if (!isAdminLoading && !isAdmin) {
@@ -256,17 +270,29 @@ const Pilote = () => {
           </div>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Missions commandées ({missions.length})</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Missions commandées ({filteredMissions.length}/{missions.length})</CardTitle>
+              <Select value={processedFilter} onValueChange={setProcessedFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filtrer par traitement" />
+                </SelectTrigger>
+                <SelectContent>
+                  {processedFilterOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent>
               {isLoading ? (
                 <div className="flex justify-center py-8">
                   <Loader />
                 </div>
-              ) : missions.length === 0 ? (
+              ) : filteredMissions.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  Aucune mission enregistrée pour le moment.
+                  {missions.length === 0 ? 'Aucune mission enregistrée pour le moment.' : 'Aucune mission ne correspond au filtre sélectionné.'}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -285,7 +311,7 @@ const Pilote = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {missions.map((mission) => (
+                      {filteredMissions.map((mission) => (
                         <TableRow key={mission.id}>
                           <TableCell className="whitespace-nowrap">
                             {new Date(mission.created_at).toLocaleDateString('fr-FR')}
