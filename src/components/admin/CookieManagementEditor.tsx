@@ -5,18 +5,30 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Save, Plus } from 'lucide-react';
+import { Loader2, Save, Plus, Trash2 } from 'lucide-react';
 import { useCookieManagement } from '@/hooks/useCookieManagement';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const CookieManagementEditor = () => {
-  const { cookieManagementSections, isLoading, updateCookieManagementSection, addCookieManagementSection } = useCookieManagement();
+  const { cookieManagementSections, isLoading, updateCookieManagementSection, addCookieManagementSection, deleteCookieManagementSection } = useCookieManagement();
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editKey, setEditKey] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const handleEdit = (section: any) => {
     setEditingSection(section.id);
@@ -57,6 +69,12 @@ const CookieManagementEditor = () => {
     setIsAdding(false);
   };
 
+  const handleDelete = async (id: string) => {
+    setIsDeleting(id);
+    await deleteCookieManagementSection(id);
+    setIsDeleting(null);
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,11 +102,38 @@ const CookieManagementEditor = () => {
       <div className="space-y-6">
         {cookieManagementSections.map((section, index) => (
           <Card key={section.id}>
-            <CardHeader>
-              <CardTitle className="text-lg">{section.section_title}</CardTitle>
-              <CardDescription>
-                Clé: {section.section_key} • Ordre: {section.display_order}
-              </CardDescription>
+            <CardHeader className="flex flex-row items-start justify-between">
+              <div>
+                <CardTitle className="text-lg">{section.section_title}</CardTitle>
+                <CardDescription>
+                  Clé: {section.section_key} • Ordre: {section.display_order}
+                </CardDescription>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="icon" className="text-destructive hover:text-destructive">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Supprimer cette section ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Cette action est irréversible. La section "{section.section_title}" sera définitivement supprimée.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(section.id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isDeleting === section.id ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                      Supprimer
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardHeader>
             <CardContent>
               {editingSection === section.id ? (

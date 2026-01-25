@@ -104,6 +104,29 @@ export const useCguContent = () => {
     }
   };
 
+  const deleteCguContentSection = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('cgu_content')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting CGU content section:', error);
+        toast.error('Erreur lors de la suppression');
+        return false;
+      }
+
+      setCguContentSections(prev => prev.filter(item => item.id !== id));
+      toast.success('Section supprimée avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error deleting CGU content section:', error);
+      toast.error('Erreur lors de la suppression');
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchCguContentSections();
   }, []);
@@ -113,6 +136,7 @@ export const useCguContent = () => {
     isLoading,
     updateCguContentSection,
     addCguContentSection,
+    deleteCguContentSection,
     refreshCguContentSections: fetchCguContentSections
   };
 };
