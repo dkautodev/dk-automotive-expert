@@ -39,13 +39,13 @@ const Index = () => {
   }
   return <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
-        <section className="relative h-[400px] md:h-[600px] bg-cover bg-center" style={{
+        <section className="relative min-h-[500px] md:min-h-[700px] bg-cover bg-center" style={{
         backgroundImage: `url("${getImageUrl('hero_background', '/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png')}")`
       }}>
           <div className="absolute inset-0 bg-black/40" />
-          <div className="container mx-auto px-4 h-full flex items-center relative z-10">
+          <div className="container mx-auto px-4 h-full flex items-center relative z-10 pt-8 md:pt-12">
             <div className="max-w-2xl">
-              <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-white leading-tight tracking-tight uppercase py-[20px]">
+              <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-white leading-tight tracking-tight uppercase">
                 {getText('hero_title', 'Convoyage de véhicules par route en France')}
               </h1>
               
