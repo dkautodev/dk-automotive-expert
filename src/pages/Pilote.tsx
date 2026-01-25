@@ -146,6 +146,10 @@ const Pilote = () => {
           status: editForm.status,
           payment_status: editForm.payment_status,
           notes: editForm.notes,
+          pickup_contact_name: editForm.pickup_contact_name,
+          pickup_contact_phone: editForm.pickup_contact_phone,
+          delivery_contact_name: editForm.delivery_contact_name,
+          delivery_contact_phone: editForm.delivery_contact_phone,
         })
         .eq('id', selectedMission.id);
 
@@ -467,6 +471,52 @@ const Pilote = () => {
                 value={editForm.delivery_address || ''}
                 onChange={(e) => setEditForm({ ...editForm, delivery_address: e.target.value })}
               />
+            </div>
+            
+            {/* Contact sur place - Départ */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="font-semibold text-dk-navy mb-3">Contact sur place - Départ</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nom du contact</label>
+                  <Input
+                    value={editForm.pickup_contact_name || ''}
+                    onChange={(e) => setEditForm({ ...editForm, pickup_contact_name: e.target.value })}
+                    placeholder="Nom du contact au départ"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Téléphone du contact</label>
+                  <Input
+                    value={editForm.pickup_contact_phone || ''}
+                    onChange={(e) => setEditForm({ ...editForm, pickup_contact_phone: e.target.value })}
+                    placeholder="Téléphone du contact"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Contact sur place - Livraison */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold text-dk-navy mb-3">Contact sur place - Livraison</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nom du contact</label>
+                  <Input
+                    value={editForm.delivery_contact_name || ''}
+                    onChange={(e) => setEditForm({ ...editForm, delivery_contact_name: e.target.value })}
+                    placeholder="Nom du contact à la livraison"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Téléphone du contact</label>
+                  <Input
+                    value={editForm.delivery_contact_phone || ''}
+                    onChange={(e) => setEditForm({ ...editForm, delivery_contact_phone: e.target.value })}
+                    placeholder="Téléphone du contact"
+                  />
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
