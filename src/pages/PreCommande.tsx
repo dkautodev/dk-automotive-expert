@@ -5,10 +5,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Edit2, Check, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
+const FUEL_OPTIONS = [
+  { value: 'essence', label: 'Essence' },
+  { value: 'diesel', label: 'Diesel' },
+  { value: 'hybride', label: 'Hybride' },
+  { value: 'electrique', label: 'Électrique' },
+  { value: 'gpl', label: 'GPL' },
+  { value: 'autre', label: 'Autre' },
+];
+
+const TIME_QUARTER_HOURS = ['00', '15', '30', '45'];
 interface QuoteData {
   pickup_address?: string;
   delivery_address?: string;
@@ -64,7 +75,12 @@ const PreCommande = () => {
   const navigate = useNavigate();
   const quoteData = location.state as QuoteData | null;
   const [isProcessing, setIsProcessing] = useState(false);
-  const [editMode, setEditMode] = useState<Record<string, boolean>>({});
+
+  // Time state - separated into hours and minutes for quarter-hour selection
+  const [pickupHour, setPickupHour] = useState('08');
+  const [pickupMinute, setPickupMinute] = useState('00');
+  const [deliveryHour, setDeliveryHour] = useState('18');
+  const [deliveryMinute, setDeliveryMinute] = useState('00');
 
   const [formData, setFormData] = useState<FormData>({
     pickupDate: '',
@@ -90,6 +106,15 @@ const PreCommande = () => {
     additionalInfo: quoteData?.additionalInfo || '',
   });
 
+  // Sync time with formData
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      pickupTime: `${pickupHour}:${pickupMinute}`,
+      deliveryTime: `${deliveryHour}:${deliveryMinute}`,
+    }));
+  }, [pickupHour, pickupMinute, deliveryHour, deliveryMinute]);
+
   // Calculate TVA (20%)
   const priceHT = parseFloat(quoteData?.price_ht || '0');
   const priceTTC = parseFloat(quoteData?.price_ttc || '0');
@@ -99,9 +124,8 @@ const PreCommande = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const toggleEditMode = (section: string) => {
-    setEditMode(prev => ({ ...prev, [section]: !prev[section] }));
-  };
+  // Generate hours array 00-23
+  const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 
   const handlePayment = async () => {
     // Validate required fields
@@ -115,6 +139,11 @@ const PreCommande = () => {
       return;
     }
 
+    // Validate required vehicle fields
+    if (!formData.brand || !formData.model || !formData.fuel || !formData.licensePlate) {
+      toast.error('Veuillez remplir les champs véhicule obligatoires (marque, modèle, carburant, immatriculation)');
+      return;
+    }
     setIsProcessing(true);
 
     try {
@@ -246,49 +275,77 @@ const PreCommande = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <h4 className="font-medium text-dk-navy">Départ</h4>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label htmlFor="pickupDate">Date</Label>
-                          <Input
-                            id="pickupDate"
-                            type="date"
-                            value={formData.pickupDate}
-                            onChange={(e) => handleInputChange('pickupDate', e.target.value)}
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="pickupTime">Heure</Label>
-                          <Input
-                            id="pickupTime"
-                            type="time"
-                            value={formData.pickupTime}
-                            onChange={(e) => handleInputChange('pickupTime', e.target.value)}
-                          />
+                      <div>
+                        <Label htmlFor="pickupDate">Date *</Label>
+                        <Input
+                          id="pickupDate"
+                          type="date"
+                          value={formData.pickupDate}
+                          onChange={(e) => handleInputChange('pickupDate', e.target.value)}
+                          min={new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                      <div>
+                        <Label>Heure *</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select value={pickupHour} onValueChange={setPickupHour}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Heure" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {hours.map((h) => (
+                                <SelectItem key={h} value={h}>{h}h</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={pickupMinute} onValueChange={setPickupMinute}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Min" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {TIME_QUARTER_HOURS.map((m) => (
+                                <SelectItem key={m} value={m}>{m}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-4">
                       <h4 className="font-medium text-dk-navy">Arrivée</h4>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label htmlFor="deliveryDate">Date</Label>
-                          <Input
-                            id="deliveryDate"
-                            type="date"
-                            value={formData.deliveryDate}
-                            onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
-                            min={formData.pickupDate || new Date().toISOString().split('T')[0]}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="deliveryTime">Heure</Label>
-                          <Input
-                            id="deliveryTime"
-                            type="time"
-                            value={formData.deliveryTime}
-                            onChange={(e) => handleInputChange('deliveryTime', e.target.value)}
-                          />
+                      <div>
+                        <Label htmlFor="deliveryDate">Date *</Label>
+                        <Input
+                          id="deliveryDate"
+                          type="date"
+                          value={formData.deliveryDate}
+                          onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
+                          min={formData.pickupDate || new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                      <div>
+                        <Label>Heure *</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select value={deliveryHour} onValueChange={setDeliveryHour}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Heure" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {hours.map((h) => (
+                                <SelectItem key={h} value={h}>{h}h</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={deliveryMinute} onValueChange={setDeliveryMinute}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Min" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {TIME_QUARTER_HOURS.map((m) => (
+                                <SelectItem key={m} value={m}>{m}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>
@@ -299,52 +356,31 @@ const PreCommande = () => {
               {/* Véhicule */}
               <Card>
                 <CardHeader className="pb-3">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-dk-navy flex items-center gap-2">
-                      <Car className="h-5 w-5" />
-                      Véhicule
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleEditMode('vehicle')}
-                    >
-                      {editMode.vehicle ? <Check className="h-4 w-4" /> : <Edit2 className="h-4 w-4" />}
-                    </Button>
-                  </div>
+                  <CardTitle className="text-dk-navy flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    Véhicule
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="vehicleType">Catégorie</Label>
-                      <Input
-                        id="vehicleType"
-                        value={formData.vehicleType}
-                        onChange={(e) => handleInputChange('vehicleType', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="brand">Marque</Label>
+                      <Label htmlFor="brand">Marque *</Label>
                       <Input
                         id="brand"
                         value={formData.brand}
                         onChange={(e) => handleInputChange('brand', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
                         placeholder="Ex: Peugeot"
+                        required
                       />
                     </div>
                     <div>
-                      <Label htmlFor="model">Modèle</Label>
+                      <Label htmlFor="model">Modèle *</Label>
                       <Input
                         id="model"
                         value={formData.model}
                         onChange={(e) => handleInputChange('model', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
                         placeholder="Ex: 308"
+                        required
                       />
                     </div>
                     <div>
@@ -353,41 +389,40 @@ const PreCommande = () => {
                         id="year"
                         value={formData.year}
                         onChange={(e) => handleInputChange('year', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
                         placeholder="Ex: 2023"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="fuel">Carburant</Label>
-                      <Input
-                        id="fuel"
-                        value={formData.fuel}
-                        onChange={(e) => handleInputChange('fuel', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
-                        placeholder="Ex: Essence"
-                      />
+                      <Label htmlFor="fuel">Carburant *</Label>
+                      <Select value={formData.fuel} onValueChange={(value) => handleInputChange('fuel', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner le carburant" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FUEL_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
-                      <Label htmlFor="licensePlate">Immatriculation</Label>
+                      <Label htmlFor="licensePlate">Immatriculation *</Label>
                       <Input
                         id="licensePlate"
                         value={formData.licensePlate}
                         onChange={(e) => handleInputChange('licensePlate', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
                         placeholder="Ex: AB-123-CD"
+                        required
                       />
                     </div>
-                    <div className="md:col-span-2">
+                    <div>
                       <Label htmlFor="vin">Numéro VIN</Label>
                       <Input
                         id="vin"
                         value={formData.vin}
                         onChange={(e) => handleInputChange('vin', e.target.value)}
-                        disabled={!editMode.vehicle}
-                        className={!editMode.vehicle ? 'bg-gray-50' : ''}
                         placeholder="Ex: VF3LBHZG8FS000001"
                       />
                     </div>
@@ -398,19 +433,10 @@ const PreCommande = () => {
               {/* Contact client */}
               <Card>
                 <CardHeader className="pb-3">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-dk-navy flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      Vos coordonnées
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleEditMode('client')}
-                    >
-                      {editMode.client ? <Check className="h-4 w-4" /> : <Edit2 className="h-4 w-4" />}
-                    </Button>
-                  </div>
+                  <CardTitle className="text-dk-navy flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Vos coordonnées
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -420,8 +446,6 @@ const PreCommande = () => {
                         id="company"
                         value={formData.company}
                         onChange={(e) => handleInputChange('company', e.target.value)}
-                        disabled={!editMode.client}
-                        className={!editMode.client ? 'bg-gray-50' : ''}
                       />
                     </div>
                     <div>
@@ -430,8 +454,6 @@ const PreCommande = () => {
                         id="firstName"
                         value={formData.firstName}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        disabled={!editMode.client}
-                        className={!editMode.client ? 'bg-gray-50' : ''}
                         required
                       />
                     </div>
@@ -441,8 +463,6 @@ const PreCommande = () => {
                         id="lastName"
                         value={formData.lastName}
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        disabled={!editMode.client}
-                        className={!editMode.client ? 'bg-gray-50' : ''}
                         required
                       />
                     </div>
@@ -453,8 +473,6 @@ const PreCommande = () => {
                         type="email"
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
-                        disabled={!editMode.client}
-                        className={!editMode.client ? 'bg-gray-50' : ''}
                         required
                       />
                     </div>
@@ -465,8 +483,6 @@ const PreCommande = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
-                        disabled={!editMode.client}
-                        className={!editMode.client ? 'bg-gray-50' : ''}
                       />
                     </div>
                   </div>
