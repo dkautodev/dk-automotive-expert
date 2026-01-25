@@ -255,7 +255,7 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
                 TRAITEMENT...
               </>
             ) : (
-              'ENVOYER VOTRE DEMANDE'
+              'ENVOYER LA DEMANDE GRATUITEMENT'
             )}
           </Button>
           
@@ -269,6 +269,15 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
             PRÉ-COMMANDER
           </Button>
         </div>
+      </div>
+      
+      <div className="mt-6 space-y-4 text-sm text-gray-600">
+        <p>
+          <strong>Pré-commander votre mission</strong> via notre formulaire sécurisé pour choisir votre date, votre horaire et renseigner les informations de votre véhicule. Dès validation, l'un de nos conseillers vous contactera pour confirmer votre mission et finaliser les derniers détails ensemble.
+        </p>
+        <p>
+          Si vous souhaitez obtenir plus d'informations sur nos solutions de convoyage, <strong>envoyez‑nous votre demande</strong> ! Un conseiller vous recontactera gratuitement dans les plus brefs délais pour répondre à toutes vos questions et vous aider à planifier votre transfert en toute tranquillité.
+        </p>
       </div>
     </div>
   );
