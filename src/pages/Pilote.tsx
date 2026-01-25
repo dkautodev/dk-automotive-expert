@@ -543,6 +543,7 @@ const Pilote = () => {
                     <label className="block text-sm font-medium mb-1">Heure début créneau</label>
                     <Input
                       type="time"
+                      step="900"
                       value={editForm.pickup_time || ''}
                       onChange={(e) => setEditForm({ ...editForm, pickup_time: e.target.value })}
                     />
@@ -551,6 +552,7 @@ const Pilote = () => {
                     <label className="block text-sm font-medium mb-1">Heure fin créneau</label>
                     <Input
                       type="time"
+                      step="900"
                       value={editForm.pickup_time_end || ''}
                       onChange={(e) => setEditForm({ ...editForm, pickup_time_end: e.target.value })}
                     />
@@ -593,6 +595,7 @@ const Pilote = () => {
                     <label className="block text-sm font-medium mb-1">Heure début créneau</label>
                     <Input
                       type="time"
+                      step="900"
                       value={editForm.delivery_time || ''}
                       onChange={(e) => setEditForm({ ...editForm, delivery_time: e.target.value })}
                     />
@@ -601,6 +604,7 @@ const Pilote = () => {
                     <label className="block text-sm font-medium mb-1">Heure fin créneau</label>
                     <Input
                       type="time"
+                      step="900"
                       value={editForm.delivery_time_end || ''}
                       onChange={(e) => setEditForm({ ...editForm, delivery_time_end: e.target.value })}
                     />
@@ -639,10 +643,22 @@ const Pilote = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Carburant</label>
-                    <Input
+                    <Select
                       value={editForm.vehicle_fuel || ''}
-                      onChange={(e) => setEditForm({ ...editForm, vehicle_fuel: e.target.value })}
-                    />
+                      onValueChange={(value) => setEditForm({ ...editForm, vehicle_fuel: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="essence">Essence</SelectItem>
+                        <SelectItem value="diesel">Diesel</SelectItem>
+                        <SelectItem value="hybride">Hybride</SelectItem>
+                        <SelectItem value="electrique">Électrique</SelectItem>
+                        <SelectItem value="gpl">GPL</SelectItem>
+                        <SelectItem value="gnv">GNV</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Type</label>
