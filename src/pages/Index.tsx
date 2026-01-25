@@ -43,7 +43,7 @@ const Index = () => {
         backgroundImage: `url("${getImageUrl('hero_background', '/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png')}")`
       }}>
           <div className="absolute inset-0 bg-black/40" />
-          <div className="container mx-auto px-4 h-full relative z-10 pt-8 md:pt-12 items-center justify-start flex flex-row py-[150px]">
+          <div className="container mx-auto px-4 h-full relative z-10 flex items-center justify-start min-h-[500px] md:min-h-[700px]">
             <div className="max-w-2xl">
               <h1 className="text-2xl font-bold mb-6 md:mb-8 text-white leading-tight tracking-tight uppercase md:text-3xl">
                 {getText('hero_title', 'Convoyage de véhicules par route en France')}
