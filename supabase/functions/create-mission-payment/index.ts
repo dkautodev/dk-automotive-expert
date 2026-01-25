@@ -30,8 +30,10 @@ interface MissionData {
   client_company?: string;
   pickup_date?: string;
   pickup_time?: string;
+  pickup_time_end?: string;
   delivery_date?: string;
   delivery_time?: string;
+  delivery_time_end?: string;
   pickup_contact_name?: string;
   pickup_contact_phone?: string;
   delivery_contact_name?: string;
@@ -132,8 +134,10 @@ serve(async (req) => {
         client_company: missionData.client_company || "",
         pickup_date: missionData.pickup_date || "",
         pickup_time: missionData.pickup_time || "",
+        pickup_time_end: missionData.pickup_time_end || "",
         delivery_date: missionData.delivery_date || "",
         delivery_time: missionData.delivery_time || "",
+        delivery_time_end: missionData.delivery_time_end || "",
         pickup_contact_name: missionData.pickup_contact_name || "",
         pickup_contact_phone: missionData.pickup_contact_phone || "",
         delivery_contact_name: missionData.delivery_contact_name || "",

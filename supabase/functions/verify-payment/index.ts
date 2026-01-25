@@ -65,7 +65,8 @@ function generateEmailHTML(missionData: any, isAdmin: boolean): string {
           <div class="section-title">📍 Enlèvement</div>
           <div class="info-row"><span class="info-label">Adresse :</span><span class="info-value">${missionData.pickup_address}</span></div>
           ${missionData.pickup_city ? `<div class="info-row"><span class="info-label">Ville :</span><span class="info-value">${missionData.pickup_postal_code || ""} ${missionData.pickup_city}</span></div>` : ""}
-          <div class="info-row"><span class="info-label">Date :</span><span class="info-value">${formatDateFR(missionData.pickup_date)}${missionData.pickup_time ? ` à ${missionData.pickup_time}` : ""}</span></div>
+          <div class="info-row"><span class="info-label">Date :</span><span class="info-value">${formatDateFR(missionData.pickup_date)}</span></div>
+          <div class="info-row"><span class="info-label">Créneau :</span><span class="info-value">${missionData.pickup_time || "N/A"}${missionData.pickup_time_end ? ` - ${missionData.pickup_time_end}` : ""}</span></div>
           ${missionData.pickup_contact_name ? `<div class="info-row"><span class="info-label">Contact sur place :</span><span class="info-value">${missionData.pickup_contact_name}${missionData.pickup_contact_phone ? ` - ${missionData.pickup_contact_phone}` : ""}</span></div>` : ""}
         </div>
 
@@ -73,8 +74,10 @@ function generateEmailHTML(missionData: any, isAdmin: boolean): string {
           <div class="section-title">🏁 Livraison</div>
           <div class="info-row"><span class="info-label">Adresse :</span><span class="info-value">${missionData.delivery_address}</span></div>
           ${missionData.delivery_city ? `<div class="info-row"><span class="info-label">Ville :</span><span class="info-value">${missionData.delivery_postal_code || ""} ${missionData.delivery_city}</span></div>` : ""}
-          <div class="info-row"><span class="info-label">Date :</span><span class="info-value">${formatDateFR(missionData.delivery_date)}${missionData.delivery_time ? ` à ${missionData.delivery_time}` : ""}</span></div>
+          <div class="info-row"><span class="info-label">Date :</span><span class="info-value">${formatDateFR(missionData.delivery_date)}</span></div>
+          <div class="info-row"><span class="info-label">Créneau :</span><span class="info-value">${missionData.delivery_time || "N/A"}${missionData.delivery_time_end ? ` - ${missionData.delivery_time_end}` : ""}</span></div>
           ${missionData.delivery_contact_name ? `<div class="info-row"><span class="info-label">Contact sur place :</span><span class="info-value">${missionData.delivery_contact_name}${missionData.delivery_contact_phone ? ` - ${missionData.delivery_contact_phone}` : ""}</span></div>` : ""}
+        </div>
         </div>
 
         <div class="section">
@@ -221,8 +224,10 @@ serve(async (req) => {
       client_company: metadata.client_company || null,
       pickup_date: metadata.pickup_date || null,
       pickup_time: metadata.pickup_time || null,
+      pickup_time_end: metadata.pickup_time_end || null,
       delivery_date: metadata.delivery_date || null,
       delivery_time: metadata.delivery_time || null,
+      delivery_time_end: metadata.delivery_time_end || null,
       pickup_contact_name: metadata.pickup_contact_name || null,
       pickup_contact_phone: metadata.pickup_contact_phone || null,
       delivery_contact_name: metadata.delivery_contact_name || null,

@@ -247,6 +247,7 @@ export type Database = {
           delivery_date: string | null
           delivery_postal_code: string | null
           delivery_time: string | null
+          delivery_time_end: string | null
           distance_km: number | null
           id: string
           is_processed: boolean
@@ -261,6 +262,7 @@ export type Database = {
           pickup_date: string | null
           pickup_postal_code: string | null
           pickup_time: string | null
+          pickup_time_end: string | null
           price_ht: number | null
           price_ttc: number | null
           status: string
@@ -286,6 +288,7 @@ export type Database = {
           delivery_date?: string | null
           delivery_postal_code?: string | null
           delivery_time?: string | null
+          delivery_time_end?: string | null
           distance_km?: number | null
           id?: string
           is_processed?: boolean
@@ -300,6 +303,7 @@ export type Database = {
           pickup_date?: string | null
           pickup_postal_code?: string | null
           pickup_time?: string | null
+          pickup_time_end?: string | null
           price_ht?: number | null
           price_ttc?: number | null
           status?: string
@@ -325,6 +329,7 @@ export type Database = {
           delivery_date?: string | null
           delivery_postal_code?: string | null
           delivery_time?: string | null
+          delivery_time_end?: string | null
           distance_km?: number | null
           id?: string
           is_processed?: boolean
@@ -339,6 +344,7 @@ export type Database = {
           pickup_date?: string | null
           pickup_postal_code?: string | null
           pickup_time?: string | null
+          pickup_time_end?: string | null
           price_ht?: number | null
           price_ttc?: number | null
           status?: string
