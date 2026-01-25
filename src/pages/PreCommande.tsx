@@ -43,9 +43,11 @@ interface QuoteData {
 interface FormData {
   // Dates & Times
   pickupDate: string;
-  pickupTime: string;
+  pickupTimeStart: string;
+  pickupTimeEnd: string;
   deliveryDate: string;
-  deliveryTime: string;
+  deliveryTimeStart: string;
+  deliveryTimeEnd: string;
   // Vehicle
   vehicleType: string;
   brand: string;
@@ -76,17 +78,23 @@ const PreCommande = () => {
   const quoteData = location.state as QuoteData | null;
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Time state - separated into hours and minutes for quarter-hour selection
-  const [pickupHour, setPickupHour] = useState('08');
-  const [pickupMinute, setPickupMinute] = useState('00');
-  const [deliveryHour, setDeliveryHour] = useState('18');
-  const [deliveryMinute, setDeliveryMinute] = useState('00');
+  // Time state - separated into hours and minutes for time slots
+  const [pickupStartHour, setPickupStartHour] = useState('09');
+  const [pickupStartMinute, setPickupStartMinute] = useState('00');
+  const [pickupEndHour, setPickupEndHour] = useState('11');
+  const [pickupEndMinute, setPickupEndMinute] = useState('00');
+  const [deliveryStartHour, setDeliveryStartHour] = useState('14');
+  const [deliveryStartMinute, setDeliveryStartMinute] = useState('00');
+  const [deliveryEndHour, setDeliveryEndHour] = useState('17');
+  const [deliveryEndMinute, setDeliveryEndMinute] = useState('00');
 
   const [formData, setFormData] = useState<FormData>({
     pickupDate: '',
-    pickupTime: '08:00',
+    pickupTimeStart: '09:00',
+    pickupTimeEnd: '11:00',
     deliveryDate: '',
-    deliveryTime: '18:00',
+    deliveryTimeStart: '14:00',
+    deliveryTimeEnd: '17:00',
     vehicleType: quoteData?.vehicle_type || '',
     brand: quoteData?.brand || '',
     model: quoteData?.model || '',
@@ -110,10 +118,12 @@ const PreCommande = () => {
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
-      pickupTime: `${pickupHour}:${pickupMinute}`,
-      deliveryTime: `${deliveryHour}:${deliveryMinute}`,
+      pickupTimeStart: `${pickupStartHour}:${pickupStartMinute}`,
+      pickupTimeEnd: `${pickupEndHour}:${pickupEndMinute}`,
+      deliveryTimeStart: `${deliveryStartHour}:${deliveryStartMinute}`,
+      deliveryTimeEnd: `${deliveryEndHour}:${deliveryEndMinute}`,
     }));
-  }, [pickupHour, pickupMinute, deliveryHour, deliveryMinute]);
+  }, [pickupStartHour, pickupStartMinute, pickupEndHour, pickupEndMinute, deliveryStartHour, deliveryStartMinute, deliveryEndHour, deliveryEndMinute]);
 
   // Calculate TVA (20%)
   const priceHT = parseFloat(quoteData?.price_ht || '0');
@@ -165,9 +175,11 @@ const PreCommande = () => {
         client_phone: formData.phone,
         client_company: formData.company,
         pickup_date: formData.pickupDate,
-        pickup_time: formData.pickupTime,
+        pickup_time: formData.pickupTimeStart,
+        pickup_time_end: formData.pickupTimeEnd,
         delivery_date: formData.deliveryDate,
-        delivery_time: formData.deliveryTime,
+        delivery_time: formData.deliveryTimeStart,
+        delivery_time_end: formData.deliveryTimeEnd,
         pickup_contact_name: formData.pickupContactName,
         pickup_contact_phone: formData.pickupContactPhone,
         delivery_contact_name: formData.deliveryContactName,
@@ -274,7 +286,7 @@ const PreCommande = () => {
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                      <h4 className="font-medium text-dk-navy">Départ</h4>
+                      <h4 className="font-medium text-dk-navy">Créneau d'enlèvement</h4>
                       <div>
                         <Label htmlFor="pickupDate">Date *</Label>
                         <Input
@@ -285,34 +297,61 @@ const PreCommande = () => {
                           min={new Date().toISOString().split('T')[0]}
                         />
                       </div>
-                      <div>
-                        <Label>Heure *</Label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Select value={pickupHour} onValueChange={setPickupHour}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Heure" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {hours.map((h) => (
-                                <SelectItem key={h} value={h}>{h}h</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select value={pickupMinute} onValueChange={setPickupMinute}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Min" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {TIME_QUARTER_HOURS.map((m) => (
-                                <SelectItem key={m} value={m}>{m}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Heure début *</Label>
+                          <div className="grid grid-cols-2 gap-1">
+                            <Select value={pickupStartHour} onValueChange={setPickupStartHour}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Heure" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {hours.map((h) => (
+                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Select value={pickupStartMinute} onValueChange={setPickupStartMinute}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Min" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIME_QUARTER_HOURS.map((m) => (
+                                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Heure fin *</Label>
+                          <div className="grid grid-cols-2 gap-1">
+                            <Select value={pickupEndHour} onValueChange={setPickupEndHour}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Heure" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {hours.map((h) => (
+                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Select value={pickupEndMinute} onValueChange={setPickupEndMinute}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Min" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIME_QUARTER_HOURS.map((m) => (
+                                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-4">
-                      <h4 className="font-medium text-dk-navy">Arrivée</h4>
+                      <h4 className="font-medium text-dk-navy">Créneau de livraison</h4>
                       <div>
                         <Label htmlFor="deliveryDate">Date *</Label>
                         <Input
@@ -323,29 +362,56 @@ const PreCommande = () => {
                           min={formData.pickupDate || new Date().toISOString().split('T')[0]}
                         />
                       </div>
-                      <div>
-                        <Label>Heure *</Label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Select value={deliveryHour} onValueChange={setDeliveryHour}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Heure" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {hours.map((h) => (
-                                <SelectItem key={h} value={h}>{h}h</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select value={deliveryMinute} onValueChange={setDeliveryMinute}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Min" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {TIME_QUARTER_HOURS.map((m) => (
-                                <SelectItem key={m} value={m}>{m}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Heure début *</Label>
+                          <div className="grid grid-cols-2 gap-1">
+                            <Select value={deliveryStartHour} onValueChange={setDeliveryStartHour}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Heure" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {hours.map((h) => (
+                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Select value={deliveryStartMinute} onValueChange={setDeliveryStartMinute}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Min" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIME_QUARTER_HOURS.map((m) => (
+                                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Heure fin *</Label>
+                          <div className="grid grid-cols-2 gap-1">
+                            <Select value={deliveryEndHour} onValueChange={setDeliveryEndHour}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Heure" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {hours.map((h) => (
+                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Select value={deliveryEndMinute} onValueChange={setDeliveryEndMinute}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Min" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {TIME_QUARTER_HOURS.map((m) => (
+                                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </div>
                     </div>
