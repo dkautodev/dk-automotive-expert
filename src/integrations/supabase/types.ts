@@ -249,6 +249,7 @@ export type Database = {
           delivery_time: string | null
           distance_km: number | null
           id: string
+          is_processed: boolean
           license_plate: string | null
           notes: string | null
           payment_intent_id: string | null
@@ -287,6 +288,7 @@ export type Database = {
           delivery_time?: string | null
           distance_km?: number | null
           id?: string
+          is_processed?: boolean
           license_plate?: string | null
           notes?: string | null
           payment_intent_id?: string | null
@@ -325,6 +327,7 @@ export type Database = {
           delivery_time?: string | null
           distance_km?: number | null
           id?: string
+          is_processed?: boolean
           license_plate?: string | null
           notes?: string | null
           payment_intent_id?: string | null
