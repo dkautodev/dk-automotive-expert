@@ -41,11 +41,11 @@ export const useCguContent = () => {
     }
   };
 
-  const updateCguContentSection = async (id: string, section_content: string) => {
+  const updateCguContentSection = async (id: string, updates: { section_content?: string; section_title?: string; section_key?: string }) => {
     try {
       const { error } = await supabase
         .from('cgu_content')
-        .update({ section_content })
+        .update(updates)
         .eq('id', id);
 
       if (error) {
@@ -56,7 +56,7 @@ export const useCguContent = () => {
 
       setCguContentSections(prev => 
         prev.map(item => 
-          item.id === id ? { ...item, section_content } : item
+          item.id === id ? { ...item, ...updates } : item
         )
       );
       toast.success('Section mise à jour avec succès');
@@ -64,6 +64,42 @@ export const useCguContent = () => {
     } catch (error) {
       console.error('Error updating CGU content section:', error);
       toast.error('Erreur lors de la mise à jour');
+      return false;
+    }
+  };
+
+  const addCguContentSection = async () => {
+    try {
+      const nextOrder = cguContentSections.length > 0 
+        ? Math.max(...cguContentSections.map(s => s.display_order)) + 1 
+        : 1;
+      
+      const newSection = {
+        section_key: `section_${nextOrder}`,
+        section_title: `Nouvelle section ${nextOrder}`,
+        section_content: '',
+        display_order: nextOrder,
+        is_active: true
+      };
+
+      const { data, error } = await supabase
+        .from('cgu_content')
+        .insert(newSection)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding CGU content section:', error);
+        toast.error('Erreur lors de l\'ajout de la section');
+        return false;
+      }
+
+      setCguContentSections(prev => [...prev, data]);
+      toast.success('Section ajoutée avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error adding CGU content section:', error);
+      toast.error('Erreur lors de l\'ajout de la section');
       return false;
     }
   };
@@ -76,6 +112,7 @@ export const useCguContent = () => {
     cguContentSections,
     isLoading,
     updateCguContentSection,
+    addCguContentSection,
     refreshCguContentSections: fetchCguContentSections
   };
 };
