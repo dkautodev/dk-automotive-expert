@@ -322,8 +322,8 @@ const Pilote = () => {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="font-medium">
-                            {mission.price_ttc ? `${mission.price_ttc.toFixed(2)} €` : '-'}
+                          <TableCell className="font-medium whitespace-nowrap">
+                            {mission.price_ttc ? `${mission.price_ttc.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
                           </TableCell>
                           <TableCell>{getStatusBadge(mission.status)}</TableCell>
                           <TableCell>{getPaymentBadge(mission.payment_status)}</TableCell>
