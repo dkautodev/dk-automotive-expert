@@ -104,6 +104,29 @@ export const useCookieManagement = () => {
     }
   };
 
+  const deleteCookieManagementSection = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('cookie_management')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting cookie management section:', error);
+        toast.error('Erreur lors de la suppression');
+        return false;
+      }
+
+      setCookieManagementSections(prev => prev.filter(item => item.id !== id));
+      toast.success('Section supprimée avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error deleting cookie management section:', error);
+      toast.error('Erreur lors de la suppression');
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchCookieManagementSections();
   }, []);
@@ -113,6 +136,7 @@ export const useCookieManagement = () => {
     isLoading,
     updateCookieManagementSection,
     addCookieManagementSection,
+    deleteCookieManagementSection,
     refreshCookieManagementSections: fetchCookieManagementSections
   };
 };

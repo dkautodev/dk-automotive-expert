@@ -104,6 +104,29 @@ export const useCgvContent = () => {
     }
   };
 
+  const deleteCgvContentSection = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('cgv_content')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting CGV content section:', error);
+        toast.error('Erreur lors de la suppression');
+        return false;
+      }
+
+      setCgvContentSections(prev => prev.filter(item => item.id !== id));
+      toast.success('Section supprimée avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error deleting CGV content section:', error);
+      toast.error('Erreur lors de la suppression');
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchCgvContentSections();
   }, []);
@@ -113,6 +136,7 @@ export const useCgvContent = () => {
     isLoading,
     updateCgvContentSection,
     addCgvContentSection,
+    deleteCgvContentSection,
     refreshCgvContentSections: fetchCgvContentSections
   };
 };

@@ -104,6 +104,29 @@ export const usePrivacyPolicy = () => {
     }
   };
 
+  const deletePrivacyPolicySection = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('privacy_policy')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting privacy policy section:', error);
+        toast.error('Erreur lors de la suppression');
+        return false;
+      }
+
+      setPrivacyPolicySections(prev => prev.filter(item => item.id !== id));
+      toast.success('Section supprimée avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error deleting privacy policy section:', error);
+      toast.error('Erreur lors de la suppression');
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchPrivacyPolicySections();
   }, []);
@@ -113,6 +136,7 @@ export const usePrivacyPolicy = () => {
     isLoading,
     updatePrivacyPolicySection,
     addPrivacyPolicySection,
+    deletePrivacyPolicySection,
     refreshPrivacyPolicySections: fetchPrivacyPolicySections
   };
 };
