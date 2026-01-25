@@ -3,31 +3,43 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Plus } from 'lucide-react';
 import { useCguContent } from '@/hooks/useCguContent';
 import { Separator } from '@/components/ui/separator';
 
 const CguEditor = () => {
-  const { cguContentSections, isLoading, updateCguContentSection } = useCguContent();
+  const { cguContentSections, isLoading, updateCguContentSection, addCguContentSection } = useCguContent();
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editKey, setEditKey] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleEdit = (section: any) => {
     setEditingSection(section.id);
     setEditContent(section.section_content || '');
+    setEditTitle(section.section_title || '');
+    setEditKey(section.section_key || '');
   };
 
   const handleSave = async () => {
     if (!editingSection) return;
     
     setIsSaving(true);
-    const success = await updateCguContentSection(editingSection, editContent);
+    const success = await updateCguContentSection(editingSection, {
+      section_content: editContent,
+      section_title: editTitle,
+      section_key: editKey
+    });
     
     if (success) {
       setEditingSection(null);
       setEditContent('');
+      setEditTitle('');
+      setEditKey('');
     }
     setIsSaving(false);
   };
@@ -35,6 +47,14 @@ const CguEditor = () => {
   const handleCancel = () => {
     setEditingSection(null);
     setEditContent('');
+    setEditTitle('');
+    setEditKey('');
+  };
+
+  const handleAddSection = async () => {
+    setIsAdding(true);
+    await addCguContentSection();
+    setIsAdding(false);
   };
 
   if (isLoading) {
@@ -50,9 +70,15 @@ const CguEditor = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-dk-navy mb-2">Éditeur - Conditions Générales d'Utilisation</h2>
-        <p className="text-gray-600">Gérez le contenu de vos CGU</p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold text-dk-navy mb-2">Éditeur - Conditions Générales d'Utilisation</h2>
+          <p className="text-gray-600">Gérez le contenu de vos CGU</p>
+        </div>
+        <Button onClick={handleAddSection} disabled={isAdding} className="flex items-center gap-2">
+          {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          Ajouter un paragraphe
+        </Button>
       </div>
 
       <div className="space-y-6">
@@ -67,6 +93,28 @@ const CguEditor = () => {
             <CardContent>
               {editingSection === section.id ? (
                 <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`title-${section.id}`}>Titre</Label>
+                      <Input
+                        id={`title-${section.id}`}
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="mt-2"
+                        placeholder="Titre de la section"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`key-${section.id}`}>Clé</Label>
+                      <Input
+                        id={`key-${section.id}`}
+                        value={editKey}
+                        onChange={(e) => setEditKey(e.target.value)}
+                        className="mt-2"
+                        placeholder="Clé unique de la section"
+                      />
+                    </div>
+                  </div>
                   <div>
                     <Label htmlFor={`content-${section.id}`}>Contenu</Label>
                     <Textarea
