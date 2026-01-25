@@ -46,8 +46,10 @@ interface Mission {
   notes: string | null;
   pickup_date: string | null;
   pickup_time: string | null;
+  pickup_time_end: string | null;
   delivery_date: string | null;
   delivery_time: string | null;
+  delivery_time_end: string | null;
   pickup_contact_name: string | null;
   pickup_contact_phone: string | null;
   delivery_contact_name: string | null;
@@ -408,8 +410,13 @@ const Pilote = () => {
                   <p>{selectedMission.pickup_postal_code} {selectedMission.pickup_city}</p>
                   {selectedMission.pickup_date && (
                     <p className="mt-2">
-                      <strong>Date:</strong> {new Date(selectedMission.pickup_date).toLocaleDateString('fr-FR')} 
-                      {selectedMission.pickup_time && ` à ${selectedMission.pickup_time}`}
+                      <strong>Date:</strong> {new Date(selectedMission.pickup_date).toLocaleDateString('fr-FR')}
+                    </p>
+                  )}
+                  {selectedMission.pickup_time && (
+                    <p>
+                      <strong>Créneau:</strong> {selectedMission.pickup_time}
+                      {selectedMission.pickup_time_end && ` - ${selectedMission.pickup_time_end}`}
                     </p>
                   )}
                   {selectedMission.pickup_contact_name && (
@@ -427,8 +434,13 @@ const Pilote = () => {
                   <p>{selectedMission.delivery_postal_code} {selectedMission.delivery_city}</p>
                   {selectedMission.delivery_date && (
                     <p className="mt-2">
-                      <strong>Date:</strong> {new Date(selectedMission.delivery_date).toLocaleDateString('fr-FR')} 
-                      {selectedMission.delivery_time && ` à ${selectedMission.delivery_time}`}
+                      <strong>Date:</strong> {new Date(selectedMission.delivery_date).toLocaleDateString('fr-FR')}
+                    </p>
+                  )}
+                  {selectedMission.delivery_time && (
+                    <p>
+                      <strong>Créneau:</strong> {selectedMission.delivery_time}
+                      {selectedMission.delivery_time_end && ` - ${selectedMission.delivery_time_end}`}
                     </p>
                   )}
                   {selectedMission.delivery_contact_name && (
