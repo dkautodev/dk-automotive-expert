@@ -52,6 +52,7 @@ interface Mission {
   pickup_contact_phone: string | null;
   delivery_contact_name: string | null;
   delivery_contact_phone: string | null;
+  is_processed: boolean;
 }
 
 const statusOptions = [
@@ -183,6 +184,27 @@ const Pilote = () => {
     }
   };
 
+  const handleToggleProcessed = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('missions')
+        .update({ is_processed: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state for instant feedback
+      setMissions(prev => prev.map(m => 
+        m.id === id ? { ...m, is_processed: !currentStatus } : m
+      ));
+      
+      toast.success(currentStatus ? 'Mission marquée à traiter' : 'Mission marquée comme traitée');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+      toast.error('Erreur lors de la mise à jour');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const option = statusOptions.find(o => o.value === status);
     return (
@@ -258,6 +280,7 @@ const Pilote = () => {
                         <TableHead>Prix TTC</TableHead>
                         <TableHead>Statut</TableHead>
                         <TableHead>Paiement</TableHead>
+                        <TableHead>Traité</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -293,6 +316,14 @@ const Pilote = () => {
                           </TableCell>
                           <TableCell>{getStatusBadge(mission.status)}</TableCell>
                           <TableCell>{getPaymentBadge(mission.payment_status)}</TableCell>
+                          <TableCell>
+                            <Badge 
+                              className={`cursor-pointer ${mission.is_processed ? 'bg-green-500 hover:bg-green-600' : 'bg-orange-500 hover:bg-orange-600'} text-white`}
+                              onClick={() => handleToggleProcessed(mission.id, mission.is_processed)}
+                            >
+                              {mission.is_processed ? 'Traité' : 'À traiter'}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button size="sm" variant="ghost" onClick={() => handleView(mission)}>
