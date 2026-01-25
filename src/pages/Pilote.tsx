@@ -167,6 +167,10 @@ const Pilote = () => {
           pickup_contact_phone: editForm.pickup_contact_phone,
           delivery_contact_name: editForm.delivery_contact_name,
           delivery_contact_phone: editForm.delivery_contact_phone,
+          pickup_time: editForm.pickup_time,
+          pickup_time_end: editForm.pickup_time_end,
+          delivery_time: editForm.delivery_time,
+          delivery_time_end: editForm.delivery_time_end,
         })
         .eq('id', selectedMission.id);
 
@@ -563,6 +567,24 @@ const Pilote = () => {
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-4 mt-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Heure début créneau</label>
+                  <Input
+                    type="time"
+                    value={editForm.pickup_time || ''}
+                    onChange={(e) => setEditForm({ ...editForm, pickup_time: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Heure fin créneau</label>
+                  <Input
+                    type="time"
+                    value={editForm.pickup_time_end || ''}
+                    onChange={(e) => setEditForm({ ...editForm, pickup_time_end: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
             
             {/* Contact sur place - Livraison */}
@@ -583,6 +605,24 @@ const Pilote = () => {
                     value={editForm.delivery_contact_phone || ''}
                     onChange={(e) => setEditForm({ ...editForm, delivery_contact_phone: e.target.value })}
                     placeholder="Téléphone du contact"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Heure début créneau</label>
+                  <Input
+                    type="time"
+                    value={editForm.delivery_time || ''}
+                    onChange={(e) => setEditForm({ ...editForm, delivery_time: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Heure fin créneau</label>
+                  <Input
+                    type="time"
+                    value={editForm.delivery_time_end || ''}
+                    onChange={(e) => setEditForm({ ...editForm, delivery_time_end: e.target.value })}
                   />
                 </div>
               </div>
