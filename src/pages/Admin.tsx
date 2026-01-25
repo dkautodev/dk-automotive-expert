@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock, Users } from 'lucide-react';
+import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock, Users, Navigation } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import IndexPageEditor from '@/components/admin/IndexPageEditor';
@@ -105,10 +106,18 @@ const Admin = () => {
                   Connecté en tant que : {user?.email} - DK Automotive
                 </p>
               </div>
-              <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2">
-                <LogOut className="w-4 h-4" />
-                Déconnexion
-              </Button>
+              <div className="flex items-center gap-3">
+                <Link to="/pilote">
+                  <Button variant="default" className="flex items-center gap-2 bg-dk-navy hover:bg-dk-navy/90">
+                    <Navigation className="w-4 h-4" />
+                    Pilote
+                  </Button>
+                </Link>
+                <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2">
+                  <LogOut className="w-4 h-4" />
+                  Déconnexion
+                </Button>
+              </div>
             </div>
           </div>
         </header>
