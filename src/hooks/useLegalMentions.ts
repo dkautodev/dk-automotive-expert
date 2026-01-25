@@ -41,11 +41,11 @@ export const useLegalMentions = () => {
     }
   };
 
-  const updateLegalMention = async (id: string, field_value: string) => {
+  const updateLegalMention = async (id: string, updates: { field_value?: string; field_label?: string; field_key?: string }) => {
     try {
       const { error } = await supabase
         .from('legal_mentions')
-        .update({ field_value })
+        .update(updates)
         .eq('id', id);
 
       if (error) {
@@ -56,7 +56,7 @@ export const useLegalMentions = () => {
 
       setLegalMentions(prev => 
         prev.map(item => 
-          item.id === id ? { ...item, field_value } : item
+          item.id === id ? { ...item, ...updates } : item
         )
       );
       toast.success('Mention légale mise à jour avec succès');
@@ -64,6 +64,131 @@ export const useLegalMentions = () => {
     } catch (error) {
       console.error('Error updating legal mention:', error);
       toast.error('Erreur lors de la mise à jour');
+      return false;
+    }
+  };
+
+  const addLegalMention = async (type: 'basic' | 'section') => {
+    try {
+      const nextOrder = legalMentions.length > 0 
+        ? Math.max(...legalMentions.map(s => s.display_order)) + 1 
+        : 1;
+      
+      if (type === 'basic') {
+        const newMention = {
+          field_key: `nouveau_champ_${nextOrder}`,
+          field_label: `Nouveau champ ${nextOrder}`,
+          field_value: '',
+          display_order: nextOrder,
+          is_active: true
+        };
+
+        const { data, error } = await supabase
+          .from('legal_mentions')
+          .insert(newMention)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error adding legal mention:', error);
+          toast.error('Erreur lors de l\'ajout du champ');
+          return false;
+        }
+
+        setLegalMentions(prev => [...prev, data]);
+        toast.success('Champ ajouté avec succès');
+        return true;
+      } else {
+        // Add a section with titre and contenu
+        const sectionKey = `section_${nextOrder}`;
+        const titreData = {
+          field_key: `${sectionKey}_titre`,
+          field_label: `Titre section ${nextOrder}`,
+          field_value: '',
+          display_order: nextOrder,
+          is_active: true
+        };
+        const contenuData = {
+          field_key: `${sectionKey}_contenu`,
+          field_label: `Contenu section ${nextOrder}`,
+          field_value: '',
+          display_order: nextOrder + 1,
+          is_active: true
+        };
+
+        const { data: titreResult, error: titreError } = await supabase
+          .from('legal_mentions')
+          .insert(titreData)
+          .select()
+          .single();
+
+        if (titreError) {
+          console.error('Error adding titre:', titreError);
+          toast.error('Erreur lors de l\'ajout de la section');
+          return false;
+        }
+
+        const { data: contenuResult, error: contenuError } = await supabase
+          .from('legal_mentions')
+          .insert(contenuData)
+          .select()
+          .single();
+
+        if (contenuError) {
+          console.error('Error adding contenu:', contenuError);
+          toast.error('Erreur lors de l\'ajout de la section');
+          return false;
+        }
+
+        setLegalMentions(prev => [...prev, titreResult, contenuResult]);
+        toast.success('Section ajoutée avec succès');
+        return true;
+      }
+    } catch (error) {
+      console.error('Error adding legal mention:', error);
+      toast.error('Erreur lors de l\'ajout');
+      return false;
+    }
+  };
+
+  const deleteLegalMention = async (id: string, isSection?: boolean, sectionKey?: string) => {
+    try {
+      if (isSection && sectionKey) {
+        // Delete both titre and contenu for the section
+        const { error } = await supabase
+          .from('legal_mentions')
+          .delete()
+          .or(`field_key.eq.${sectionKey}_titre,field_key.eq.${sectionKey}_contenu`);
+
+        if (error) {
+          console.error('Error deleting section:', error);
+          toast.error('Erreur lors de la suppression');
+          return false;
+        }
+
+        setLegalMentions(prev => prev.filter(item => 
+          item.field_key !== `${sectionKey}_titre` && item.field_key !== `${sectionKey}_contenu`
+        ));
+      } else {
+        const { error } = await supabase
+          .from('legal_mentions')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          console.error('Error deleting legal mention:', error);
+          toast.error('Erreur lors de la suppression');
+          return false;
+        }
+
+        setLegalMentions(prev => prev.filter(item => item.id !== id));
+      }
+      
+      toast.success('Suppression effectuée avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error deleting legal mention:', error);
+      toast.error('Erreur lors de la suppression');
       return false;
     }
   };
@@ -76,6 +201,8 @@ export const useLegalMentions = () => {
     legalMentions,
     isLoading,
     updateLegalMention,
+    addLegalMention,
+    deleteLegalMention,
     refreshLegalMentions: fetchLegalMentions
   };
 };
