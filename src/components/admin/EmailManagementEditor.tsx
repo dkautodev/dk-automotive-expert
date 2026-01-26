@@ -112,17 +112,7 @@ const EmailManagementEditor = () => {
         </p>
       </div>
 
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="flex items-start gap-3">
-          <Send className="h-5 w-5 text-blue-600 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-blue-900">Configuration Brevo</h3>
-            <p className="text-sm text-blue-700 mt-1">
-              Les emails sont envoyés via l'API Brevo avec la clé API configurée dans les secrets Supabase (BREVO_API_KEY).
-            </p>
-          </div>
-        </div>
-      </div>
+      
 
       <Accordion type="multiple" defaultValue={['quotes', 'payments']} className="space-y-4">
         <AccordionItem value="quotes" className="border rounded-lg px-4">
