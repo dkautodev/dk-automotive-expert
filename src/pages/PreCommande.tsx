@@ -9,16 +9,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-
-const FUEL_OPTIONS = [
-  { value: 'essence', label: 'Essence' },
-  { value: 'diesel', label: 'Diesel' },
-  { value: 'hybride', label: 'Hybride' },
-  { value: 'electrique', label: 'Électrique' },
-  { value: 'gpl', label: 'GPL' },
-  { value: 'autre', label: 'Autre' },
-];
-
+const FUEL_OPTIONS = [{
+  value: 'essence',
+  label: 'Essence'
+}, {
+  value: 'diesel',
+  label: 'Diesel'
+}, {
+  value: 'hybride',
+  label: 'Hybride'
+}, {
+  value: 'electrique',
+  label: 'Électrique'
+}, {
+  value: 'gpl',
+  label: 'GPL'
+}, {
+  value: 'autre',
+  label: 'Autre'
+}];
 const TIME_QUARTER_HOURS = ['00', '15', '30', '45'];
 interface QuoteData {
   pickup_address?: string;
@@ -39,7 +48,6 @@ interface QuoteData {
   price_ttc?: string;
   additionalInfo?: string;
 }
-
 interface FormData {
   // Dates & Times
   pickupDate: string;
@@ -71,7 +79,6 @@ interface FormData {
   // Notes
   additionalInfo: string;
 }
-
 const PreCommande = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -87,7 +94,6 @@ const PreCommande = () => {
   const [deliveryStartMinute, setDeliveryStartMinute] = useState('00');
   const [deliveryEndHour, setDeliveryEndHour] = useState('17');
   const [deliveryEndMinute, setDeliveryEndMinute] = useState('00');
-
   const [formData, setFormData] = useState<FormData>({
     pickupDate: '',
     pickupTimeStart: '09:00',
@@ -111,7 +117,7 @@ const PreCommande = () => {
     pickupContactPhone: '',
     deliveryContactName: '',
     deliveryContactPhone: '',
-    additionalInfo: quoteData?.additionalInfo || '',
+    additionalInfo: quoteData?.additionalInfo || ''
   });
 
   // Sync time with formData
@@ -121,7 +127,7 @@ const PreCommande = () => {
       pickupTimeStart: `${pickupStartHour}:${pickupStartMinute}`,
       pickupTimeEnd: `${pickupEndHour}:${pickupEndMinute}`,
       deliveryTimeStart: `${deliveryStartHour}:${deliveryStartMinute}`,
-      deliveryTimeEnd: `${deliveryEndHour}:${deliveryEndMinute}`,
+      deliveryTimeEnd: `${deliveryEndHour}:${deliveryEndMinute}`
     }));
   }, [pickupStartHour, pickupStartMinute, pickupEndHour, pickupEndMinute, deliveryStartHour, deliveryStartMinute, deliveryEndHour, deliveryEndMinute]);
 
@@ -129,21 +135,23 @@ const PreCommande = () => {
   const priceHT = parseFloat(quoteData?.price_ht || '0');
   const priceTTC = parseFloat(quoteData?.price_ttc || '0');
   const tva = priceTTC - priceHT;
-
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   // Generate hours array 00-23
-  const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-
+  const hours = Array.from({
+    length: 24
+  }, (_, i) => i.toString().padStart(2, '0'));
   const handlePayment = async () => {
     // Validate required fields
     if (!formData.email || !formData.firstName || !formData.lastName) {
       toast.error('Veuillez remplir les informations de contact');
       return;
     }
-
     if (!formData.pickupDate || !formData.deliveryDate) {
       toast.error('Veuillez sélectionner les dates de départ et d\'arrivée');
       return;
@@ -155,7 +163,6 @@ const PreCommande = () => {
       return;
     }
     setIsProcessing(true);
-
     try {
       const missionData = {
         pickup_address: quoteData?.pickup_address || '',
@@ -184,17 +191,17 @@ const PreCommande = () => {
         pickup_contact_phone: formData.pickupContactPhone,
         delivery_contact_name: formData.deliveryContactName,
         delivery_contact_phone: formData.deliveryContactPhone,
-        notes: formData.additionalInfo,
+        notes: formData.additionalInfo
       };
-
-      const { data, error } = await supabase.functions.invoke('create-mission-payment', {
-        body: missionData,
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('create-mission-payment', {
+        body: missionData
       });
-
       if (error) {
         throw new Error(error.message);
       }
-
       if (data?.url) {
         // Redirect to Stripe Checkout
         window.location.href = data.url;
@@ -208,10 +215,8 @@ const PreCommande = () => {
       setIsProcessing(false);
     }
   };
-
   if (!quoteData) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white">
+    return <div className="min-h-screen flex flex-col bg-white">
         <main className="flex-1 animate-fadeIn">
           <div className="container mx-auto px-4 py-16">
             <Card className="max-w-2xl mx-auto">
@@ -227,19 +232,12 @@ const PreCommande = () => {
             </Card>
           </div>
         </main>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+  return <div className="min-h-screen flex flex-col bg-gray-50">
       <main className="flex-1 animate-fadeIn">
         <div className="container mx-auto px-4 py-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/devis')} 
-            className="mb-6 text-dk-navy hover:text-dk-blue"
-          >
+          <Button variant="ghost" onClick={() => navigate('/devis')} className="mb-6 text-dk-navy hover:text-dk-blue my-[10px]">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour au formulaire de devis
           </Button>
@@ -289,13 +287,7 @@ const PreCommande = () => {
                       <h4 className="font-medium text-dk-navy">Créneau d'enlèvement</h4>
                       <div>
                         <Label htmlFor="pickupDate">Date *</Label>
-                        <Input
-                          id="pickupDate"
-                          type="date"
-                          value={formData.pickupDate}
-                          onChange={(e) => handleInputChange('pickupDate', e.target.value)}
-                          min={new Date().toISOString().split('T')[0]}
-                        />
+                        <Input id="pickupDate" type="date" value={formData.pickupDate} onChange={e => handleInputChange('pickupDate', e.target.value)} min={new Date().toISOString().split('T')[0]} />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -306,9 +298,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Heure" />
                               </SelectTrigger>
                               <SelectContent>
-                                {hours.map((h) => (
-                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
-                                ))}
+                                {hours.map(h => <SelectItem key={h} value={h}>{h}h</SelectItem>)}
                               </SelectContent>
                             </Select>
                             <Select value={pickupStartMinute} onValueChange={setPickupStartMinute}>
@@ -316,9 +306,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Min" />
                               </SelectTrigger>
                               <SelectContent>
-                                {TIME_QUARTER_HOURS.map((m) => (
-                                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                                ))}
+                                {TIME_QUARTER_HOURS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           </div>
@@ -331,9 +319,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Heure" />
                               </SelectTrigger>
                               <SelectContent>
-                                {hours.map((h) => (
-                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
-                                ))}
+                                {hours.map(h => <SelectItem key={h} value={h}>{h}h</SelectItem>)}
                               </SelectContent>
                             </Select>
                             <Select value={pickupEndMinute} onValueChange={setPickupEndMinute}>
@@ -341,9 +327,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Min" />
                               </SelectTrigger>
                               <SelectContent>
-                                {TIME_QUARTER_HOURS.map((m) => (
-                                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                                ))}
+                                {TIME_QUARTER_HOURS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           </div>
@@ -354,13 +338,7 @@ const PreCommande = () => {
                       <h4 className="font-medium text-dk-navy">Créneau de livraison</h4>
                       <div>
                         <Label htmlFor="deliveryDate">Date *</Label>
-                        <Input
-                          id="deliveryDate"
-                          type="date"
-                          value={formData.deliveryDate}
-                          onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
-                          min={formData.pickupDate || new Date().toISOString().split('T')[0]}
-                        />
+                        <Input id="deliveryDate" type="date" value={formData.deliveryDate} onChange={e => handleInputChange('deliveryDate', e.target.value)} min={formData.pickupDate || new Date().toISOString().split('T')[0]} />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -371,9 +349,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Heure" />
                               </SelectTrigger>
                               <SelectContent>
-                                {hours.map((h) => (
-                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
-                                ))}
+                                {hours.map(h => <SelectItem key={h} value={h}>{h}h</SelectItem>)}
                               </SelectContent>
                             </Select>
                             <Select value={deliveryStartMinute} onValueChange={setDeliveryStartMinute}>
@@ -381,9 +357,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Min" />
                               </SelectTrigger>
                               <SelectContent>
-                                {TIME_QUARTER_HOURS.map((m) => (
-                                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                                ))}
+                                {TIME_QUARTER_HOURS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           </div>
@@ -396,9 +370,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Heure" />
                               </SelectTrigger>
                               <SelectContent>
-                                {hours.map((h) => (
-                                  <SelectItem key={h} value={h}>{h}h</SelectItem>
-                                ))}
+                                {hours.map(h => <SelectItem key={h} value={h}>{h}h</SelectItem>)}
                               </SelectContent>
                             </Select>
                             <Select value={deliveryEndMinute} onValueChange={setDeliveryEndMinute}>
@@ -406,9 +378,7 @@ const PreCommande = () => {
                                 <SelectValue placeholder="Min" />
                               </SelectTrigger>
                               <SelectContent>
-                                {TIME_QUARTER_HOURS.map((m) => (
-                                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                                ))}
+                                {TIME_QUARTER_HOURS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           </div>
@@ -431,66 +401,36 @@ const PreCommande = () => {
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="brand">Marque *</Label>
-                      <Input
-                        id="brand"
-                        value={formData.brand}
-                        onChange={(e) => handleInputChange('brand', e.target.value)}
-                        placeholder="Ex: Peugeot"
-                        required
-                      />
+                      <Input id="brand" value={formData.brand} onChange={e => handleInputChange('brand', e.target.value)} placeholder="Ex: Peugeot" required />
                     </div>
                     <div>
                       <Label htmlFor="model">Modèle *</Label>
-                      <Input
-                        id="model"
-                        value={formData.model}
-                        onChange={(e) => handleInputChange('model', e.target.value)}
-                        placeholder="Ex: 308"
-                        required
-                      />
+                      <Input id="model" value={formData.model} onChange={e => handleInputChange('model', e.target.value)} placeholder="Ex: 308" required />
                     </div>
                     <div>
                       <Label htmlFor="year">Année</Label>
-                      <Input
-                        id="year"
-                        value={formData.year}
-                        onChange={(e) => handleInputChange('year', e.target.value)}
-                        placeholder="Ex: 2023"
-                      />
+                      <Input id="year" value={formData.year} onChange={e => handleInputChange('year', e.target.value)} placeholder="Ex: 2023" />
                     </div>
                     <div>
                       <Label htmlFor="fuel">Carburant *</Label>
-                      <Select value={formData.fuel} onValueChange={(value) => handleInputChange('fuel', value)}>
+                      <Select value={formData.fuel} onValueChange={value => handleInputChange('fuel', value)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner le carburant" />
                         </SelectTrigger>
                         <SelectContent>
-                          {FUEL_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
+                          {FUEL_OPTIONS.map(option => <SelectItem key={option.value} value={option.value}>
                               {option.label}
-                            </SelectItem>
-                          ))}
+                            </SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
                       <Label htmlFor="licensePlate">Immatriculation *</Label>
-                      <Input
-                        id="licensePlate"
-                        value={formData.licensePlate}
-                        onChange={(e) => handleInputChange('licensePlate', e.target.value)}
-                        placeholder="Ex: AB-123-CD"
-                        required
-                      />
+                      <Input id="licensePlate" value={formData.licensePlate} onChange={e => handleInputChange('licensePlate', e.target.value)} placeholder="Ex: AB-123-CD" required />
                     </div>
                     <div>
                       <Label htmlFor="vin">Numéro VIN</Label>
-                      <Input
-                        id="vin"
-                        value={formData.vin}
-                        onChange={(e) => handleInputChange('vin', e.target.value)}
-                        placeholder="Ex: VF3LBHZG8FS000001"
-                      />
+                      <Input id="vin" value={formData.vin} onChange={e => handleInputChange('vin', e.target.value)} placeholder="Ex: VF3LBHZG8FS000001" />
                     </div>
                   </div>
                 </CardContent>
@@ -508,48 +448,23 @@ const PreCommande = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
                       <Label htmlFor="company">Société (optionnel)</Label>
-                      <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) => handleInputChange('company', e.target.value)}
-                      />
+                      <Input id="company" value={formData.company} onChange={e => handleInputChange('company', e.target.value)} />
                     </div>
                     <div>
                       <Label htmlFor="firstName">Prénom *</Label>
-                      <Input
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        required
-                      />
+                      <Input id="firstName" value={formData.firstName} onChange={e => handleInputChange('firstName', e.target.value)} required />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Nom *</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        required
-                      />
+                      <Input id="lastName" value={formData.lastName} onChange={e => handleInputChange('lastName', e.target.value)} required />
                     </div>
                     <div>
                       <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        required
-                      />
+                      <Input id="email" type="email" value={formData.email} onChange={e => handleInputChange('email', e.target.value)} required />
                     </div>
                     <div>
                       <Label htmlFor="phone">Téléphone</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                      />
+                      <Input id="phone" type="tel" value={formData.phone} onChange={e => handleInputChange('phone', e.target.value)} />
                     </div>
                   </div>
                 </CardContent>
@@ -569,44 +484,22 @@ const PreCommande = () => {
                       <h4 className="font-medium text-dk-navy">Contact au départ</h4>
                       <div>
                         <Label htmlFor="pickupContactName">Nom complet</Label>
-                        <Input
-                          id="pickupContactName"
-                          value={formData.pickupContactName}
-                          onChange={(e) => handleInputChange('pickupContactName', e.target.value)}
-                          placeholder="Nom de la personne sur place"
-                        />
+                        <Input id="pickupContactName" value={formData.pickupContactName} onChange={e => handleInputChange('pickupContactName', e.target.value)} placeholder="Nom de la personne sur place" />
                       </div>
                       <div>
                         <Label htmlFor="pickupContactPhone">Téléphone</Label>
-                        <Input
-                          id="pickupContactPhone"
-                          type="tel"
-                          value={formData.pickupContactPhone}
-                          onChange={(e) => handleInputChange('pickupContactPhone', e.target.value)}
-                          placeholder="Numéro de téléphone"
-                        />
+                        <Input id="pickupContactPhone" type="tel" value={formData.pickupContactPhone} onChange={e => handleInputChange('pickupContactPhone', e.target.value)} placeholder="Numéro de téléphone" />
                       </div>
                     </div>
                     <div className="space-y-4">
                       <h4 className="font-medium text-dk-navy">Contact à la livraison</h4>
                       <div>
                         <Label htmlFor="deliveryContactName">Nom complet</Label>
-                        <Input
-                          id="deliveryContactName"
-                          value={formData.deliveryContactName}
-                          onChange={(e) => handleInputChange('deliveryContactName', e.target.value)}
-                          placeholder="Nom de la personne sur place"
-                        />
+                        <Input id="deliveryContactName" value={formData.deliveryContactName} onChange={e => handleInputChange('deliveryContactName', e.target.value)} placeholder="Nom de la personne sur place" />
                       </div>
                       <div>
                         <Label htmlFor="deliveryContactPhone">Téléphone</Label>
-                        <Input
-                          id="deliveryContactPhone"
-                          type="tel"
-                          value={formData.deliveryContactPhone}
-                          onChange={(e) => handleInputChange('deliveryContactPhone', e.target.value)}
-                          placeholder="Numéro de téléphone"
-                        />
+                        <Input id="deliveryContactPhone" type="tel" value={formData.deliveryContactPhone} onChange={e => handleInputChange('deliveryContactPhone', e.target.value)} placeholder="Numéro de téléphone" />
                       </div>
                     </div>
                   </div>
@@ -619,12 +512,7 @@ const PreCommande = () => {
                   <CardTitle className="text-dk-navy">Informations complémentaires</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <textarea
-                    className="w-full min-h-[100px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-dk-navy"
-                    value={formData.additionalInfo}
-                    onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-                    placeholder="Instructions particulières, accès, horaires spéciaux..."
-                  />
+                  <textarea className="w-full min-h-[100px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-dk-navy" value={formData.additionalInfo} onChange={e => handleInputChange('additionalInfo', e.target.value)} placeholder="Instructions particulières, accès, horaires spéciaux..." />
                 </CardContent>
               </Card>
             </div>
@@ -671,22 +559,14 @@ const PreCommande = () => {
                       </div>
                     </div>
 
-                    <Button 
-                      className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
-                      onClick={handlePayment}
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? (
-                        <>
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg" onClick={handlePayment} disabled={isProcessing}>
+                      {isProcessing ? <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Traitement en cours...
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <CreditCard className="mr-2 h-5 w-5" />
                           Payer {priceTTC.toFixed(2)} €
-                        </>
-                      )}
+                        </>}
                     </Button>
 
                     <p className="text-xs text-gray-500 text-center">
@@ -699,8 +579,6 @@ const PreCommande = () => {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default PreCommande;
