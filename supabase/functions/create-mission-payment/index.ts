@@ -48,6 +48,15 @@ serve(async (req) => {
   }
 
   try {
+    const origin = (() => {
+      const o = req.headers.get("origin");
+      if (o) return o;
+      const ref = req.headers.get("referer");
+      if (ref) return new URL(ref).origin;
+      // Last resort: fall back to the request URL origin (functions domain)
+      return new URL(req.url).origin;
+    })();
+
     const missionData: MissionData = await req.json();
     console.log("Received mission data:", missionData);
 
@@ -61,7 +70,17 @@ serve(async (req) => {
     }
 
     // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    // NOTE: secrets can sometimes contain trailing newlines/spaces depending on how they were pasted.
+    // Stripe treats that as an invalid key, so we defensively trim.
+    const stripeKey = (Deno.env.get("STRIPE_SECRET_KEY") ?? "").trim();
+    if (!stripeKey) {
+      throw new Error("STRIPE_SECRET_KEY manquante (Supabase > Settings > Functions)");
+    }
+    if (!stripeKey.startsWith("sk_")) {
+      throw new Error("STRIPE_SECRET_KEY invalide (doit commencer par sk_)");
+    }
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
@@ -89,18 +108,16 @@ serve(async (req) => {
 
     console.log("Customer ID:", customerId);
 
-    // Create a one-time payment session with multiple payment methods
-    // Note: Apple Pay and Google Pay are automatically enabled when using "card" 
-    // if they are configured in your Stripe account
-    const session = await stripe.checkout.sessions.create({
+    const sessionParamsBase = {
       customer: customerId,
-      payment_method_types: ["card", "sepa_debit", "paypal"],
       line_items: [
         {
           price_data: {
             currency: "eur",
             product_data: {
-              name: `Convoyage véhicule - ${missionData.vehicle_brand || ''} ${missionData.vehicle_model || ''}`.trim() || 'Convoyage véhicule',
+              name:
+                `Convoyage véhicule - ${missionData.vehicle_brand || ""} ${missionData.vehicle_model || ""}`.trim() ||
+                "Convoyage véhicule",
               description: `De ${missionData.pickup_address} à ${missionData.delivery_address} (${missionData.distance_km} km)`,
             },
             unit_amount: Math.round(missionData.price_ttc * 100), // Convert to cents
@@ -108,9 +125,9 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/pre-commande`,
+      mode: "payment" as const,
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pre-commande`,
       metadata: {
         pickup_address: missionData.pickup_address,
         delivery_address: missionData.delivery_address,
@@ -144,7 +161,34 @@ serve(async (req) => {
         delivery_contact_phone: missionData.delivery_contact_phone || "",
         notes: missionData.notes || "",
       },
-    });
+    };
+
+    // Create a one-time payment session with multiple payment methods.
+    // Note: Apple Pay and Google Pay are automatically enabled when using "card" if configured in Stripe.
+    // Some Stripe accounts don't have SEPA/PayPal enabled; if Stripe rejects the method list, we fall back to card.
+    const preferredPaymentMethods = ["card", "sepa_debit", "paypal"];
+
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        ...sessionParamsBase,
+        payment_method_types: preferredPaymentMethods,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("payment method type provided") && message.includes("is invalid")) {
+        console.warn(
+          "Some payment methods are not enabled on this Stripe account. Falling back to card-only.",
+          { message },
+        );
+        session = await stripe.checkout.sessions.create({
+          ...sessionParamsBase,
+          payment_method_types: ["card"],
+        });
+      } else {
+        throw err;
+      }
+    }
 
     console.log("Checkout session created:", session.id);
 
