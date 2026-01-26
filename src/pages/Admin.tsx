@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock, Users, Navigation } from 'lucide-react';
+import { LogOut, BarChart3, FileText, Truck, Settings, Euro, Home, HelpCircle, Scale, Shield, Cookie, User, Image, Lock, Users, Navigation, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -17,6 +17,7 @@ import CguEditor from '@/components/admin/CguEditor';
 import ProfessionalSpaceEditor from '@/components/admin/ProfessionalSpaceEditor';
 import LogoEditor from '@/components/admin/LogoEditor';
 import PasswordEditor from '@/components/admin/PasswordEditor';
+import EmailManagementEditor from '@/components/admin/EmailManagementEditor';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('accueil');
@@ -163,6 +164,10 @@ const Admin = () => {
                 label: 'Espace professionnel',
                 icon: User
               }, {
+                id: 'emails',
+                label: 'Emails',
+                icon: Mail
+              }, {
                 id: 'logo',
                 label: 'Logo',
                 icon: Image
@@ -199,6 +204,7 @@ const Admin = () => {
           {activeTab === 'cgv' && <CgvEditor />}
           {activeTab === 'cgu' && <CguEditor />}
           {activeTab === 'espace-professionnel' && <ProfessionalSpaceEditor />}
+          {activeTab === 'emails' && <EmailManagementEditor />}
           {activeTab === 'logo' && <LogoEditor />}
           {activeTab === 'mot-de-passe' && <PasswordEditor />}
         </main>
