@@ -107,9 +107,7 @@ const EmailManagementEditor = () => {
           <Mail className="h-6 w-6" />
           Gestion des emails Brevo
         </h2>
-        <p className="text-gray-600 mt-2">
-          Visualisez les emails transactionnels configurés dans l'application. Ces emails sont envoyés automatiquement via l'API Brevo.
-        </p>
+        
       </div>
 
       
