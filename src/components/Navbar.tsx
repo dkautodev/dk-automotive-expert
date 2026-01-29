@@ -1,24 +1,24 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfessionalSpaceSettings } from "@/hooks/useProfessionalSpaceSettings";
 import { usePageContents } from "@/hooks/usePageContents";
-
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { getProfessionalSpaceUrl } = useProfessionalSpaceSettings();
-  const { contents } = usePageContents('navbar');
-  
+  const {
+    getProfessionalSpaceUrl
+  } = useProfessionalSpaceSettings();
+  const {
+    contents
+  } = usePageContents('navbar');
   const isActive = (path: string) => location.pathname === path;
   const professionalSpaceUrl = getProfessionalSpaceUrl();
-  
+
   // Get the logo URL from page contents or use default
   const logoContent = contents.find(item => item.block_key === 'logo');
   const logoUrl = logoContent?.content_value || '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
-  
   const navItems = [{
     path: "/about",
     label: "Qui sommes-nous ?"
@@ -32,31 +32,16 @@ const Navbar = () => {
     path: "/faq",
     label: "FAQ"
   }];
-
   return <>
       {/* TOPBAR */}
       <div className="fixed top-0 left-0 right-0 z-[55] bg-dk-navy h-[34px] flex items-center">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-12">
           {/* Social */}
           <div className="flex items-center gap-4">
-            <a 
-              href="https://facebook.com/" 
-              title="Suivez DK Automotive sur Facebook" 
-              aria-label="Facebook DK Automotive"
-              rel="noopener noreferrer" 
-              target="_blank" 
-              className="text-white hover:text-blue-300 transition-colors"
-            >
+            <a href="https://facebook.com/" title="Suivez DK Automotive sur Facebook" aria-label="Facebook DK Automotive" rel="noopener noreferrer" target="_blank" className="text-white hover:text-blue-300 transition-colors">
               <Facebook className="w-5 h-5" />
             </a>
-            <a 
-              href="https://instagram.com/" 
-              title="Suivez DK Automotive sur Instagram"
-              aria-label="Instagram DK Automotive" 
-              rel="noopener noreferrer" 
-              target="_blank" 
-              className="text-white hover:text-blue-300 transition-colors"
-            >
+            <a href="https://instagram.com/" title="Suivez DK Automotive sur Instagram" aria-label="Instagram DK Automotive" rel="noopener noreferrer" target="_blank" className="text-white hover:text-blue-300 transition-colors">
               <Instagram className="w-5 h-5" />
             </a>
           </div>
@@ -68,9 +53,7 @@ const Navbar = () => {
           </div>
           {/* Mobile text - shorter version */}
           <div className="flex sm:hidden flex-1 justify-center">
-            <span className="text-white text-xs font-normal">
-              + 2 000 missions réalisées
-            </span>
+            <span className="text-white text-xs font-normal">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</span>
           </div>
           {/* espace à droite pour équilibrer */}
           <div className="w-[60px] hidden sm:block" />
@@ -83,15 +66,10 @@ const Navbar = () => {
           <div className="flex justify-between h-16 px-[25px]">
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0">
-                <img 
-                  alt="DK Automotive" 
-                  className="h-10 w-auto object-fill" 
-                  src={logoUrl}
-                  onError={(e) => {
-                    // Fallback to default logo if the dynamic one fails to load
-                    e.currentTarget.src = '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
-                  }}
-                />
+                <img alt="DK Automotive" className="h-10 w-auto object-fill" src={logoUrl} onError={e => {
+                // Fallback to default logo if the dynamic one fails to load
+                e.currentTarget.src = '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+              }} />
               </Link>
             </div>
 
@@ -134,5 +112,4 @@ const Navbar = () => {
       </nav>
     </>;
 };
-
 export default Navbar;
