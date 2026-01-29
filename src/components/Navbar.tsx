@@ -35,25 +35,45 @@ const Navbar = () => {
 
   return <>
       {/* TOPBAR */}
-      <div className="fixed top-0 left-0 right-0 z-[55] bg-[#18257D] h-[34px] flex items-center">
+      <div className="fixed top-0 left-0 right-0 z-[55] bg-dk-navy h-[34px] flex items-center">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-12">
           {/* Social */}
           <div className="flex items-center gap-4">
-            <a href="https://facebook.com/" title="Facebook" rel="noopener noreferrer" target="_blank" className="text-white hover:text-blue-300 transition-colors">
+            <a 
+              href="https://facebook.com/" 
+              title="Suivez DK Automotive sur Facebook" 
+              aria-label="Facebook DK Automotive"
+              rel="noopener noreferrer" 
+              target="_blank" 
+              className="text-white hover:text-blue-300 transition-colors"
+            >
               <Facebook className="w-5 h-5" />
             </a>
-            <a href="https://instagram.com/" title="Instagram" rel="noopener noreferrer" target="_blank" className="text-white hover:text-blue-300 transition-colors">
+            <a 
+              href="https://instagram.com/" 
+              title="Suivez DK Automotive sur Instagram"
+              aria-label="Instagram DK Automotive" 
+              rel="noopener noreferrer" 
+              target="_blank" 
+              className="text-white hover:text-blue-300 transition-colors"
+            >
               <Instagram className="w-5 h-5" />
             </a>
           </div>
-          {/* Center text */}
-          <div className="flex-1 text-center">
+          {/* Center text - hidden on small screens, visible on medium+ */}
+          <div className="hidden sm:flex flex-1 justify-center">
             <span className="text-white text-sm font-normal">
               Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.
             </span>
           </div>
+          {/* Mobile text - shorter version */}
+          <div className="flex sm:hidden flex-1 justify-center">
+            <span className="text-white text-xs font-normal">
+              + 2 000 missions réalisées
+            </span>
+          </div>
           {/* espace à droite pour équilibrer */}
-          <div className="w-[60px] hidden sm:block"></div>
+          <div className="w-[60px] hidden sm:block" />
         </div>
       </div>
 
@@ -82,7 +102,7 @@ const Navbar = () => {
                 </Link>)}
 
               {/* Bouton Espace professionnel */}
-              <a href={professionalSpaceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors">
+              <a href={professionalSpaceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-dk-navy text-white rounded-lg hover:bg-dk-navy/90 transition-colors">
                 <User className="w-4 h-4 text-white" />
                 Espace professionnel
               </a>
@@ -104,7 +124,7 @@ const Navbar = () => {
                   </Link>)}
 
                 {/* Bouton Espace professionnel pour mobile */}
-                <a href={professionalSpaceUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-[#18257D] text-white rounded-lg hover:bg-[#142064] transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <a href={professionalSpaceUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-dk-navy text-white rounded-lg hover:bg-dk-navy/90 transition-colors" onClick={() => setIsMenuOpen(false)}>
                   <User className="w-4 h-4 text-white" />
                   Espace professionnel
                 </a>
