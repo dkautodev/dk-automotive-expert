@@ -1,10 +1,8 @@
-
 import React from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
 import { useAboutPageContents } from '@/hooks/useAboutPageContents';
+import SEO from '@/components/SEO';
 
 const About = () => {
   const { contents, isLoading } = useAboutPageContents();
@@ -24,23 +22,46 @@ const About = () => {
     return contentData.url || '';
   };
 
+  // Schema.org structured data for AboutPage
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "À propos de DK Automotive",
+    "description": "Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés.",
+    "url": "https://dkautomotive.fr/about",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "DK Automotive",
+      "foundingDate": "2018",
+      "description": "Expert en convoyage de véhicules par route en France",
+      "areaServed": "France",
+      "serviceType": ["Convoyage automobile", "Transport de véhicules", "Livraison de véhicules"]
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin mr-2" />
           <span>Chargement...</span>
         </div>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="animate-fadeIn">
+    <>
+      <SEO 
+        title="À propos - Expert Convoyage Automobile"
+        description="Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés. Service fiable et sécurisé."
+        canonical="https://dkautomotive.fr/about"
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
+      <main className="min-h-screen bg-white animate-fadeIn">
         {/* Section Hero */}
         <section className="py-16 md:py-24 px-4">
           <div className="container mx-auto">
@@ -263,8 +284,7 @@ const About = () => {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+    </>
   );
 };
 
