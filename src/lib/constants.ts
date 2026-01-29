@@ -1,5 +1,5 @@
 
-export const GOOGLE_MAPS_API_KEY = "AIzaSyBjGI3KdkPfON3ssMq3_Qp3j9XZLXJHP_M";
+export const GOOGLE_MAPS_API_KEY = "AIzaSyA5RjbR6obTrUwTbVGvCZ3JSG_SvHZ_NBs";
 
 export const VEHICLE_TYPES = [
   { id: "berline", name: "Berline" },
