@@ -1,6 +1,6 @@
-
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -34,7 +34,7 @@ function AppContent() {
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       {!isAuthPage && <Navbar />}
-      <main className={`flex-1 ${!isAuthPage ? 'pt-16' : ''}`}>
+      <main className={`flex-1 ${!isAuthPage ? 'pt-[98px]' : ''}`}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
@@ -60,14 +60,16 @@ function AppContent() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
-          <AppContent />
-          <Toaster />
-        </Router>
-      </AuthProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router>
+            <AppContent />
+            <Toaster />
+          </Router>
+        </AuthProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 
