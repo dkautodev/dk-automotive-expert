@@ -53,7 +53,7 @@ const Navbar = () => {
           </div>
           {/* Mobile text - shorter version */}
           <div className="flex sm:hidden flex-1 justify-center">
-            <span className="text-white text-xs font-normal">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</span>
+            <span className="text-white text-xs font-normal text-center">Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.</span>
           </div>
           {/* espace à droite pour équilibrer */}
           <div className="w-[60px] hidden sm:block" />
