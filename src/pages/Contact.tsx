@@ -105,14 +105,9 @@ const Contact = () => {
         {/* Contact Section */}
         <section className="py-8 md:py-12 bg-muted/30">
           <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Contact Info Cards */}
-                
-
-                {/* Contact Form */}
-                <div className="lg:col-span-2">
-                  <div className="bg-card rounded-xl shadow-lg p-6 md:p-8 border border-border">
+            <div className="max-w-2xl mx-auto">
+              {/* Contact Form */}
+              <div className="bg-card rounded-xl shadow-lg p-6 md:p-8 border border-border">
                     {/* Form Header */}
                     <div className="flex items-center gap-3 pb-4 mb-6 border-b border-border">
                       <div className="w-10 h-10 bg-dk-navy/10 rounded-lg flex items-center justify-center">
@@ -236,10 +231,8 @@ const Contact = () => {
                       </form>
                     </Form>
                   </div>
-                </div>
               </div>
             </div>
-          </div>
         </section>
 
         {/* CTA Section */}
