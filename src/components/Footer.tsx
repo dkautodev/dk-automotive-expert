@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -39,20 +39,9 @@ const Footer = () => {
                 className="h-12 w-auto filter invert grayscale" 
               />
             </Link>
-            <p className="text-white/70 text-sm leading-relaxed mb-6">
+            <p className="text-white/70 text-sm leading-relaxed">
               Votre partenaire de confiance pour le convoyage de véhicules partout en France.
             </p>
-            <div className="space-y-3">
-              <a 
-                href="mailto:contact@dkautomotive.fr" 
-                className="flex items-center gap-3 text-sm text-white/80 hover:text-white transition-colors group"
-              >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                  <Mail className="w-4 h-4" />
-                </div>
-                contact@dkautomotive.fr
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
