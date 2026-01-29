@@ -3,7 +3,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calculator, RefreshCcw } from 'lucide-react';
+import { Calculator, RefreshCcw, MapPin, Car, CheckCircle2, Lightbulb, Shield } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
 import { useRef } from 'react';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { PickupAddressField } from './PickupAddressField';
 import { DeliveryAddressField } from './DeliveryAddressField';
+import { cn } from '@/lib/utils';
 
 interface NewAddressVehicleStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -41,7 +42,6 @@ const NewAddressVehicleStep = ({
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
-  // Autocomplétion pour les champs
   const pickupAuto = useGoogleAutocomplete({
     ref: pickupInputRef,
     onPlaceSelected: place => {
@@ -51,6 +51,7 @@ const NewAddressVehicleStep = ({
     },
     types: ["geocode", "establishment"]
   });
+  
   const deliveryAuto = useGoogleAutocomplete({
     ref: deliveryInputRef,
     onPlaceSelected: place => {
@@ -129,7 +130,6 @@ const NewAddressVehicleStep = ({
     const delivery = form.getValues('delivery_address');
     form.setValue('pickup_address', delivery || '', { shouldValidate: true });
     form.setValue('delivery_address', pickup || '', { shouldValidate: true });
-    // Annule les calculs précédents, car le contexte a changé
     setDistance(null);
     setPriceHT(null);
     setPriceTTC(null);
@@ -142,110 +142,134 @@ const NewAddressVehicleStep = ({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-dk-navy">Adresses et catégorie de véhicule</h2>
-      {/* Champs d'adresses côte-à-côte avec bouton échange parfaitement centré */}
-      <div className="w-full flex flex-col md:flex-row items-center gap-0 relative">
-        {/* Champ adresse de prise en charge */}
-        <div className="w-full md:w-1/2 flex-1 px-0 md:pr-4">
+      {/* Section Header */}
+      <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="w-10 h-10 bg-dk-navy/10 rounded-lg flex items-center justify-center">
+          <MapPin className="w-5 h-5 text-dk-navy" />
+        </div>
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-dk-navy">Adresses et catégorie de véhicule</h2>
+          <p className="text-sm text-muted-foreground">Renseignez les lieux de prise en charge et de livraison</p>
+        </div>
+      </div>
+
+      {/* Address Fields */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto,1fr] gap-4 items-end">
+        <div className="w-full">
           <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
         </div>
-        {/* Bouton d'échange centré horizontalement ET verticalement */}
-        <div className="flex-shrink-0 flex items-center justify-center md:mx-1 my-4 md:my-0">
+        
+        {/* Switch Button */}
+        <div className="flex justify-center lg:pb-2">
           <button
             type="button"
             aria-label="Échanger les adresses"
             onClick={handleSwitchAddresses}
-            className="
-              bg-white border border-gray-300 rounded-full shadow
-              p-2 flex items-center justify-center
-              hover:bg-gray-100 active:bg-gray-200
-              transition
-              z-30
-            "
-            style={{ width: '44px', height: '44px' }}
+            className="bg-card border border-border rounded-full shadow-sm p-2.5 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
           >
-            <RefreshCcw className="w-6 h-6 text-[#1a237e]" />
+            <RefreshCcw className="w-5 h-5 text-dk-navy" />
           </button>
         </div>
-        {/* Champ adresse de livraison */}
-        <div className="w-full md:w-1/2 flex-1 px-0 md:pl-4">
+        
+        <div className="w-full">
           <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
         </div>
       </div>
-      <FormField control={form.control} name="vehicle_type" render={({
-        field
-      }) => (
-        <FormItem>
-          <FormLabel className="text-dk-navy font-semibold">
-            CATÉGORIE DE VÉHICULE (GRILLE TARIFAIRE) *
-          </FormLabel>
-          <Select onValueChange={field.onChange} value={field.value}>
-            <FormControl>
-              <SelectTrigger className="bg-[#EEF1FF]">
-                <SelectValue placeholder="Sélectionner une catégorie de véhicule" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              {vehicleTypes.map(type => (
-                <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )} />
 
-      <div className="flex justify-center">
+      {/* Vehicle Type */}
+      <div className="pt-2">
+        <FormField control={form.control} name="vehicle_type" render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
+              <Car className="w-4 h-4" />
+              CATÉGORIE DE VÉHICULE <span className="text-destructive">*</span>
+            </FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger className="bg-muted/50 border-border focus:ring-dk-navy">
+                  <SelectValue placeholder="Sélectionner une catégorie de véhicule" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent className="bg-popover border-border">
+                {vehicleTypes.map(type => (
+                  <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )} />
+      </div>
+
+      {/* Calculate Button */}
+      <div className="flex justify-center pt-2">
         <Button
           type="button"
           onClick={handleCalculate}
           disabled={!pickupAddress || !deliveryAddress || !vehicleType || isCalculating}
-          className="bg-[#1a237e] hover:bg-[#3f51b5] flex items-center gap-2"
+          className="bg-dk-navy hover:bg-dk-blue text-white flex items-center gap-2 px-6 py-5 text-base transition-colors"
         >
           <Calculator className="h-5 w-5" />
           {isCalculating ? "Calcul en cours..." : "Calculer la distance et le prix"}
         </Button>
       </div>
+
+      {/* Results Card */}
       {distance && priceHT && priceTTC && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-2">
-          <h3 className="font-semibold text-green-800 mb-2">Résultat du calcul</h3>
-          <div className="grid grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="text-gray-600">Distance:</span>
-              <p className="font-semibold">{distance} km</p>
+        <div className="bg-green-50 border border-green-200 rounded-xl p-5 animate-fadeIn">
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-green-800">Résultat du calcul</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            <div className="bg-white/80 rounded-lg p-3 text-center">
+              <span className="text-muted-foreground block text-xs uppercase tracking-wide">Distance</span>
+              <p className="font-bold text-lg text-dk-navy">{distance} km</p>
             </div>
-            <div>
-              <span className="text-gray-600">Prix HT:</span>
-              <p className="font-semibold">{priceHT} €</p>
+            <div className="bg-white/80 rounded-lg p-3 text-center">
+              <span className="text-muted-foreground block text-xs uppercase tracking-wide">Prix HT</span>
+              <p className="font-bold text-lg text-dk-navy">{priceHT} €</p>
             </div>
-            <div>
-              <span className="text-gray-600">Prix TTC:</span>
-              <p className="font-semibold">{priceTTC} €</p>
+            <div className="bg-white/80 rounded-lg p-3 text-center">
+              <span className="text-muted-foreground block text-xs uppercase tracking-wide">Prix TTC</span>
+              <p className="font-bold text-lg text-green-600">{priceTTC} €</p>
             </div>
           </div>
-          {/* Bloc des 3 items avec émojis */}
-          <ul className="mt-4 space-y-1 text-[15px]">
-            <li className="flex items-center gap-2">
-              <span role="img" aria-label="pense-bête">💡</span>
-              Tous frais inclus
+          
+          <ul className="mt-4 space-y-2 text-sm">
+            <li className="flex items-center gap-2 text-green-800">
+              <Lightbulb className="w-4 h-4 flex-shrink-0" />
+              <span>Tous frais inclus</span>
             </li>
-            <li className="flex items-center gap-2">
-              <span role="img" aria-label="chauffeur">🚗</span>
-              Livraison par chauffeur professionnel
+            <li className="flex items-center gap-2 text-green-800">
+              <Car className="w-4 h-4 flex-shrink-0" />
+              <span>Livraison par chauffeur professionnel</span>
             </li>
-            <li className="flex items-center gap-2">
-              <span role="img" aria-label="assurance">🛡️</span>
-              Assurance tous risques
+            <li className="flex items-center gap-2 text-green-800">
+              <Shield className="w-4 h-4 flex-shrink-0" />
+              <span>Assurance tous risques</span>
             </li>
           </ul>
         </div>
       )}
-      <div className="flex justify-end mt-6">
-        <Button type="button" onClick={handleNext} disabled={!distance} className="bg-[#1a237e] hover:bg-[#3f51b5]">
+
+      {/* Navigation */}
+      <div className="flex justify-end pt-4 border-t border-border">
+        <Button 
+          type="button" 
+          onClick={handleNext} 
+          disabled={!distance} 
+          className={cn(
+            "bg-dk-navy hover:bg-dk-blue text-white px-8 py-5 text-base transition-colors",
+            !distance && "opacity-50 cursor-not-allowed"
+          )}
+        >
           SUIVANT
         </Button>
       </div>
     </div>
   );
 };
+
 export default NewAddressVehicleStep;

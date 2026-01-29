@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UseFormReturn } from 'react-hook-form';
@@ -15,7 +14,7 @@ import { QuoteFormValues } from '../quoteFormSchema';
 import { Loader } from '@/components/ui/loader';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, User, Send, MapPin, Info } from 'lucide-react';
 
 interface PriceInfo {
   distance: string;
@@ -53,7 +52,6 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
       
       const data = form.getValues();
       
-      // Préparer les données pour la page de pré-commande
       const quoteData = {
         ...data,
         distance: priceInfo?.distance?.replace(' km', '') || '',
@@ -61,7 +59,6 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
         price_ttc: priceInfo?.priceTTC || '',
       };
       
-      // Naviguer vers la page de pré-commande avec les données
       navigate('/pre-commande', { state: quoteData });
     } catch (error: any) {
       setSubmitError(error.message || "Erreur lors de la validation du formulaire");
@@ -99,48 +96,67 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-dk-navy">Étape 3: Vos coordonnées</h2>
+      {/* Section Header */}
+      <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="w-10 h-10 bg-dk-navy/10 rounded-lg flex items-center justify-center">
+          <User className="w-5 h-5 text-dk-navy" />
+        </div>
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-dk-navy">Vos coordonnées</h2>
+          <p className="text-sm text-muted-foreground">Pour que nous puissions vous recontacter</p>
+        </div>
+      </div>
       
       {submitError && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive">
           <AlertDescription>{submitError}</AlertDescription>
         </Alert>
       )}
       
+      {/* Price Summary Card */}
       {priceInfo && (
-        <div className="bg-gray-100 p-4 rounded-md mb-6">
-          <h3 className="text-lg font-semibold mb-2">Résumé de votre demande</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm font-medium">Distance estimée:</p>
-              <p className="text-lg">{priceInfo.distance}</p>
+        <div className="bg-dk-navy/5 border border-dk-navy/20 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="w-5 h-5 text-dk-navy" />
+            <h3 className="font-semibold text-dk-navy">Résumé de votre demande</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-card rounded-lg p-3 text-center border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Distance</p>
+              <p className="text-lg font-bold text-dk-navy">{priceInfo.distance}</p>
             </div>
-            <div>
-              <p className="text-sm font-medium">Prix HT:</p>
-              <p className="text-lg font-semibold">{priceInfo.priceHT} €</p>
+            <div className="bg-card rounded-lg p-3 text-center border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Prix HT</p>
+              <p className="text-lg font-bold text-dk-navy">{priceInfo.priceHT} €</p>
             </div>
-            <div>
-              <p className="text-sm font-medium">Prix TTC:</p>
-              <p className="text-lg font-semibold">{priceInfo.priceTTC} €</p>
+            <div className="bg-card rounded-lg p-3 text-center border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Prix TTC</p>
+              <p className="text-lg font-bold text-green-600">{priceInfo.priceTTC} €</p>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            * Ces tarifs sont donnés à titre indicatif et seront confirmés par notre équipe.
+          <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+            <Info className="w-3 h-3" />
+            Ces tarifs sont donnés à titre indicatif et seront confirmés par notre équipe.
           </p>
         </div>
       )}
       
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Contact Form Grid */}
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="company"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                SOCIÉTÉ / ORGANISATION <span className="text-red-500">*</span>
+                SOCIÉTÉ / ORGANISATION <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre entreprise" {...field} className="bg-[#EEF1FF]" />
+                <Input 
+                  placeholder="Votre entreprise" 
+                  {...field} 
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -153,10 +169,14 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                PRÉNOM <span className="text-red-500">*</span>
+                PRÉNOM <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre prénom" {...field} className="bg-[#EEF1FF]" />
+                <Input 
+                  placeholder="Votre prénom" 
+                  {...field} 
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -169,10 +189,14 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                NOM <span className="text-red-500">*</span>
+                NOM <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre nom" {...field} className="bg-[#EEF1FF]" />
+                <Input 
+                  placeholder="Votre nom" 
+                  {...field} 
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -185,10 +209,15 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-dk-navy font-semibold">
-                EMAIL <span className="text-red-500">*</span>
+                EMAIL <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="votre@email.com" {...field} className="bg-[#EEF1FF]" type="email" />
+                <Input 
+                  placeholder="votre@email.com" 
+                  {...field} 
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy" 
+                  type="email" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -199,12 +228,16 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
           control={form.control}
           name="phone"
           render={({ field }) => (
-            <FormItem className="md:col-span-2">
+            <FormItem className="sm:col-span-2">
               <FormLabel className="text-dk-navy font-semibold">
-                TÉLÉPHONE <span className="text-red-500">*</span>
+                TÉLÉPHONE <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="Votre numéro de téléphone" {...field} className="bg-[#EEF1FF]" />
+                <Input 
+                  placeholder="Votre numéro de téléphone" 
+                  {...field} 
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -223,7 +256,7 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
             <FormControl>
               <Textarea
                 placeholder="Ajoutez des informations supplémentaires concernant votre demande"
-                className="bg-[#EEF1FF] min-h-[100px]"
+                className="bg-muted/50 border-border focus-visible:ring-dk-navy min-h-[100px] resize-none"
                 {...field}
               />
             </FormControl>
@@ -232,12 +265,14 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
         )}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+      {/* Navigation and Submit */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 border-t border-border">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onPrevious}
           disabled={loading}
+          className="border-border hover:bg-muted"
         >
           PRÉCÉDENT
         </Button>
@@ -246,7 +281,7 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
           <Button 
             type="button" 
             onClick={handleSubmit} 
-            className="bg-[#1a237e] hover:bg-[#3f51b5]" 
+            className="bg-dk-navy hover:bg-dk-blue text-white" 
             disabled={loading}
           >
             {loading ? (
@@ -255,7 +290,10 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
                 TRAITEMENT...
               </>
             ) : (
-              'ENVOYER LA DEMANDE GRATUITEMENT'
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                ENVOYER LA DEMANDE
+              </>
             )}
           </Button>
           
@@ -271,12 +309,13 @@ const NewContactStep = ({ form, onSubmit, onPrevious, loading, priceInfo }: NewC
         </div>
       </div>
       
-      <div className="mt-6 space-y-4 text-sm text-gray-600">
+      {/* Explanation Text */}
+      <div className="bg-muted/30 rounded-lg p-4 space-y-3 text-sm text-muted-foreground">
         <p>
-          <strong>Pré-commander votre mission</strong> via notre formulaire sécurisé pour choisir votre date, votre horaire et renseigner les informations de votre véhicule. Dès validation, l'un de nos conseillers vous contactera pour confirmer votre mission et finaliser les derniers détails ensemble.
+          <strong className="text-foreground">Pré-commander votre mission</strong> via notre formulaire sécurisé pour choisir votre date, votre horaire et renseigner les informations de votre véhicule. Dès validation, l'un de nos conseillers vous contactera pour confirmer votre mission.
         </p>
         <p>
-          Si vous souhaitez obtenir plus d'informations sur nos solutions de convoyage, <strong>envoyez‑nous votre demande</strong> ! Un conseiller vous recontactera gratuitement dans les plus brefs délais pour répondre à toutes vos questions et vous aider à planifier votre transfert en toute tranquillité.
+          Si vous souhaitez obtenir plus d'informations, <strong className="text-foreground">envoyez-nous votre demande</strong> ! Un conseiller vous recontactera gratuitement dans les plus brefs délais.
         </p>
       </div>
     </div>

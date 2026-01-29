@@ -1,10 +1,10 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Car, Info } from 'lucide-react';
 
 interface NewVehicleDetailsStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -36,12 +36,27 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-dk-navy">Étape 2: Détails du véhicule</h2>
-        <p className="text-gray-600 mt-2">Cette étape est facultative mais permet un devis plus précis</p>
+      {/* Section Header */}
+      <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="w-10 h-10 bg-dk-navy/10 rounded-lg flex items-center justify-center">
+          <Car className="w-5 h-5 text-dk-navy" />
+        </div>
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-dk-navy">Détails du véhicule</h2>
+          <p className="text-sm text-muted-foreground">Informations facultatives pour un devis plus précis</p>
+        </div>
+      </div>
+
+      {/* Info Banner */}
+      <div className="bg-muted/50 border border-border rounded-lg p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-dk-navy flex-shrink-0 mt-0.5" />
+        <p className="text-sm text-muted-foreground">
+          Cette étape est <span className="font-medium text-foreground">facultative</span> mais permet d'obtenir un devis plus précis et de préparer votre mission de convoyage.
+        </p>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Form Grid */}
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="brand"
@@ -51,7 +66,7 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
               <FormControl>
                 <Input 
                   placeholder="Ex: Renault, Peugeot, BMW..."
-                  className="bg-[#EEF1FF]"
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy"
                   {...field}
                 />
               </FormControl>
@@ -69,7 +84,7 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
               <FormControl>
                 <Input 
                   placeholder="Ex: Clio, 208, Série 3..."
-                  className="bg-[#EEF1FF]"
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy"
                   {...field}
                 />
               </FormControl>
@@ -87,7 +102,7 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
               <FormControl>
                 <Input 
                   placeholder="Ex: 2020"
-                  className="bg-[#EEF1FF]"
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy"
                   {...field}
                 />
               </FormControl>
@@ -104,11 +119,11 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
               <FormLabel className="text-dk-navy font-semibold">CARBURANT</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-[#EEF1FF]">
+                  <SelectTrigger className="bg-muted/50 border-border focus:ring-dk-navy">
                     <SelectValue placeholder="Sélectionner le carburant" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-popover border-border">
                   {fuelTypes.map((fuel) => (
                     <SelectItem key={fuel.id} value={fuel.id}>
                       {fuel.name}
@@ -130,8 +145,9 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
               <FormControl>
                 <Input 
                   placeholder="Ex: AB-123-CD"
-                  className="bg-[#EEF1FF]"
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy uppercase"
                   {...field}
+                  onChange={e => field.onChange(e.target.value.toUpperCase())}
                 />
               </FormControl>
               <FormMessage />
@@ -148,7 +164,7 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
               <FormControl>
                 <Input 
                   placeholder="Numéro d'identification du véhicule"
-                  className="bg-[#EEF1FF]"
+                  className="bg-muted/50 border-border focus-visible:ring-dk-navy"
                   {...field}
                 />
               </FormControl>
@@ -158,14 +174,20 @@ const NewVehicleDetailsStep = ({ form, onNext, onPrevious }: NewVehicleDetailsSt
         />
       </div>
 
-      <div className="flex justify-between mt-6">
-        <Button type="button" variant="outline" onClick={onPrevious}>
+      {/* Navigation */}
+      <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-4 border-t border-border">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onPrevious}
+          className="border-border hover:bg-muted"
+        >
           PRÉCÉDENT
         </Button>
         <Button 
           type="button" 
           onClick={handleNext}
-          className="bg-[#1a237e] hover:bg-[#3f51b5]"
+          className="bg-dk-navy hover:bg-dk-blue text-white px-8"
         >
           SUIVANT
         </Button>
