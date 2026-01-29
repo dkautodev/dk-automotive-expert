@@ -48,9 +48,9 @@ const FAQ = () => {
   }, []);
 
   const trustBadges = [
-    { icon: HelpCircle, label: "Questions fréquentes", sublabel: "Réponses claires" },
-    { icon: MessageCircle, label: "Support réactif", sublabel: "À votre écoute" },
-    { icon: Clock, label: "Disponible 24/7", sublabel: "Consultable à tout moment" },
+    { icon: HelpCircle, label: "Réponses claires" },
+    { icon: MessageCircle, label: "Support réactif" },
+    { icon: Clock, label: "Disponible 24/7" },
   ];
 
   return (
@@ -63,44 +63,25 @@ const FAQ = () => {
       
       <div className="min-h-screen bg-background">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-dk-navy via-dk-navy to-dk-blue py-16 md:py-24 overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-32 h-32 border border-white/20 rounded-full" />
-            <div className="absolute bottom-10 right-10 w-48 h-48 border border-white/20 rounded-full" />
-            <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-white/20 rounded-full" />
-          </div>
-          
+        <section className="relative bg-dk-navy py-12 md:py-16">
+          <div className="absolute inset-0 bg-gradient-to-br from-dk-navy via-dk-navy to-dk-blue opacity-90" />
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
-                <HelpCircle className="h-4 w-4 text-white" />
-                <span className="text-white/90 text-sm font-medium">Centre d'aide</span>
-              </div>
-              
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-                Questions <span className="text-white/80">Fréquentes</span>
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-2xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+                Questions Fréquentes
               </h1>
-              
-              <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8">
+              <p className="text-white/90 text-base md:text-lg font-light leading-relaxed mb-8">
                 Trouvez toutes les réponses à vos interrogations sur notre service de convoyage de véhicules
               </p>
               
-              {/* Trust Badges */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+              {/* Trust badges */}
+              <div className="flex flex-wrap justify-center gap-4 md:gap-8">
                 {trustBadges.map((badge, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20"
-                  >
-                    <div className="p-2 bg-white/20 rounded-lg">
-                      <badge.icon className="h-5 w-5 text-white" />
+                  <div key={index} className="flex items-center gap-2 text-white/90">
+                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                      <badge.icon className="w-5 h-5" aria-hidden="true" />
                     </div>
-                    <div className="text-left">
-                      <p className="text-white font-semibold text-sm">{badge.label}</p>
-                      <p className="text-white/70 text-xs">{badge.sublabel}</p>
-                    </div>
+                    <span className="text-sm font-medium">{badge.label}</span>
                   </div>
                 ))}
               </div>
@@ -109,44 +90,42 @@ const FAQ = () => {
         </section>
 
         {/* FAQ Content */}
-        <section className="py-12 md:py-20 px-4">
-          <div className="container mx-auto">
-            <div className="max-w-4xl mx-auto">
+        <section className="py-8 md:py-12 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
               {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-16 gap-4">
-                  <Loader2 className="h-10 w-10 text-dk-navy animate-spin" />
-                  <p className="text-muted-foreground">Chargement des FAQ...</p>
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <Loader2 className="h-8 w-8 text-dk-navy animate-spin" />
+                  <p className="text-muted-foreground text-sm">Chargement des FAQ...</p>
                 </div>
               ) : faqItems.length === 0 ? (
-                <div className="text-center py-16">
-                  <HelpCircle className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-                  <p className="text-muted-foreground text-lg">Aucune FAQ disponible pour le moment.</p>
+                <div className="text-center py-12">
+                  <HelpCircle className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="text-muted-foreground">Aucune FAQ disponible pour le moment.</p>
                 </div>
               ) : (
-                <Accordion type="single" collapsible className="space-y-3">
+                <Accordion type="single" collapsible className="space-y-2">
                   {faqItems.map((item, index) => (
                     <AccordionItem 
                       key={item.id} 
                       value={`item-${item.id}`} 
-                      className="bg-gradient-to-r from-dk-navy to-dk-blue rounded-xl shadow-lg border-0 overflow-hidden group"
+                      className="bg-card rounded-lg shadow-sm border border-border overflow-hidden"
                     >
-                      <AccordionTrigger className="px-5 md:px-6 py-4 md:py-5 hover:no-underline text-left">
-                        <div className="flex items-start gap-3 md:gap-4 w-full pr-4">
-                          <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-sm md:text-base">{index + 1}</span>
+                      <AccordionTrigger className="px-4 py-3 hover:no-underline text-left hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 w-full pr-2">
+                          <div className="flex-shrink-0 w-7 h-7 bg-dk-navy/10 rounded-md flex items-center justify-center">
+                            <span className="text-dk-navy font-semibold text-xs">{index + 1}</span>
                           </div>
-                          <span className="text-white font-medium text-sm md:text-base leading-relaxed">
+                          <span className="text-foreground font-medium text-sm leading-relaxed">
                             {item.question}
                           </span>
                         </div>
                       </AccordionTrigger>
-                      <AccordionContent className="px-5 md:px-6 pb-5 md:pb-6">
-                        <div className="pl-11 md:pl-14">
-                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-                            <p className="text-white/90 text-sm md:text-base leading-relaxed">
-                              {item.answer}
-                            </p>
-                          </div>
+                      <AccordionContent className="px-4 pb-4">
+                        <div className="pl-10">
+                          <p className="text-muted-foreground text-sm leading-relaxed">
+                            {item.answer}
+                          </p>
                         </div>
                       </AccordionContent>
                     </AccordionItem>
@@ -158,28 +137,28 @@ const FAQ = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="py-12 md:py-16 px-4 bg-muted/30">
-          <div className="container mx-auto">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-background rounded-2xl shadow-xl p-6 md:p-10 border">
-                <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+        <section className="py-8 md:py-12 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-card rounded-xl shadow-lg p-5 md:p-6 border border-border">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-dk-navy to-dk-blue rounded-2xl flex items-center justify-center">
-                      <MessageCircle className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                    <div className="w-12 h-12 bg-dk-navy/10 rounded-lg flex items-center justify-center">
+                      <MessageCircle className="h-6 w-6 text-dk-navy" />
                     </div>
                   </div>
                   
-                  <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-lg font-bold text-dk-navy mb-1">
                       Vous n'avez pas trouvé votre réponse ?
                     </h3>
-                    <p className="text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Notre équipe est à votre disposition pour répondre à toutes vos questions.
                     </p>
                   </div>
                   
                   <div className="flex-shrink-0">
-                    <Button asChild size="lg" className="bg-dk-navy hover:bg-dk-navy/90 text-white gap-2">
+                    <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white gap-2">
                       <Link to="/contact">
                         Nous contacter
                         <ArrowRight className="h-4 w-4" />
@@ -193,49 +172,18 @@ const FAQ = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 md:py-24 px-4 bg-gradient-to-br from-dk-navy via-dk-navy to-dk-blue relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1/4 right-1/4 w-64 h-64 border border-white/20 rounded-full" />
-            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 border border-white/20 rounded-full" />
-          </div>
-          
-          <div className="container mx-auto relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                FAITES LE CHOIX DE L'EXPERTISE
+        <section className="py-12 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-dk-navy mb-4">
+                Besoin d'un devis rapidement ?
               </h2>
-              <h3 className="text-xl md:text-3xl font-bold text-white/80 mb-6">
-                DK AUTOMOTIVE
-              </h3>
-              
-              <p className="text-base md:text-lg text-white/80 mb-4">
-                UN PARTENAIRE FIABLE POUR VOS BESOINS EN CONVOYAGE
+              <p className="text-muted-foreground mb-6">
+                Utilisez notre calculateur en ligne pour obtenir un tarif instantané.
               </p>
-              
-              <p className="text-sm md:text-base text-white/70 max-w-3xl mx-auto mb-8 leading-relaxed">
-                Rejoignez dès aujourd'hui notre réseau de clients satisfaits et découvrez la différence que DK AUTOMOTIVE peut apporter à votre expérience de transport de véhicules.
-              </p>
-              
-              {/* Features */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                {[
-                  "Transport sécurisé",
-                  "Tarifs transparents",
-                  "Prise en charge rapide",
-                  "Couverture nationale"
-                ].map((feature, index) => (
-                  <div key={index} className="flex items-center justify-center gap-2 text-white/90">
-                    <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-400 flex-shrink-0" />
-                    <span className="text-xs md:text-sm font-medium">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <Button asChild size="lg" className="bg-white text-dk-navy hover:bg-white/90 font-semibold px-8 py-6 text-base md:text-lg gap-2">
+              <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white px-8 py-5 text-base">
                 <Link to="/devis">
-                  DEMANDEZ VOTRE DEVIS
-                  <ArrowRight className="h-5 w-5" />
+                  Demander un devis gratuit
                 </Link>
               </Button>
             </div>
