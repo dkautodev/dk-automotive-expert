@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, Phone, Building, Asterisk } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader } from '@/components/ui/loader';
 import { supabase } from '@/integrations/supabase/client';
-
 const formSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -22,11 +20,9 @@ const formSchema = z.object({
   subject: z.string().min(2, "L'objet doit contenir au moins 2 caractères"),
   message: z.string().min(10, "Le message doit contenir au moins 10 caractères")
 });
-
 const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,25 +35,20 @@ const Contact = () => {
       message: ""
     }
   });
-
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setSubmitError(null);
-
     try {
       console.log("Sending contact form data:", values);
-
-      const { data, error } = await supabase.functions.invoke(
-        "send-contact-email",
-        {
-          body: values
-        }
-      );
-
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("send-contact-email", {
+        body: values
+      });
       if (error) {
         throw new Error(error.message || "Erreur lors de l'envoi du message");
       }
-
       toast.success("Message envoyé avec succès !");
       form.reset();
     } catch (error: any) {
@@ -71,13 +62,14 @@ const Contact = () => {
   };
 
   // Helper pour afficher le label avec astérisque
-  const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
-    <span className="flex items-center gap-1">
+  const RequiredLabel = ({
+    children
+  }: {
+    children: React.ReactNode;
+  }) => <span className="flex items-center gap-1">
       {children}
       <Asterisk size={14} className="text-red-500 ml-1" aria-label="champ obligatoire" />
-    </span>
-  );
-
+    </span>;
   return <div className="min-h-screen bg-white">
       <main className="animate-fadeIn">
         <section className="py-12 md:py-16 px-4">
@@ -86,7 +78,7 @@ const Contact = () => {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
                 <span className="text-black">CONTACTEZ-NOUS POUR TOUTES</span>
                 <br className="hidden md:block" />
-                <span className="text-dk-navy">VOS DEMANDES</span>
+                <span className="text-dk-navy text-center"> VOS DEMANDES</span>
               </h1>
               <p className="text-gray-700 text-base md:text-lg max-w-3xl mx-auto mb-2">
                 Besoin d'un devis personnalisé ? Des questions sur nos prestations de convoyage de véhicules ? Contactez-nous dès maintenant pour obtenir toutes les informations dont vous avez besoin.
@@ -99,18 +91,16 @@ const Contact = () => {
                   Envoyez-nous un message
                 </h2>
                 
-                {submitError && (
-                  <Alert variant="destructive" className="mb-4">
+                {submitError && <Alert variant="destructive" className="mb-4">
                     <AlertDescription>{submitError}</AlertDescription>
-                  </Alert>
-                )}
+                  </Alert>}
                 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <FormField control={form.control} name="firstName" render={({
-                        field
-                      }) => <FormItem>
+                      field
+                    }) => <FormItem>
                               <FormLabel>
                                 <RequiredLabel>Prénom</RequiredLabel>
                               </FormLabel>
@@ -121,8 +111,8 @@ const Contact = () => {
                             </FormItem>} />
 
                       <FormField control={form.control} name="lastName" render={({
-                        field
-                      }) => <FormItem>
+                      field
+                    }) => <FormItem>
                               <FormLabel>
                                 <RequiredLabel>Nom</RequiredLabel>
                               </FormLabel>
@@ -134,8 +124,8 @@ const Contact = () => {
                     </div>
 
                     <FormField control={form.control} name="companyName" render={({
-                      field
-                    }) => <FormItem>
+                    field
+                  }) => <FormItem>
                             <FormLabel>
                               Société <span className="text-xs text-gray-400">(facultatif)</span>
                             </FormLabel>
@@ -147,8 +137,8 @@ const Contact = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <FormField control={form.control} name="email" render={({
-                        field
-                      }) => <FormItem>
+                      field
+                    }) => <FormItem>
                               <FormLabel>
                                 <RequiredLabel>Email</RequiredLabel>
                               </FormLabel>
@@ -159,8 +149,8 @@ const Contact = () => {
                             </FormItem>} />
 
                       <FormField control={form.control} name="phone" render={({
-                        field
-                      }) => <FormItem>
+                      field
+                    }) => <FormItem>
                               <FormLabel>
                                 <RequiredLabel>Téléphone</RequiredLabel>
                               </FormLabel>
@@ -172,8 +162,8 @@ const Contact = () => {
                     </div>
 
                     <FormField control={form.control} name="subject" render={({
-                      field
-                    }) => <FormItem>
+                    field
+                  }) => <FormItem>
                             <FormLabel>
                               <RequiredLabel>Objet</RequiredLabel>
                             </FormLabel>
@@ -184,8 +174,8 @@ const Contact = () => {
                           </FormItem>} />
 
                     <FormField control={form.control} name="message" render={({
-                      field
-                    }) => <FormItem>
+                    field
+                  }) => <FormItem>
                             <FormLabel>
                               <RequiredLabel>Message</RequiredLabel>
                             </FormLabel>
@@ -195,19 +185,11 @@ const Contact = () => {
                             <FormMessage />
                           </FormItem>} />
 
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-dk-navy hover:bg-dk-blue transition-colors"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <>
+                    <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue transition-colors" disabled={loading}>
+                      {loading ? <>
                           <Loader className="mr-2 h-4 w-4 animate-spin" />
                           ENVOI EN COURS...
-                        </>
-                      ) : (
-                        'Envoyer le message'
-                      )}
+                        </> : 'Envoyer le message'}
                     </Button>
                   </form>
                 </Form>
@@ -221,5 +203,4 @@ const Contact = () => {
       </main>
     </div>;
 };
-
 export default Contact;
