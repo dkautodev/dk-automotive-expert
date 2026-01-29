@@ -542,6 +542,45 @@ export type Database = {
         }
         Relationships: []
       }
+      social_links: {
+        Row: {
+          created_at: string
+          display_order: number
+          icon: string | null
+          id: string
+          is_active: boolean
+          platform: string
+          platform_label: string
+          updated_at: string
+          updated_by: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          platform: string
+          platform_label: string
+          updated_at?: string
+          updated_by?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          platform?: string
+          platform_label?: string
+          updated_at?: string
+          updated_by?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
