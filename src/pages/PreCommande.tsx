@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone } from 'lucide-react';
+import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import StripePaymentWrapper from '@/components/payment/StripePaymentWrapper';
+import { supabase } from '@/integrations/supabase/client';
 const FUEL_OPTIONS = [{
   value: 'essence',
   label: 'Essence'
@@ -83,7 +83,7 @@ const PreCommande = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const quoteData = location.state as QuoteData | null;
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Time state - separated into hours and minutes for time slots
   const [pickupStartHour, setPickupStartHour] = useState('09');
@@ -146,64 +146,74 @@ const PreCommande = () => {
   const hours = Array.from({
     length: 24
   }, (_, i) => i.toString().padStart(2, '0'));
-  // Validate form and prepare mission data
-  useEffect(() => {
-    const isValid = !!(
-      formData.email && 
-      formData.firstName && 
-      formData.lastName &&
-      formData.pickupDate && 
-      formData.deliveryDate &&
-      formData.brand && 
-      formData.model && 
-      formData.fuel && 
-      formData.licensePlate
-    );
-    setIsFormValid(isValid);
-  }, [formData]);
+  const handlePayment = async () => {
+    // Validate required fields
+    if (!formData.email || !formData.firstName || !formData.lastName) {
+      toast.error('Veuillez remplir les informations de contact');
+      return;
+    }
+    if (!formData.pickupDate || !formData.deliveryDate) {
+      toast.error('Veuillez sélectionner les dates de départ et d\'arrivée');
+      return;
+    }
 
-  // Memoized mission data for payment
-  const missionData = useMemo(() => ({
-    pickup_address: quoteData?.pickup_address || '',
-    delivery_address: quoteData?.delivery_address || '',
-    distance_km: parseFloat(quoteData?.distance || '0'),
-    price_ht: priceHT,
-    price_ttc: priceTTC,
-    vehicle_type: formData.vehicleType,
-    vehicle_brand: formData.brand,
-    vehicle_model: formData.model,
-    vehicle_year: formData.year,
-    vehicle_fuel: formData.fuel,
-    license_plate: formData.licensePlate,
-    vehicle_vin: formData.vin,
-    client_name: `${formData.firstName} ${formData.lastName}`,
-    client_email: formData.email,
-    client_phone: formData.phone,
-    client_company: formData.company,
-    pickup_date: formData.pickupDate,
-    pickup_time: formData.pickupTimeStart,
-    pickup_time_end: formData.pickupTimeEnd,
-    delivery_date: formData.deliveryDate,
-    delivery_time: formData.deliveryTimeStart,
-    delivery_time_end: formData.deliveryTimeEnd,
-    pickup_contact_name: formData.pickupContactName,
-    pickup_contact_phone: formData.pickupContactPhone,
-    delivery_contact_name: formData.deliveryContactName,
-    delivery_contact_phone: formData.deliveryContactPhone,
-    notes: formData.additionalInfo
-  }), [quoteData, priceHT, priceTTC, formData]);
-
-  const handlePaymentSuccess = (paymentIntentId: string) => {
-    navigate('/payment-success', { 
-      state: { 
-        paymentIntentId,
-        missionData 
-      } 
-    });
-  };
-
-  const handlePaymentError = (error: string) => {
-    console.error('Payment error:', error);
+    // Validate required vehicle fields
+    if (!formData.brand || !formData.model || !formData.fuel || !formData.licensePlate) {
+      toast.error('Veuillez remplir les champs véhicule obligatoires (marque, modèle, carburant, immatriculation)');
+      return;
+    }
+    setIsProcessing(true);
+    try {
+      const missionData = {
+        pickup_address: quoteData?.pickup_address || '',
+        delivery_address: quoteData?.delivery_address || '',
+        distance_km: parseFloat(quoteData?.distance || '0'),
+        price_ht: priceHT,
+        price_ttc: priceTTC,
+        vehicle_type: formData.vehicleType,
+        vehicle_brand: formData.brand,
+        vehicle_model: formData.model,
+        vehicle_year: formData.year,
+        vehicle_fuel: formData.fuel,
+        license_plate: formData.licensePlate,
+        vehicle_vin: formData.vin,
+        client_name: `${formData.firstName} ${formData.lastName}`,
+        client_email: formData.email,
+        client_phone: formData.phone,
+        client_company: formData.company,
+        pickup_date: formData.pickupDate,
+        pickup_time: formData.pickupTimeStart,
+        pickup_time_end: formData.pickupTimeEnd,
+        delivery_date: formData.deliveryDate,
+        delivery_time: formData.deliveryTimeStart,
+        delivery_time_end: formData.deliveryTimeEnd,
+        pickup_contact_name: formData.pickupContactName,
+        pickup_contact_phone: formData.pickupContactPhone,
+        delivery_contact_name: formData.deliveryContactName,
+        delivery_contact_phone: formData.deliveryContactPhone,
+        notes: formData.additionalInfo
+      };
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('create-mission-payment', {
+        body: missionData
+      });
+      if (error) {
+        throw new Error(error.message);
+      }
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de paiement non reçue');
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error(`Erreur lors de la création du paiement: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
   if (!quoteData) {
     return <div className="min-h-screen flex flex-col bg-white">
@@ -542,28 +552,26 @@ const PreCommande = () => {
                       <p className="font-medium mb-2">Moyens de paiement acceptés:</p>
                       <div className="flex flex-wrap gap-2">
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">Carte bancaire</span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">PayPal</span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">SEPA</span>
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">Apple Pay</span>
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">Google Pay</span>
-                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">Stripe Link</span>
                       </div>
                     </div>
 
-                    <Separator />
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg" onClick={handlePayment} disabled={isProcessing}>
+                      {isProcessing ? <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Traitement en cours...
+                        </> : <>
+                          <CreditCard className="mr-2 h-5 w-5" />
+                          Payer {priceTTC.toFixed(2)} €
+                        </>}
+                    </Button>
 
-                    {/* Embedded Stripe Card Form */}
-                    {isFormValid ? (
-                      <StripePaymentWrapper
-                        missionData={missionData}
-                        onSuccess={handlePaymentSuccess}
-                        onError={handlePaymentError}
-                      />
-                    ) : (
-                      <div className="text-center py-4">
-                        <p className="text-amber-600 text-sm">
-                          Veuillez remplir tous les champs obligatoires (*) pour accéder au paiement.
-                        </p>
-                      </div>
-                    )}
+                    <p className="text-xs text-gray-500 text-center">
+                      Paiement sécurisé par Stripe. Vos données bancaires sont protégées.
+                    </p>
                   </CardContent>
                 </Card>
               </div>
