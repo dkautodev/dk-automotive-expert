@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calculator, RefreshCcw, MapPin, Car, CheckCircle2, Lightbulb, Shield } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
@@ -10,8 +11,7 @@ import { toast } from 'sonner';
 import { useGoogleAutocomplete } from "@/hooks/useGoogleAutocomplete";
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
-import { PickupAddressField } from './PickupAddressField';
-import { DeliveryAddressField } from './DeliveryAddressField';
+import { assignRefs } from './assignRefs';
 import { cn } from '@/lib/utils';
 
 interface NewAddressVehicleStepProps {
@@ -154,29 +154,90 @@ const NewAddressVehicleStep = ({
       </div>
 
       {/* Address Fields - Side by side with swap button in the middle */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto,1fr] gap-3 lg:gap-4">
-        <div className="w-full">
-          <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
+      <div className="space-y-2">
+        {/* Labels row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-12">
+          <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
+          </FormLabel>
+          <FormLabel className="hidden lg:flex text-dk-navy font-semibold items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            ADRESSE DE LIVRAISON <span className="text-destructive">*</span>
+          </FormLabel>
         </div>
         
-        {/* Switch Button - Centered vertically with inputs */}
-        <div className="hidden lg:flex items-end pb-[2px]">
+        {/* Inputs row with swap button in between */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto,1fr] gap-3 lg:gap-2 items-center">
+          {/* Pickup Input */}
+          <FormField
+            control={form.control}
+            name="pickup_address"
+            render={({ field }: any) => (
+              <FormItem className="space-y-0">
+                <FormControl>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={pickupAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
+                      className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${pickupAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
+                      {...field}
+                      ref={assignRefs(pickupInputRef, field.ref)}
+                      disabled={!!pickupAuto.error}
+                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
+                      autoComplete="off"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* Swap Button - Desktop */}
           <button
             type="button"
             aria-label="Échanger les adresses"
             onClick={handleSwitchAddresses}
-            className="bg-card border border-border rounded-full shadow-sm p-2 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
+            className="hidden lg:flex bg-card border border-border rounded-full shadow-sm p-2.5 items-center justify-center hover:bg-muted active:scale-95 transition-all"
           >
             <RefreshCcw className="w-4 h-4 text-dk-navy" />
           </button>
-        </div>
-        
-        <div className="w-full">
-          <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
+          
+          {/* Mobile label for delivery */}
+          <FormLabel className="lg:hidden text-dk-navy font-semibold flex items-center gap-2 pt-2">
+            <MapPin className="w-4 h-4" />
+            ADRESSE DE LIVRAISON <span className="text-destructive">*</span>
+          </FormLabel>
+          
+          {/* Delivery Input */}
+          <FormField
+            control={form.control}
+            name="delivery_address"
+            render={({ field }: any) => (
+              <FormItem className="space-y-0">
+                <FormControl>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={deliveryAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
+                      className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
+                      {...field}
+                      ref={assignRefs(deliveryInputRef, field.ref)}
+                      disabled={!!deliveryAuto.error}
+                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
+                      autoComplete="off"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         
         {/* Mobile swap button */}
-        <div className="lg:hidden flex justify-center -mt-2 -mb-2">
+        <div className="lg:hidden flex justify-center py-1">
           <button
             type="button"
             aria-label="Échanger les adresses"
