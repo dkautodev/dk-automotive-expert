@@ -1,4 +1,3 @@
-
 import { FC, RefObject } from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -17,13 +16,16 @@ export const PickupAddressField: FC<PickupAddressFieldProps> = ({ form, pickupAu
     name="pickup_address"
     render={({ field }: any) => (
       <FormItem>
-        <FormLabel className="text-dk-navy font-semibold">ADRESSE DE PRISE EN CHARGE *</FormLabel>
+        <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
+        </FormLabel>
         <FormControl>
           <div className="relative">
-            <MapPin className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={pickupAuto.error ? "Petit problème... Une erreur s'est produite" : "Saisissez l'adresse complète"}
-              className={`pl-8 bg-[#EEF1FF] ${pickupAuto.error ? 'opacity-60 cursor-not-allowed' : ''}`}
+              placeholder={pickupAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
+              className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${pickupAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
               {...field}
               ref={assignRefs(pickupInputRef, field.ref)}
               disabled={!!pickupAuto.error}
@@ -31,7 +33,7 @@ export const PickupAddressField: FC<PickupAddressFieldProps> = ({ form, pickupAu
               autoComplete="off"
             />
             {pickupAuto.error && (
-              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-destructive">
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-destructive">
                 {pickupAuto.error}
               </span>
             )}

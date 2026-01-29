@@ -1,4 +1,3 @@
-
 import { Form } from '@/components/ui/form';
 import { useQuoteForm } from './hooks/useQuoteForm';
 import NewAddressVehicleStep from './steps/NewAddressVehicleStep';
@@ -59,11 +58,13 @@ const QuoteForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="w-full">
       <Form {...form}>
-        <div className="space-y-8">
+        <div className="space-y-6">
           <QuoteFormProgress currentStep={step} />
-          {renderStep()}
+          <div className="animate-fadeIn">
+            {renderStep()}
+          </div>
         </div>
       </Form>
     </div>
