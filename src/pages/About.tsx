@@ -63,19 +63,19 @@ const About = () => {
       />
       <main className="min-h-screen bg-white animate-fadeIn">
         {/* Section Hero */}
-        <section className="py-16 md:py-24 px-4">
+        <section className="py-12 md:py-16 px-4">
           <div className="container mx-auto">
             <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              <h1 className="text-2xl md:text-3xl font-bold mb-4 uppercase tracking-tight">
                 {getContentValue('hero_title', 'title')}
               </h1>
-              <h2 className="text-4xl md:text-5xl font-bold text-[#18257D] mb-6">
+              <h2 className="text-xl md:text-3xl font-bold text-dk-navy mb-6">
                 {getContentValue('hero_main_title', 'title')}
               </h2>
-              <p className="text-lg md:text-xl text-gray-700 mb-6 md:mb-8">
+              <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8">
                 {getContentValue('hero_subtitle', 'subtitle')}
               </p>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 md:mb-12">
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8 md:mb-12">
                 {getContentValue('hero_description')}
               </p>
             </div>
@@ -95,33 +95,33 @@ const About = () => {
                   />
                 )}
               </div>
-              <div className="space-y-6">
-                <h3 className="text-3xl font-bold text-[#18257D]">
+              <div className="space-y-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                   {getContentValue('why_choose_title', 'title')}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
+                </h2>
+                <p className="text-muted-foreground leading-relaxed">
                   {getContentValue('why_choose_description')}
                 </p>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">{getContentValue('why_choose_benefit_1')}</p>
+                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
+                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_1')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">{getContentValue('why_choose_benefit_2')}</p>
+                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
+                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_2')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">{getContentValue('why_choose_benefit_3')}</p>
+                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
+                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_3')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="text-[#18257D] h-6 w-6 flex-shrink-0" />
-                    <p className="text-gray-600">{getContentValue('why_choose_benefit_4')}</p>
+                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
+                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_4')}</span>
                   </div>
                 </div>
-                <div className="pt-4">
-                  <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
+                <div className="pt-2">
+                  <Link to="/devis" className="inline-block bg-dk-navy text-white px-6 py-3 rounded hover:bg-dk-navy/90 transition-colors">
                     Demander un devis
                   </Link>
                 </div>
@@ -131,24 +131,24 @@ const About = () => {
         </section>
 
         {/* Section Chauffeurs Expérimentés */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-12 md:py-16 px-4 bg-white">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <h3 className="text-3xl font-bold text-[#18257D]">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="space-y-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                   {getContentValue('drivers_title', 'title')}
-                </h3>
-                <h3 className="text-3xl font-bold text-[#18257D]">
+                </h2>
+                <h3 className="text-xl md:text-2xl font-bold text-dk-navy">
                   {getContentValue('drivers_subtitle', 'title')}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   {getContentValue('drivers_description_1')}
                 </p>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   {getContentValue('drivers_description_2')}
                 </p>
-                <div className="pt-4">
-                  <Link to="/contact" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
+                <div className="pt-2">
+                  <Link to="/contact" className="inline-block bg-dk-navy text-white px-6 py-3 rounded hover:bg-dk-navy/90 transition-colors">
                     Contactez-nous
                   </Link>
                 </div>
@@ -156,7 +156,7 @@ const About = () => {
               <div>
                 {getImageUrl('drivers_image') && (
                   <img 
-                    alt="DK Automotive drivers" 
+                    alt="Chauffeurs professionnels DK Automotive pour convoyage automobile" 
                     className="rounded-lg shadow-lg w-full" 
                     src={getImageUrl('drivers_image')} 
                   />
@@ -167,95 +167,95 @@ const About = () => {
         </section>
 
         {/* Section Nos Valeurs */}
-        <section className="py-16 px-4 bg-[#18257D] text-white">
+        <section className="py-12 md:py-16 px-4 bg-dk-navy text-white">
           <div className="container mx-auto">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold">
                 {getContentValue('values_section_title', 'title')}
-              </h3>
+              </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center space-y-4">
+              <article className="text-center space-y-3">
                 <div className="flex justify-center">
                   {getImageUrl('value_ecoconduite_image') && (
                     <img 
-                      alt="Écoconduite" 
-                      className="w-16 h-16 mb-4" 
+                      alt="Écoconduite - Engagement environnemental DK Automotive" 
+                      className="w-14 h-14 mb-3" 
                       src={getImageUrl('value_ecoconduite_image')} 
                     />
                   )}
                 </div>
-                <h4 className="text-xl font-bold">
+                <h3 className="text-lg font-bold">
                   {getContentValue('value_ecoconduite_title', 'title')}
-                </h4>
-                <p className="text-sm">
+                </h3>
+                <p className="text-sm text-white/80">
                   {getContentValue('value_ecoconduite_content')}
                 </p>
-              </div>
-              <div className="text-center space-y-4">
+              </article>
+              <article className="text-center space-y-3">
                 <div className="flex justify-center">
                   {getImageUrl('value_expertise_image') && (
                     <img 
-                      alt="Expertise technique" 
-                      className="w-16 h-16 mb-4" 
+                      alt="Expertise technique en convoyage de véhicules" 
+                      className="w-14 h-14 mb-3" 
                       src={getImageUrl('value_expertise_image')} 
                     />
                   )}
                 </div>
-                <h4 className="text-xl font-bold">
+                <h3 className="text-lg font-bold">
                   {getContentValue('value_expertise_title', 'title')}
-                </h4>
-                <p className="text-sm">
+                </h3>
+                <p className="text-sm text-white/80">
                   {getContentValue('value_expertise_content')}
                 </p>
-              </div>
-              <div className="text-center space-y-4">
+              </article>
+              <article className="text-center space-y-3">
                 <div className="flex justify-center">
                   {getImageUrl('value_service_image') && (
                     <img 
-                      alt="Service sur-mesure" 
-                      className="w-16 h-16 mb-4" 
+                      alt="Service sur-mesure de transport automobile" 
+                      className="w-14 h-14 mb-3" 
                       src={getImageUrl('value_service_image')} 
                     />
                   )}
                 </div>
-                <h4 className="text-xl font-bold">
+                <h3 className="text-lg font-bold">
                   {getContentValue('value_service_title', 'title')}
-                </h4>
-                <p className="text-sm">
+                </h3>
+                <p className="text-sm text-white/80">
                   {getContentValue('value_service_content')}
                 </p>
-              </div>
+              </article>
             </div>
           </div>
         </section>
 
         {/* Section Expertise en Convoyage */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-12 md:py-16 px-4 bg-white">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 {getImageUrl('expertise_image') && (
                   <img 
-                    alt="Expertise en convoyage" 
+                    alt="Expertise en convoyage automobile France" 
                     className="rounded-lg shadow-lg w-full" 
                     src={getImageUrl('expertise_image')} 
                   />
                 )}
               </div>
-              <div className="space-y-6">
-                <h3 className="text-3xl font-bold text-[#18257D]">
+              <div className="space-y-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                   {getContentValue('expertise_title', 'title')}
-                </h3>
-                <h4 className="text-2xl font-bold">
+                </h2>
+                <h3 className="text-xl md:text-2xl font-bold">
                   {getContentValue('expertise_subtitle', 'title')}
-                </h4>
-                <p className="text-gray-600 leading-relaxed">
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
                   {getContentValue('expertise_description')}
                 </p>
-                <div className="pt-4">
-                  <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 rounded hover:bg-[#18257D]/90 transition-colors">
-                    RÉSERVEZ VOTRE TRANSPORT EN TOUTE CONFIANCE
+                <div className="pt-2">
+                  <Link to="/devis" className="inline-block bg-dk-navy text-white px-6 py-3 rounded hover:bg-dk-navy/90 transition-colors text-sm font-medium">
+                    Réservez votre transport en toute confiance
                   </Link>
                 </div>
               </div>
@@ -264,22 +264,22 @@ const About = () => {
         </section>
 
         {/* Section Finale */}
-        <section className="py-16 px-4 bg-white">
-          <div className="container mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-4">
+        <section className="py-12 md:py-16 px-4 bg-muted/50">
+          <div className="container mx-auto text-center max-w-3xl">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
               {getContentValue('final_title', 'title')}
             </h2>
-            <h3 className="text-4xl font-bold text-[#18257D] mb-4">
+            <h3 className="text-xl md:text-2xl font-bold text-dk-navy mb-4">
               {getContentValue('final_main_title', 'title')}
             </h3>
-            <p className="text-lg text-gray-700 mb-8">
+            <p className="text-muted-foreground mb-4">
               {getContentValue('final_subtitle', 'subtitle')}
             </p>
-            <p className="text-lg text-gray-700 mb-8">
+            <p className="text-muted-foreground mb-8">
               {getContentValue('final_description')}
             </p>
-            <Link to="/devis" className="inline-block bg-[#18257D] text-white px-8 py-4 text-lg font-semibold hover:bg-[#18257D]/90 transition-colors">
-              DEMANDEZ VOTRE DEVIS
+            <Link to="/devis" className="inline-block bg-dk-navy text-white px-8 py-4 font-medium hover:bg-dk-navy/90 transition-colors">
+              Demandez votre devis
             </Link>
           </div>
         </section>
