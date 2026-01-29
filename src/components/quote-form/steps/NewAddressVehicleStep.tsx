@@ -153,26 +153,38 @@ const NewAddressVehicleStep = ({
         </div>
       </div>
 
-      {/* Address Fields */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto,1fr] gap-4 items-end">
+      {/* Address Fields - Side by side with swap button in the middle */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto,1fr] gap-3 lg:gap-4">
         <div className="w-full">
           <PickupAddressField form={form} pickupAuto={pickupAuto} pickupInputRef={pickupInputRef} />
         </div>
         
-        {/* Switch Button */}
-        <div className="flex justify-center lg:pb-2">
+        {/* Switch Button - Centered vertically with inputs */}
+        <div className="hidden lg:flex items-end pb-[2px]">
           <button
             type="button"
             aria-label="Échanger les adresses"
             onClick={handleSwitchAddresses}
-            className="bg-card border border-border rounded-full shadow-sm p-2.5 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
+            className="bg-card border border-border rounded-full shadow-sm p-2 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
           >
-            <RefreshCcw className="w-5 h-5 text-dk-navy" />
+            <RefreshCcw className="w-4 h-4 text-dk-navy" />
           </button>
         </div>
         
         <div className="w-full">
           <DeliveryAddressField form={form} deliveryAuto={deliveryAuto} deliveryInputRef={deliveryInputRef} />
+        </div>
+        
+        {/* Mobile swap button */}
+        <div className="lg:hidden flex justify-center -mt-2 -mb-2">
+          <button
+            type="button"
+            aria-label="Échanger les adresses"
+            onClick={handleSwitchAddresses}
+            className="bg-card border border-border rounded-full shadow-sm p-2 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
+          >
+            <RefreshCcw className="w-4 h-4 text-dk-navy" />
+          </button>
         </div>
       </div>
 
