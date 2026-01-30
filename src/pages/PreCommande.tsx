@@ -79,46 +79,90 @@ interface FormData {
   // Notes
   additionalInfo: string;
 }
+const STORAGE_KEY = 'precommande_data';
+
 const PreCommande = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const quoteData = location.state as QuoteData | null;
+  
+  // Get data from navigation state or sessionStorage
+  const getInitialQuoteData = (): QuoteData | null => {
+    const stateData = location.state as QuoteData | null;
+    if (stateData) {
+      // Save to sessionStorage for later retrieval
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stateData));
+      return stateData;
+    }
+    // Try to retrieve from sessionStorage
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const quoteData = getInitialQuoteData();
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Get stored form data from sessionStorage
+  const getStoredFormData = (): Partial<FormData> => {
+    const stored = sessionStorage.getItem(STORAGE_KEY + '_form');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return {};
+      }
+    }
+    return {};
+  };
+
+  const storedFormData = getStoredFormData();
+
   // Time state - separated into hours and minutes for time slots
-  const [pickupStartHour, setPickupStartHour] = useState('09');
-  const [pickupStartMinute, setPickupStartMinute] = useState('00');
-  const [pickupEndHour, setPickupEndHour] = useState('11');
-  const [pickupEndMinute, setPickupEndMinute] = useState('00');
-  const [deliveryStartHour, setDeliveryStartHour] = useState('14');
-  const [deliveryStartMinute, setDeliveryStartMinute] = useState('00');
-  const [deliveryEndHour, setDeliveryEndHour] = useState('17');
-  const [deliveryEndMinute, setDeliveryEndMinute] = useState('00');
+  const [pickupStartHour, setPickupStartHour] = useState(storedFormData.pickupTimeStart?.split(':')[0] || '09');
+  const [pickupStartMinute, setPickupStartMinute] = useState(storedFormData.pickupTimeStart?.split(':')[1] || '00');
+  const [pickupEndHour, setPickupEndHour] = useState(storedFormData.pickupTimeEnd?.split(':')[0] || '11');
+  const [pickupEndMinute, setPickupEndMinute] = useState(storedFormData.pickupTimeEnd?.split(':')[1] || '00');
+  const [deliveryStartHour, setDeliveryStartHour] = useState(storedFormData.deliveryTimeStart?.split(':')[0] || '14');
+  const [deliveryStartMinute, setDeliveryStartMinute] = useState(storedFormData.deliveryTimeStart?.split(':')[1] || '00');
+  const [deliveryEndHour, setDeliveryEndHour] = useState(storedFormData.deliveryTimeEnd?.split(':')[0] || '17');
+  const [deliveryEndMinute, setDeliveryEndMinute] = useState(storedFormData.deliveryTimeEnd?.split(':')[1] || '00');
+  
   const [formData, setFormData] = useState<FormData>({
-    pickupDate: '',
-    pickupTimeStart: '09:00',
-    pickupTimeEnd: '11:00',
-    deliveryDate: '',
-    deliveryTimeStart: '14:00',
-    deliveryTimeEnd: '17:00',
-    vehicleType: quoteData?.vehicle_type || '',
-    brand: quoteData?.brand || '',
-    model: quoteData?.model || '',
-    year: quoteData?.year || '',
-    fuel: quoteData?.fuel || '',
-    licensePlate: quoteData?.licensePlate || '',
-    vin: '',
-    company: quoteData?.company || '',
-    firstName: quoteData?.firstName || '',
-    lastName: quoteData?.lastName || '',
-    email: quoteData?.email || '',
-    phone: quoteData?.phone || '',
-    pickupContactName: '',
-    pickupContactPhone: '',
-    deliveryContactName: '',
-    deliveryContactPhone: '',
-    additionalInfo: quoteData?.additionalInfo || ''
+    pickupDate: storedFormData.pickupDate || '',
+    pickupTimeStart: storedFormData.pickupTimeStart || '09:00',
+    pickupTimeEnd: storedFormData.pickupTimeEnd || '11:00',
+    deliveryDate: storedFormData.deliveryDate || '',
+    deliveryTimeStart: storedFormData.deliveryTimeStart || '14:00',
+    deliveryTimeEnd: storedFormData.deliveryTimeEnd || '17:00',
+    vehicleType: storedFormData.vehicleType || quoteData?.vehicle_type || '',
+    brand: storedFormData.brand || quoteData?.brand || '',
+    model: storedFormData.model || quoteData?.model || '',
+    year: storedFormData.year || quoteData?.year || '',
+    fuel: storedFormData.fuel || quoteData?.fuel || '',
+    licensePlate: storedFormData.licensePlate || quoteData?.licensePlate || '',
+    vin: storedFormData.vin || '',
+    company: storedFormData.company || quoteData?.company || '',
+    firstName: storedFormData.firstName || quoteData?.firstName || '',
+    lastName: storedFormData.lastName || quoteData?.lastName || '',
+    email: storedFormData.email || quoteData?.email || '',
+    phone: storedFormData.phone || quoteData?.phone || '',
+    pickupContactName: storedFormData.pickupContactName || '',
+    pickupContactPhone: storedFormData.pickupContactPhone || '',
+    deliveryContactName: storedFormData.deliveryContactName || '',
+    deliveryContactPhone: storedFormData.deliveryContactPhone || '',
+    additionalInfo: storedFormData.additionalInfo || quoteData?.additionalInfo || ''
   });
+
+  // Save form data to sessionStorage whenever it changes
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY + '_form', JSON.stringify(formData));
+  }, [formData]);
 
   // Sync time with formData
   useEffect(() => {
@@ -553,7 +597,6 @@ const PreCommande = () => {
                       <div className="flex flex-wrap gap-2">
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">Carte bancaire</span>
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">PayPal</span>
-                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">SEPA</span>
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">Apple Pay</span>
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">Google Pay</span>
                       </div>

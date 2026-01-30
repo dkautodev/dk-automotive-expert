@@ -33,7 +33,7 @@ export const quoteFormSchema = z.object({
   vin: z.string().optional(),
   
   // Étape 3 : Contact (obligatoire)
-  company: z.string().min(1, 'La société est requise'),
+  company: z.string().optional(),
   firstName: z.string().min(1, 'Le prénom est requis'),
   lastName: z.string().min(1, 'Le nom est requis'),
   email: z.string().email('Format d\'email invalide'),
