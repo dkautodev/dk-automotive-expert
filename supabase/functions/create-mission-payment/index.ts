@@ -166,7 +166,8 @@ serve(async (req) => {
     // Create a one-time payment session with multiple payment methods.
     // Note: Apple Pay and Google Pay are automatically enabled when using "card" if configured in Stripe.
     // Some Stripe accounts don't have SEPA/PayPal enabled; if Stripe rejects the method list, we fall back to card.
-    const preferredPaymentMethods = ["card", "sepa_debit", "paypal"];
+    // SEPA was intentionally removed per user request.
+    const preferredPaymentMethods = ["card", "paypal"];
 
     let session;
     try {
