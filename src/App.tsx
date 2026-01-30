@@ -28,7 +28,7 @@ function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin' || location.pathname === '/pilote';
   const isAuthPage = location.pathname === '/auth' || location.pathname === '/payment-success';
-  const isAboutPage = location.pathname === '/about';
+  // isAboutPage variable removed - Footer should show on About page
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -53,7 +53,7 @@ function AppContent() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
         </Routes>
       </main>
-      {!isAdminPage && !isAuthPage && !isAboutPage && <Footer />}
+      {!isAdminPage && !isAuthPage && <Footer />}
     </div>
   );
 }
