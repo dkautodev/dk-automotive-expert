@@ -153,12 +153,10 @@ const NewAddressVehicleStep = ({
         </div>
       </div>
 
-      {/* Address Fields - Side by side on desktop, stacked with button in between on mobile */}
-      
-      {/* Desktop Layout */}
-      <div className="hidden lg:block space-y-2">
-        {/* Labels row */}
-        <div className="grid grid-cols-2 gap-12">
+      {/* Address Fields - Single responsive layout to ensure refs work correctly */}
+      <div className="space-y-4">
+        {/* Desktop Labels Row */}
+        <div className="hidden lg:grid lg:grid-cols-2 lg:gap-12">
           <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
             <MapPin className="w-4 h-4" />
             ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
@@ -169,8 +167,15 @@ const NewAddressVehicleStep = ({
           </FormLabel>
         </div>
         
-        {/* Inputs row with swap button in between */}
-        <div className="grid grid-cols-[1fr,auto,1fr] gap-2 items-center">
+        {/* Mobile: Pickup Label */}
+        <FormLabel className="lg:hidden text-dk-navy font-semibold flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
+        </FormLabel>
+        
+        {/* Inputs and Swap Button */}
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr,auto,1fr] gap-3 lg:gap-2 lg:items-center">
+          {/* Pickup Address Input */}
           <FormField
             control={form.control}
             name="pickup_address"
@@ -195,92 +200,25 @@ const NewAddressVehicleStep = ({
             )}
           />
           
-          <button
-            type="button"
-            aria-label="Échanger les adresses"
-            onClick={handleSwitchAddresses}
-            className="bg-card border border-border rounded-full shadow-sm p-2.5 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
-          >
-            <RefreshCcw className="w-4 h-4 text-dk-navy" />
-          </button>
+          {/* Swap Button */}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              aria-label="Échanger les adresses"
+              onClick={handleSwitchAddresses}
+              className="bg-card border border-border rounded-full shadow-sm p-2 lg:p-2.5 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
+            >
+              <RefreshCcw className="w-4 h-4 text-dk-navy" />
+            </button>
+          </div>
           
-          <FormField
-            control={form.control}
-            name="delivery_address"
-            render={({ field }: any) => (
-              <FormItem className="space-y-0">
-                <FormControl>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder={deliveryAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
-                      className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
-                      {...field}
-                      ref={assignRefs(deliveryInputRef, field.ref)}
-                      disabled={!!deliveryAuto.error}
-                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
-                      autoComplete="off"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
-      
-      {/* Mobile Layout - Stacked with button between fields */}
-      <div className="lg:hidden space-y-3">
-        {/* Pickup Address */}
-        <div className="space-y-1">
-          <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
-          </FormLabel>
-          <FormField
-            control={form.control}
-            name="pickup_address"
-            render={({ field }: any) => (
-              <FormItem className="space-y-0">
-                <FormControl>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder={pickupAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
-                      className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${pickupAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
-                      {...field}
-                      ref={assignRefs(pickupInputRef, field.ref)}
-                      disabled={!!pickupAuto.error}
-                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
-                      autoComplete="off"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        {/* Swap Button - Centered between fields */}
-        <div className="flex justify-center">
-          <button
-            type="button"
-            aria-label="Échanger les adresses"
-            onClick={handleSwitchAddresses}
-            className="bg-card border border-border rounded-full shadow-sm p-2 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
-          >
-            <RefreshCcw className="w-4 h-4 text-dk-navy" />
-          </button>
-        </div>
-        
-        {/* Delivery Address */}
-        <div className="space-y-1">
-          <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
+          {/* Mobile: Delivery Label */}
+          <FormLabel className="lg:hidden text-dk-navy font-semibold flex items-center gap-2">
             <MapPin className="w-4 h-4" />
             ADRESSE DE LIVRAISON <span className="text-destructive">*</span>
           </FormLabel>
+          
+          {/* Delivery Address Input */}
           <FormField
             control={form.control}
             name="delivery_address"
