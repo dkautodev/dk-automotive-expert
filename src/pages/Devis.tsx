@@ -9,7 +9,7 @@ const Devis = () => {
       <SEO 
         title="Demander un devis" 
         description="Obtenez un devis gratuit et immédiat pour le convoyage de votre véhicule. Service rapide, tarifs transparents et assurance tous risques incluse."
-        canonical="https://dkautomotive.fr/devis"
+        canonical="https://www.dkautomotive.fr/devis"
       />
       
       <main className="flex-1 animate-fadeIn">

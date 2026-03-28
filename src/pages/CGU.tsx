@@ -55,7 +55,7 @@ const CGU = () => {
       <SEO 
         title="CGU - Conditions Générales d'Utilisation"
         description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
-        canonical="https://dkautomotive.fr/cgu"
+        canonical="https://www.dkautomotive.fr/cgu"
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">

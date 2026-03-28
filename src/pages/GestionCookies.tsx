@@ -55,7 +55,7 @@ const GestionCookies = () => {
       <SEO 
         title="Gestion des Cookies"
         description="Informations sur l'utilisation des cookies sur le site de DK Automotive. Apprenez comment nous utilisons les cookies et comment vous pouvez les gérer."
-        canonical="https://dkautomotive.fr/gestion-cookies"
+        canonical="https://www.dkautomotive.fr/gestion-cookies"
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">

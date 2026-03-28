@@ -55,7 +55,7 @@ const PolitiqueConfidentialite = () => {
       <SEO 
         title="Politique de Confidentialité"
         description="Consultez la politique de confidentialité de DK Automotive. Informations sur la collecte, l'utilisation et la protection de vos données personnelles."
-        canonical="https://dkautomotive.fr/politique-confidentialite"
+        canonical="https://www.dkautomotive.fr/politique-confidentialite"
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">

@@ -28,7 +28,7 @@ const About = () => {
     "@type": "AboutPage",
     "name": "À propos de DK Automotive",
     "description": "Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés.",
-    "url": "https://dkautomotive.fr/about",
+    "url": "https://www.dkautomotive.fr/about",
     "mainEntity": {
       "@type": "Organization",
       "name": "DK Automotive",
@@ -55,7 +55,7 @@ const About = () => {
       <SEO 
         title="À propos - Expert Convoyage Automobile"
         description="Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés. Service fiable et sécurisé."
-        canonical="https://dkautomotive.fr/about"
+        canonical="https://www.dkautomotive.fr/about"
       />
       <script
         type="application/ld+json"

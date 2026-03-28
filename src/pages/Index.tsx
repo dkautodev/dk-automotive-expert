@@ -40,8 +40,8 @@ const Index = () => {
     "@type": "LocalBusiness",
     "name": "DK Automotive",
     "description": "Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h.",
-    "url": "https://dkautomotive.fr",
-    "logo": "https://dkautomotive.fr/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png",
+    "url": "https://www.dkautomotive.fr",
+    "logo": "https://www.dkautomotive.fr/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png",
     "image": "https://app-private.dkautomotive.fr/lovable-uploads/4922f807-dfd8-4cf6-b440-ee35efade638.png",
     "telephone": "+33",
     "address": {
@@ -87,7 +87,7 @@ const Index = () => {
       </div>;
   }
   return <div className="min-h-screen bg-white">
-      <SEO title="Accueil" description="Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h. Plus de 2000 missions réalisées par des chauffeurs professionnels." canonical="https://dkautomotive.fr/" />
+      <SEO title="Accueil" description="Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h. Plus de 2000 missions réalisées par des chauffeurs professionnels." canonical="https://www.dkautomotive.fr/" />
       
       {/* Schema.org JSON-LD */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{

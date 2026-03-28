@@ -55,7 +55,7 @@ const CGV = () => {
       <SEO 
         title="CGV - Conditions Générales de Vente"
         description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
-        canonical="https://dkautomotive.fr/cgv"
+        canonical="https://www.dkautomotive.fr/cgv"
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">

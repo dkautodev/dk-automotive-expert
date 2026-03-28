@@ -61,7 +61,7 @@ const Contact = () => {
     }
   };
   return <div className="min-h-screen flex flex-col bg-background">
-      <SEO title="Contact" description="Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules. Notre équipe vous répond rapidement pour un service personnalisé." canonical="https://dkautomotive.fr/contact" />
+      <SEO title="Contact" description="Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules. Notre équipe vous répond rapidement pour un service personnalisé." canonical="https://www.dkautomotive.fr/contact" />
       
       <main className="flex-1 animate-fadeIn">
         {/* Hero Section */}

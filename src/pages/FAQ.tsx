@@ -58,7 +58,7 @@ const FAQ = () => {
       <SEO 
         title="FAQ - Questions Fréquentes"
         description="Trouvez toutes les réponses à vos questions sur notre service de convoyage de véhicules. FAQ complète sur les tarifs, délais, assurances et modalités."
-        canonical="https://dkautomotive.fr/faq"
+        canonical="https://www.dkautomotive.fr/faq"
       />
       
       <div className="min-h-screen bg-background">

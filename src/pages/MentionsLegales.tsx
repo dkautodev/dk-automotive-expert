@@ -50,7 +50,7 @@ const MentionsLegales = () => {
       <SEO 
         title="Mentions Légales"
         description="Consultez les mentions légales de DK Automotive. Informations sur la société, l'hébergement du site et la protection des données."
-        canonical="https://dkautomotive.fr/mentions-legales"
+        canonical="https://www.dkautomotive.fr/mentions-legales"
       />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
