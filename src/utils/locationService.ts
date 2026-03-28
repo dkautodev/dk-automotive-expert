@@ -1,5 +1,5 @@
 
-import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /**
  * Interface pour représenter une commune française

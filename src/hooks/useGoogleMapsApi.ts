@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 interface UseGoogleMapsApiOptions {
   libraries?: string[];

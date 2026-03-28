@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
+
 
 export interface MapError {
   message: string;

@@ -10,7 +10,7 @@ import { useRef } from 'react';
 import { toast } from 'sonner';
 import { useGoogleAutocomplete } from "@/hooks/useGoogleAutocomplete";
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 import { assignRefs } from './assignRefs';
 import { cn } from '@/lib/utils';
 

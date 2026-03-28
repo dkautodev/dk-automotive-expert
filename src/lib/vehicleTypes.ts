@@ -9,3 +9,12 @@ export const vehicleTypes = [
   { id: "utilitaire_15_20m3", name: "Utilitaire 15-20m3 (type Iveco Daily)" },
   { id: "utilitaire_plus_20m3", name: "Utilitaire + de 20m3 & Nacelle" }
 ];
+export const COMPANY_INFO = {
+  name: "DK Automotive",
+  email: "dkautomotive70@gmail.com",
+  phone: "+33 7 68 71 77 44",
+  address: "70000 Vesoul, France"
+};
+
+// Prix de base par kilomètre
+export const PRICE_PER_KM = 0.73;

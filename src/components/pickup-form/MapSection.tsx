@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin } from 'lucide-react';
-import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 interface MapSectionProps {
   onAddressSelect?: (address: string) => void;
