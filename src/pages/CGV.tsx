@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import { useCgvContent } from '@/hooks/useCgvContent';
 import { Loader2 } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const CGV = () => {
   const { cgvContentSections, isLoading } = useCgvContent();
@@ -52,6 +52,11 @@ const CGV = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="CGV - Conditions Générales de Vente"
+        description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
+        canonical="https://dkautomotive.fr/cgv"
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Conditions Générales de Vente</h1>

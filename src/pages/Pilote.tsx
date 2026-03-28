@@ -16,6 +16,7 @@ import { ArrowLeft, Edit, Trash2, Eye, RefreshCw } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TimeSelect from '@/components/admin/TimeSelect';
+import SEO from '@/components/SEO';
 
 interface Mission {
   id: string;
@@ -238,6 +239,7 @@ const Pilote = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO title="Espace Pilote" noIndex={true} />
       <Navbar />
       
       <main className="pt-24 pb-16">

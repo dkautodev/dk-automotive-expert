@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import { usePrivacyPolicy } from '@/hooks/usePrivacyPolicy';
 import { Loader2 } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const PolitiqueConfidentialite = () => {
   const { privacyPolicySections, isLoading } = usePrivacyPolicy();
@@ -52,6 +52,11 @@ const PolitiqueConfidentialite = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Politique de Confidentialité"
+        description="Consultez la politique de confidentialité de DK Automotive. Informations sur la collecte, l'utilisation et la protection de vos données personnelles."
+        canonical="https://dkautomotive.fr/politique-confidentialite"
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Politique de confidentialité</h1>

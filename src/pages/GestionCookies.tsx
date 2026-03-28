@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import { useCookieManagement } from '@/hooks/useCookieManagement';
 import { Loader2 } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const GestionCookies = () => {
   const { cookieManagementSections, isLoading } = useCookieManagement();
@@ -52,6 +52,11 @@ const GestionCookies = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Gestion des Cookies"
+        description="Informations sur l'utilisation des cookies sur le site de DK Automotive. Apprenez comment nous utilisons les cookies et comment vous pouvez les gérer."
+        canonical="https://dkautomotive.fr/gestion-cookies"
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Gestion des Cookies</h1>

@@ -18,6 +18,7 @@ import LogoEditor from '@/components/admin/LogoEditor';
 import PasswordEditor from '@/components/admin/PasswordEditor';
 import EmailManagementEditor from '@/components/admin/EmailManagementEditor';
 import SocialLinksEditor from '@/components/admin/SocialLinksEditor';
+import SEO from '@/components/SEO';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('accueil');
@@ -96,6 +97,7 @@ const Admin = () => {
 
   return (
     <ProtectedRoute>
+      <SEO title="Administration" noIndex={true} />
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-sm border-b pt-[98px] py-[55px]">

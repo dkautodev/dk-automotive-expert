@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import { useCguContent } from '@/hooks/useCguContent';
 import { Loader2 } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const CGU = () => {
   const { cguContentSections, isLoading } = useCguContent();
@@ -52,6 +52,11 @@ const CGU = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="CGU - Conditions Générales d'Utilisation"
+        description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
+        canonical="https://dkautomotive.fr/cgu"
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Conditions Générales d'Utilisation</h1>

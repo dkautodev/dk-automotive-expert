@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import SEO from '@/components/SEO';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -45,6 +46,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-[118px]">
+      <SEO title="Connexion Administrateur" noIndex={true} />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <img 

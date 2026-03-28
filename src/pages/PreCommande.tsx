@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import SEO from '@/components/SEO';
 const FUEL_OPTIONS = [{
   value: 'essence',
   label: 'Essence'
@@ -279,6 +280,7 @@ const PreCommande = () => {
       </div>;
   }
   return <div className="min-h-screen flex flex-col bg-gray-50">
+      <SEO title="Finaliser votre commande" noIndex={true} />
       <main className="flex-1 animate-fadeIn">
         <div className="container mx-auto px-4 py-8">
           <Button variant="ghost" onClick={() => navigate('/devis')} className="mb-6 text-dk-navy hover:text-dk-blue my-[10px]">

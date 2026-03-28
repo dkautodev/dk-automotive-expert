@@ -1,5 +1,8 @@
 User-agent: *
 Disallow: /admin
 Disallow: /auth
+Disallow: /pilote
+Disallow: /payment-success
+Disallow: /pre-commande
 
 Sitemap: https://dkautomotive.fr/sitemap.xml

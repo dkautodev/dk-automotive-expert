@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Loader2, Home, AlertCircle } from 'lucide-react';
+import { AlertCircle, Home, Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import SEO from '@/components/SEO';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -97,7 +98,8 @@ const PaymentSuccess = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="max-w-lg w-full mx-4">
+      <SEO title="Paiement Réussi" noIndex={true} />
+      <Card className="max-lg w-full mx-4">
         <CardContent className="p-8 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-12 w-12 text-green-600" />
