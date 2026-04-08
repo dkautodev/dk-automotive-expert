@@ -5,4 +5,4 @@ Disallow: /pilote
 Disallow: /payment-success
 Disallow: /pre-commande
 
-Sitemap: https://dkautomotive.fr/sitemap.xml
+Sitemap: https://www.dkautomotive.fr/sitemap.xml
