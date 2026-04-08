@@ -29,15 +29,16 @@ export const usePriceCalculation = () => {
         .eq('vehicle_category', vehicleType)
         .eq('active', true);
 
+      if (error) {
+        console.error('[CALCUL PRIX] Erreur Supabase:', error);
+      }
+
       // Trouver la bonne tranche côté client avec conversion explicite en Number
       const pricingData = pricingGrids?.find(row => {
         const min = Number(row.min_distance) || 0;
         const max = Number(row.max_distance) || 999999;
         return distance >= min && distance <= max;
       });
-
-      // Affichage debug
-      console.log('[CALCUL PRIX] Résultat filtrage local:', pricingData, 'Erreur base:', error);
 
       // Si pas de grille trouvée => taux par km (fallback)
       if (error || !pricingData) {
