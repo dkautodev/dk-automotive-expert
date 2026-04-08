@@ -22,23 +22,26 @@ export const usePriceCalculation = () => {
       // Debug : affichage des arguments
       console.log('[CALCUL PRIX] Appel avec: distance', distance, ', vehicleType', vehicleType);
 
-      // Fetch la meilleure grille tarifaire depuis la base externe
-      const { data: pricingData, error } = await externalSupabase
+      // Fetch toutes les grilles actives pour cette catégorie
+      const { data: pricingGrids, error } = await externalSupabase
         .from('pricing_grids')
         .select('*')
         .eq('vehicle_category', vehicleType)
-        .eq('active', true)
-        .lte('min_distance', distance)
-        .gte('max_distance', distance)
-        .order('min_distance', { ascending: false })
-        .maybeSingle();
+        .eq('active', true);
+
+      // Trouver la bonne tranche côté client avec conversion explicite en Number
+      const pricingData = pricingGrids?.find(row => {
+        const min = Number(row.min_distance) || 0;
+        const max = Number(row.max_distance) || 999999;
+        return distance >= min && distance <= max;
+      });
 
       // Affichage debug
-      console.log('[CALCUL PRIX] Résultat grille externe:', pricingData, error);
+      console.log('[CALCUL PRIX] Résultat filtrage local:', pricingData, 'Erreur base:', error);
 
       // Si pas de grille trouvée => taux par km (fallback)
       if (error || !pricingData) {
-        console.log('Aucune grille tarifaire trouvée dans la base externe, utilisation du tarif au km');
+        console.log('Aucune tranche tarifaire correspondante trouvée, utilisation du tarif au km');
         const baseRatePerKm = getBaseRatePerKm(vehicleType);
         const priceHT = distance * baseRatePerKm;
         const priceTTC = priceHT * 1.2;
