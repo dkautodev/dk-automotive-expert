@@ -21,6 +21,7 @@ import Auth from "@/pages/Auth";
 import PreCommande from "@/pages/PreCommande";
 import Pilote from "@/pages/Pilote";
 import PaymentSuccess from "@/pages/PaymentSuccess";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ function AppContent() {
           <Route path="/pre-commande" element={<PreCommande />} />
           <Route path="/pilote" element={<Pilote />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       {!isAdminPage && !isAuthPage && <Footer />}
