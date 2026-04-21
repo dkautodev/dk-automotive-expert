@@ -1,3 +1,4 @@
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
@@ -6,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calculator, RefreshCcw, MapPin, Car, CheckCircle2, Lightbulb, Shield } from 'lucide-react';
 import { vehicleTypes } from '@/lib/vehicleTypes';
-import { useRef } from 'react';
 import { toast } from 'sonner';
 import { useGoogleAutocomplete } from "@/hooks/useGoogleAutocomplete";
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 import { assignRefs } from './assignRefs';
 import { cn } from '@/lib/utils';
+import VehicleCategorySelector from '../VehicleCategorySelector';
 
 interface NewAddressVehicleStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -39,6 +40,10 @@ const NewAddressVehicleStep = ({
     calculatePrice,
     isCalculating
   } = usePriceCalculation();
+
+  const pickupAddress = form.watch('pickup_address');
+  const deliveryAddress = form.watch('delivery_address');
+  const vehicleType = form.watch('vehicle_type');
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const deliveryInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,24 +67,38 @@ const NewAddressVehicleStep = ({
     types: ["geocode", "establishment"]
   });
 
-  const handleCalculate = async () => {
-    const pickupAddress = form.getValues('pickup_address');
-    const deliveryAddress = form.getValues('delivery_address');
-    const vehicleType = form.getValues('vehicle_type');
-    if (!pickupAddress || !deliveryAddress || !vehicleType) {
-      toast.error('Veuillez remplir tous les champs requis');
-      return;
-    }
+  // Automatisation du calcul
+  const [lastCalculatedValues, setLastCalculatedValues] = useState({
+    pickup: '',
+    delivery: '',
+    vehicle: ''
+  });
+
+  const handleCalculate = useCallback(async (isManual = false) => {
+    const pAddress = form.getValues('pickup_address');
+    const dAddress = form.getValues('delivery_address');
+    const vType = form.getValues('vehicle_type');
+
+    if (!pAddress || !dAddress || !vType) return;
     if (!GOOGLE_MAPS_API_KEY) {
       toast.error('Clé API Google Maps non configurée');
       return;
     }
+
+    // Éviter de recalculer si les valeurs n'ont pas changé
+    if (!isManual && 
+        pAddress === lastCalculatedValues.pickup && 
+        dAddress === lastCalculatedValues.delivery && 
+        vType === lastCalculatedValues.vehicle) {
+      return;
+    }
+
     try {
       const service = new google.maps.DistanceMatrixService();
       const response = await new Promise<google.maps.DistanceMatrixResponse>((resolve, reject) => {
         service.getDistanceMatrix({
-          origins: [pickupAddress],
-          destinations: [deliveryAddress],
+          origins: [pAddress],
+          destinations: [dAddress],
           travelMode: google.maps.TravelMode.DRIVING,
           unitSystem: google.maps.UnitSystem.METRIC,
           avoidHighways: false,
@@ -92,25 +111,47 @@ const NewAddressVehicleStep = ({
           }
         });
       });
+
       const element = response.rows[0]?.elements[0];
       if (!element || element.status !== 'OK') {
         throw new Error('Impossible de calculer la distance');
       }
+
       const distanceInKm = Math.ceil(element.distance.value / 1000);
       setDistance(distanceInKm);
 
-      const priceResult = await calculatePrice(distanceInKm, vehicleType);
-      if (!priceResult) {
-        return;
-      }
+      const priceResult = await calculatePrice(distanceInKm, vType);
+      if (!priceResult) return;
+
       setPriceHT(priceResult.priceHT);
       setPriceTTC(priceResult.priceTTC);
-      toast.success('Distance et prix calculés avec succès');
+      
+      setLastCalculatedValues({
+        pickup: pAddress,
+        delivery: dAddress,
+        vehicle: vType
+      });
+
+      if (isManual) {
+        toast.success('Distance et prix calculés avec succès');
+      }
     } catch (error) {
       console.error('Erreur lors du calcul:', error);
       toast.error('Erreur lors du calcul de la distance et du prix');
     }
-  };
+  }, [form, lastCalculatedValues, calculatePrice, setDistance, setPriceHT, setPriceTTC]);
+
+  // Effet pour le calcul automatique avec debounce
+  useEffect(() => {
+    const canCalculate = pickupAddress && deliveryAddress && vehicleType;
+    if (!canCalculate) return;
+
+    const timer = setTimeout(() => {
+      handleCalculate();
+    }, 800); // 800ms de debounce
+
+    return () => clearTimeout(timer);
+  }, [pickupAddress, deliveryAddress, vehicleType, handleCalculate]);
 
   const handleNext = () => {
     if (!distance) {
@@ -136,12 +177,9 @@ const NewAddressVehicleStep = ({
     toast.success("Les adresses ont été échangées !");
   };
 
-  const pickupAddress = form.watch('pickup_address');
-  const deliveryAddress = form.watch('delivery_address');
-  const vehicleType = form.watch('vehicle_type');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Section Header */}
       <div className="flex items-center gap-3 pb-4 border-b border-border">
         <div className="w-10 h-10 bg-dk-navy/10 rounded-lg flex items-center justify-center">
@@ -249,39 +287,31 @@ const NewAddressVehicleStep = ({
       <div className="pt-2">
         <FormField control={form.control} name="vehicle_type" render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
+            <FormLabel className="text-dk-navy font-semibold flex items-center gap-2 mb-3">
               <Car className="w-4 h-4" />
               CATÉGORIE DE VÉHICULE <span className="text-destructive">*</span>
             </FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger className="bg-muted/50 border-border focus:ring-dk-navy">
-                  <SelectValue placeholder="Sélectionner une catégorie de véhicule" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent className="bg-popover border-border">
-                {vehicleTypes.map(type => (
-                  <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormControl>
+              <VehicleCategorySelector 
+                value={field.value} 
+                onChange={field.onChange} 
+                disabled={isCalculating}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )} />
       </div>
 
-      {/* Calculate Button */}
-      <div className="flex justify-center pt-2">
-        <Button
-          type="button"
-          onClick={handleCalculate}
-          disabled={!pickupAddress || !deliveryAddress || !vehicleType || isCalculating}
-          className="bg-dk-navy hover:bg-dk-blue text-white flex items-center gap-2 px-6 py-5 text-base transition-colors"
-        >
-          <Calculator className="h-5 w-5" />
-          {isCalculating ? "Calcul en cours..." : "Calculer la distance et le prix"}
-        </Button>
-      </div>
+      {/* Loading Indicator - Only takes space when active */}
+      {isCalculating && (
+        <div className="flex justify-center items-center py-2 animate-fadeIn">
+          <div className="flex items-center gap-2 text-dk-navy animate-pulse">
+            <RefreshCcw className="h-4 w-4 animate-spin" />
+            <span className="text-sm font-semibold italic">Calcul en cours...</span>
+          </div>
+        </div>
+      )}
 
       {/* Results Card */}
       {distance && priceHT && priceTTC && (
