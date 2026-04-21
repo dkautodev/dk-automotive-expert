@@ -26,6 +26,7 @@ enabled = true
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
+enable_signup = false
 
 [analytics]
 enabled = false
