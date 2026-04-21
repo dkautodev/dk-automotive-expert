@@ -41,8 +41,8 @@ const Index = () => {
     "name": "DK Automotive",
     "description": "Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h.",
     "url": "https://www.dkautomotive.fr",
-    "logo": "https://www.dkautomotive.fr/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png",
-    "image": "https://app-private.dkautomotive.fr/lovable-uploads/4922f807-dfd8-4cf6-b440-ee35efade638.png",
+    "logo": "https://www.dkautomotive.fr/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png",
+    "image": "https://app-private.dkautomotive.fr/upload/4922f807-dfd8-4cf6-b440-ee35efade638.png",
     "telephone": "+33",
     "address": {
       "@type": "PostalAddress",
@@ -97,7 +97,7 @@ const Index = () => {
       <main className="animate-fadeIn">
         {/* Hero Section */}
         <section className="relative min-h-[500px] md:min-h-[700px] bg-cover bg-center" style={{
-        backgroundImage: `url("${getImageUrl('hero_background', '/lovable-uploads/51603c32-87b6-4e5d-ab03-7352caca679d.png')}")`
+        backgroundImage: `url("${getImageUrl('hero_background', '/upload/51603c32-87b6-4e5d-ab03-7352caca679d.png')}")`
       }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="container mx-auto px-4 h-full relative z-10 flex items-center justify-start min-h-[500px] md:min-h-[700px]">
@@ -158,7 +158,7 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <img alt="Voiture sur route - DK Automotive convoyage professionnel" className="rounded-lg w-full" loading="lazy" src={getImageUrl('section_expertise_image', '/lovable-uploads/2849f1ca-ef57-425c-8271-11ee1da479e6.jpg')} />
+                <img alt="Voiture sur route - DK Automotive convoyage professionnel" className="rounded-lg w-full" loading="lazy" src={getImageUrl('section_expertise_image', '/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.jpg')} />
               </div>
               <div className="space-y-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
@@ -203,7 +203,7 @@ const Index = () => {
                 </ul>
               </div>
               <div className="order-1 md:order-2">
-                <img alt="Livraison rapide de véhicules - Garage automobile" className="rounded-lg w-full" loading="lazy" src={getImageUrl('section_delais_image', '/lovable-uploads/38340b13-78ba-4ae6-ba15-9851924dcf27.jpg')} />
+                <img alt="Livraison rapide de véhicules - Garage automobile" className="rounded-lg w-full" loading="lazy" src={getImageUrl('section_delais_image', '/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.jpg')} />
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <img alt="Remise de clés de véhicule - Service de convoyage" className="rounded-lg w-full" loading="lazy" src={getImageUrl('section_tarification_image', '/lovable-uploads/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.jpg')} />
+                <img alt="Remise de clés de véhicule - Service de convoyage" className="rounded-lg w-full" loading="lazy" src={getImageUrl('section_tarification_image', '/upload/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.jpg')} />
               </div>
               <div className="space-y-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">

@@ -35,7 +35,7 @@ const Footer = () => {
             <Link to="/" className="inline-block mb-6">
               <img 
                 alt="DK Automotive Logo" 
-                src="/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" 
+                src="/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png" 
                 className="h-12 w-auto filter invert grayscale" 
               />
             </Link>

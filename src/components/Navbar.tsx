@@ -29,7 +29,7 @@ const Navbar = () => {
 
   // Get the logo URL from page contents or use default
   const logoContent = contents.find(item => item.block_key === 'logo');
-  const logoUrl = logoContent?.content_value || '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+  const logoUrl = logoContent?.content_value || '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
   
   const navItems = [
     { path: "/", label: "Accueil" },
@@ -91,7 +91,7 @@ const Navbar = () => {
                   className="h-10 w-auto object-fill" 
                   src={logoUrl} 
                   onError={(e) => {
-                    e.currentTarget.src = '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+                    e.currentTarget.src = '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
                   }} 
                 />
               </Link>

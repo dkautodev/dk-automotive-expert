@@ -52,7 +52,7 @@ const Auth = () => {
           <img 
             alt="DK Automotive" 
             className="h-12 w-auto object-fill mx-auto mb-4" 
-            src="/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png" 
+            src="/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png" 
           />
           <CardTitle className="text-2xl font-bold text-dk-navy">Espace Administrateur</CardTitle>
           <CardDescription>

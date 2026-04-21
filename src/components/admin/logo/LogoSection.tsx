@@ -25,7 +25,7 @@ const LogoSection = ({ contents, uploadImage, updateContent, refetch }: LogoSect
   });
 
   const logoContent = contents.find(item => item.block_key === 'logo');
-  const currentLogoUrl = logoContent?.content_value || '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+  const currentLogoUrl = logoContent?.content_value || '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

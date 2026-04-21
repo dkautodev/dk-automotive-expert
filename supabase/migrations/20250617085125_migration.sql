@@ -11,7 +11,7 @@ INSERT INTO public.page_contents (
   'navbar',
   'logo',
   'image',
-  '/lovable-uploads/64b69a10-c303-48f4-9b56-7bee8e58a109.png',
+  '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png',
   1,
   true
 )

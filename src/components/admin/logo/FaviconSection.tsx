@@ -11,7 +11,7 @@ const FaviconSection = ({
   contents
 }: FaviconSectionProps) => {
   const faviconContent = contents.find(item => item.block_key === 'favicon');
-  const currentFaviconUrl = faviconContent?.content_value || '/lovable-uploads/favicon.png';
+  const currentFaviconUrl = faviconContent?.content_value || '/upload/favicon.png';
   return <Card>
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-dk-navy">
