@@ -60,8 +60,31 @@ const Contact = () => {
       setLoading(false);
     }
   };
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contactez DK Automotive",
+    "description": "Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules en France. Obtenez un devis personnalisé ou une réponse à vos questions.",
+    "url": "https://www.dkautomotive.fr/contact",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "DK Automotive",
+      "logo": "https://app-private.dkautomotive.fr/lovable-uploads/4922f807-dfd8-4cf6-b440-ee35efade638.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+33123456789", // Placeholder, ideally should come from config
+        "contactType": "customer service",
+        "email": "contact@dkautomotive.fr"
+      }
+    }
+  };
+
   return <div className="min-h-screen flex flex-col bg-background">
       <SEO title="Contact" description="Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules. Notre équipe vous répond rapidement pour un service personnalisé." canonical="https://www.dkautomotive.fr/contact" />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
       
       <main className="flex-1 animate-fadeIn">
         {/* Hero Section */}
