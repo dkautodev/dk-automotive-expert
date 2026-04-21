@@ -1,19 +1,17 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { QuoteFormValues } from '../quoteFormSchema';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calculator, RefreshCcw, MapPin, Car, CheckCircle2, Lightbulb, Shield } from 'lucide-react';
-import { vehicleTypes } from '@/lib/vehicleTypes';
+import { MapPin, Car, RefreshCcw } from 'lucide-react';
 import { toast } from 'sonner';
-import { useGoogleAutocomplete } from "@/hooks/useGoogleAutocomplete";
-import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-import { assignRefs } from './assignRefs';
 import { cn } from '@/lib/utils';
 import VehicleCategorySelector from '../VehicleCategorySelector';
+
+// Hooks & Components
+import { useQuoteFlow } from '../hooks/useQuoteFlow';
+import AddressSection from './components/AddressSection';
+import PriceResultsCard from './components/PriceResultsCard';
 
 interface NewAddressVehicleStepProps {
   form: UseFormReturn<QuoteFormValues>;
@@ -37,146 +35,29 @@ const NewAddressVehicleStep = ({
   setPriceTTC
 }: NewAddressVehicleStepProps) => {
   const {
-    calculatePrice,
-    isCalculating
-  } = usePriceCalculation();
-
-  const pickupAddress = form.watch('pickup_address');
-  const deliveryAddress = form.watch('delivery_address');
-  const vehicleType = form.watch('vehicle_type');
-  const pickupInputRef = useRef<HTMLInputElement>(null);
-  const deliveryInputRef = useRef<HTMLInputElement>(null);
-
-  const pickupAuto = useGoogleAutocomplete({
-    ref: pickupInputRef,
-    onPlaceSelected: place => {
-      if (place && place.formatted_address) {
-        form.setValue("pickup_address", place.formatted_address, { shouldValidate: true });
-      }
-    },
-    types: ["geocode", "establishment"]
-  });
-  
-  const deliveryAuto = useGoogleAutocomplete({
-    ref: deliveryInputRef,
-    onPlaceSelected: place => {
-      if (place && place.formatted_address) {
-        form.setValue("delivery_address", place.formatted_address, { shouldValidate: true });
-      }
-    },
-    types: ["geocode", "establishment"]
-  });
-
-  // Automatisation du calcul
-  const [lastCalculatedValues, setLastCalculatedValues] = useState({
-    pickup: '',
-    delivery: '',
-    vehicle: ''
-  });
-
-  const handleCalculate = useCallback(async (isManual = false) => {
-    const pAddress = form.getValues('pickup_address');
-    const dAddress = form.getValues('delivery_address');
-    const vType = form.getValues('vehicle_type');
-
-    if (!pAddress || !dAddress || !vType) return;
-    if (!GOOGLE_MAPS_API_KEY) {
-      toast.error('Clé API Google Maps non configurée');
-      return;
-    }
-
-    // Éviter de recalculer si les valeurs n'ont pas changé
-    if (!isManual && 
-        pAddress === lastCalculatedValues.pickup && 
-        dAddress === lastCalculatedValues.delivery && 
-        vType === lastCalculatedValues.vehicle) {
-      return;
-    }
-
-    try {
-      const service = new google.maps.DistanceMatrixService();
-      const response = await new Promise<google.maps.DistanceMatrixResponse>((resolve, reject) => {
-        service.getDistanceMatrix({
-          origins: [pAddress],
-          destinations: [dAddress],
-          travelMode: google.maps.TravelMode.DRIVING,
-          unitSystem: google.maps.UnitSystem.METRIC,
-          avoidHighways: false,
-          avoidTolls: false
-        }, (response, status) => {
-          if (status === google.maps.DistanceMatrixStatus.OK && response) {
-            resolve(response);
-          } else {
-            reject(new Error(`Erreur Google Maps: ${status}`));
-          }
-        });
-      });
-
-      const element = response.rows[0]?.elements[0];
-      if (!element || element.status !== 'OK') {
-        throw new Error('Impossible de calculer la distance');
-      }
-
-      const distanceInKm = Math.ceil(element.distance.value / 1000);
-      setDistance(distanceInKm);
-
-      const priceResult = await calculatePrice(distanceInKm, vType);
-      if (!priceResult) return;
-
-      setPriceHT(priceResult.priceHT);
-      setPriceTTC(priceResult.priceTTC);
-      
-      setLastCalculatedValues({
-        pickup: pAddress,
-        delivery: dAddress,
-        vehicle: vType
-      });
-
-      if (isManual) {
-        toast.success('Distance et prix calculés avec succès');
-      }
-    } catch (error) {
-      console.error('Erreur lors du calcul:', error);
-      toast.error('Erreur lors du calcul de la distance et du prix');
-    }
-  }, [form, lastCalculatedValues, calculatePrice, setDistance, setPriceHT, setPriceTTC]);
-
-  // Effet pour le calcul automatique avec debounce
-  useEffect(() => {
-    const canCalculate = pickupAddress && deliveryAddress && vehicleType;
-    if (!canCalculate) return;
-
-    const timer = setTimeout(() => {
-      handleCalculate();
-    }, 800); // 800ms de debounce
-
-    return () => clearTimeout(timer);
-  }, [pickupAddress, deliveryAddress, vehicleType, handleCalculate]);
+    isCalculating,
+    pickupInputRef,
+    deliveryInputRef,
+    pickupAuto,
+    deliveryAuto,
+    handleSwitchAddresses,
+    handleCalculate,
+    pickupAddress,
+    deliveryAddress,
+    vehicleType
+  } = useQuoteFlow({ form, setDistance, setPriceHT, setPriceTTC });
 
   const handleNext = () => {
     if (!distance) {
       toast.error('Veuillez d\'abord calculer la distance et le prix');
       return;
     }
-    const data = {
+    onNext({
       pickup_address: form.getValues('pickup_address'),
       delivery_address: form.getValues('delivery_address'),
       vehicle_type: form.getValues('vehicle_type')
-    };
-    onNext(data);
+    });
   };
-
-  const handleSwitchAddresses = () => {
-    const pickup = form.getValues('pickup_address');
-    const delivery = form.getValues('delivery_address');
-    form.setValue('pickup_address', delivery || '', { shouldValidate: true });
-    form.setValue('delivery_address', pickup || '', { shouldValidate: true });
-    setDistance(null);
-    setPriceHT(null);
-    setPriceTTC(null);
-    toast.success("Les adresses ont été échangées !");
-  };
-
 
   return (
     <div className="space-y-4">
@@ -191,99 +72,17 @@ const NewAddressVehicleStep = ({
         </div>
       </div>
 
-      {/* Address Fields - Single responsive layout to ensure refs work correctly */}
-      <div className="space-y-4">
-        {/* Desktop Labels Row */}
-        <div className="hidden lg:grid lg:grid-cols-2 lg:gap-12">
-          <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
-          </FormLabel>
-          <FormLabel className="text-dk-navy font-semibold flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            ADRESSE DE LIVRAISON <span className="text-destructive">*</span>
-          </FormLabel>
-        </div>
-        
-        {/* Mobile: Pickup Label */}
-        <FormLabel className="lg:hidden text-dk-navy font-semibold flex items-center gap-2">
-          <MapPin className="w-4 h-4" />
-          ADRESSE DE PRISE EN CHARGE <span className="text-destructive">*</span>
-        </FormLabel>
-        
-        {/* Inputs and Swap Button */}
-        <div className="flex flex-col lg:grid lg:grid-cols-[1fr,auto,1fr] gap-3 lg:gap-2 lg:items-center">
-          {/* Pickup Address Input */}
-          <FormField
-            control={form.control}
-            name="pickup_address"
-            render={({ field }: any) => (
-              <FormItem className="space-y-0">
-                <FormControl>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder={pickupAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
-                      className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${pickupAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
-                      {...field}
-                      ref={assignRefs(pickupInputRef, field.ref)}
-                      disabled={!!pickupAuto.error}
-                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
-                      autoComplete="off"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Swap Button */}
-          <div className="flex justify-center">
-            <button
-              type="button"
-              aria-label="Échanger les adresses"
-              onClick={handleSwitchAddresses}
-              className="bg-card border border-border rounded-full shadow-sm p-2 lg:p-2.5 flex items-center justify-center hover:bg-muted active:scale-95 transition-all"
-            >
-              <RefreshCcw className="w-4 h-4 text-dk-navy" />
-            </button>
-          </div>
-          
-          {/* Mobile: Delivery Label */}
-          <FormLabel className="lg:hidden text-dk-navy font-semibold flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            ADRESSE DE LIVRAISON <span className="text-destructive">*</span>
-          </FormLabel>
-          
-          {/* Delivery Address Input */}
-          <FormField
-            control={form.control}
-            name="delivery_address"
-            render={({ field }: any) => (
-              <FormItem className="space-y-0">
-                <FormControl>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder={deliveryAuto.error ? "Une erreur s'est produite" : "Saisissez l'adresse complète"}
-                      className={`pl-10 bg-muted/50 border-border focus-visible:ring-dk-navy ${deliveryAuto.error ? 'opacity-60 cursor-not-allowed border-destructive' : ''}`}
-                      {...field}
-                      ref={assignRefs(deliveryInputRef, field.ref)}
-                      disabled={!!deliveryAuto.error}
-                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
-                      autoComplete="off"
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
+      {/* 1. Address Section (Extracted) */}
+      <AddressSection 
+        form={form}
+        pickupInputRef={pickupInputRef}
+        deliveryInputRef={deliveryInputRef}
+        pickupAuto={pickupAuto}
+        deliveryAuto={deliveryAuto}
+        onSwitch={handleSwitchAddresses}
+      />
 
-      {/* Vehicle Type */}
+      {/* 2. Vehicle Category Section */}
       <div className="pt-2">
         <FormField control={form.control} name="vehicle_type" render={({ field }) => (
           <FormItem>
@@ -303,7 +102,7 @@ const NewAddressVehicleStep = ({
         )} />
       </div>
 
-      {/* Loading Indicator - Only takes space when active */}
+      {/* 3. Loading Indicator */}
       {isCalculating && (
         <div className="flex justify-center items-center py-2 animate-fadeIn">
           <div className="flex items-center gap-2 text-dk-navy animate-pulse">
@@ -313,45 +112,12 @@ const NewAddressVehicleStep = ({
         </div>
       )}
 
-      {/* Results Card */}
-      {distance && priceHT && priceTTC && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 animate-fadeIn">
-          <div className="flex items-center gap-2 mb-4">
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-800">Résultat du calcul</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-            <div className="bg-white/80 rounded-lg p-3 text-center">
-              <span className="text-muted-foreground block text-xs uppercase tracking-wide">Distance</span>
-              <p className="font-bold text-lg text-dk-navy">{distance} km</p>
-            </div>
-            <div className="bg-white/80 rounded-lg p-3 text-center">
-              <span className="text-muted-foreground block text-xs uppercase tracking-wide">Prix HT</span>
-              <p className="font-bold text-lg text-dk-navy">{priceHT} €</p>
-            </div>
-            <div className="bg-white/80 rounded-lg p-3 text-center">
-              <span className="text-muted-foreground block text-xs uppercase tracking-wide">Prix TTC</span>
-              <p className="font-bold text-lg text-green-600">{priceTTC} €</p>
-            </div>
-          </div>
-          
-          <ul className="mt-4 space-y-2 text-sm">
-            <li className="flex items-center gap-2 text-green-800">
-              <Lightbulb className="w-4 h-4 flex-shrink-0" />
-              <span>Tous frais inclus</span>
-            </li>
-            <li className="flex items-center gap-2 text-green-800">
-              <Car className="w-4 h-4 flex-shrink-0" />
-              <span>Livraison par chauffeur professionnel</span>
-            </li>
-            <li className="flex items-center gap-2 text-green-800">
-              <Shield className="w-4 h-4 flex-shrink-0" />
-              <span>Assurance tous risques</span>
-            </li>
-          </ul>
-        </div>
-      )}
+      {/* 4. Results Card (Extracted) */}
+      <PriceResultsCard 
+        distance={distance}
+        priceHT={priceHT}
+        priceTTC={priceTTC}
+      />
 
       {/* Navigation */}
       <div className="flex justify-end pt-4 border-t border-border">
