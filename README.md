@@ -64,4 +64,4 @@ DK Automotive Expert est une application web moderne conçue pour automatiser et
 - **SEO Ready** : Données structurées JSON-LD et balises Open Graph optimisées pour un partage parfait sur les réseaux sociaux.
 
 ---
-**Développé par DK Automotive & Antigravity.**
+**Développé par DK Automotive.**
