@@ -22,6 +22,8 @@ import PreCommande from "@/pages/PreCommande";
 import Pilote from "@/pages/Pilote";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import NotFound from "@/pages/NotFound";
+import { CookieConsent } from "@/components/common/CookieConsent";
+import { ConsentManagedScripts } from "@/components/common/ConsentManagedScripts";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +70,8 @@ function App() {
           <Router>
             <AppContent />
             <Toaster />
+            <CookieConsent />
+            <ConsentManagedScripts />
           </Router>
         </AuthProvider>
       </QueryClientProvider>
