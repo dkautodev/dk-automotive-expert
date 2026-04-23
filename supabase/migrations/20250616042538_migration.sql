@@ -93,7 +93,7 @@ INSERT INTO public.page_contents (page_slug, block_key, block_type, content_json
 ('index', 'section_expertise_content', 'text', '{"content": "Chez DK AUTOMOTIVE, nos chauffeurs professionnels ont été sélectionnés pour leur expérience et leur engagement exceptionnels. Formés à des procédures strictes et à l''écoconduite, ils garantissent un convoyage sûr et écologique de votre véhicule."}'),
 ('index', 'section_expertise_image', 'image', '{"url": "/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.jpg"}'),
 ('index', 'section_delais_title', 'text', '{"title": "DÉLAIS DE LIVRAISON RAPIDES"}'),
-('index', 'section_delais_content', 'text', '{"content": "DK AUTOMOTIVE se distingue par la réduction significative des délais de livraison. Avec une garantie de prise en charge rapide sous 48h, nous offrons un service rapide et fiable partout en France."}'),
+('index', 'section_delais_content', 'text', '{"content": "DK AUTOMOTIVE se distingue par la réduction significative des délais de livraison. Avec une garantie de prise en charge rapide sous 48h, nous offrons un service rapide et fiable en France."}'),
 ('index', 'section_delais_image', 'image', '{"url": "/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.jpg"}'),
 ('index', 'section_tarification_title', 'text', '{"title": "TARIFICATION TRANSPARENTE ET PERSONNALISÉE"}'),
 ('index', 'section_tarification_content', 'text', '{"content": "Nous offrons des tarifs transparents et adaptés, incluant tous les frais, pour répondre aux besoins uniques de chaque client, avec un engagement pour un service éco-responsable."}'),

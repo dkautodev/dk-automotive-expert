@@ -29,18 +29,18 @@ const Footer = () => {
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-          
+
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block mb-6">
-              <img 
-                alt="DK Automotive Logo" 
-                src="/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png" 
-                className="h-12 w-auto filter invert grayscale" 
+              <img
+                alt="DK Automotive Logo"
+                src="/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png"
+                className="h-12 w-auto filter invert grayscale"
               />
             </Link>
             <p className="text-white/70 text-sm leading-relaxed">
-              Votre partenaire de confiance pour le convoyage de véhicules partout en France.
+              Votre partenaire de confiance pour le convoyage de véhicules en France.
             </p>
           </div>
 
@@ -52,8 +52,8 @@ const Footer = () => {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.to}>
-                  <Link 
-                    to={link.to} 
+                  <Link
+                    to={link.to}
                     className="text-white/70 hover:text-white text-sm transition-colors inline-flex items-center gap-2 group"
                   >
                     <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
@@ -73,7 +73,7 @@ const Footer = () => {
               {serviceLinks.map((link, index) => (
                 <li key={index}>
                   {link.external ? (
-                    <a 
+                    <a
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -84,8 +84,8 @@ const Footer = () => {
                       <ExternalLink className="w-3 h-3 opacity-50" />
                     </a>
                   ) : (
-                    <Link 
-                      to={link.to!} 
+                    <Link
+                      to={link.to!}
                       className="text-white/70 hover:text-white text-sm transition-colors inline-flex items-center gap-2 group"
                     >
                       <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
@@ -105,8 +105,8 @@ const Footer = () => {
             <ul className="space-y-3">
               {legalLinks.map((link) => (
                 <li key={link.to}>
-                  <Link 
-                    to={link.to} 
+                  <Link
+                    to={link.to}
                     className="text-white/70 hover:text-white text-sm transition-colors inline-flex items-center gap-2 group"
                   >
                     <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-200" />
@@ -127,7 +127,7 @@ const Footer = () => {
               © {currentYear} DK Automotive. Tous droits réservés.
             </p>
             <p className="text-white/40 text-xs">
-              Convoyage de véhicules partout en France
+              Convoyage de véhicules en France
             </p>
           </div>
         </div>

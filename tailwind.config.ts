@@ -80,7 +80,8 @@ export default {
         slideIn: "slideIn 0.5s ease-out",
       },
       fontFamily: {
-        'playfair': ['Playfair Display', 'serif'],
+        'sans': ['Inter', 'sans-serif'],
+        'heading': ['Outfit', 'sans-serif'],
       },
     },
   },

@@ -37,7 +37,7 @@ function AppContent() {
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       {!isAuthPage && <Navbar />}
-      <main className={`flex-1 ${!isAuthPage ? 'pt-[98px]' : ''}`}>
+      <main className="flex-1 pt-[98px]">
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />

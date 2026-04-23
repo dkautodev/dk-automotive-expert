@@ -30,7 +30,7 @@ const Navbar = () => {
   // Get the logo URL from page contents or use default
   const logoContent = contents.find(item => item.block_key === 'logo');
   const logoUrl = logoContent?.content_value || '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
-  
+
   const navItems = [
     { path: "/", label: "Accueil" },
     { path: "/devis", label: "Obtenir votre devis" },
@@ -49,13 +49,13 @@ const Navbar = () => {
             {socialLinks.map((link) => {
               const IconComponent = getIconComponent(link.icon);
               return (
-                <a 
+                <a
                   key={link.id}
-                  href={link.url || '#'} 
-                  title={`Suivez DK Automotive sur ${link.platform_label}`} 
-                  aria-label={`${link.platform_label} DK Automotive`} 
-                  rel="noopener noreferrer" 
-                  target="_blank" 
+                  href={link.url || '#'}
+                  title={`Suivez DK Automotive sur ${link.platform_label}`}
+                  aria-label={`${link.platform_label} DK Automotive`}
+                  rel="noopener noreferrer"
+                  target="_blank"
                   className="text-white hover:text-blue-300 transition-colors"
                 >
                   <IconComponent className="w-5 h-5" />
@@ -65,8 +65,8 @@ const Navbar = () => {
           </div>
           {/* Center text - hidden on small screens, visible on medium+ */}
           <div className="hidden sm:flex flex-1 justify-center">
-            <span className="text-white text-sm font-normal">
-              Expert en convoyage depuis 2018 avec + 2 000 missions réalisées.
+            <span className="text-white text-xs font-light tracking-wide uppercase">
+              Expert en convoyage depuis 2018 — Plus de 2 000 missions réalisées
             </span>
           </div>
           {/* Mobile text - shorter version */}
@@ -81,48 +81,51 @@ const Navbar = () => {
       </div>
 
       {/* NAVBAR */}
-      <nav className="bg-white shadow-sm border-b fixed top-[34px] left-0 right-0 z-50">
-        <div className="w-full px-4 sm:px-6 lg:px-0 py-[5px]">
+      <nav className="glass-nav">
+        <div className="w-full px-4 sm:px-6 lg:px-12 py-1">
           <div className="flex justify-between h-16 px-[25px]">
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0">
-                <img 
-                  alt="DK Automotive" 
-                  className="h-10 w-auto object-fill" 
-                  src={logoUrl} 
+                <img
+                  alt="DK Automotive"
+                  className="h-10 w-auto object-fill"
+                  src={logoUrl}
                   onError={(e) => {
                     e.currentTarget.src = '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
-                  }} 
+                  }}
                 />
               </Link>
             </div>
 
             {/* Desktop menu */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-10">
               {navItems.map(item => (
-                <Link 
-                  key={item.path} 
-                  to={item.path} 
-                  className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive(item.path) 
-                      ? "text-dk-navy border-b-2 border-dk-navy" 
-                      : "text-gray-700 hover:text-dk-navy"
-                  }`}
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`px-1 py-1 text-sm font-medium transition-all duration-300 relative group ${isActive(item.path)
+                      ? "text-dk-navy"
+                      : "text-gray-600 hover:text-dk-navy"
+                    }`}
                 >
                   {item.label}
+                  <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-dk-navy transition-transform duration-300 ${isActive(item.path) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    }`} />
                 </Link>
               ))}
 
               {/* Bouton Espace professionnel */}
-              <a 
-                href={professionalSpaceUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-dk-navy text-white rounded-lg hover:bg-dk-navy/90 transition-colors"
-              >
-                <User className="w-4 h-4 text-white" />
-                Espace professionnel
-              </a>
+              <div className="ml-6 pl-6 border-l border-gray-200">
+                <a
+                  href={professionalSpaceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-lg gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Espace professionnel</span>
+                </a>
+              </div>
             </div>
 
             {/* Mobile menu button */}
@@ -138,14 +141,13 @@ const Navbar = () => {
             <div className="md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
                 {navItems.map(item => (
-                  <Link 
-                    key={item.path} 
-                    to={item.path} 
-                    className={`block px-3 py-2 text-base font-medium transition-colors ${
-                      isActive(item.path) 
-                        ? "text-dk-navy bg-dk-navy/5" 
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`block px-3 py-2 text-base font-medium transition-colors ${isActive(item.path)
+                        ? "text-dk-navy bg-dk-navy/5"
                         : "text-gray-700 hover:text-dk-navy hover:bg-gray-50"
-                    }`} 
+                      }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.label}
@@ -153,11 +155,11 @@ const Navbar = () => {
                 ))}
 
                 {/* Bouton Espace professionnel pour mobile */}
-                <a 
-                  href={professionalSpaceUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-dk-navy text-white rounded-lg hover:bg-dk-navy/90 transition-colors" 
+                <a
+                  href={professionalSpaceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 text-base font-medium bg-dk-navy text-white rounded-lg hover:bg-dk-navy/90 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <User className="w-4 h-4 text-white" />

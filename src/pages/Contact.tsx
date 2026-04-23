@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Mail, Phone, Building, Send, MessageSquare, Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader } from '@/components/ui/loader';
 import { supabase } from '@/integrations/supabase/client';
 import SEO from '@/components/SEO';
+import Hero from '@/components/common/Hero';
 const formSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -88,49 +90,35 @@ const Contact = () => {
       
       <main className="flex-1 animate-fadeIn">
         {/* Hero Section */}
-        <section className="relative bg-dk-navy py-12 md:py-16">
-          <div className="absolute inset-0 bg-gradient-to-br from-dk-navy via-dk-navy to-dk-blue opacity-90" />
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-2xl md:text-4xl font-bold text-white mb-4 tracking-tight">
-                Contactez-nous
-              </h1>
-              <p className="text-white/90 text-base md:text-lg font-light leading-relaxed mb-8">
-                Besoin d'un devis personnalisé ? Des questions sur nos prestations ? 
-                Notre équipe est à votre écoute.
-              </p>
-              
-              {/* Trust badges */}
-              <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-                <div className="flex items-center gap-2 text-white/90">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5" aria-hidden="true" />
-                  </div>
-                  <span className="text-sm font-medium">Réponse rapide</span>
-                </div>
-                <div className="flex items-center gap-2 text-white/90">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                    <Clock className="w-5 h-5" aria-hidden="true" />
-                  </div>
-                  <span className="text-sm font-medium">Du lundi au vendredi</span>
-                </div>
-                <div className="flex items-center gap-2 text-white/90">
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                    <Phone className="w-5 h-5" aria-hidden="true" />
-                  </div>
-                  <span className="text-sm font-medium">Conseil gratuit</span>
-                </div>
+        <Hero
+          title="Contactez-nous"
+          description="Besoin d'un devis personnalisé ? Des questions sur nos prestations ? Notre équipe est à votre écoute."
+          backgroundImage="/upload/51603c32-87b6-4e5d-ab03-7352caca679d.png"
+          height="min-h-[350px] md:min-h-[450px]"
+        >
+          {/* Trust badges */}
+          <div className="flex flex-wrap gap-4 md:gap-8 mt-8">
+            <div className="flex items-center gap-2 text-white/90">
+              <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10">
+                <MessageSquare className="w-5 h-5" aria-hidden="true" />
               </div>
+              <span className="text-sm font-medium tracking-wide uppercase">Réponse rapide</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/90">
+              <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10">
+                <Clock className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <span className="text-sm font-medium tracking-wide uppercase">Du lundi au vendredi</span>
             </div>
           </div>
-        </section>
+        </Hero>
 
         {/* Contact Section */}
-        <section className="py-8 md:py-12 bg-muted/30">
+        <section className="section-spacing bg-gray-50/50">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
-              <div className="bg-card rounded-xl shadow-lg p-6 md:p-8 border border-border">
+              <div className="premium-card p-8 md:p-10">
                     {/* Form Header */}
                     <div className="flex items-center gap-3 pb-4 mb-6 border-b border-border">
                       <div className="w-10 h-10 bg-dk-navy/10 rounded-lg flex items-center justify-center">
@@ -138,7 +126,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <h2 className="text-xl md:text-2xl font-bold text-dk-navy">Envoyez-nous un message</h2>
-                        <p className="text-sm text-muted-foreground">Nous vous répondrons dans les plus brefs délais</p>
+                        <p className="text-sm text-muted-foreground mt-1">Nous vous répondrons dans les plus brefs délais</p>
                       </div>
                     </div>
                     
@@ -152,8 +140,8 @@ const Contact = () => {
                           <FormField control={form.control} name="firstName" render={({
                           field
                         }) => <FormItem>
-                                <FormLabel className="text-dk-navy font-semibold">
-                                  PRÉNOM <span className="text-destructive">*</span>
+                                <FormLabel className="text-dk-navy font-semibold text-sm">
+                                  Prénom <span className="text-destructive">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input placeholder="Votre prénom" className="bg-muted/50 border-border focus-visible:ring-dk-navy" {...field} />
@@ -164,8 +152,8 @@ const Contact = () => {
                           <FormField control={form.control} name="lastName" render={({
                           field
                         }) => <FormItem>
-                                <FormLabel className="text-dk-navy font-semibold">
-                                  NOM <span className="text-destructive">*</span>
+                                <FormLabel className="text-dk-navy font-semibold text-sm">
+                                  Nom <span className="text-destructive">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input placeholder="Votre nom" className="bg-muted/50 border-border focus-visible:ring-dk-navy" {...field} />
@@ -177,8 +165,8 @@ const Contact = () => {
                         <FormField control={form.control} name="companyName" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-dk-navy font-semibold">
-                                SOCIÉTÉ <span className="text-muted-foreground text-xs font-normal">(facultatif)</span>
+                              <FormLabel className="text-dk-navy font-semibold text-sm">
+                                Société <span className="text-muted-foreground text-xs font-normal">(facultatif)</span>
                               </FormLabel>
                               <FormControl>
                                 <Input placeholder="Nom de votre société" className="bg-muted/50 border-border focus-visible:ring-dk-navy" {...field} />
@@ -190,8 +178,8 @@ const Contact = () => {
                           <FormField control={form.control} name="email" render={({
                           field
                         }) => <FormItem>
-                                <FormLabel className="text-dk-navy font-semibold">
-                                  EMAIL <span className="text-destructive">*</span>
+                                <FormLabel className="text-dk-navy font-semibold text-sm">
+                                  Email <span className="text-destructive">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input type="email" placeholder="votre@email.com" className="bg-muted/50 border-border focus-visible:ring-dk-navy" {...field} />
@@ -202,8 +190,8 @@ const Contact = () => {
                           <FormField control={form.control} name="phone" render={({
                           field
                         }) => <FormItem>
-                                <FormLabel className="text-dk-navy font-semibold">
-                                  TÉLÉPHONE <span className="text-destructive">*</span>
+                                <FormLabel className="text-dk-navy font-semibold text-sm">
+                                  Téléphone <span className="text-destructive">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input placeholder="06 12 34 56 78" className="bg-muted/50 border-border focus-visible:ring-dk-navy" {...field} />
@@ -215,8 +203,8 @@ const Contact = () => {
                         <FormField control={form.control} name="subject" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-dk-navy font-semibold">
-                                OBJET <span className="text-destructive">*</span>
+                              <FormLabel className="text-dk-navy font-semibold text-sm">
+                                Objet <span className="text-destructive">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input placeholder="Objet de votre message" className="bg-muted/50 border-border focus-visible:ring-dk-navy" {...field} />
@@ -227,8 +215,8 @@ const Contact = () => {
                         <FormField control={form.control} name="message" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-dk-navy font-semibold">
-                                MESSAGE <span className="text-destructive">*</span>
+                              <FormLabel className="text-dk-navy font-semibold text-sm">
+                                Message <span className="text-destructive">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Textarea placeholder="Décrivez votre demande..." className="bg-muted/50 border-border focus-visible:ring-dk-navy min-h-[120px] resize-none" {...field} />
@@ -237,10 +225,10 @@ const Contact = () => {
                             </FormItem>} />
 
                         <div className="pt-2">
-                          <Button type="submit" className="w-full bg-dk-navy hover:bg-dk-blue text-white py-5 text-base transition-colors" disabled={loading}>
+                          <Button type="submit" className="w-full btn-premium bg-dk-navy hover:bg-dk-blue text-white py-6" disabled={loading}>
                             {loading ? <>
                                 <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                ENVOI EN COURS...
+                                Envoi en cours...
                               </> : <>
                                 <Send className="mr-2 h-4 w-4" />
                                 Envoyer le message
@@ -259,20 +247,20 @@ const Contact = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-12 bg-background">
+        <section className="section-spacing bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-dk-navy mb-4">
+              <h2 className="mb-4">
                 Besoin d'un devis rapidement ?
               </h2>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground text-lg mb-8">
                 Utilisez notre calculateur en ligne pour obtenir un tarif instantané.
               </p>
-              <a href="/devis">
-                <Button className="bg-dk-navy hover:bg-dk-blue text-white px-8 py-5 text-base">
+              <Link to="/devis">
+                <Button className="btn-premium bg-dk-navy hover:bg-dk-blue text-white px-10 py-6">
                   Demander un devis gratuit
                 </Button>
-              </a>
+              </Link>
             </div>
           </div>
         </section>
