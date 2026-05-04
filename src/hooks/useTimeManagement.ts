@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { OrderState } from "@/types/order";
 import { format, setHours, setMinutes, addMinutes } from "date-fns";
 
@@ -9,6 +8,17 @@ export const useTimeManagement = (
 ) => {
   const [pickupTime, setPickupTime] = useState<string>("08:00");
   const [deliveryTime, setDeliveryTime] = useState<string>("08:30");
+
+  const updateOrderDetails = useCallback((date: Date, time: string, type: 'pickup' | 'delivery') => {
+    if (orderDetails) {
+      const updatedOrderDetails = {
+        ...orderDetails,
+        [type === 'pickup' ? 'pickupTime' : 'deliveryTime']: time,
+        [type === 'pickup' ? 'pickupDate' : 'deliveryDate']: date,
+      };
+      setOrderDetails(updatedOrderDetails);
+    }
+  }, [orderDetails, setOrderDetails]);
 
   useEffect(() => {
     // Set default times when dates are selected
@@ -31,18 +41,7 @@ export const useTimeManagement = (
     if (orderDetails.deliveryTime) {
       setDeliveryTime(orderDetails.deliveryTime);
     }
-  }, [orderDetails.pickupDate, orderDetails.deliveryDate]);
-
-  const updateOrderDetails = (date: Date, time: string, type: 'pickup' | 'delivery') => {
-    if (orderDetails) {
-      const updatedOrderDetails = {
-        ...orderDetails,
-        [type === 'pickup' ? 'pickupTime' : 'deliveryTime']: time,
-        [type === 'pickup' ? 'pickupDate' : 'deliveryDate']: date,
-      };
-      setOrderDetails(updatedOrderDetails);
-    }
-  };
+  }, [orderDetails.pickupDate, orderDetails.deliveryDate, orderDetails.pickupTime, orderDetails.deliveryTime, updateOrderDetails]);
 
   const handlePickupTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = e.target.value;

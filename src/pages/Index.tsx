@@ -61,41 +61,46 @@ const Index = () => {
       "reviewCount": "2000"
     }
   };
-  if (isLoading) {
-    return <div className="min-h-screen bg-white">
-      <SEO />
-      {/* Hero Skeleton */}
-      <section className="relative min-h-[500px] md:min-h-[700px] bg-muted">
-        <div className="container mx-auto px-4 py-20">
-          <div className="max-w-2xl space-y-6">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <Skeleton className="h-6 w-2/3" />
-            <Skeleton className="h-6 w-1/2" />
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-12 w-48" />
-          </div>
-        </div>
-      </section>
-      {/* Trust Section Skeleton */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 text-center">
-          <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
-          <Skeleton className="h-8 w-1/3 mx-auto mb-4" />
-          <Skeleton className="h-6 w-2/3 mx-auto" />
-        </div>
-      </section>
-    </div>;
-  }
-  return <div className="min-h-screen bg-white">
-    <SEO title="Accueil" description="Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h. Plus de 2000 missions réalisées par des chauffeurs professionnels." canonical="https://www.dkautomotive.fr/" />
+  return (
+    <div className="min-h-screen bg-white">
+      <SEO 
+        title="Accueil" 
+        description="Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h. Plus de 2000 missions réalisées par des chauffeurs professionnels." 
+        canonical="https://www.dkautomotive.fr/" 
+      />
 
-    {/* Schema.org JSON-LD */}
-    <script type="application/ld+json" dangerouslySetInnerHTML={{
-      __html: JSON.stringify(schemaData)
-    }} />
+      {isLoading ? (
+        <>
+          {/* Hero Skeleton */}
+          <section className="relative min-h-[500px] md:min-h-[700px] bg-muted">
+            <div className="container mx-auto px-4 py-20">
+              <div className="max-w-2xl space-y-6">
+                <Skeleton className="h-10 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-12 w-48" />
+              </div>
+            </div>
+          </section>
+          {/* Trust Section Skeleton */}
+          <section className="py-16">
+            <div className="container mx-auto px-4 text-center">
+              <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
+              <Skeleton className="h-8 w-1/3 mx-auto mb-4" />
+              <Skeleton className="h-6 w-2/3 mx-auto" />
+            </div>
+          </section>
+        </>
+      ) : (
+        <>
+          {/* Schema.org JSON-LD */}
+          <script type="application/ld+json" dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schemaData)
+          }} />
 
-    <main className="animate-fadeIn">
+          <main className="animate-fadeIn">
       {/* Hero Section */}
       <Hero
         title={getText('hero_title', 'Convoyage de véhicules par route en France')}
@@ -361,7 +366,11 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </main>
-  </div>;
+        </main>
+      </>
+      )}
+    </div>
+  );
 };
+
 export default Index;

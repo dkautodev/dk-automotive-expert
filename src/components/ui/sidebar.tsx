@@ -1,4 +1,5 @@
 
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Menu } from "lucide-react";
@@ -61,6 +62,8 @@ export function Sidebar({
     </aside>
   );
 }
+
+export const SIDEBAR_COOKIE_NAME = "sidebar:state";
 
 export const SidebarTrigger = () => {
   const { toggleCollapsed } = useSidebar();

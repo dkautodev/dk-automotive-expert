@@ -8,9 +8,14 @@ const CGU = () => {
   const { cguContentSections, isLoading } = useCguContent();
 
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="CGU - Conditions Générales d'Utilisation"
+        description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
+        canonical="https://www.dkautomotive.fr/cgu"
+      />
+      {isLoading ? (
         <main className="flex-grow">
           <div className="container mx-auto px-4 py-12">
             <div className="text-center">
@@ -19,18 +24,8 @@ const CGU = () => {
             </div>
           </div>
         </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <SEO 
-        title="CGU - Conditions Générales d'Utilisation"
-        description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
-        canonical="https://www.dkautomotive.fr/cgu"
-      />
-      <main className="flex-grow">
+      ) : (
+        <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Conditions Générales d'Utilisation</h1>
           
@@ -57,6 +52,7 @@ const CGU = () => {
           </div>
         </div>
       </main>
+      )}
     </div>
   );
 };

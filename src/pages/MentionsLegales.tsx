@@ -30,9 +30,14 @@ const MentionsLegales = () => {
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Mentions Légales"
+        description="Consultez les mentions légales de DK Automotive. Informations sur la société, l'hébergement du site et la protection des données."
+        canonical="https://www.dkautomotive.fr/mentions-legales"
+      />
+      {isLoading ? (
         <main className="flex-grow">
           <div className="container mx-auto px-4 py-12">
             <div className="text-center">
@@ -41,18 +46,8 @@ const MentionsLegales = () => {
             </div>
           </div>
         </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <SEO 
-        title="Mentions Légales"
-        description="Consultez les mentions légales de DK Automotive. Informations sur la société, l'hébergement du site et la protection des données."
-        canonical="https://www.dkautomotive.fr/mentions-legales"
-      />
-      <main className="flex-grow">
+      ) : (
+        <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-12">Mentions Légales</h1>
           
@@ -99,6 +94,7 @@ const MentionsLegales = () => {
           </div>
         </div>
       </main>
+      )}
     </div>
   );
 };

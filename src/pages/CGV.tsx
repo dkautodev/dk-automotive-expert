@@ -8,9 +8,14 @@ const CGV = () => {
   const { cgvContentSections, isLoading } = useCgvContent();
 
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="CGV - Conditions Générales de Vente"
+        description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
+        canonical="https://www.dkautomotive.fr/cgv"
+      />
+      {isLoading ? (
         <main className="flex-grow">
           <div className="container mx-auto px-4 py-12">
             <div className="text-center">
@@ -19,18 +24,8 @@ const CGV = () => {
             </div>
           </div>
         </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <SEO 
-        title="CGV - Conditions Générales de Vente"
-        description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
-        canonical="https://www.dkautomotive.fr/cgv"
-      />
-      <main className="flex-grow">
+      ) : (
+        <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Conditions Générales de Vente</h1>
           
@@ -57,6 +52,7 @@ const CGV = () => {
           </div>
         </div>
       </main>
+      )}
     </div>
   );
 };

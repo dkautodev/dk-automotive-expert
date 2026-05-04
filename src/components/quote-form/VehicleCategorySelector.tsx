@@ -48,35 +48,35 @@ const VehicleCategorySelector: React.FC<VehicleCategorySelectorProps> = ({
           type="button"
           disabled={disabled}
           className={cn(
-            "w-full flex items-center justify-between p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 group text-left mt-2",
+            "w-full flex items-center justify-between p-2 sm:p-2.5 rounded-lg border transition-all duration-300 group text-left mt-1.5",
             value 
-              ? "border-dk-navy bg-white shadow-sm" 
-              : "border-dk-navy bg-white shadow-sm hover:bg-slate-50",
+              ? "border-dk-navy bg-white shadow-sm ring-1 ring-dk-navy/5" 
+              : "border-slate-200 bg-white shadow-sm hover:border-dk-navy/30 hover:bg-slate-50",
             disabled && "opacity-50 cursor-not-allowed"
           )}
         >
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center gap-3 flex-1">
             {/* Left Icon Storage Box */}
             <div className={cn(
-              "h-12 w-12 rounded-xl flex items-center justify-center transition-colors border border-slate-100 flex-shrink-0",
-              value ? "bg-white shadow-sm" : "bg-slate-50"
+              "h-10 w-10 rounded-lg flex items-center justify-center transition-colors border border-slate-100 flex-shrink-0",
+              "bg-white"
             )}>
               {selectedImage ? (
-                <img src={selectedImage} alt="VHL" className="h-9 w-9 object-contain" />
+                <img src={selectedImage} alt="VHL" className="h-8 w-8 object-contain" />
               ) : (
-                <Car className="h-5 w-5 text-slate-400" />
+                <Car className="h-4 w-4 text-slate-400" />
               )}
             </div>
             
             <div className="flex flex-col">
               <span className={cn(
-                "text-sm sm:text-base font-semibold transition-colors",
+                "text-sm font-semibold transition-colors leading-none mb-1",
                 value ? "text-dk-navy" : "text-slate-400"
               )}>
                 {selectedType ? selectedType.name : "Choisir un type de véhicule"}
               </span>
               {value && (
-                <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+                <span className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold">
                   Catégorie sélectionnée
                 </span>
               )}
@@ -85,12 +85,12 @@ const VehicleCategorySelector: React.FC<VehicleCategorySelectorProps> = ({
           
           {/* Plus/Check Circular Icon */}
           <div className={cn(
-            "h-10 w-10 rounded-full flex items-center justify-center transition-all shadow-sm",
+            "h-8 w-8 rounded-full flex items-center justify-center transition-all shadow-sm",
             value 
               ? "bg-dk-navy text-white" 
-              : "bg-blue-100 text-blue-600 group-hover:bg-blue-200"
+              : "bg-blue-50 text-blue-600 group-hover:bg-blue-100"
           )}>
-            {value ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+            {value ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           </div>
         </button>
       </DialogTrigger>
@@ -117,7 +117,7 @@ const VehicleCategorySelector: React.FC<VehicleCategorySelectorProps> = ({
                     : "border-border bg-white hover:border-dk-navy/40 hover:bg-slate-50"
                 )}
               >
-                <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-lg bg-slate-50 flex items-center justify-center">
+                <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-lg bg-white flex items-center justify-center border border-slate-100">
                   {image ? (
                     <img 
                       src={image} 

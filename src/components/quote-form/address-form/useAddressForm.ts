@@ -10,12 +10,14 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
   const [isLoadingPickupCommunes, setIsLoadingPickupCommunes] = useState(false);
   const [isLoadingDeliveryCommunes, setIsLoadingDeliveryCommunes] = useState(false);
 
+  const pickupPostalCode = form.watch('pickupPostalCode');
+  const deliveryPostalCode = form.watch('deliveryPostalCode');
+
   useEffect(() => {
-    const postalCode = form.watch('pickupPostalCode');
     const fetchPickupCommunes = async () => {
-      if (postalCode && postalCode.length === 5) {
+      if (pickupPostalCode && pickupPostalCode.length === 5) {
         setIsLoadingPickupCommunes(true);
-        const communes = await getCommunesByPostalCode(postalCode);
+        const communes = await getCommunesByPostalCode(pickupPostalCode);
         setPickupCommunes(communes);
         setIsLoadingPickupCommunes(false);
         
@@ -28,14 +30,13 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
     };
     
     fetchPickupCommunes();
-  }, [form.watch('pickupPostalCode'), form]);
+  }, [pickupPostalCode, form]);
 
   useEffect(() => {
-    const postalCode = form.watch('deliveryPostalCode');
     const fetchDeliveryCommunes = async () => {
-      if (postalCode && postalCode.length === 5) {
+      if (deliveryPostalCode && deliveryPostalCode.length === 5) {
         setIsLoadingDeliveryCommunes(true);
-        const communes = await getCommunesByPostalCode(postalCode);
+        const communes = await getCommunesByPostalCode(deliveryPostalCode);
         setDeliveryCommunes(communes);
         setIsLoadingDeliveryCommunes(false);
         
@@ -48,7 +49,7 @@ export const useAddressForm = (form: UseFormReturn<QuoteFormValues>) => {
     };
     
     fetchDeliveryCommunes();
-  }, [form.watch('deliveryPostalCode'), form]);
+  }, [deliveryPostalCode, form]);
 
   const handleNext = () => {
     const pickupComplement = form.getValues('pickupComplement') ? `, ${form.getValues('pickupComplement')}` : '';

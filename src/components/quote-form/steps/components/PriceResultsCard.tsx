@@ -14,41 +14,41 @@ const PriceResultsCard = ({
   if (!distance || !priceHT || !priceTTC) return null;
 
   return (
-    <div className="bg-green-50 border border-green-200 rounded-xl p-5 animate-fadeIn">
-      <div className="flex items-center gap-2 mb-4">
-        <CheckCircle2 className="w-5 h-5 text-green-600" />
-        <h3 className="font-semibold text-green-800">Résultat du calcul</h3>
+    <div className="bg-green-50/50 border border-green-100 rounded-lg p-4 animate-fadeIn">
+      <div className="flex items-center gap-2 mb-3">
+        <CheckCircle2 className="w-4 h-4 text-green-600" />
+        <h3 className="text-sm font-bold text-green-800 uppercase tracking-tight">Résultat du calcul</h3>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-        <div className="bg-white/80 rounded-lg p-3 text-center">
-          <span className="text-muted-foreground block text-xs uppercase tracking-wide">Distance</span>
-          <p className="font-bold text-lg text-dk-navy">{distance} km</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+        <div className="bg-white/60 rounded-md p-2.5 text-center border border-green-100/50">
+          <span className="text-muted-foreground block text-[10px] uppercase tracking-wider font-medium">Distance</span>
+          <p className="font-bold text-base text-dk-navy">{distance} km</p>
         </div>
-        <div className="bg-white/80 rounded-lg p-3 text-center">
-          <span className="text-muted-foreground block text-xs uppercase tracking-wide">Prix HT</span>
-          <p className="font-bold text-lg text-dk-navy">{priceHT} €</p>
+        <div className="bg-white/60 rounded-md p-2.5 text-center border border-green-100/50">
+          <span className="text-muted-foreground block text-[10px] uppercase tracking-wider font-medium">Prix HT</span>
+          <p className="font-bold text-base text-dk-navy">{priceHT} €</p>
         </div>
-        <div className="bg-white/80 rounded-lg p-3 text-center">
-          <span className="text-muted-foreground block text-xs uppercase tracking-wide">Prix TTC</span>
-          <p className="font-bold text-lg text-green-600">{priceTTC} €</p>
+        <div className="bg-white/60 rounded-md p-2.5 text-center border border-green-100/50">
+          <span className="text-muted-foreground block text-[10px] uppercase tracking-wider font-medium">Prix TTC</span>
+          <p className="font-bold text-base text-green-600">{priceTTC} €</p>
         </div>
       </div>
       
-      <ul className="mt-4 space-y-2 text-sm">
-        <li className="flex items-center gap-2 text-green-800">
-          <Lightbulb className="w-4 h-4 flex-shrink-0" />
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="flex items-center gap-1.5 text-green-700 text-[11px] font-medium">
+          <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" />
           <span>Tous frais inclus</span>
-        </li>
-        <li className="flex items-center gap-2 text-green-800">
-          <Car className="w-4 h-4 flex-shrink-0" />
-          <span>Livraison par chauffeur professionnel</span>
-        </li>
-        <li className="flex items-center gap-2 text-green-800">
-          <Shield className="w-4 h-4 flex-shrink-0" />
-          <span>Assurance tous risques</span>
-        </li>
-      </ul>
+        </div>
+        <div className="flex items-center gap-1.5 text-green-700 text-[11px] font-medium">
+          <Car className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>Chauffeur pro</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-green-700 text-[11px] font-medium">
+          <Shield className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>Assurance incluse</span>
+        </div>
+      </div>
     </div>
   );
 };

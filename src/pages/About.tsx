@@ -41,17 +41,6 @@ const About = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="flex items-center justify-center py-32">
-          <Loader2 className="w-8 h-8 animate-spin mr-2" />
-          <span>Chargement...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <SEO 
@@ -59,11 +48,20 @@ const About = () => {
         description="Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés. Service fiable et sécurisé."
         canonical="https://www.dkautomotive.fr/about"
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-      />
-      <main className="min-h-screen bg-white animate-fadeIn">
+      {isLoading ? (
+        <div className="min-h-screen bg-white">
+          <div className="flex items-center justify-center py-32">
+            <Loader2 className="w-8 h-8 animate-spin mr-2" />
+            <span>Chargement...</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+          />
+          <main className="min-h-screen bg-white animate-fadeIn">
         {/* Hero Section */}
         <Hero
           title={getContentValue('hero_main_title', 'title')}
@@ -276,6 +274,8 @@ const About = () => {
           </div>
         </section>
       </main>
+    </>
+    )}
     </>
   );
 };

@@ -35,9 +35,14 @@ const GestionCookies = () => {
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Gestion des Cookies"
+        description="Informations sur l'utilisation des cookies sur le site de DK Automotive. Apprenez comment nous utilisons les cookies et comment vous pouvez les gérer."
+        canonical="https://www.dkautomotive.fr/gestion-cookies"
+      />
+      {isLoading ? (
         <main className="flex-grow">
           <div className="container mx-auto px-4 py-12">
             <div className="text-center">
@@ -46,18 +51,8 @@ const GestionCookies = () => {
             </div>
           </div>
         </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <SEO 
-        title="Gestion des Cookies"
-        description="Informations sur l'utilisation des cookies sur le site de DK Automotive. Apprenez comment nous utilisons les cookies et comment vous pouvez les gérer."
-        canonical="https://www.dkautomotive.fr/gestion-cookies"
-      />
-      <main className="flex-grow">
+      ) : (
+        <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Gestion des Cookies</h1>
           
@@ -78,6 +73,7 @@ const GestionCookies = () => {
           </div>
         </div>
       </main>
+      )}
     </div>
   );
 };

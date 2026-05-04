@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -18,7 +18,7 @@ export const usePageContents = (pageSlug: string) => {
   const [contents, setContents] = useState<PageContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchContents = async () => {
+  const fetchContents = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('page_contents')
@@ -45,7 +45,7 @@ export const usePageContents = (pageSlug: string) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [pageSlug]);
 
   const updateContent = async (id: string, updates: Partial<PageContent>) => {
     try {
@@ -125,7 +125,7 @@ export const usePageContents = (pageSlug: string) => {
 
   useEffect(() => {
     fetchContents();
-  }, [pageSlug]);
+  }, [fetchContents]);
 
   return {
     contents,

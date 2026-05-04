@@ -35,9 +35,14 @@ const PolitiqueConfidentialite = () => {
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Politique de Confidentialité"
+        description="Consultez la politique de confidentialité de DK Automotive. Informations sur la collecte, l'utilisation et la protection de vos données personnelles."
+        canonical="https://www.dkautomotive.fr/politique-confidentialite"
+      />
+      {isLoading ? (
         <main className="flex-grow">
           <div className="container mx-auto px-4 py-12">
             <div className="text-center">
@@ -46,18 +51,8 @@ const PolitiqueConfidentialite = () => {
             </div>
           </div>
         </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <SEO 
-        title="Politique de Confidentialité"
-        description="Consultez la politique de confidentialité de DK Automotive. Informations sur la collecte, l'utilisation et la protection de vos données personnelles."
-        canonical="https://www.dkautomotive.fr/politique-confidentialite"
-      />
-      <main className="flex-grow">
+      ) : (
+        <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Politique de confidentialité</h1>
           
@@ -98,6 +93,7 @@ const PolitiqueConfidentialite = () => {
           </div>
         </div>
       </main>
+      )}
     </div>
   );
 };

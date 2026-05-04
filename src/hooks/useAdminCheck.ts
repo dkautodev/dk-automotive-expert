@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -8,7 +8,7 @@ export const useAdminCheck = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user, isAuthenticated } = useAuth();
 
-  const checkAdminStatus = async () => {
+  const checkAdminStatus = useCallback(async () => {
     if (!isAuthenticated || !user) {
       setIsAdmin(false);
       setIsLoading(false);
@@ -34,11 +34,11 @@ export const useAdminCheck = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     checkAdminStatus();
-  }, [user, isAuthenticated]);
+  }, [checkAdminStatus]);
 
   return {
     isAdmin,
