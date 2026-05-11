@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/cookies",
+      "destination": "/gestion-cookies",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
