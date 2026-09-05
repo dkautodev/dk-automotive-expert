@@ -104,8 +104,8 @@ const Navbar = () => {
                   key={item.path}
                   to={item.path}
                   className={`px-1 py-1 text-sm font-medium transition-all duration-300 relative group ${isActive(item.path)
-                      ? "text-dk-navy"
-                      : "text-gray-600 hover:text-dk-navy"
+                    ? "text-dk-navy"
+                    : "text-gray-600 hover:text-dk-navy"
                     }`}
                 >
                   {item.label}
@@ -145,8 +145,8 @@ const Navbar = () => {
                     key={item.path}
                     to={item.path}
                     className={`block px-3 py-2 text-base font-medium transition-colors ${isActive(item.path)
-                        ? "text-dk-navy bg-dk-navy/5"
-                        : "text-gray-700 hover:text-dk-navy hover:bg-gray-50"
+                      ? "text-dk-navy bg-dk-navy/5"
+                      : "text-gray-700 hover:text-dk-navy hover:bg-gray-50"
                       }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
