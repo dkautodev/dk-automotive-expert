@@ -66,7 +66,7 @@ const Navbar = () => {
           {/* Center text - hidden on small screens, visible on medium+ */}
           <div className="hidden sm:flex flex-1 justify-center">
             <span className="text-white text-xs font-light tracking-wide uppercase">
-              Expert en convoyage depuis 2018 — Plus de 2 000 missions réalisées
+              Expert en convoyage de véhicules depuis 2018 — Plus de 2 000 missions réalisées
             </span>
           </div>
           {/* Mobile text - shorter version */}
