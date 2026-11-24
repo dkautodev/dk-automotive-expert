@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/sonner";
@@ -16,7 +16,6 @@ import CGU from "@/pages/CGU";
 import MentionsLegales from "@/pages/MentionsLegales";
 import PolitiqueConfidentialite from "@/pages/PolitiqueConfidentialite";
 import GestionCookies from "@/pages/GestionCookies";
-import Admin from "@/pages/Admin";
 import Auth from "@/pages/Auth";
 import PreCommande from "@/pages/PreCommande";
 import Pilote from "@/pages/Pilote";
@@ -49,7 +48,7 @@ function AppContent() {
           <Route path="/mentions-legales" element={<MentionsLegales />} />
           <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
           <Route path="/gestion-cookies" element={<GestionCookies />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<Navigate to="/pilote" replace />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pre-commande" element={<PreCommande />} />
           <Route path="/pilote" element={<Pilote />} />

@@ -20,7 +20,7 @@ const Auth = () => {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate('/admin');
+    navigate('/pilote');
     return null;
   }
 
@@ -38,7 +38,7 @@ const Auth = () => {
       }
     } else {
       toast.success('Connexion réussie !');
-      navigate('/admin');
+      navigate('/pilote');
     }
     
     setIsLoading(false);
@@ -46,7 +46,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-[118px]">
-      <SEO title="Connexion Administrateur" noIndex={true} />
+      <SEO title="Connexion Espace Pilote" noIndex={true} />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <img 
@@ -54,9 +54,9 @@ const Auth = () => {
             className="h-12 w-auto object-fill mx-auto mb-4" 
             src="/upload/logo-1750513203662.webp" 
           />
-          <CardTitle className="text-2xl font-bold text-dk-navy">Espace Administrateur</CardTitle>
+          <CardTitle className="text-2xl font-bold text-dk-navy">Espace Pilote & Gestion</CardTitle>
           <CardDescription>
-            Connectez-vous à votre compte administrateur
+            Connectez-vous pour accéder au suivi des missions et convoyages
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -68,7 +68,7 @@ const Auth = () => {
                 <Input 
                   id="email" 
                   type="email" 
-                  placeholder="admin@dkautomotive.fr" 
+                  placeholder="pilote@dkautomotive.fr" 
                   value={email} 
                   onChange={e => setEmail(e.target.value)} 
                   className="pl-10" 

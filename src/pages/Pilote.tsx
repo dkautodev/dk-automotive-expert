@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,10 +14,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Loader } from '@/components/ui/loader';
 import { toast } from 'sonner';
-import { ArrowLeft, Edit, Trash2, Eye, RefreshCw } from 'lucide-react';
+import { Edit, Trash2, Eye, RefreshCw, LogOut, KeyRound } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TimeSelect from '@/components/admin/TimeSelect';
+import PasswordEditor from '@/components/admin/PasswordEditor';
 import SEO from '@/components/SEO';
 
 interface Mission {
@@ -85,12 +88,14 @@ const statusFilterOptions = [
 
 const Pilote = () => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const { isAdmin, isLoading: isAdminLoading } = useAdminCheck();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Mission>>({});
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -244,18 +249,33 @@ const Pilote = () => {
       
       <main className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={() => navigate('/admin')}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour Admin
-              </Button>
-              <h1 className="text-3xl font-bold text-dk-navy">Gestion des Missions</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-dk-navy">Espace Pilote & Missions</h1>
+              <p className="text-sm text-muted-foreground mt-1">Suivi et gestion des convoyages en temps réel</p>
             </div>
-            <Button onClick={fetchMissions} variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Actualiser
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button onClick={fetchMissions} variant="outline" size="sm">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Actualiser
+              </Button>
+              <Button onClick={() => setIsPasswordDialogOpen(true)} variant="outline" size="sm">
+                <KeyRound className="w-4 h-4 mr-2" />
+                Mot de passe
+              </Button>
+              <Button 
+                onClick={async () => {
+                  await signOut();
+                  toast.success("Déconnexion réussie");
+                  navigate('/auth');
+                }} 
+                variant="destructive" 
+                size="sm"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Déconnexion
+              </Button>
+            </div>
           </div>
 
           <Card>
@@ -783,9 +803,25 @@ const Pilote = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Dialogue de modification du mot de passe */}
+      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Modifier mon mot de passe</DialogTitle>
+          </DialogHeader>
+          <PasswordEditor />
+        </DialogContent>
+      </Dialog>
+
       <Footer />
     </div>
   );
 };
 
-export default Pilote;
+const PilotePage = () => (
+  <ProtectedRoute>
+    <Pilote />
+  </ProtectedRoute>
+);
+
+export default PilotePage;
