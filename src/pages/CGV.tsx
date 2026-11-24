@@ -4,12 +4,35 @@ import SEO from '@/components/SEO';
 import { cgvSections } from '@/data/faqAndLegalContent';
 
 const CGV = () => {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": "https://www.dkautomotive.fr/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "CGV",
+        "item": "https://www.dkautomotive.fr/cgv"
+      }
+    ]
+  };
+
   return (
     <main className="min-h-screen flex flex-col">
       <SEO 
         title="CGV - Conditions Générales de Vente"
         description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
         canonical="https://www.dkautomotive.fr/cgv"
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">

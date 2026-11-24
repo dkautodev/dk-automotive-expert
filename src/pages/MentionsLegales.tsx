@@ -27,12 +27,35 @@ const MentionsLegales = () => {
     );
   };
 
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": "https://www.dkautomotive.fr/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Mentions Légales",
+        "item": "https://www.dkautomotive.fr/mentions-legales"
+      }
+    ]
+  };
+
   return (
     <main className="min-h-screen flex flex-col">
       <SEO 
         title="Mentions Légales"
         description="Consultez les mentions légales de DK Automotive. Informations sur la société, l'hébergement du site et la protection des données."
         canonical="https://www.dkautomotive.fr/mentions-legales"
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">

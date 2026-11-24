@@ -76,8 +76,11 @@ const Contact = () => {
         "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
         "contactPoint": {
           "@type": "ContactPoint",
+          "telephone": "+33615606285",
           "contactType": "customer service",
-          "email": "contact@dkautomotive.fr"
+          "email": "contact@dkautomotive.fr",
+          "areaServed": "FR",
+          "availableLanguage": ["French"]
         }
       }
     },

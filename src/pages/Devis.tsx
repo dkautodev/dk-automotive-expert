@@ -10,15 +10,39 @@ const Devis = () => {
       "@type": "Service",
       "serviceType": "Convoyage automobile par la route",
       "name": "Devis de convoyage automobile immédiat",
-      "description": "Calculateur et devis en ligne immédiat pour le convoyage de véhicules particuliers ou utilitaires en France et Europe.",
+      "description": "Calculateur et devis en ligne immédiat pour le convoyage de véhicules particuliers ou utilitaires en France et Europe avec assurance tous risques incluse.",
       "provider": {
         "@type": "LocalBusiness",
         "name": "DK Automotive",
-        "url": "https://www.dkautomotive.fr"
+        "url": "https://www.dkautomotive.fr",
+        "telephone": "+33615606285",
+        "email": "contact@dkautomotive.fr",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "19 RUE DE BRESSE",
+          "addressLocality": "BOBIGNY",
+          "postalCode": "93000",
+          "addressCountry": "FR"
+        }
       },
-      "areaServed": {
-        "@type": "Country",
-        "name": "France"
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "France"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Europe"
+        }
+      ],
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "EUR",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "priceCurrency": "EUR",
+          "unitText": "km"
+        }
       }
     },
     {

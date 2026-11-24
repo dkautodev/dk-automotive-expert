@@ -4,12 +4,35 @@ import SEO from '@/components/SEO';
 import { cguSections } from '@/data/faqAndLegalContent';
 
 const CGU = () => {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": "https://www.dkautomotive.fr/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "CGU",
+        "item": "https://www.dkautomotive.fr/cgu"
+      }
+    ]
+  };
+
   return (
     <main className="min-h-screen flex flex-col">
       <SEO 
         title="CGU - Conditions Générales d'Utilisation"
         description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
         canonical="https://www.dkautomotive.fr/cgu"
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">

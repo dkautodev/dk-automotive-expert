@@ -6,25 +6,58 @@ import Hero from '@/components/common/Hero';
 import { getIndexText as getText, getIndexImage as getImageUrl } from '@/data/siteContent';
 
 const Index = () => {
-  // Schema.org JSON-LD pour le référencement local
+  // Schema.org JSON-LD officiel conforme Google pour le référencement local
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "DK Automotive",
-    "description": "Expert en convoyage de véhicules par route en France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h.",
+    "description": "Société de convoyage de véhicules par route en France et Île-de-France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h.",
     "url": "https://www.dkautomotive.fr/",
     "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
     "image": "https://www.dkautomotive.fr/upload/hero_background-1790463219069.webp",
+    "telephone": "+33615606285",
+    "email": "contact@dkautomotive.fr",
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": "19 RUE DE BRESSE",
+      "addressLocality": "BOBIGNY",
+      "postalCode": "93000",
       "addressCountry": "FR"
     },
-    "areaServed": {
-      "@type": "Country",
-      "name": "France"
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 48.9086,
+      "longitude": 2.4397
     },
-    "serviceType": ["Convoyage automobile", "Transport de véhicules", "Livraison de voitures"],
-    "priceRange": "€€"
+    "areaServed": [
+      {
+        "@type": "Country",
+        "name": "France"
+      },
+      {
+        "@type": "AdministrativeArea",
+        "name": "Île-de-France"
+      }
+    ],
+    "serviceType": [
+      "Convoyage automobile",
+      "Transport de véhicules par la route",
+      "Acheminement de flotte automobile",
+      "Livraison de voitures neuves et d'occasion"
+    ],
+    "priceRange": "€€",
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "08:00",
+      "closes": "19:00"
+    }
   };
   return (
     <div className="min-h-screen bg-white">
