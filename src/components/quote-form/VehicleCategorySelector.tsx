@@ -62,7 +62,11 @@ const VehicleCategorySelector: React.FC<VehicleCategorySelectorProps> = ({
               "bg-white"
             )}>
               {selectedImage ? (
-                <img src={selectedImage} alt="VHL" className="h-8 w-8 object-contain" />
+                <img 
+                  src={selectedImage} 
+                  alt={selectedType ? `Catégorie sélectionnée : ${selectedType.name}` : "Type de véhicule"} 
+                  className="h-8 w-8 object-contain" 
+                />
               ) : (
                 <Car className="h-4 w-4 text-slate-400" />
               )}

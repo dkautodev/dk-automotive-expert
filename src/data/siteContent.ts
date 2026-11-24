@@ -6,7 +6,7 @@
 
 export const indexContent: Record<string, any> = {
   "hero_background": {
-    "url": "/upload/hero_background-1790463219069.webp"
+    "url": "/upload/convoyage-automobile-france.webp"
   },
   "hero_title": {
     "title": "DK Automotive - Convoyage Automobile France"
@@ -15,7 +15,7 @@ export const indexContent: Record<string, any> = {
     "content": "DK Automotive fait de la réactivité sa priorité absolue en réduisant significativement les délais d'enlèvement et de livraison afin de vous offrir une solution de transport automobile rapide, souple et sans attente. Grâce à une prise en charge garantie sous 48 heures maximum en moyenne partout en France, nous assurons également une couverture globale étendue aux pays limitrophes avec un respect strict des créneaux convenus. Qu'il s'agisse de l'acheminement d'un véhicule individuel ou du transfert d'une flotte d'entreprise complète, nous vous garantissons une prestation porte-à-porte alliant fiabilité, ponctualité et sécurité optimale."
   },
   "section_delais_image": {
-    "url": "/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.webp"
+    "url": "/upload/convoyage-delais-rapide.webp"
   },
   "section_delais_title": {
     "title": "DÉLAIS DE LIVRAISON RAPIDES"
@@ -24,7 +24,7 @@ export const indexContent: Record<string, any> = {
     "content": "Chez DK Automotive, la sécurité de chaque transfert automobile repose sur le savoir-faire de nos convoyeurs professionnels. Rigoureusement sélectionnés et bénéficiant d'une formation continue, ils maîtrisent la conduite des véhicules thermiques, hybrides et électriques au départ de Paris, de l'Île-de-France et partout en France. Chaque mission de convoyage comprend un état des lieux contradictoire avec photos horodatées et géolocalisées ainsi que la pratique de l'écoconduite pour préserver la mécanique de votre voiture et réduire les émissions de CO2."
   },
   "section_expertise_image": {
-    "url": "/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.webp"
+    "url": "/upload/convoyage-expertise-route.webp"
   },
   "section_expertise_title": {
     "title": "CHAUFFEURS PROFESSIONNELS SÉLECTIONNÉS"
@@ -33,7 +33,7 @@ export const indexContent: Record<string, any> = {
     "content": "Obtenez un devis immédiat pour un convoyage voiture adapté à vos besoins grâce à notre offre 100% tout compris (carburant, péages, frais annexes et assurance tous risques), garantissant une transparence totale sans aucun coût caché, combinée à un engagement fort pour la réduction des émissions de CO₂ grâce aux éco-gestes de nos chauffeurs. \nÀ titre d'exemple, comptez un tarif de 480,00 € TTC tout inclus pour le convoyage d'une voiture sur un trajet Paris-Lyon (466 km), ou 735,00 € TTC tout compris pour le transfert d'une berline sur un parcours Paris-Marseille (774 km)."
   },
   "section_tarification_image": {
-    "url": "/upload/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.webp"
+    "url": "/upload/convoyage-tarification-transparente.webp"
   },
   "section_tarification_title": {
     "title": "TARIFICATION TRANSPARENTE ET PERSONNALISÉE"
@@ -69,7 +69,7 @@ export const indexContent: Record<string, any> = {
     "title": "CONVOYAGE DE VÉHICULES PAR LA ROUTE EN FRANCE ET EUROPE"
   },
   "logo": {
-    "url": "/upload/logo-1750513203662.webp"
+    "url": "/upload/dk-automotive-logo.webp"
   },
   "hero_point_1": {
     "text": "Convoyage sur mesure & Économique"
@@ -168,7 +168,7 @@ export const aboutContent: Record<string, any> = {
     "content": "Forts d'une solide expérience dans les métiers du convoyage voiture et du transport en général depuis 2018, nous sommes deux entrepreneurs avec une équipe de convoyeurs professionnels répartis sur l'ensemble du territoire national, animés par une passion commune pour l’automobile et la logistique. Notre mission est claire : Proposer un service de convoyage de voiture fiable, rapide et sécurisé, adapté aux besoins des professionnels comme des particuliers.\n\nDès le départ, nous avons construit notre activité autour d’une expertise terrain solide dans l'acheminement de véhicules sur toutes distances et en tout lieux. Nous intervenons sur une large gamme de prestations : convoyage de véhicules neuves, d’occasion et véhicules premium mais aussi le déplacement de véhicules utilitaires.\n\nGrâce à notre expérience, nous maîtrisons parfaitement les exigences du convoyage automobile : respect des délais, gestion logistique optimisée, suivi des missions et qualité de service irréprochable. \nChaque transport de véhicule est réalisé avec rigueur, en garantissant sécurité, ponctualité et transparence.\n\nNotre priorité est d’accompagner nos clients avec des solutions sur mesure. Nous sommes en partenariats avec des concessionnaires, loueurs, entreprises et gestionnaires de flotte, en leur offrant un service de convoyage clé en main.\n\nAujourd’hui, nous mettons tout en œuvre pour devenir un acteur incontournable du convoyage de voitures en France, en nous appuyant sur des valeurs fortes : professionnalisme, réactivité et confiance."
   },
   "why_choose_image": {
-    "url": "/upload/section_tarification_image-1776964200267.webp"
+    "url": "/upload/convoyage-flotte-professionnelle.webp"
   },
   "why_choose_title": {
     "title": "POURQUOI CHOISIR DK AUTOMOTIVE POUR VOS BESOINS EN CONVOYAGE AUTOMOBILE ?"
@@ -201,7 +201,7 @@ export const aboutContent: Record<string, any> = {
     "content": "Nous accordons une importance primordiale à la formation continue de nos convoyeurs professionnels afin de vous garantir un acheminement automobile sûr, rigoureux et respectueux de l'environnement. Nos chauffeurs professionnels bénéficient d'un perfectionnement régulier axé sur l'éco-conduite, la maîtrise technique des véhicules de dernière génération (hybrides et 100 % électriques) ainsi que les protocoles complets de prise en main et d'état des lieux."
   },
   "drivers_image": {
-    "url": "/upload/value_ecoconduite_image-1776981907439.webp"
+    "url": "/upload/chauffeurs-convoyage-ecoconduite.webp"
   },
   "values_section_title": {
     "title": "Nos valeurs"
@@ -228,7 +228,7 @@ export const aboutContent: Record<string, any> = {
     "content": "Chez DK AUTOMOTIVE, nous nous adaptons à vos besoins spécifiques en matière de convoyage de véhicules, offrant des solutions personnalisées pour assurer une expérience client optimale et un convoyage voiture en toute sérénité."
   },
   "expertise_image": {
-    "url": "/upload/expertise_image-1790425483584.webp"
+    "url": "/upload/convoyage-automobile-expertise.webp"
   },
   "expertise_title": {
     "title": "EXPERTISE EN CONVOYAGE AUTOMOBILE"

@@ -73,7 +73,7 @@ const Contact = () => {
         "@type": "Organization",
         "name": "DK Automotive",
         "url": "https://www.dkautomotive.fr",
-        "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
+        "logo": "https://www.dkautomotive.fr/upload/dk-automotive-logo.webp",
         "contactPoint": {
           "@type": "ContactPoint",
           "telephone": "+33615606285",
@@ -120,7 +120,7 @@ const Contact = () => {
         <Hero
           title="Contactez-nous"
           description="Besoin d'un devis personnalisé ? Des questions sur nos prestations ? Notre équipe est à votre écoute."
-          backgroundImage="/upload/hero_background-1790463219069.webp"
+          backgroundImage="/upload/convoyage-automobile-france.webp"
           height="min-h-[440px] md:min-h-[520px]"
         >
           {/* Trust badges */}

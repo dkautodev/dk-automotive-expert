@@ -20,7 +20,7 @@ const Navbar = () => {
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
-  const logoUrl = '/upload/logo-1750513203662.webp';
+  const logoUrl = '/upload/dk-automotive-logo.webp';
 
   const navItems = [
     { path: "/", label: "Accueil" },
@@ -78,13 +78,13 @@ const Navbar = () => {
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0">
                 <img
-                  alt="DK Automotive"
+                  alt="DK Automotive - Convoyage et transport automobile professionnel"
                   width={155}
                   height={40}
                   className="h-10 w-auto object-contain"
                   src={logoUrl}
                   onError={(e) => {
-                    e.currentTarget.src = '/upload/logo-1750513203662.webp';
+                    e.currentTarget.src = '/upload/dk-automotive-logo.webp';
                   }}
                 />
               </Link>

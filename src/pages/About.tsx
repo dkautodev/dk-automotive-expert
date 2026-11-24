@@ -51,10 +51,7 @@ const About = () => {
         title="À Propos — Société de Convoyage de Véhicules par Route | DK Automotive"
         description="Découvrez DK Automotive, société experte en convoyage automobile par route depuis 2018. Plus de 2 000 missions de transfert sécurisé pour particuliers et professionnels."
         canonical="https://www.dkautomotive.fr/about"
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        schema={schemaData}
       />
       <main className="min-h-screen bg-white animate-fadeIn">
         {/* Hero Section */}
@@ -62,7 +59,7 @@ const About = () => {
           title={getContentValue('hero_main_title', 'title')}
           subtitle={getContentValue('hero_title', 'title')}
           description={getContentValue('hero_subtitle', 'subtitle')}
-          backgroundImage="/upload/hero_background-1790463219069.webp"
+          backgroundImage="/upload/convoyage-automobile-france.webp"
           height="min-h-[480px] md:min-h-[560px]"
         />
 
@@ -95,7 +92,7 @@ const About = () => {
             <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div className="img-frame order-2 md:order-1">
                 <div className="img-frame-accent" />
-                {getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp') && (
+                {getImageUrl('why_choose_image', '/upload/convoyage-flotte-professionnelle.webp') && (
                   <img 
                     alt="DK Automotive expertise" 
                     width={1760}
@@ -103,7 +100,7 @@ const About = () => {
                     className="img-standard" 
                     loading="lazy"
                     decoding="async"
-                    src={getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp')} 
+                    src={getImageUrl('why_choose_image', '/upload/convoyage-flotte-professionnelle.webp')} 
                   />
                 )}
               </div>
@@ -183,7 +180,7 @@ const About = () => {
               </div>
               <div className="img-frame order-2">
                 <div className="img-frame-accent" />
-                {getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp') && (
+                {getImageUrl('drivers_image', '/upload/chauffeurs-convoyage-ecoconduite.webp') && (
                   <img 
                     alt="Chauffeurs professionnels DK Automotive" 
                     width={5564}
@@ -191,7 +188,7 @@ const About = () => {
                     className="img-standard" 
                     loading="lazy"
                     decoding="async"
-                    src={getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp')} 
+                    src={getImageUrl('drivers_image', '/upload/chauffeurs-convoyage-ecoconduite.webp')} 
                   />
                 )}
               </div>
@@ -261,7 +258,7 @@ const About = () => {
             <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div className="img-frame order-2 md:order-1">
                 <div className="img-frame-accent" />
-                {getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp') && (
+                {getImageUrl('expertise_image', '/upload/convoyage-automobile-expertise.webp') && (
                   <img 
                     alt="Expertise en convoyage automobile" 
                     width={1448}
@@ -269,7 +266,7 @@ const About = () => {
                     className="img-standard" 
                     loading="lazy"
                     decoding="async"
-                    src={getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp')} 
+                    src={getImageUrl('expertise_image', '/upload/convoyage-automobile-expertise.webp')} 
                   />
                 )}
               </div>

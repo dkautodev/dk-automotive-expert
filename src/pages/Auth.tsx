@@ -54,7 +54,7 @@ const Auth = () => {
             width={186}
             height={48}
             className="h-12 w-auto object-contain mx-auto mb-4" 
-            src="/upload/logo-1750513203662.webp" 
+            src="/upload/dk-automotive-logo.webp" 
           />
           <CardTitle className="text-2xl font-bold text-dk-navy">Espace Pilote & Gestion</CardTitle>
           <CardDescription>

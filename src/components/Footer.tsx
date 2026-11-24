@@ -35,10 +35,10 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block mb-6">
               <img
-                alt="DK Automotive Logo"
+                alt="DK Automotive - Convoyage et transport automobile professionnel"
                 width={186}
                 height={48}
-                src="/upload/logo-1750513203662.webp"
+                src="/upload/dk-automotive-logo.webp"
                 className="h-12 w-auto filter invert grayscale"
                 loading="lazy"
                 decoding="async"
