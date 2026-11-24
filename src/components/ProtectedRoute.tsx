@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,7 +22,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       if (!isAuthenticated) {
         navigate('/auth');
       } else if (!isAdmin) {
-        navigate('/');
+        toast.error("Accès refusé. Compte non autorisé.");
+        navigate('/auth');
       }
     }
   }, [isAuthenticated, isAdmin, isLoading, navigate]);

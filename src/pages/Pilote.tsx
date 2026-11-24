@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useAdminCheck } from '@/hooks/useAdminCheck';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,7 +88,6 @@ const statusFilterOptions = [
 const Pilote = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { isAdmin, isLoading: isAdminLoading } = useAdminCheck();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
@@ -105,17 +103,8 @@ const Pilote = () => {
   });
 
   useEffect(() => {
-    if (!isAdminLoading && !isAdmin) {
-      toast.error("Accès refusé. Vous devez être administrateur.");
-      navigate('/auth');
-    }
-  }, [isAdmin, isAdminLoading, navigate]);
-
-  useEffect(() => {
-    if (isAdmin) {
-      fetchMissions();
-    }
-  }, [isAdmin]);
+    fetchMissions();
+  }, []);
 
   const fetchMissions = async () => {
     setIsLoading(true);
@@ -229,18 +218,6 @@ const Pilote = () => {
       </Badge>
     );
   };
-
-  if (isAdminLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
