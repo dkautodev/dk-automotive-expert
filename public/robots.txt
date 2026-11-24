@@ -4,5 +4,6 @@ Disallow: /auth
 Disallow: /pilote
 Disallow: /payment-success
 Disallow: /pre-commande
+Disallow: /cgi-bin/
 
 Sitemap: https://www.dkautomotive.fr/sitemap.xml
