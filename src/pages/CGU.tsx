@@ -1,13 +1,9 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
-import { useCguContent } from '@/hooks/useCguContent';
-import { Loader2 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { cguSections } from '@/data/faqAndLegalContent';
 
 const CGU = () => {
-  const { cguContentSections, isLoading } = useCguContent();
-
-
   return (
     <div className="min-h-screen flex flex-col">
       <SEO 
@@ -15,22 +11,12 @@ const CGU = () => {
         description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
         canonical="https://www.dkautomotive.fr/cgu"
       />
-      {isLoading ? (
-        <main className="flex-grow">
-          <div className="container mx-auto px-4 py-12">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-              <p>Chargement des conditions générales d'utilisation...</p>
-            </div>
-          </div>
-        </main>
-      ) : (
-        <main className="flex-grow">
+      <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Conditions Générales d'Utilisation</h1>
           
           <div className="max-w-4xl mx-auto space-y-8">
-            {cguContentSections.map((section, index) => (
+            {cguSections.map((section, index) => (
               <React.Fragment key={section.id}>
                 <section className="mb-8">
                   {section.section_title && (
@@ -46,13 +32,12 @@ const CGU = () => {
                     </div>
                   )}
                 </section>
-                {index < cguContentSections.length - 1 && <Separator />}
+                {index < cguSections.length - 1 && <Separator />}
               </React.Fragment>
             ))}
           </div>
         </div>
-      </main>
-      )}
+      </div>
     </div>
   );
 };

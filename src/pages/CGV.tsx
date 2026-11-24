@@ -1,13 +1,9 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
-import { useCgvContent } from '@/hooks/useCgvContent';
-import { Loader2 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { cgvSections } from '@/data/faqAndLegalContent';
 
 const CGV = () => {
-  const { cgvContentSections, isLoading } = useCgvContent();
-
-
   return (
     <div className="min-h-screen flex flex-col">
       <SEO 
@@ -15,22 +11,12 @@ const CGV = () => {
         description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
         canonical="https://www.dkautomotive.fr/cgv"
       />
-      {isLoading ? (
-        <main className="flex-grow">
-          <div className="container mx-auto px-4 py-12">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-              <p>Chargement des conditions générales de vente...</p>
-            </div>
-          </div>
-        </main>
-      ) : (
-        <main className="flex-grow">
+      <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Conditions Générales de Vente</h1>
           
           <div className="max-w-4xl mx-auto space-y-8">
-            {cgvContentSections.map((section, index) => (
+            {cgvSections.map((section, index) => (
               <React.Fragment key={section.id}>
                 <section className="mb-8">
                   {section.section_title && (
@@ -46,13 +32,12 @@ const CGV = () => {
                     </div>
                   )}
                 </section>
-                {index < cgvContentSections.length - 1 && <Separator />}
+                {index < cgvSections.length - 1 && <Separator />}
               </React.Fragment>
             ))}
           </div>
         </div>
-      </main>
-      )}
+      </div>
     </div>
   );
 };

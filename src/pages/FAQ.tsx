@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Accordion,
@@ -6,53 +6,31 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
-import { HelpCircle, MessageCircle, Clock, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { HelpCircle, MessageCircle, Clock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Hero from '@/components/common/Hero';
-
-interface FaqItem {
-  id: string;
-  question: string;
-  answer: string;
-  display_order: number;
-}
+import { faqItems } from '@/data/faqAndLegalContent';
 
 const FAQ = () => {
-  const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchFaqItems = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('faq_items')
-          .select('*')
-          .eq('is_active', true)
-          .order('display_order', { ascending: true });
-
-        if (error) {
-          console.error('Error fetching FAQ items:', error);
-          return;
-        }
-
-        setFaqItems(data || []);
-      } catch (error) {
-        console.error('Error fetching FAQ items:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFaqItems();
-  }, []);
-
   const trustBadges = [
     { icon: HelpCircle, label: "Réponses claires" },
     { icon: MessageCircle, label: "Support réactif" },
     { icon: Clock, label: "Disponible 24/7" },
   ];
+
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(item => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  };
 
   return (
     <>
@@ -62,6 +40,11 @@ const FAQ = () => {
         canonical="https://www.dkautomotive.fr/faq"
       />
       
+      {/* Schema.org FAQPage pré-généré immédiatement pour Googlebot */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schemaData)
+      }} />
+
       <div className="min-h-screen bg-background">
         {/* Hero Section */}
         <Hero
@@ -83,67 +66,37 @@ const FAQ = () => {
           </div>
         </Hero>
 
-        {/* Schema.org FAQPage */}
-        {!isLoading && faqItems.length > 0 && (
-          <script type="application/ld+json" dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "mainEntity": faqItems.map(item => ({
-                "@type": "Question",
-                "name": item.question,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": item.answer
-                }
-              }))
-            })
-          }} />
-        )}
-
         {/* FAQ Content */}
         <section className="section-spacing bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Loader2 className="h-8 w-8 text-dk-navy animate-spin" />
-                  <p className="text-muted-foreground text-sm">Chargement des FAQ...</p>
-                </div>
-              ) : faqItems.length === 0 ? (
-                <div className="text-center py-12">
-                  <HelpCircle className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-                  <p className="text-muted-foreground">Aucune FAQ disponible pour le moment.</p>
-                </div>
-              ) : (
-                <Accordion type="single" collapsible className="space-y-2">
-                  {faqItems.map((item, index) => (
-                    <AccordionItem 
-                      key={item.id} 
-                      value={`item-${item.id}`} 
-                      className="premium-card mb-4 border-none overflow-hidden"
-                    >
-                      <AccordionTrigger className="px-4 py-3 hover:no-underline text-left hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full pr-2">
-                          <div className="flex-shrink-0 w-7 h-7 bg-dk-navy/10 rounded-md flex items-center justify-center">
-                            <span className="text-dk-navy font-semibold text-xs">{index + 1}</span>
-                          </div>
-                          <span className="text-foreground font-medium text-sm leading-relaxed">
-                            {item.question}
-                          </span>
+              <Accordion type="single" collapsible className="space-y-2">
+                {faqItems.map((item, index) => (
+                  <AccordionItem 
+                    key={item.id} 
+                    value={`item-${item.id}`} 
+                    className="premium-card mb-4 border-none overflow-hidden"
+                  >
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline text-left hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 w-full pr-2">
+                        <div className="flex-shrink-0 w-7 h-7 bg-dk-navy/10 rounded-md flex items-center justify-center">
+                          <span className="text-dk-navy font-semibold text-xs">{index + 1}</span>
                         </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 pb-4">
-                        <div className="pl-10">
-                          <p className="text-muted-foreground text-sm leading-relaxed">
-                            {item.answer}
-                          </p>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              )}
+                        <span className="text-foreground font-medium text-sm leading-relaxed">
+                          {item.question}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <div className="pl-10">
+                        <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">
+                          {item.answer}
+                        </p>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </section>
@@ -193,9 +146,10 @@ const FAQ = () => {
               <p className="text-muted-foreground mb-6">
                 Utilisez notre calculateur en ligne pour obtenir un tarif instantané.
               </p>
-              <Button asChild className="bg-dk-navy hover:bg-dk-blue text-white px-8 py-5 text-base">
+              <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
                 <Link to="/devis">
                   Demander un devis gratuit
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
             </div>

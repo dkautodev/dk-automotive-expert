@@ -215,17 +215,11 @@ export const aboutContent: Record<string, any> = {
   "value_ecoconduite_content": {
     "content": "Nos convoyeurs professionnels sont formés pour adopter des pratiques de conduite écologique pour réduire la consommation de carburant et minimiser l'impact environnemental."
   },
-  "value_expertise_image": {
-    "url": "/upload/value_expertise_image-1790462749274.JPG"
-  },
   "value_expertise_title": {
     "title": "EXPERTISE TECHNIQUE"
   },
   "value_expertise_content": {
     "content": "Nos convoyeurs professionnels sont experts dans la connaissance technique des différents véhicules, leur permettant de s'adapter à toutes les situations et de garantir un convoyage sécurisé et mises en main optimales."
-  },
-  "value_service_image": {
-    "url": "/lovable-uploads/2b49a059-d379-4b8f-847a-628ff2c1a7bc.jpg"
   },
   "value_service_title": {
     "title": "SERVICE SUR-MESURE"

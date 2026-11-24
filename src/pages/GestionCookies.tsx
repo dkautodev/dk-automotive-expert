@@ -1,12 +1,9 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
-import { useCookieManagement } from '@/hooks/useCookieManagement';
-import { Loader2 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { cookieManagementSections } from '@/data/faqAndLegalContent';
 
 const GestionCookies = () => {
-  const { cookieManagementSections, isLoading } = useCookieManagement();
-
   const getCookieManagementSection = (sectionKey: string) => {
     const section = cookieManagementSections.find(item => item.section_key === sectionKey);
     return section?.section_content || '';
@@ -42,38 +39,21 @@ const GestionCookies = () => {
         description="Informations sur l'utilisation des cookies sur le site de DK Automotive. Apprenez comment nous utilisons les cookies et comment vous pouvez les gérer."
         canonical="https://www.dkautomotive.fr/gestion-cookies"
       />
-      {isLoading ? (
-        <main className="flex-grow">
-          <div className="container mx-auto px-4 py-12">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-              <p>Chargement de la gestion des cookies...</p>
-            </div>
-          </div>
-        </main>
-      ) : (
-        <main className="flex-grow">
+      <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Gestion des Cookies</h1>
           
           <div className="max-w-4xl mx-auto space-y-8">
             {renderSection('introduction')}
-
             <Separator />
-
             {renderSection('utilisation')}
-
             <Separator />
-
             {renderSection('gestion')}
-
             <Separator />
-
             {renderSection('contact')}
           </div>
         </div>
-      </main>
-      )}
+      </div>
     </div>
   );
 };

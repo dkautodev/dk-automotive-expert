@@ -1,12 +1,9 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
-import { usePrivacyPolicy } from '@/hooks/usePrivacyPolicy';
-import { Loader2 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { privacyPolicySections } from '@/data/faqAndLegalContent';
 
 const PolitiqueConfidentialite = () => {
-  const { privacyPolicySections, isLoading } = usePrivacyPolicy();
-
   const getPrivacyPolicySection = (sectionKey: string) => {
     const section = privacyPolicySections.find(item => item.section_key === sectionKey);
     return section?.section_content || '';
@@ -42,58 +39,31 @@ const PolitiqueConfidentialite = () => {
         description="Consultez la politique de confidentialité de DK Automotive. Informations sur la collecte, l'utilisation et la protection de vos données personnelles."
         canonical="https://www.dkautomotive.fr/politique-confidentialite"
       />
-      {isLoading ? (
-        <main className="flex-grow">
-          <div className="container mx-auto px-4 py-12">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-              <p>Chargement de la politique de confidentialité...</p>
-            </div>
-          </div>
-        </main>
-      ) : (
-        <main className="flex-grow">
+      <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-8">Politique de confidentialité</h1>
           
           <div className="max-w-4xl mx-auto space-y-8">
             {renderSection('introduction')}
-
             <Separator />
-
             {renderSection('collecte_donnees')}
-
             <Separator />
-
             {renderSection('utilisation_donnees')}
-
             <Separator />
-
             {renderSection('partage_donnees')}
-
             <Separator />
-
             {renderSection('conservation_donnees')}
-
             <Separator />
-
             {renderSection('securite_donnees')}
-
             <Separator />
-
             {renderSection('vos_droits')}
-
             <Separator />
-
             {renderSection('modifications_politique')}
-
             <Separator />
-
             {renderSection('contact')}
           </div>
         </div>
-      </main>
-      )}
+      </div>
     </div>
   );
 };

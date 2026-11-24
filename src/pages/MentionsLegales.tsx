@@ -1,12 +1,9 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
-import { useLegalMentions } from '@/hooks/useLegalMentions';
-import { Loader2 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { legalMentions } from '@/data/faqAndLegalContent';
 
 const MentionsLegales = () => {
-  const { legalMentions, isLoading } = useLegalMentions();
-
   const getLegalMentionValue = (fieldKey: string) => {
     const mention = legalMentions.find(item => item.field_key === fieldKey);
     return mention?.field_value || '';
@@ -23,7 +20,7 @@ const MentionsLegales = () => {
         {title && <h2 className="text-xl font-semibold text-dk-navy mb-4">{title}</h2>}
         {content && (
           <div className="bg-gray-50 p-6 rounded-lg">
-            <p className="text-gray-700 leading-relaxed">{content}</p>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{content}</p>
           </div>
         )}
       </section>
@@ -37,17 +34,7 @@ const MentionsLegales = () => {
         description="Consultez les mentions légales de DK Automotive. Informations sur la société, l'hébergement du site et la protection des données."
         canonical="https://www.dkautomotive.fr/mentions-legales"
       />
-      {isLoading ? (
-        <main className="flex-grow">
-          <div className="container mx-auto px-4 py-12">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-              <p>Chargement des mentions légales...</p>
-            </div>
-          </div>
-        </main>
-      ) : (
-        <main className="flex-grow">
+      <div className="flex-grow">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-center text-dk-navy mb-12">Mentions Légales</h1>
           
@@ -81,20 +68,14 @@ const MentionsLegales = () => {
 
             {/* Sections avec titre + contenu regroupés */}
             {renderSection('hebergement_titre', 'hebergement_contenu')}
-
             {renderSection('propriete_intellectuelle_titre', 'propriete_intellectuelle_contenu')}
-
             {renderSection('responsabilite_titre', 'responsabilite_contenu')}
-
             {renderSection('protection_donnees_titre', 'protection_donnees_contenu')}
-
             {renderSection('liens_hypertextes_titre', 'liens_hypertextes_contenu')}
-
             {renderSection('cookies_titre', 'cookies_contenu')}
           </div>
         </div>
-      </main>
-      )}
+      </div>
     </div>
   );
 };
