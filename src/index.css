@@ -145,11 +145,35 @@
   }
   
   .btn-premium {
-    @apply inline-flex items-center justify-center rounded-lg px-8 py-3 text-sm font-semibold transition-all duration-300 active:scale-95 shadow-lg shadow-dk-navy/10 hover:shadow-xl hover:shadow-dk-navy/20;
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 text-base font-semibold tracking-wide transition-all duration-300 active:scale-95 shadow-lg shadow-dk-navy/15 hover:shadow-xl hover:shadow-dk-navy/25 hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3.5 text-base font-semibold border-2 border-dk-navy text-dk-navy bg-white hover:bg-dk-navy hover:text-white transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md;
   }
 
   .glass-card {
     @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden;
+  }
+
+  .check-bullet-icon {
+    @apply w-5 h-5 rounded-full bg-dk-navy/10 text-dk-navy flex items-center justify-center flex-shrink-0 mt-0.5;
+  }
+
+  .check-bullet-item {
+    @apply flex items-start gap-3 text-muted-foreground text-base leading-relaxed;
+  }
+
+  .img-frame {
+    position: relative;
+  }
+
+  .img-frame-accent {
+    @apply absolute -inset-4 bg-dk-navy/5 rounded-2xl scale-95 transition-transform duration-500 pointer-events-none;
+  }
+
+  .img-frame:hover .img-frame-accent {
+    transform: scale(1);
   }
 }
 
@@ -159,10 +183,10 @@
   }
 
   .section-spacing {
-    @apply py-12 md:py-20;
+    @apply py-14 md:py-24;
   }
 
   .img-standard {
-    @apply aspect-video object-cover rounded-xl;
+    @apply aspect-video w-full object-cover rounded-2xl shadow-xl relative z-10;
   }
 }

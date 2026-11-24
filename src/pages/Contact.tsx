@@ -94,7 +94,7 @@ const Contact = () => {
           title="Contactez-nous"
           description="Besoin d'un devis personnalisé ? Des questions sur nos prestations ? Notre équipe est à votre écoute."
           backgroundImage="/upload/hero_background-1790463219069.webp"
-          height="min-h-[350px] md:min-h-[450px]"
+          height="min-h-[440px] md:min-h-[520px]"
         >
           {/* Trust badges */}
           <div className="flex flex-wrap gap-4 md:gap-8 mt-8">

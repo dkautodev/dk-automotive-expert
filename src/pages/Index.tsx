@@ -56,7 +56,7 @@ const Index = () => {
         <div className="space-y-4 mb-10">
           {[1, 2, 3].map((num) => (
             <div key={num} className="flex items-center gap-3 text-white/90">
-              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                 <Check className="w-4 h-4 text-white" aria-hidden="true" />
               </div>
               <span className="text-base md:text-lg font-light tracking-wide">
@@ -67,7 +67,7 @@ const Index = () => {
         </div>
 
         <Link to="/devis">
-          <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-xl px-10 py-7 text-lg group">
+          <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
             Demander mon devis sur mesure
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
@@ -76,42 +76,46 @@ const Index = () => {
 
       <section className="section-spacing bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center text-center mb-16">
+          <div className="flex flex-col items-center text-center">
             <span className="text-dk-navy uppercase tracking-[0.2em] text-xs font-bold mb-4 border-b-2 border-dk-navy/20 pb-2">
               Expertise & Confiance
             </span>
             <h2 className="max-w-3xl mx-auto">
               {getText('trust_section_title', 'Faites confiance à DK Automotive')}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl mx-auto mt-4">
+            <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl mx-auto mt-2">
               {getText('trust_section_subtitle', "L'expert du convoyage automobile sur route")}
             </p>
           </div>
         </div>
       </section>
 
+      {/* Section 1: Expertise (Image gauche sur desktop, Image bas sur mobile) */}
       <section className="section-spacing bg-gray-50/50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative group">
-              <div className="absolute -inset-4 bg-dk-navy/5 rounded-2xl scale-95 group-hover:scale-100 transition-transform duration-500" />
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="img-frame order-2 md:order-1">
+              <div className="img-frame-accent" />
               <img
                 alt="Voiture sur route - DK Automotive convoyage professionnel"
-                className="img-standard shadow-xl relative z-10"
+                className="img-standard"
                 loading="lazy"
                 src={getImageUrl('section_expertise_image', '/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.webp')}
               />
             </div>
-            <div className="space-y-6">
+            <div className="space-y-6 order-1 md:order-2">
               <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                 {getText('section_expertise_title', 'Expertise et dévouement des chauffeurs')}
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed text-base">
                 {getText('section_expertise_content', "Chez DK AUTOMOTIVE, nos chauffeurs professionnels ont été sélectionnés pour leur expérience et leur engagement exceptionnels. Formés à des procédures strictes et à l'écoconduite, ils garantissent un convoyage sûr et écologique de votre véhicule.")}
               </p>
-              <div className="pt-4">
-                <Link to="/contact" className="inline-flex items-center text-dk-navy font-semibold hover:gap-2 transition-all">
-                  Contactez-nous <ArrowRight className="ml-2 h-4 w-4" />
+              <div className="pt-2">
+                <Link to="/contact">
+                  <Button className="btn-secondary group">
+                    Contactez-nous
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
                 </Link>
               </div>
             </div>
@@ -119,29 +123,33 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Section 2: Délais (Image droite sur desktop, Image bas sur mobile) */}
       <section className="section-spacing bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 order-2 md:order-1">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="space-y-6 order-1">
               <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                 {getText('section_delais_title', 'Délais de livraison rapides')}
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed text-base">
                 {getText('section_delais_content', 'DK AUTOMOTIVE se distingue par la réduction significative des délais de livraison. Avec une garantie de prise en charge rapide sous 48h, nous offrons un service rapide et fiable en France.')}
               </p>
-              <ul className="space-y-4 pt-4">
+              <ul className="space-y-3 pt-2">
                 {[1, 2, 3].map((num) => (
-                  <li key={num} className="flex items-center gap-3 text-muted-foreground">
-                    <Check className="w-5 h-5 text-dk-navy flex-shrink-0" aria-hidden="true" />
+                  <li key={num} className="check-bullet-item">
+                    <span className="check-bullet-icon">
+                      <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                    </span>
                     <span>{getText(`section_delais_point_${num}`, '')}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="order-1 md:order-2">
+            <div className="img-frame order-2">
+              <div className="img-frame-accent" />
               <img
                 alt="Livraison rapide de véhicules"
-                className="img-standard shadow-lg"
+                className="img-standard"
                 loading="lazy"
                 src={getImageUrl('section_delais_image', '/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.webp')}
               />
@@ -150,41 +158,44 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Section 3: Tarification (Image gauche sur desktop, Image bas sur mobile) */}
       <section className="section-spacing bg-gray-50/50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative group">
-              <div className="absolute -inset-4 bg-dk-navy/5 rounded-2xl scale-95 group-hover:scale-100 transition-transform duration-500" />
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="img-frame order-2 md:order-1">
+              <div className="img-frame-accent" />
               <img
                 alt="Remise de clés de véhicule"
-                className="img-standard shadow-xl relative z-10"
+                className="img-standard"
                 loading="lazy"
                 src={getImageUrl('section_tarification_image', '/upload/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.webp')}
               />
             </div>
-            <div className="space-y-6">
+            <div className="space-y-6 order-1 md:order-2">
               <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                 {getText('section_tarification_title', 'Tarification transparente et personnalisée')}
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed text-base">
                 {getText('section_tarification_content', "Nous offrons des tarifs transparents et adaptés, incluant tous les frais, pour répondre aux besoins uniques de chaque client, avec un engagement pour un service éco-responsable.")}
               </p>
-              <ul className="space-y-4 pt-4">
+              <ul className="space-y-3 pt-2">
                 {[1, 2, 3].map((num) => (
-                  <li key={num} className="flex items-center gap-3 text-muted-foreground">
-                    <Check className="w-5 h-5 text-dk-navy flex-shrink-0" aria-hidden="true" />
+                  <li key={num} className="check-bullet-item">
+                    <span className="check-bullet-icon">
+                      <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                    </span>
                     <span>{getText(`section_tarification_point_${num}`, '')}</span>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          <div className="mt-20 text-center mx-auto max-w-2xl bg-white p-8 rounded-2xl shadow-sm border border-dk-navy/5">
-            <p className="text-muted-foreground mb-8 text-lg">
+          <div className="mt-16 text-center mx-auto max-w-2xl bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-dk-navy/5">
+            <p className="text-muted-foreground mb-6 text-lg">
               {getText('section_tarification_cta_text', 'Prêt à découvrir la différence avec nos services de convoyage professionnels ?')}
             </p>
             <Link to="/devis">
-              <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-xl px-10 py-7 text-lg group">
+              <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
                 Obtenez votre devis gratuitement !
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -302,7 +313,7 @@ const Index = () => {
                 {getText('how_it_works_cta_title', 'Commencez dès maintenant !')}
               </h3>
               <Link to="/devis">
-                <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-xl px-10 py-7 text-lg group">
+                <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
                   {getText('how_it_works_cta_button', 'Demandez votre devis gratuitement')}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Button>

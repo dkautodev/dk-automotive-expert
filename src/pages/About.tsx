@@ -43,50 +43,60 @@ const About = () => {
           subtitle={getContentValue('hero_title', 'title')}
           description={getContentValue('hero_subtitle', 'subtitle')}
           backgroundImage="/upload/hero_background-1790463219069.webp"
-          height="min-h-[400px] md:min-h-[500px]"
+          height="min-h-[480px] md:min-h-[560px]"
         />
 
         {/* Section Pourquoi choisir DK Automotive */}
         <section className="section-spacing px-4 bg-gray-50/50">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div>
+            <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div className="img-frame order-2 md:order-1">
+                <div className="img-frame-accent" />
                 {getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp') && (
                   <img 
                     alt="DK Automotive expertise" 
-                    className="img-standard shadow-xl" 
+                    className="img-standard" 
+                    loading="lazy"
                     src={getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp')} 
                   />
                 )}
               </div>
-              <div className="space-y-4">
+              <div className="space-y-6 order-1 md:order-2">
                 <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
                   {getContentValue('why_choose_title', 'title')}
                 </h2>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed text-base">
                   {getContentValue('why_choose_description')}
                 </p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_1')}</span>
+                <div className="space-y-3 pt-2">
+                  <div className="check-bullet-item">
+                    <span className="check-bullet-icon">
+                      <Check className="w-3.5 h-3.5" />
+                    </span>
+                    <span>{getContentValue('why_choose_benefit_1')}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_2')}</span>
+                  <div className="check-bullet-item">
+                    <span className="check-bullet-icon">
+                      <Check className="w-3.5 h-3.5" />
+                    </span>
+                    <span>{getContentValue('why_choose_benefit_2')}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_3')}</span>
+                  <div className="check-bullet-item">
+                    <span className="check-bullet-icon">
+                      <Check className="w-3.5 h-3.5" />
+                    </span>
+                    <span>{getContentValue('why_choose_benefit_3')}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="text-dk-navy h-5 w-5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{getContentValue('why_choose_benefit_4')}</span>
+                  <div className="check-bullet-item">
+                    <span className="check-bullet-icon">
+                      <Check className="w-3.5 h-3.5" />
+                    </span>
+                    <span>{getContentValue('why_choose_benefit_4')}</span>
                   </div>
                 </div>
-                <div className="pt-6">
+                <div className="pt-2">
                   <Link to="/devis">
-                    <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-xl px-10 py-7 text-lg group">
+                    <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
                       Demander mon devis sur mesure
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
@@ -100,31 +110,38 @@ const About = () => {
         {/* Section Chauffeurs Expérimentés */}
         <section className="section-spacing px-4 bg-white">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
-                  {getContentValue('drivers_title', 'title')}
-                </h2>
-                <h3 className="text-xl md:text-2xl font-bold text-dk-navy">
-                  {getContentValue('drivers_subtitle', 'title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
+            <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div className="space-y-6 order-1">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-dk-navy mb-2">
+                    {getContentValue('drivers_title', 'title')}
+                  </h2>
+                  <h3 className="text-xl md:text-2xl font-bold text-dk-navy/90">
+                    {getContentValue('drivers_subtitle', 'title')}
+                  </h3>
+                </div>
+                <p className="text-muted-foreground leading-relaxed text-base">
                   {getContentValue('drivers_description_1')}
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed text-base">
                   {getContentValue('drivers_description_2')}
                 </p>
                 <div className="pt-2">
-                  <Link to="/contact" className="inline-block bg-dk-navy text-white px-6 py-3 rounded hover:bg-dk-navy/90 transition-colors">
-                    Contactez-nous
+                  <Link to="/contact">
+                    <Button className="btn-secondary group">
+                      Contactez-nous
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Button>
                   </Link>
                 </div>
               </div>
-              <div>
+              <div className="img-frame order-2">
+                <div className="img-frame-accent" />
                 {getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp') && (
                   <img 
                     alt="Chauffeurs professionnels DK Automotive" 
-                    className="img-standard shadow-xl" 
+                    className="img-standard" 
+                    loading="lazy"
                     src={getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp')} 
                   />
                 )}
@@ -192,29 +209,33 @@ const About = () => {
         {/* Section Expertise en Convoyage */}
         <section className="section-spacing px-4 bg-white">
           <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
+            <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div className="img-frame order-2 md:order-1">
+                <div className="img-frame-accent" />
                 {getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp') && (
                   <img 
                     alt="Expertise en convoyage automobile" 
-                    className="img-standard shadow-xl" 
+                    className="img-standard" 
+                    loading="lazy"
                     src={getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp')} 
                   />
                 )}
               </div>
-              <div className="space-y-4">
-                <h2 className="text-2xl md:text-3xl font-bold text-dk-navy">
-                  {getContentValue('expertise_title', 'title')}
-                </h2>
-                <h3 className="text-xl md:text-2xl font-bold">
-                  {getContentValue('expertise_subtitle', 'title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
+              <div className="space-y-6 order-1 md:order-2">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-dk-navy mb-2">
+                    {getContentValue('expertise_title', 'title')}
+                  </h2>
+                  <h3 className="text-xl md:text-2xl font-bold text-dk-navy/90">
+                    {getContentValue('expertise_subtitle', 'title')}
+                  </h3>
+                </div>
+                <p className="text-muted-foreground leading-relaxed text-base">
                   {getContentValue('expertise_description')}
                 </p>
                 <div className="pt-2">
                   <Link to="/devis">
-                    <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-xl px-10 py-7 text-lg group">
+                    <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
                       Réserver mon transport en toute confiance
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
@@ -237,11 +258,11 @@ const About = () => {
             <p className="text-muted-foreground mb-4">
               {getContentValue('final_subtitle', 'subtitle')}
             </p>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-8 text-base">
               {getContentValue('final_description')}
             </p>
             <Link to="/devis">
-              <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue hover:shadow-xl px-10 py-7 text-lg group">
+              <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
                 Demandez votre devis gratuitement
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>

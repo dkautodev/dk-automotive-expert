@@ -286,7 +286,7 @@ export const socialLinks = [
     id: "linkedin",
     platform: "linkedin",
     platform_label: "LinkedIn",
-    url: "https://www.linkedin.com/company/108387928/",
+    url: "https://www.linkedin.com/company/l-equipe-dk-automotive/",
     icon: "linkedin",
   },
 ];
