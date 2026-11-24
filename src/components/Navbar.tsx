@@ -2,9 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Facebook, Instagram, Linkedin, Twitter, Youtube, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useProfessionalSpaceSettings } from "@/hooks/useProfessionalSpaceSettings";
-import { usePageContents } from "@/hooks/usePageContents";
-import { useSocialLinks } from "@/hooks/useSocialLinks";
+import { socialLinks, professionalSpaceUrl } from "@/data/siteContent";
 
 const getIconComponent = (iconName: string | null) => {
   switch (iconName) {
@@ -20,16 +18,9 @@ const getIconComponent = (iconName: string | null) => {
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { getProfessionalSpaceUrl } = useProfessionalSpaceSettings();
-  const { contents } = usePageContents('navbar');
-  const { socialLinks } = useSocialLinks();
 
   const isActive = (path: string) => location.pathname === path;
-  const professionalSpaceUrl = getProfessionalSpaceUrl();
-
-  // Get the logo URL from page contents or use default
-  const logoContent = contents.find(item => item.block_key === 'logo');
-  const logoUrl = logoContent?.content_value || '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+  const logoUrl = '/upload/logo-1750513203662.webp';
 
   const navItems = [
     { path: "/", label: "Accueil" },
@@ -91,7 +82,7 @@ const Navbar = () => {
                   className="h-10 w-auto object-fill"
                   src={logoUrl}
                   onError={(e) => {
-                    e.currentTarget.src = '/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png';
+                    e.currentTarget.src = '/upload/logo-1750513203662.webp';
                   }}
                 />
               </Link>

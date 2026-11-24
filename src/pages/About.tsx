@@ -1,28 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Check, Loader2, ArrowRight, Leaf, ShieldCheck, Settings2 } from 'lucide-react';
-import { useAboutPageContents } from '@/hooks/useAboutPageContents';
+import { Check, ArrowRight, Leaf, ShieldCheck, Settings2 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import Hero from '@/components/common/Hero';
+import { getAboutValue as getContentValue, getAboutImage as getImageUrl } from '@/data/siteContent';
 
 const About = () => {
-  const { contents, isLoading } = useAboutPageContents();
-
-  const getContentByKey = (key: string) => {
-    const content = contents.find(c => c.block_key === key);
-    return content?.content_json || {};
-  };
-
-  const getContentValue = (key: string, field: string = 'content') => {
-    const contentData = getContentByKey(key);
-    return contentData[field] || '';
-  };
-
-  const getImageUrl = (key: string) => {
-    const contentData = getContentByKey(key);
-    return contentData.url || '';
-  };
 
   // Schema.org structured data for AboutPage
   const schemaData = {
@@ -48,26 +32,17 @@ const About = () => {
         description="Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés. Service fiable et sécurisé."
         canonical="https://www.dkautomotive.fr/about"
       />
-      {isLoading ? (
-        <div className="min-h-screen bg-white">
-          <div className="flex items-center justify-center py-32">
-            <Loader2 className="w-8 h-8 animate-spin mr-2" />
-            <span>Chargement...</span>
-          </div>
-        </div>
-      ) : (
-        <>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-          />
-          <main className="min-h-screen bg-white animate-fadeIn">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
+      <main className="min-h-screen bg-white animate-fadeIn">
         {/* Hero Section */}
         <Hero
           title={getContentValue('hero_main_title', 'title')}
           subtitle={getContentValue('hero_title', 'title')}
           description={getContentValue('hero_subtitle', 'subtitle')}
-          backgroundImage="/upload/51603c32-87b6-4e5d-ab03-7352caca679d.png"
+          backgroundImage="/upload/hero_background-1790463219069.webp"
           height="min-h-[400px] md:min-h-[500px]"
         />
 
@@ -76,11 +51,11 @@ const About = () => {
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
-                {getImageUrl('why_choose_image') && (
+                {getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp') && (
                   <img 
                     alt="DK Automotive expertise" 
                     className="img-standard shadow-xl" 
-                    src={getImageUrl('why_choose_image')} 
+                    src={getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp')} 
                   />
                 )}
               </div>
@@ -146,11 +121,11 @@ const About = () => {
                 </div>
               </div>
               <div>
-                {getImageUrl('drivers_image') && (
+                {getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp') && (
                   <img 
                     alt="Chauffeurs professionnels DK Automotive" 
                     className="img-standard shadow-xl" 
-                    src={getImageUrl('drivers_image')} 
+                    src={getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp')} 
                   />
                 )}
               </div>
@@ -219,11 +194,11 @@ const About = () => {
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                {getImageUrl('expertise_image') && (
+                {getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp') && (
                   <img 
                     alt="Expertise en convoyage automobile" 
                     className="img-standard shadow-xl" 
-                    src={getImageUrl('expertise_image')} 
+                    src={getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp')} 
                   />
                 )}
               </div>
@@ -274,8 +249,6 @@ const About = () => {
           </div>
         </section>
       </main>
-    </>
-    )}
     </>
   );
 };

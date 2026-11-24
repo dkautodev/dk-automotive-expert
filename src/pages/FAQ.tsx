@@ -67,7 +67,7 @@ const FAQ = () => {
         <Hero
           title="Questions Fréquentes"
           description="Trouvez toutes les réponses à vos interrogations sur notre service de convoyage de véhicules"
-          backgroundImage="/upload/51603c32-87b6-4e5d-ab03-7352caca679d.png"
+          backgroundImage="/upload/hero_background-1790463219069.webp"
           height="min-h-[350px] md:min-h-[450px]"
         >
           {/* Trust badges */}

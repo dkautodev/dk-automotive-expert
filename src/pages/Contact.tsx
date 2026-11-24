@@ -93,7 +93,7 @@ const Contact = () => {
         <Hero
           title="Contactez-nous"
           description="Besoin d'un devis personnalisé ? Des questions sur nos prestations ? Notre équipe est à votre écoute."
-          backgroundImage="/upload/51603c32-87b6-4e5d-ab03-7352caca679d.png"
+          backgroundImage="/upload/hero_background-1790463219069.webp"
           height="min-h-[350px] md:min-h-[450px]"
         >
           {/* Trust badges */}

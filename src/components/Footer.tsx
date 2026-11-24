@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ExternalLink } from 'lucide-react';
+import { professionalSpaceUrl } from '@/data/siteContent';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -13,7 +14,7 @@ const Footer = () => {
 
   const serviceLinks = [
     { label: 'Demander un devis', to: '/devis' },
-    { label: 'Espace professionnel', href: 'https://app-private.dkautomotive.fr/home', external: true },
+    { label: 'Espace professionnel', href: `${professionalSpaceUrl}/home`, external: true },
   ];
 
   const legalLinks = [
@@ -35,7 +36,7 @@ const Footer = () => {
             <Link to="/" className="inline-block mb-6">
               <img
                 alt="DK Automotive Logo"
-                src="/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png"
+                src="/upload/logo-1750513203662.webp"
                 className="h-12 w-auto filter invert grayscale"
               />
             </Link>

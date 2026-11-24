@@ -1,40 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight, Check, ClipboardList, PhoneCall, Truck } from 'lucide-react';
-import { usePageContents } from '@/hooks/usePageContents';
 import SEO from '@/components/SEO';
 import Hero from '@/components/common/Hero';
+import { getIndexText as getText, getIndexImage as getImageUrl } from '@/data/siteContent';
+
 const Index = () => {
-  const {
-    contents,
-    isLoading
-  } = usePageContents('index');
-
-  // Helper function pour récupérer le contenu d'un bloc
-  const getContent = (blockKey: string) => {
-    const content = contents.find(c => c.block_key === blockKey);
-    if (!content) return null;
-    if (content.content_json) {
-      return content.content_json;
-    }
-    return {
-      value: content.content_value
-    };
-  };
-
-  // Helper function pour récupérer une image
-  const getImageUrl = (blockKey: string, fallback: string) => {
-    const content = getContent(blockKey);
-    return content?.url || fallback;
-  };
-
-  // Helper function pour récupérer du texte
-  const getText = (blockKey: string, fallback: string) => {
-    const content = getContent(blockKey);
-    return content?.title || content?.subtitle || content?.description || content?.content || content?.text || content?.value || fallback;
-  };
-
   // Schema.org JSON-LD pour le référencement local
   const schemaData = {
     "@context": "https://schema.org",
@@ -69,43 +40,17 @@ const Index = () => {
         canonical="https://www.dkautomotive.fr/" 
       />
 
-      {isLoading ? (
-        <>
-          {/* Hero Skeleton */}
-          <section className="relative min-h-[500px] md:min-h-[700px] bg-muted">
-            <div className="container mx-auto px-4 py-20">
-              <div className="max-w-2xl space-y-6">
-                <Skeleton className="h-10 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="h-6 w-2/3" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-12 w-48" />
-              </div>
-            </div>
-          </section>
-          {/* Trust Section Skeleton */}
-          <section className="py-16">
-            <div className="container mx-auto px-4 text-center">
-              <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
-              <Skeleton className="h-8 w-1/3 mx-auto mb-4" />
-              <Skeleton className="h-6 w-2/3 mx-auto" />
-            </div>
-          </section>
-        </>
-      ) : (
-        <>
-          {/* Schema.org JSON-LD */}
-          <script type="application/ld+json" dangerouslySetInnerHTML={{
-            __html: JSON.stringify(schemaData)
-          }} />
+      {/* Schema.org JSON-LD */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schemaData)
+      }} />
 
-          <main className="animate-fadeIn">
+      <main className="animate-fadeIn">
       {/* Hero Section */}
       <Hero
         title={getText('hero_title', 'Convoyage de véhicules par route en France')}
         description={getText('hero_description', 'Confiez-nous le convoyage de vos véhicules, pour un service sur mesure, écologique et économique.')}
-        backgroundImage={getImageUrl('hero_background', '/upload/51603c32-87b6-4e5d-ab03-7352caca679d.png')}
+        backgroundImage={getImageUrl('hero_background', '/upload/hero_background-1790463219069.webp')}
         height="min-h-[550px] md:min-h-[750px]"
       >
         <div className="space-y-4 mb-10">
@@ -154,7 +99,7 @@ const Index = () => {
                 alt="Voiture sur route - DK Automotive convoyage professionnel"
                 className="img-standard shadow-xl relative z-10"
                 loading="lazy"
-                src={getImageUrl('section_expertise_image', '/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.jpg')}
+                src={getImageUrl('section_expertise_image', '/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.webp')}
               />
             </div>
             <div className="space-y-6">
@@ -198,7 +143,7 @@ const Index = () => {
                 alt="Livraison rapide de véhicules"
                 className="img-standard shadow-lg"
                 loading="lazy"
-                src={getImageUrl('section_delais_image', '/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.jpg')}
+                src={getImageUrl('section_delais_image', '/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.webp')}
               />
             </div>
           </div>
@@ -214,7 +159,7 @@ const Index = () => {
                 alt="Remise de clés de véhicule"
                 className="img-standard shadow-xl relative z-10"
                 loading="lazy"
-                src={getImageUrl('section_tarification_image', '/upload/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.jpg')}
+                src={getImageUrl('section_tarification_image', '/upload/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.webp')}
               />
             </div>
             <div className="space-y-6">
@@ -366,9 +311,7 @@ const Index = () => {
           </div>
         </div>
       </section>
-        </main>
-      </>
-      )}
+      </main>
     </div>
   );
 };
