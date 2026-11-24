@@ -9,9 +9,9 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const DEFAULT_TITLE = "DK Automotive - Convoyage Automobile France";
+const DEFAULT_TITLE = "Convoyage Automobile France & Île-de-France | DK Automotive";
 const DEFAULT_DESCRIPTION =
-  "Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h. Plus de 2000 missions réalisées.";
+  "Société de convoyage de véhicules par route en Île-de-France et France entière. Acheminement sécurisé porte-à-porte avec assurance tous risques incluse.";
 const SITE_NAME = "DK Automotive";
 const DEFAULT_IMAGE = "https://www.dkautomotive.fr/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png";
 
