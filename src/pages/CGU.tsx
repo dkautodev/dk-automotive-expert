@@ -5,7 +5,7 @@ import { cguSections } from '@/data/faqAndLegalContent';
 
 const CGU = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col">
       <SEO 
         title="CGU - Conditions Générales d'Utilisation"
         description="Consultez les conditions générales d'utilisation du site de DK Automotive. Informations sur l'accès au site, son utilisation et la propriété intellectuelle."
@@ -38,7 +38,7 @@ const CGU = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

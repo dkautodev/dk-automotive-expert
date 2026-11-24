@@ -33,7 +33,7 @@ const PolitiqueConfidentialite = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col">
       <SEO 
         title="Politique de Confidentialité"
         description="Consultez la politique de confidentialité de DK Automotive. Informations sur la collecte, l'utilisation et la protection de vos données personnelles."
@@ -64,7 +64,7 @@ const PolitiqueConfidentialite = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

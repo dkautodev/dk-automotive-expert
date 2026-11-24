@@ -15,7 +15,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center bg-gray-50 px-4 py-16">
+    <main className="min-h-[70vh] flex items-center justify-center bg-gray-50 px-4 py-16">
       <SEO title="Page non trouvée" noIndex={true} />
       <div className="text-center max-w-md mx-auto">
         <span className="text-dk-navy text-6xl md:text-8xl font-extrabold tracking-tight">404</span>
@@ -37,7 +37,7 @@ const NotFound = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -33,7 +33,7 @@ const GestionCookies = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col">
       <SEO 
         title="Gestion des Cookies"
         description="Informations sur l'utilisation des cookies sur le site de DK Automotive. Apprenez comment nous utilisons les cookies et comment vous pouvez les gérer."
@@ -54,7 +54,7 @@ const GestionCookies = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

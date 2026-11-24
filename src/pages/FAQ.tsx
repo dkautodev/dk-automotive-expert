@@ -65,7 +65,7 @@ const FAQ = () => {
         __html: JSON.stringify(schemaData)
       }} />
 
-      <div className="min-h-screen bg-background">
+      <main className="min-h-screen bg-background">
         {/* Hero Section */}
         <Hero
           title="Questions Fréquentes"
@@ -175,7 +175,7 @@ const FAQ = () => {
             </div>
           </div>
         </section>
-      </div>
+      </main>
     </>
   );
 };

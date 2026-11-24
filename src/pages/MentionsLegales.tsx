@@ -28,7 +28,7 @@ const MentionsLegales = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col">
       <SEO 
         title="Mentions Légales"
         description="Consultez les mentions légales de DK Automotive. Informations sur la société, l'hébergement du site et la protection des données."
@@ -76,7 +76,7 @@ const MentionsLegales = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

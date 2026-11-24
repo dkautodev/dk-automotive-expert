@@ -5,7 +5,7 @@ import { cgvSections } from '@/data/faqAndLegalContent';
 
 const CGV = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col">
       <SEO 
         title="CGV - Conditions Générales de Vente"
         description="Consultez les conditions générales de vente de DK Automotive. Informations sur nos services de convoyage, tarifs et responsabilités."
@@ -38,7 +38,7 @@ const CGV = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
