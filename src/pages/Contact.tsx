@@ -71,10 +71,10 @@ const Contact = () => {
     "mainEntity": {
       "@type": "Organization",
       "name": "DK Automotive",
-      "logo": "https://app-private.dkautomotive.fr/upload/4922f807-dfd8-4cf6-b440-ee35efade638.png",
+      "url": "https://www.dkautomotive.fr",
+      "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+33123456789", // Placeholder, ideally should come from config
         "contactType": "customer service",
         "email": "contact@dkautomotive.fr"
       }
@@ -82,7 +82,11 @@ const Contact = () => {
   };
 
   return <div className="min-h-screen flex flex-col bg-background">
-      <SEO title="Contact" description="Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules. Notre équipe vous répond rapidement pour un service personnalisé." canonical="https://www.dkautomotive.fr/contact" />
+      <SEO 
+        title="Contactez DK Automotive — Devis Flotte & Convoyage Voiture | DK Automotive" 
+        description="Contactez notre équipe de convoyage de véhicules. Demandes spécifiques, transferts de flotte ou questions logistiques partout en France." 
+        canonical="https://www.dkautomotive.fr/contact" 
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}

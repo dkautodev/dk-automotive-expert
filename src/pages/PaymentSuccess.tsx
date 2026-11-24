@@ -49,6 +49,7 @@ const PaymentSuccess = () => {
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <SEO title="Paiement en cours" noIndex={true} />
         <Card className="max-w-md w-full mx-4">
           <CardContent className="p-8 text-center">
             <Loader2 className="h-16 w-16 animate-spin text-green-600 mx-auto mb-4" />
@@ -67,6 +68,7 @@ const PaymentSuccess = () => {
   if (status === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <SEO title="Erreur paiement" noIndex={true} />
         <Card className="max-w-md w-full mx-4">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
@@ -98,6 +100,7 @@ const PaymentSuccess = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <SEO title="Confirmation de réservation" noIndex={true} />
       <SEO title="Paiement Réussi" noIndex={true} />
       <Card className="max-lg w-full mx-4">
         <CardContent className="p-8 text-center">

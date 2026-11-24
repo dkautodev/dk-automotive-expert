@@ -28,8 +28,8 @@ const About = () => {
   return (
     <>
       <SEO 
-        title="À propos - Expert Convoyage Automobile"
-        description="Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés. Service fiable et sécurisé."
+        title="À Propos — Société de Convoyage de Véhicules par Route | DK Automotive"
+        description="Découvrez DK Automotive, société experte en convoyage automobile par route depuis 2018. Plus de 2 000 missions de transfert sécurisé pour particuliers et professionnels."
         canonical="https://www.dkautomotive.fr/about"
       />
       <script

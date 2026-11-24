@@ -4,12 +4,33 @@ import SEO from '@/components/SEO';
 import { FileText, Shield, Clock } from 'lucide-react';
 
 const Devis = () => {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Convoyage automobile par la route",
+    "name": "Devis de convoyage automobile immédiat",
+    "description": "Calculateur et devis en ligne immédiat pour le convoyage de véhicules particuliers ou utilitaires en France et Europe.",
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "DK Automotive",
+      "url": "https://www.dkautomotive.fr"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "France"
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEO 
-        title="Demander un devis" 
-        description="Obtenez un devis gratuit et immédiat pour le convoyage de votre véhicule. Service rapide, tarifs transparents et assurance tous risques incluse."
+        title="Devis Convoyage Voiture Gratuit & Tarif Immédiat | DK Automotive" 
+        description="Calculez le prix de votre convoyage automobile en quelques clics. Devis immédiat, gratuit, sans engagement, assurance tous risques incluse."
         canonical="https://www.dkautomotive.fr/devis"
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       
       <main className="flex-1 animate-fadeIn">

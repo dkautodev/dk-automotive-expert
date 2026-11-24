@@ -10,6 +10,7 @@ import { ArrowLeft, CreditCard, Car, User, MapPin, Calendar, Phone, Loader2 } fr
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import SEO from '@/components/SEO';
+import SEO from '@/components/SEO';
 const FUEL_OPTIONS = [{
   value: 'essence',
   label: 'Essence'
@@ -262,6 +263,7 @@ const PreCommande = () => {
   };
   if (!quoteData) {
     return <div className="min-h-screen flex flex-col bg-white">
+        <SEO title="Réservation de convoyage" noIndex={true} />
         <main className="flex-1 animate-fadeIn">
           <div className="container mx-auto px-4 py-16">
             <Card className="max-w-2xl mx-auto">
@@ -280,6 +282,7 @@ const PreCommande = () => {
       </div>;
   }
   return <div className="min-h-screen flex flex-col bg-gray-50">
+      <SEO title="Réservation de convoyage" noIndex={true} />
       <SEO title="Finaliser votre commande" noIndex={true} />
       <main className="flex-1 animate-fadeIn">
         <div className="container mx-auto px-4 py-8">

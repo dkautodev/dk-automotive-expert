@@ -11,11 +11,10 @@ const Index = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "DK Automotive",
-    "description": "Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h.",
-    "url": "https://www.dkautomotive.fr",
-    "logo": "https://www.dkautomotive.fr/upload/64b69a10-c303-48f4-9b56-7bee8e58a109.png",
-    "image": "https://app-private.dkautomotive.fr/upload/4922f807-dfd8-4cf6-b440-ee35efade638.png",
-    "telephone": "+33",
+    "description": "Expert en convoyage de véhicules par route en France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h.",
+    "url": "https://www.dkautomotive.fr/",
+    "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
+    "image": "https://www.dkautomotive.fr/upload/hero_background-1790463219069.webp",
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "FR"
@@ -25,18 +24,13 @@ const Index = () => {
       "name": "France"
     },
     "serviceType": ["Convoyage automobile", "Transport de véhicules", "Livraison de voitures"],
-    "priceRange": "€€",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "2000"
-    }
+    "priceRange": "€€"
   };
   return (
     <div className="min-h-screen bg-white">
       <SEO 
-        title="Accueil" 
-        description="Expert en convoyage de véhicules par route en France depuis 2018. Transport sécurisé, tarifs transparents, prise en charge sous 48h. Plus de 2000 missions réalisées par des chauffeurs professionnels." 
+        title="Convoyage Automobile France & Île-de-France | DK Automotive" 
+        description="Société de convoyage de véhicules par route en France et Île-de-France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h." 
         canonical="https://www.dkautomotive.fr/" 
       />
 
