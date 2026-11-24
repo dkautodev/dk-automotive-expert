@@ -36,8 +36,12 @@ const Footer = () => {
             <Link to="/" className="inline-block mb-6">
               <img
                 alt="DK Automotive Logo"
+                width={186}
+                height={48}
                 src="/upload/logo-1750513203662.webp"
                 className="h-12 w-auto filter invert grayscale"
+                loading="lazy"
+                decoding="async"
               />
             </Link>
             <p className="text-white/70 text-sm leading-relaxed">

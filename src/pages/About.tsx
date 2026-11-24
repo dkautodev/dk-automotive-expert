@@ -98,8 +98,11 @@ const About = () => {
                 {getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp') && (
                   <img 
                     alt="DK Automotive expertise" 
+                    width={1760}
+                    height={1308}
                     className="img-standard" 
                     loading="lazy"
+                    decoding="async"
                     src={getImageUrl('why_choose_image', '/upload/section_tarification_image-1776964200267.webp')} 
                   />
                 )}
@@ -183,8 +186,11 @@ const About = () => {
                 {getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp') && (
                   <img 
                     alt="Chauffeurs professionnels DK Automotive" 
+                    width={5564}
+                    height={3710}
                     className="img-standard" 
                     loading="lazy"
+                    decoding="async"
                     src={getImageUrl('drivers_image', '/upload/value_ecoconduite_image-1776981907439.webp')} 
                   />
                 )}
@@ -258,8 +264,11 @@ const About = () => {
                 {getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp') && (
                   <img 
                     alt="Expertise en convoyage automobile" 
+                    width={1448}
+                    height={1086}
                     className="img-standard" 
                     loading="lazy"
+                    decoding="async"
                     src={getImageUrl('expertise_image', '/upload/expertise_image-1790425483584.webp')} 
                   />
                 )}

@@ -125,8 +125,11 @@ const Index = () => {
               <div className="img-frame-accent" />
               <img
                 alt="Voiture sur route - DK Automotive convoyage professionnel"
+                width={1280}
+                height={720}
                 className="img-standard"
                 loading="lazy"
+                decoding="async"
                 src={getImageUrl('section_expertise_image', '/upload/2849f1ca-ef57-425c-8271-11ee1da479e6.webp')}
               />
             </div>
@@ -176,8 +179,11 @@ const Index = () => {
               <div className="img-frame-accent" />
               <img
                 alt="Livraison rapide de véhicules"
+                width={1280}
+                height={720}
                 className="img-standard"
                 loading="lazy"
+                decoding="async"
                 src={getImageUrl('section_delais_image', '/upload/38340b13-78ba-4ae6-ba15-9851924dcf27.webp')}
               />
             </div>
@@ -193,8 +199,11 @@ const Index = () => {
               <div className="img-frame-accent" />
               <img
                 alt="Remise de clés de véhicule"
+                width={1280}
+                height={720}
                 className="img-standard"
                 loading="lazy"
+                decoding="async"
                 src={getImageUrl('section_tarification_image', '/upload/e26f2a44-10f8-4ea8-bf96-6fe52fe1cf18.webp')}
               />
             </div>

@@ -15,7 +15,6 @@ const Devis = () => {
         "@type": "LocalBusiness",
         "name": "DK Automotive",
         "url": "https://www.dkautomotive.fr",
-        "telephone": "+33615606285",
         "email": "contact@dkautomotive.fr",
         "address": {
           "@type": "PostalAddress",

@@ -35,6 +35,8 @@ export const Hero: React.FC<HeroProps> = ({
         <img
           src={backgroundImage}
           alt={title}
+          width={1920}
+          height={1080}
           fetchPriority="high"
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover z-0"

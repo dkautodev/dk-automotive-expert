@@ -79,7 +79,9 @@ const Navbar = () => {
               <Link to="/" className="flex-shrink-0">
                 <img
                   alt="DK Automotive"
-                  className="h-10 w-auto object-fill"
+                  width={155}
+                  height={40}
+                  className="h-10 w-auto object-contain"
                   src={logoUrl}
                   onError={(e) => {
                     e.currentTarget.src = '/upload/logo-1750513203662.webp';
