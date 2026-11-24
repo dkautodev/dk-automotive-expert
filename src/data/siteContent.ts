@@ -156,13 +156,13 @@ export const indexContent: Record<string, any> = {
 
 export const aboutContent: Record<string, any> = {
   "hero_title": {
-    "title": "Bienvenue chez"
+    "title": "Société de Convoyage Automobile"
   },
   "hero_main_title": {
-    "title": "Dk Automotive"
+    "title": "DK Automotive — Expert du Convoyage de Véhicules par Route"
   },
   "hero_subtitle": {
-    "subtitle": "Votre partenaire fiable du convoyage de véhicules par route."
+    "subtitle": "Votre partenaire de confiance pour le transport et l'acheminement de véhicules en France et Europe."
   },
   "hero_description": {
     "content": "Forts d'une solide expérience dans les métiers du convoyage voiture et du transport en général depuis 2018, nous sommes deux entrepreneurs avec une équipe de convoyeurs professionnels répartis sur l'ensemble du territoire national, animés par une passion commune pour l’automobile et la logistique. Notre mission est claire : Proposer un service de convoyage de voiture fiable, rapide et sécurisé, adapté aux besoins des professionnels comme des particuliers.\n\nDès le départ, nous avons construit notre activité autour d’une expertise terrain solide dans l'acheminement de véhicules sur toutes distances et en tout lieux. Nous intervenons sur une large gamme de prestations : convoyage de véhicules neuves, d’occasion et véhicules premium mais aussi le déplacement de véhicules utilitaires.\n\nGrâce à notre expérience, nous maîtrisons parfaitement les exigences du convoyage automobile : respect des délais, gestion logistique optimisée, suivi des missions et qualité de service irréprochable. \nChaque transport de véhicule est réalisé avec rigueur, en garantissant sécurité, ponctualité et transparence.\n\nNotre priorité est d’accompagner nos clients avec des solutions sur mesure. Nous sommes en partenariats avec des concessionnaires, loueurs, entreprises et gestionnaires de flotte, en leur offrant un service de convoyage clé en main.\n\nAujourd’hui, nous mettons tout en œuvre pour devenir un acteur incontournable du convoyage de voitures en France, en nous appuyant sur des valeurs fortes : professionnalisme, réactivité et confiance."

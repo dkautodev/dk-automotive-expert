@@ -9,21 +9,41 @@ import { getAboutValue as getContentValue, getAboutImage as getImageUrl } from '
 const About = () => {
 
   // Schema.org structured data for AboutPage
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "À propos de DK Automotive",
-    "description": "Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés.",
-    "url": "https://www.dkautomotive.fr/about",
-    "mainEntity": {
-      "@type": "Organization",
-      "name": "DK Automotive",
-      "foundingDate": "2018",
-      "description": "Expert en convoyage de véhicules par route en France",
-      "areaServed": "France",
-      "serviceType": ["Convoyage automobile", "Transport de véhicules", "Livraison de véhicules"]
+  const schemaData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "À propos de DK Automotive",
+      "description": "Découvrez DK Automotive, expert en convoyage automobile en France depuis 2018. Plus de 2000 missions réalisées avec des chauffeurs professionnels certifiés.",
+      "url": "https://www.dkautomotive.fr/about",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "DK Automotive",
+        "foundingDate": "2018",
+        "description": "Expert en convoyage de véhicules par route en France",
+        "areaServed": "France",
+        "serviceType": ["Convoyage automobile", "Transport de véhicules", "Livraison de véhicules"]
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Accueil",
+          "item": "https://www.dkautomotive.fr/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "À propos",
+          "item": "https://www.dkautomotive.fr/about"
+        }
+      ]
     }
-  };
+  ];
 
   return (
     <>
@@ -45,6 +65,29 @@ const About = () => {
           backgroundImage="/upload/hero_background-1790463219069.webp"
           height="min-h-[480px] md:min-h-[560px]"
         />
+
+        {/* Section Présentation & Histoire DK Automotive (Richesse SEO) */}
+        <section className="section-spacing px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="text-center mb-10">
+                <span className="text-dk-navy uppercase tracking-[0.2em] text-xs font-bold mb-4 border-b-2 border-dk-navy/20 pb-2 inline-block">
+                  Notre Histoire & Notre Mission
+                </span>
+                <h2 className="text-2xl md:text-3xl font-bold text-dk-navy mt-4">
+                  Une expertise terrain au service du convoyage automobile
+                </h2>
+              </div>
+              <div className="prose prose-lg max-w-none text-muted-foreground leading-relaxed space-y-4">
+                {getContentValue('hero_description').split('\n\n').map((paragraph: string, idx: number) => (
+                  <p key={idx} className="text-base md:text-lg">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Section Pourquoi choisir DK Automotive */}
         <section className="section-spacing px-4 bg-gray-50/50">
@@ -95,12 +138,12 @@ const About = () => {
                   </div>
                 </div>
                 <div className="pt-2">
-                  <Link to="/devis">
-                    <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+                  <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+                    <Link to="/devis">
                       Demander mon devis sur mesure
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -127,12 +170,12 @@ const About = () => {
                   {getContentValue('drivers_description_2')}
                 </p>
                 <div className="pt-2">
-                  <Link to="/contact">
-                    <Button className="btn-secondary group">
+                  <Button asChild className="btn-secondary group">
+                    <Link to="/contact">
                       Contactez-nous
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
               </div>
               <div className="img-frame order-2">
@@ -234,12 +277,12 @@ const About = () => {
                   {getContentValue('expertise_description')}
                 </p>
                 <div className="pt-2">
-                  <Link to="/devis">
-                    <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+                  <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+                    <Link to="/devis">
                       Réserver mon transport en toute confiance
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -261,12 +304,12 @@ const About = () => {
             <p className="text-muted-foreground mb-8 text-base">
               {getContentValue('final_description')}
             </p>
-            <Link to="/devis">
-              <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+            <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+              <Link to="/devis">
                 Demandez votre devis gratuitement
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </section>
       </main>

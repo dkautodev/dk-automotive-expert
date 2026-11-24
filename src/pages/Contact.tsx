@@ -62,24 +62,44 @@ const Contact = () => {
       setLoading(false);
     }
   };
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "ContactPage",
-    "name": "Contactez DK Automotive",
-    "description": "Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules en France. Obtenez un devis personnalisé ou une réponse à vos questions.",
-    "url": "https://www.dkautomotive.fr/contact",
-    "mainEntity": {
-      "@type": "Organization",
-      "name": "DK Automotive",
-      "url": "https://www.dkautomotive.fr",
-      "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer service",
-        "email": "contact@dkautomotive.fr"
+  const schemaData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contactez DK Automotive",
+      "description": "Contactez DK Automotive pour toutes vos demandes de convoyage de véhicules en France. Obtenez un devis personnalisé ou une réponse à vos questions.",
+      "url": "https://www.dkautomotive.fr/contact",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "DK Automotive",
+        "url": "https://www.dkautomotive.fr",
+        "logo": "https://www.dkautomotive.fr/upload/logo-1750513203662.webp",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "email": "contact@dkautomotive.fr"
+        }
       }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Accueil",
+          "item": "https://www.dkautomotive.fr/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Contact",
+          "item": "https://www.dkautomotive.fr/contact"
+        }
+      ]
     }
-  };
+  ];
 
   return <div className="min-h-screen flex flex-col bg-background">
       <SEO 

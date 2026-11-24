@@ -25,14 +25,24 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section 
       className={cn(
-        "relative flex items-center bg-cover bg-center overflow-hidden -mt-[98px]",
+        "relative flex items-center overflow-hidden -mt-[98px]",
         height,
         className
       )}
-      style={backgroundImage ? { backgroundImage: `url("${backgroundImage}")` } : {}}
     >
+      {/* Background Image optimisée pour le LCP et Google Images */}
+      {backgroundImage && (
+        <img
+          src={backgroundImage}
+          alt={title}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+      )}
+
       {/* Overlay */}
-      <div className={cn("absolute inset-0 z-0", overlayOpacity)} />
+      <div className={cn("absolute inset-0 z-10", overlayOpacity)} />
       
       {/* Decorative Elements */}
       <div className="absolute -bottom-px left-0 w-full h-8 bg-gradient-to-t from-white to-transparent z-10" />

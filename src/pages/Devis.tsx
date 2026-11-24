@@ -4,22 +4,42 @@ import SEO from '@/components/SEO';
 import { FileText, Shield, Clock } from 'lucide-react';
 
 const Devis = () => {
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "serviceType": "Convoyage automobile par la route",
-    "name": "Devis de convoyage automobile immédiat",
-    "description": "Calculateur et devis en ligne immédiat pour le convoyage de véhicules particuliers ou utilitaires en France et Europe.",
-    "provider": {
-      "@type": "LocalBusiness",
-      "name": "DK Automotive",
-      "url": "https://www.dkautomotive.fr"
+  const schemaData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "serviceType": "Convoyage automobile par la route",
+      "name": "Devis de convoyage automobile immédiat",
+      "description": "Calculateur et devis en ligne immédiat pour le convoyage de véhicules particuliers ou utilitaires en France et Europe.",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "DK Automotive",
+        "url": "https://www.dkautomotive.fr"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "France"
+      }
     },
-    "areaServed": {
-      "@type": "Country",
-      "name": "France"
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Accueil",
+          "item": "https://www.dkautomotive.fr/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Devis",
+          "item": "https://www.dkautomotive.fr/devis"
+        }
+      ]
     }
-  };
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

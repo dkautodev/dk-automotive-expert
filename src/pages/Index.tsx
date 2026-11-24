@@ -60,12 +60,12 @@ const Index = () => {
           ))}
         </div>
 
-        <Link to="/devis">
-          <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+        <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+          <Link to="/devis">
             Demander mon devis sur mesure
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </Hero>
 
       <section className="section-spacing bg-white overflow-hidden">
@@ -105,12 +105,12 @@ const Index = () => {
                 {getText('section_expertise_content', "Chez DK AUTOMOTIVE, nos chauffeurs professionnels ont été sélectionnés pour leur expérience et leur engagement exceptionnels. Formés à des procédures strictes et à l'écoconduite, ils garantissent un convoyage sûr et écologique de votre véhicule.")}
               </p>
               <div className="pt-2">
-                <Link to="/contact">
-                  <Button className="btn-secondary group">
+                <Button asChild className="btn-secondary group">
+                  <Link to="/contact">
                     Contactez-nous
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -188,12 +188,12 @@ const Index = () => {
             <p className="text-muted-foreground mb-6 text-lg">
               {getText('section_tarification_cta_text', 'Prêt à découvrir la différence avec nos services de convoyage professionnels ?')}
             </p>
-            <Link to="/devis">
-              <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+            <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+              <Link to="/devis">
                 Obtenez votre devis gratuitement !
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -269,9 +269,9 @@ const Index = () => {
                 <div className="w-24 h-24 bg-primary/80 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ClipboardList className="w-12 h-12 text-white" aria-hidden="true" />
                 </div>
-                <h4 className="text-lg font-bold text-dk-navy mb-4">
+                <h3 className="text-lg font-bold text-dk-navy mb-4">
                   {getText('step_1_title', '1. JE REMPLIS LE FORMULAIRE DE DEVIS')}
-                </h4>
+                </h3>
                 <p className="text-muted-foreground">
                   {getText('step_1_description', 'Je remplis le formulaire de devis en vérifiant correctement mes informations.')}
                 </p>
@@ -281,9 +281,9 @@ const Index = () => {
                 <div className="w-24 h-24 bg-primary/80 rounded-full flex items-center justify-center mx-auto mb-6">
                   <PhoneCall className="w-12 h-12 text-white" aria-hidden="true" />
                 </div>
-                <h4 className="text-lg font-bold text-dk-navy mb-4">
+                <h3 className="text-lg font-bold text-dk-navy mb-4">
                   {getText('step_2_title', '2. APPEL AVEC UN CONSEILLER')}
-                </h4>
+                </h3>
                 <p className="text-muted-foreground">
                   {getText('step_2_description', 'Un conseiller vous rappelle pour planifier votre convoyage.')}
                 </p>
@@ -293,9 +293,9 @@ const Index = () => {
                 <div className="w-24 h-24 bg-primary/80 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Truck className="w-12 h-12 text-white" aria-hidden="true" />
                 </div>
-                <h4 className="text-lg font-bold text-dk-navy mb-4">
+                <h3 className="text-lg font-bold text-dk-navy mb-4">
                   {getText('step_3_title', '3. CONVOYAGE DE VOTRE VÉHICULE')}
-                </h4>
+                </h3>
                 <p className="text-muted-foreground">
                   {getText('step_3_description', "J'accepte mon devis et votre projet est réalisé à la date et heure convenue.")}
                 </p>
@@ -306,12 +306,12 @@ const Index = () => {
               <h3 className="text-xl font-bold mb-4">
                 {getText('how_it_works_cta_title', 'Commencez dès maintenant !')}
               </h3>
-              <Link to="/devis">
-                <Button className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+              <Button asChild className="btn-premium bg-dk-navy text-white hover:bg-dk-blue group">
+                <Link to="/devis">
                   {getText('how_it_works_cta_button', 'Demandez votre devis gratuitement')}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
