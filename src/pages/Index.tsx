@@ -11,15 +11,15 @@ const Index = () => {
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "DK AUTOMOTIVE",
-      "alternateName": ["DK Automotive", "DK Automotive Convoyage", "DKAutomotive"],
+      "name": "DK Automotive",
+      "alternateName": ["DK Automotive Convoyage", "DKAutomotive"],
       "url": "https://www.dkautomotive.fr/"
     },
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "DK Automotive",
-      "description": "Société de convoyage de véhicules par route en France et Île-de-France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h.",
+      "description": "Confiez le transfert de votre voiture à DK Automotive : convoyeurs expérimentés, assurance tous risques incluse et devis immédiat en ligne partout en France.",
       "url": "https://www.dkautomotive.fr/",
       "logo": "https://www.dkautomotive.fr/upload/dk-automotive-logo.webp",
       "image": "https://www.dkautomotive.fr/upload/convoyage-automobile-france.webp",
@@ -72,8 +72,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <SEO
-        title="Convoyage Automobile France & Île-de-France | DK Automotive"
-        description="Société de convoyage de véhicules par route en France et Île-de-France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h."
+        title="Convoyage de véhicules France & Île-de-France | DK Automotive"
+        description="Confiez le transfert de votre voiture à DK Automotive : convoyeurs expérimentés, assurance tous risques incluse et devis immédiat en ligne partout en France."
         canonical="https://www.dkautomotive.fr/"
         schema={schemaData}
       />

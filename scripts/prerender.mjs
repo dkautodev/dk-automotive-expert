@@ -26,8 +26,8 @@ const template = fs.readFileSync(templatePath, 'utf8');
 const routes = [
   {
     path: '/',
-    title: 'Convoyage Automobile France & Île-de-France | DK Automotive',
-    description: 'Société de convoyage de véhicules par route en France et Île-de-France depuis 2018. Acheminement sécurisé porte-à-porte, tarifs transparents, prise en charge sous 48h.',
+    title: 'Convoyage de véhicules France & Île-de-France | DK Automotive',
+    description: 'Confiez le transfert de votre voiture à DK Automotive : convoyeurs expérimentés, assurance tous risques incluse et devis immédiat en ligne partout en France.',
     canonical: 'https://www.dkautomotive.fr/',
     h1: 'Convoyage de véhicules par la route en France et Europe'
   },
